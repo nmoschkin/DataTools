@@ -1,7 +1,7 @@
 # DataTools
-## Version 5.0
+## Version 7.0 alpha
 
-**September 5, 2021**
+**January 30, 2022**
 
 So, I've finally started programming regularly in WinUI 3/Project Reunion and by extension the UWP namespaces.  I will be cleaning this code up and organizing it into sections based on target type.  I will also be cleaning up and 'universalizing' all of the universal code and the Win32 code will become better organized. I'm going to merge code from separate DLL's and break out new ones.  
 
@@ -13,18 +13,19 @@ Please, if you have questions or comments, do not hesitate to use the issues boa
 
 --
 
-DataTools Memory, Hardware, and misc. Libraries v5.0
+DataTools Memory, Hardware, and misc. Libraries v7.0
 
-Completely refactored into C# and .NET 5.0.
+The project is finally completely refactored into C# and .NET 6.0, and taking on a final form.  
 
-Introducing a portable version of DataTools core library (not complete.)
+The hardware components have been separated out into the various types of hardware so you don't have to include a massive hardware library to get at one specific thing.
 
-This entire solution is a large, slow, work in progress that has taken years. 
+Also, I have moved a lot of what used to be open-to-the-public guts code to the backend.  I am figuring if there is a need to expose deeper functions in the future, I can abstract them to a layer more consanguine for 3rd-part consumption.
+
+Also very different is all references to WPF and WinForms libraries have been removed from the DataTools.Win32.* projects, as has anything that feels even remotely 'ViewModelly'.  Going forward, layers that interface with WPF, WinUI, or WinForms will have their own intermediate libraries (or you can write your own!)
+
 Most of the code is well-documented.
 
-This package is a new project, completely separate from the Visual Basic projects, and are only similar on the surface.  Most of the changes are breaking.  
-
-More documentation will be forthcoming in the next few weeks (as of 11/28/2020), as I get the internal documentation organized.
+I will be using SandCastle Help Compiler to create a new Wiki for this very different project.
 
 The Demo Project is the **SysInfoTool** project.  
 
