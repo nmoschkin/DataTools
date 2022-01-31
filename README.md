@@ -1,5 +1,7 @@
-# DataTools
-## Version 7.0 alpha
+# DataTools #
+## Version 7.0 Alpha ##
+
+## Updates ##
 
 **January 30, 2022**
 
@@ -11,9 +13,9 @@ Therefore, I am going to be starting work on **DataTools 7.0** which will be a m
 
 Please, if you have questions or comments, do not hesitate to use the issues board to comment or just reach out. 
 
---
+## DataTools Utility Libraries v7.0a ##
 
-DataTools Memory, Hardware, and misc. Libraries v7.0
+## Notes ##
 
 The project is finally completely refactored into C# and .NET 6.0, and taking on a final form.  
 
