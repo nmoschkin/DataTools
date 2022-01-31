@@ -241,7 +241,7 @@ namespace DataTools.Win32.Disk.Partition
         /// <remarks></remarks>
         private void Parse(string s)
         {
-            var vs = TextTools.Split(s, ",", true, true, '"', '"', false, false, true);
+            var vs = TextTools.Split(s, ",", true, true, '"', '"', true, false, true);
 
             int i;
             int c = vs.Length;

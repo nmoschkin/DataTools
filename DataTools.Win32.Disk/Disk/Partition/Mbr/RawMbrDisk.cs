@@ -1,4 +1,5 @@
 ﻿using DataTools.Win32;
+using DataTools.Win32.Disk.Partition;
 using DataTools.Win32.Memory;
 
 using System;
@@ -78,6 +79,20 @@ namespace DataTools.Disk.Partition.Mbr
             }
 
 			mbrInfo = mm.ToStruct<MBR>();
+
+			foreach (var part in mbrInfo.PartTable)
+            {
+				
+				var partTypes = PartitionCodeInfo.FindByCode(part.PartType);
+
+				if (part.PartType == 0x05 || part.PartType == 0x0f)
+                {
+					// Extended partition 
+					// Let's read this info, too.
+
+                }
+
+            }
 
 			//mbrInfo.Code = p.ToByteArray(0, 440);			
 			//p += 440;
