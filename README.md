@@ -1,5 +1,6 @@
-# DataTools #
-## Version 7.0 Alpha ##
+# DataTools Utility Libraries #
+## Version 7.0.0 Alpha ##
+
 
 ## Updates ##
 
@@ -12,8 +13,6 @@ The organizational structure of this project is going to be changed so much that
 Therefore, I am going to be starting work on **DataTools 7.0** which will be a major reorganization (but not an entire rewrite).  
 
 Please, if you have questions or comments, do not hesitate to use the issues board to comment or just reach out. 
-
-## DataTools Utility Libraries v7.0a ##
 
 ## Notes ##
 
