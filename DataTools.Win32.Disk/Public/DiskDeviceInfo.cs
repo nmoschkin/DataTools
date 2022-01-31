@@ -151,7 +151,6 @@ namespace DataTools.Win32.Disk
             {
                 return _DiskLayout;
             }
-
             internal set
             {
                 _DiskLayout = value;
