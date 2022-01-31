@@ -28,7 +28,7 @@ namespace DataTools.Win32
     /// </summary>
     /// <remarks></remarks>
     [SecurityCritical()]
-    internal static class RawDisk
+    public static class RawGptDisk
     {
 
         /// <summary>

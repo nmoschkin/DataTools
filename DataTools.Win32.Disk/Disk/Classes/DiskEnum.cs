@@ -179,7 +179,15 @@ namespace DataTools.Win32.Disk
                             for (long d = 0; d < sne; d++)
                             {
                                 sdi.Version2Entries = mm.ToStruct<STORAGE_DEPENDENCY_INFO_TYPE_2>();
-                                inf.BackingStore[(int)d] = Path.GetFullPath(sdi.Version2Entries.DependentVolumeRelativePath.ToString());
+                                try
+                                {
+                                    var relpath = sdi.Version2Entries.DependentVolumeRelativePath.ToString();
+                                    inf.BackingStore[(int)d] = Path.GetFullPath(relpath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.Error.WriteLine(ex.Message);
+                                }
                             }
                         }
 

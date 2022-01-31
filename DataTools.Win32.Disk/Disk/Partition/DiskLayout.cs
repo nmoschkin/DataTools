@@ -18,6 +18,11 @@ namespace DataTools.Win32.Disk.Partition
         internal Partitioning.DRIVE_LAYOUT_INFORMATION_EX _Layout;
         internal IDiskPartition[] _Parts;
 
+        public IDiskPartition[] ToArray()
+        {
+            return _Parts?.ToArray() ?? new IDiskPartition[0];
+        }
+
         /// <summary>
         /// Populates disk layout information from an open disk handle.
         /// </summary>

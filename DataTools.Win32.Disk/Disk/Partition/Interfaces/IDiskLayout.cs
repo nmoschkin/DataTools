@@ -31,6 +31,12 @@ namespace DataTools.Win32.Disk.Partition
         IDiskPartition this[int index] { get; set; }
 
         /// <summary>
+        /// Returns an array of <see cref="IDiskPartition"/> objects associated with this disk layout.
+        /// </summary>
+        /// <returns></returns>
+        IDiskPartition[] ToArray();
+
+        /// <summary>
         /// Returns the number of partitions on the disk.
         /// </summary>
         /// <value></value>

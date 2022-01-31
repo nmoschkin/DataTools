@@ -24,7 +24,6 @@ namespace DataTools.Win32.Disk
     {
         public DEPENDENT_DISK_FLAG DependencyTypeFlags;
         public uint ProviderSpecificFlags;
-        [MarshalAs(UnmanagedType.Struct)]
         public VIRTUAL_STORAGE_TYPE VirtualStorageType;
         public uint AncestorLevel;
         [MarshalAs(UnmanagedType.Struct)]
