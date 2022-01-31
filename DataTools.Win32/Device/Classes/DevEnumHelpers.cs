@@ -12,6 +12,8 @@
 
 using System;
 using System.ComponentModel;
+using System.Reflection;
+
 using DataTools.Text;
 using DataTools.Win32;
 
@@ -19,6 +21,57 @@ namespace DataTools.Win32
 {
     internal static class DevEnumHelpers
     {
+
+
+        /// <summary>
+        /// Gets a <see cref="DescriptionAttribute" /> value
+        /// </summary>
+        /// <param name="value">An object</param>
+        /// <returns>A <see cref="DescriptionAttribute" /> value</returns>
+        public static string GetEnumDescription(object value)
+        {
+            if (!(value != null && value.GetType().BaseType == typeof(Enum))) return null;
+
+            var fi = value.GetType().GetFields(BindingFlags.Public | BindingFlags.Static);
+            foreach (var fe in fi)
+            {
+
+                object fobj = fe.GetValue(value);
+
+                if (fobj.ToString() == value.ToString())
+                {
+                    return GetDescription(fe);
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="DescriptionAttribute" /> value
+        /// </summary>
+        /// <param name="mi">A <see cref="MemberInfo"/> object</param>
+        /// <returns>A <see cref="DescriptionAttribute" /> value</returns>
+        public static string GetDescription(MemberInfo mi)
+        {
+            DescriptionAttribute attr = (DescriptionAttribute)mi.GetCustomAttribute(typeof(DescriptionAttribute));
+            if (attr is null)
+                return null;
+            return attr.Description;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="DescriptionAttribute" /> value
+        /// </summary>
+        /// <param name="t">A <see cref="System.Type"/></param>
+        /// <returns>A <see cref="DescriptionAttribute" /> value</returns>
+        public static string GetDescription(Type t)
+        {
+            DescriptionAttribute attr = (DescriptionAttribute)t.GetCustomAttribute(typeof(DescriptionAttribute));
+            if (attr is null)
+                return null;
+            return attr.Description;
+        }
 
 
         /// <summary>

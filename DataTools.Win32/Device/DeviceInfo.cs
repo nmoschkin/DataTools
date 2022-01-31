@@ -670,7 +670,7 @@ namespace DataTools.Win32
         {
             get
             {
-                return FileTools.GetEnumDescription(_DeviceClass);
+                return DevEnumHelpers.GetEnumDescription(_DeviceClass);
             }
         }
 
@@ -731,7 +731,7 @@ namespace DataTools.Win32
         {
             get
             {
-                return FileTools.GetEnumDescription(DeviceClass);
+                return DevEnumHelpers.GetEnumDescription(DeviceClass);
             }
         }
 
