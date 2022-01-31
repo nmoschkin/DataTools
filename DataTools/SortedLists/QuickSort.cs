@@ -44,13 +44,12 @@ namespace DataTools.SortedLists
             Sort(ref values, dynComp, lo, hi);
         }
 
-
         /// <summary>
         /// Sort an array of objects that implement <see cref="IComparable{T}"/>.
         /// </summary>
         /// <typeparam name="T">The type of object to sort.</typeparam>
         /// <param name="values">The array of values to sort.</param>
-        public static void Sort<T>(ref T[] values) where T: IComparable<T>
+        public static void Sort<T>(ref T[] values) where T : IComparable<T>
         {
             if (values == null || values.Length == 0) return;
 
@@ -182,8 +181,7 @@ namespace DataTools.SortedLists
         }
 
 
-        #region ObservableCollection sorting
-
+        #region IList sorting
 
 
 
@@ -193,35 +191,63 @@ namespace DataTools.SortedLists
         /// <typeparam name="T">The type of object to sort.</typeparam>
         /// <param name="values">The array of values to sort.</param>
         /// <param name="comparison">The comparison function to use.</param>
-        public static void Sort<T>(ObservableCollection<T> values, Comparison<T> comparison)
+        /// <param name="didChange">True if the collection did change.</param>
+        public static void Sort<T>(IList<T> values, Comparison<T> comparison)
         {
-            if (values == null || values.Count == 0) return;
+            Sort(values, comparison, out _);
+        }
+
+
+        /// <summary>
+        /// Sort an array of objects.
+        /// </summary>
+        /// <typeparam name="T">The type of object to sort.</typeparam>
+        /// <param name="values">The array of values to sort.</param>
+        /// <param name="comparison">The comparison function to use.</param>
+        /// <param name="didChange">True if the collection did change.</param>
+        public static void Sort<T>(IList<T> values, Comparison<T> comparison, out bool didChange)
+        {
+            if (values == null || values.Count == 0)
+            {
+                didChange = false;
+                return;
+            }
 
             int lo = 0;
             int hi = values.Count - 1;
 
-            Sort<T>(values, comparison, lo, hi);
+            Sort<T>(values, comparison, lo, hi, out didChange);
         }
 
-        private static void Sort<T>(ObservableCollection<T> values, Comparison<T> comparison, int lo, int hi)
+        private static void Sort<T>(IList<T> values, Comparison<T> comparison, int lo, int hi, out bool didChange)
         {
+            bool dcf = false;
+            bool dc = false;
+
             if (lo < hi)
             {
-                int p = Partition(values, comparison, lo, hi);
+                int p = Partition(values, comparison, lo, hi, out dc);
+                dcf |= dc;
 
-                Sort(values, comparison, lo, p);
-                Sort(values, comparison, p + 1, hi);
+                Sort(values, comparison, lo, p, out dc);
+                dcf |= dc;
 
+                Sort(values, comparison, p + 1, hi, out dc);
+                dcf |= dc;
             }
+
+            didChange = dcf;
         }
 
-        private static int Partition<T>(ObservableCollection<T> values, Comparison<T> comparison, int lo, int hi)
+        private static int Partition<T>(IList<T> values, Comparison<T> comparison, int lo, int hi, out bool didChange)
         {
             var ppt = (hi + lo) / 2;
             var pivot = values[ppt];
 
             int i = lo - 1;
             int j = hi + 1;
+
+            bool dc = false;
 
             while (true)
             {
@@ -233,15 +259,22 @@ namespace DataTools.SortedLists
                 {
                     --j;
                 } while (j >= 0 && comparison(values[j], pivot) > 0);
-                if (i >= j) return j;
+        
+                if (i >= j)
+                {
+                    didChange = dc;
+                    return j;
+
+                }
 
                 T sw = values[i];
 
                 values[i] = values[j];
                 values[j] = sw;
+
+                dc = true;
             }
         }
-
 
         #endregion
 

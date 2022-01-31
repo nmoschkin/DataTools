@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentView
+    x:Class="DataTools.XamarinForms.ColorControls.ColorPicker"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+    xmlns:tt="clr-namespace:TouchTracking.Forms;assembly=TouchTracking.Forms">
+    <ContentView.Content>
+        <Grid>
+            <Image
+                x:Name="PickerSite"
+                HorizontalOptions="Fill"
+                VerticalOptions="Fill" />
+
+            <skia:SKCanvasView
+                x:Name="Canvas"
+                HorizontalOptions="Fill"
+                Scale="1"
+                VerticalOptions="Fill" />
+
+            <!--<Ellipse
+                x:Name="Surround"
+                Width="16"
+                Height="16"
+                Fill="Transparent"
+                Stroke="Black"
+                StrokeThickness="1" />-->
+
+            <!--<Ellipse
+                x:Name="Point"
+                Width="1"
+                Height="1"
+                Stroke="Black"
+                StrokeThickness="1" />-->
+            <Grid.Effects>
+                <tt:TouchEffect Capture="True" TouchAction="OnTouch" />
+            </Grid.Effects>
+        </Grid>
+    </ContentView.Content>
+</ContentView>

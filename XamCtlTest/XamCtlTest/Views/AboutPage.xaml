@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="XamCtlTest.Views.AboutPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:cp="clr-namespace:DataTools.XamarinForms.ColorControls;assembly=DataTools.XamarinForms.ColorControls"
+    xmlns:vm="clr-namespace:XamCtlTest.ViewModels"
+    Title="{Binding Title}">
+
+    <ContentPage.BindingContext>
+        <vm:AboutViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Accent">#96d1ff</Color>
+
+            <cp:ColorBrushConverter x:Key="brushconv" />
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackLayout
+            BackgroundColor="{StaticResource Accent}"
+            HorizontalOptions="Fill"
+            VerticalOptions="FillAndExpand">
+            <StackLayout
+                HorizontalOptions="Center"
+                Orientation="Horizontal"
+                VerticalOptions="Center">
+                <ContentView Padding="0,40,0,40" VerticalOptions="FillAndExpand">
+                    <Image
+                        HeightRequest="64"
+                        Source="xamarin_logo.png"
+                        VerticalOptions="Center" />
+                </ContentView>
+            </StackLayout>
+        </StackLayout>
+        <Grid Grid.Row="1">
+
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <cp:ColorPicker
+                x:Name="Picker"
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="8"
+                HeightRequest="300"
+                HorizontalOptions="Fill"
+                SnapToNamedColor="True"
+                VerticalOptions="Center"
+                WidthRequest="300" />
+
+            <Label
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="8"
+                TextColor="Black">
+                Current Color:
+            </Label>
+
+            <Label
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="8"
+                BackgroundColor="{Binding Source={x:Reference Picker}, Path=SelectedColor}"
+                HeightRequest="24" />
+
+            <Label
+                Grid.Row="2"
+                Grid.Column="1"
+                Margin="8"
+                Text="{Binding Source={x:Reference Picker}, Path=SelectedColorName}"
+                TextColor="Black" />
+
+
+        </Grid>
+    </Grid>
+
+</ContentPage>

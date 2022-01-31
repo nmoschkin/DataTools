@@ -1,0 +1,452 @@
+﻿<UserControl
+    x:Class="DataTools.ColorControls.ColorPicker"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:DataTools.ColorControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    x:Name="Picker"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <local:ColorConverter x:Key="colorConv" />
+            <local:BoolConverter x:Key="visConv" Mode="Visibility" />
+
+            <Style x:Key="Elements" TargetType="TextBox">
+                <Setter Property="Width" Value="60" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="Margin" Value="8,8,0,8" />
+                <Setter Property="Padding" Value="2,4" />
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontSize" Value="14" />
+            </Style>
+
+            <Style x:Key="BigElements" TargetType="TextBox">
+                <Setter Property="Width" Value="160" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="Margin" Value="8,8,0,8" />
+                <Setter Property="Padding" Value="2,4" />
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontSize" Value="14" />
+            </Style>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid
+        x:Name="ControlGrid"
+        MinWidth="660"
+        Margin="0">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <Grid
+            Grid.Row="0"
+            Grid.RowSpan="1"
+            Grid.Column="0">
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+
+            <local:ColorElement
+                x:Name="ColorSwatch"
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="14"
+                VerticalAlignment="Stretch"
+                Background="Transparent"
+                ColorValue="{Binding V, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                ElementSize="10"
+                Mode="{Binding ElementName=Picker, Path=Mode, Mode=OneWay}"
+                NameResolution="Exact"
+                SelectedColor="{Binding SelectedColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                SelectedColorName="{Binding SelectedColorName, Mode=OneWayToSource}" />
+
+
+            <Rectangle
+                Grid.Row="1"
+                Width="{Binding ElementName=ColorSwatch, Path=ActualWidth}"
+                Height="12"
+                Margin="14,4,14,0">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Offset="0" Color="Black" />
+                        <GradientStop Offset="1" Color="White" />
+
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+            <Slider
+                Grid.Row="2"
+                Width="{Binding ElementName=ColorSwatch, Path=ActualWidth}"
+                Margin="14,0,14,8"
+                LargeChange="0.10"
+                Maximum="1"
+                Minimum="0"
+                TickFrequency="0.02"
+                TickPlacement="TopLeft"
+                Ticks="0.01"
+                Value="{Binding V, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+        </Grid>
+
+
+        <Grid
+            Grid.Row="0"
+            Grid.RowSpan="1"
+            Grid.Column="1"
+            Margin="14"
+            VerticalAlignment="Center">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Margin="8,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="14"
+                Text="Red:"
+                Visibility="{Binding ShowRGB, Converter={StaticResource visConv}, Mode=OneWay}" />
+
+            <TextBox
+                Grid.Row="0"
+                Grid.Column="1"
+                Style="{StaticResource Elements}"
+                Visibility="{Binding ShowRGB, Converter={StaticResource visConv}, Mode=OneWay}">
+                <TextBox.Text>
+                    <Binding Path="R">
+                        <Binding.ValidationRules>
+                            <local:ColorValidator />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+
+            </TextBox>
+
+
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="8,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="14"
+                Text="Green:"
+                Visibility="{Binding ShowRGB, Converter={StaticResource visConv}, Mode=OneWay}" />
+
+            <TextBox
+                Grid.Row="1"
+                Grid.Column="1"
+                Style="{StaticResource Elements}"
+                Visibility="{Binding ShowRGB, Converter={StaticResource visConv}, Mode=OneWay}">
+                <TextBox.Text>
+                    <Binding Path="G">
+                        <Binding.ValidationRules>
+                            <local:ColorValidator />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+
+            </TextBox>
+
+
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="0"
+                Margin="8,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="14"
+                Text="Blue:"
+                Visibility="{Binding ShowRGB, Converter={StaticResource visConv}, Mode=OneWay}" />
+
+            <TextBox
+                Grid.Row="2"
+                Grid.Column="1"
+                Style="{StaticResource Elements}"
+                Visibility="{Binding ShowRGB, Converter={StaticResource visConv}, Mode=OneWay}">
+                <TextBox.Text>
+                    <Binding Path="B">
+                        <Binding.ValidationRules>
+                            <local:ColorValidator />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+
+            </TextBox>
+
+            <TextBlock
+                Grid.Row="0"
+                Grid.Column="2"
+                Margin="8,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="14"
+                Text="Hue:"
+                Visibility="{Binding ShowHSV, Converter={StaticResource visConv}, Mode=OneWay}" />
+
+            <TextBox
+                Grid.Row="0"
+                Grid.Column="3"
+                Style="{StaticResource Elements}"
+                Visibility="{Binding ShowHSV, Converter={StaticResource visConv}, Mode=OneWay}">
+                <TextBox.Text>
+                    <Binding Path="H">
+                        <Binding.ValidationRules>
+                            <local:ColorValidator ValidateHue="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+
+            </TextBox>
+
+
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="2"
+                Margin="8,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="14"
+                Text="Saturation:"
+                Visibility="{Binding ShowHSV, Converter={StaticResource visConv}, Mode=OneWay}" />
+
+            <TextBox
+                Grid.Row="1"
+                Grid.Column="3"
+                Style="{StaticResource Elements}"
+                Visibility="{Binding ShowHSV, Converter={StaticResource visConv}, Mode=OneWay}">
+                <TextBox.Text>
+                    <Binding Path="S">
+                        <Binding.ValidationRules>
+                            <local:ColorValidator ValidateSatVal="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+
+            </TextBox>
+
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="2"
+                Margin="8,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="14"
+                Text="Value:"
+                Visibility="{Binding ShowHSV, Converter={StaticResource visConv}, Mode=OneWay}" />
+
+            <TextBox
+                Grid.Row="2"
+                Grid.Column="3"
+                Style="{StaticResource Elements}"
+                Visibility="{Binding ShowHSV, Converter={StaticResource visConv}, Mode=OneWay}">
+                <TextBox.Text>
+                    <Binding Path="V">
+                        <Binding.ValidationRules>
+                            <local:ColorValidator ValidateSatVal="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+
+            </TextBox>
+
+            <CheckBox
+                Grid.Row="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Height="{Binding ElementName=AlphaBox, Path=ActualHeight}"
+                Margin="14,14,0,14"
+                VerticalContentAlignment="Center"
+                Content="Show Alpha"
+                FlowDirection="RightToLeft"
+                IsChecked="{Binding ShowAlpha, Mode=TwoWay}"
+                Visibility="{Binding ShowAlphaOption, Converter={StaticResource visConv}, Mode=OneWay}" />
+            <TextBlock
+                Grid.Row="3"
+                Grid.Column="2"
+                Margin="8,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="14"
+                Text="Alpha:"
+                Visibility="{Binding ShowAlpha, Converter={StaticResource visConv}, Mode=OneWay}" />
+
+            <TextBox
+                x:Name="AlphaBox"
+                Grid.Row="3"
+                Grid.Column="3"
+                Style="{StaticResource Elements}"
+                Visibility="{Binding ShowAlpha, Converter={StaticResource visConv}, Mode=OneWay}">
+                <TextBox.Text>
+                    <Binding Path="A">
+                        <Binding.ValidationRules>
+                            <local:ColorValidator ValidateSatVal="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+
+            </TextBox>
+
+
+
+            <TextBlock
+                Grid.Row="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="8,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI"
+                FontSize="14"
+                Text="Web Hex Value:"
+                Visibility="{Binding ShowWebHexValue, Converter={StaticResource visConv}, Mode=OneWay}" />
+
+            <TextBox
+                Grid.Row="4"
+                Grid.Column="2"
+                Grid.ColumnSpan="2"
+                Style="{StaticResource BigElements}"
+                Visibility="{Binding ShowWebHexValue, Converter={StaticResource visConv}, Mode=OneWay}">
+
+                <TextBox.Text>
+                    <Binding Converter="{StaticResource colorConv}" Path="SelectedColor">
+                        <Binding.ValidationRules>
+                            <local:ColorValidator ValidateWebHex="True" />
+                        </Binding.ValidationRules>
+                    </Binding>
+                </TextBox.Text>
+
+            </TextBox>
+
+
+
+        </Grid>
+
+        <Grid
+            Grid.Row="1"
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            HorizontalAlignment="Stretch">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition x:Name="RHColor" />
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+
+                <TextBlock
+                    Margin="14,8,14,2"
+                    Text="Named Colors:"
+                    Visibility="{Binding ShowNamedColors, Converter={StaticResource visConv}}" />
+
+                <local:NamedColorPicker
+                    Grid.Row="1"
+                    Width="{Binding ElementName=ColorSwatch, Path=ActualWidth}"
+                    Height="32"
+                    Margin="14,3,14,13"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    SelectedItem="{Binding SelectedNamedColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    Visibility="{Binding ShowNamedColors, Converter={StaticResource visConv}}" />
+            </Grid>
+
+
+            <StackPanel
+                x:Name="SelPanel"
+                Grid.Column="1"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <StackPanel
+                    Margin="14,14"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Orientation="Vertical">
+
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Segoe UI"
+                        FontSize="14"
+                        Text="Selected Color:" />
+
+                    <TextBlock
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        FontFamily="Segoe UI"
+                        FontSize="14"
+                        Text="{Binding ElementName=ColorSwatch, Path=SelectedColorName}" />
+
+                </StackPanel>
+
+                <Rectangle
+                    Grid.Row="1"
+                    Grid.Column="5"
+                    Width="48"
+                    Height="48"
+                    Margin="14,14"
+                    VerticalAlignment="Top"
+                    Stroke="{x:Static SystemColors.ActiveBorderBrush}">
+
+                    <Rectangle.Fill>
+                        <SolidColorBrush Color="{Binding SelectedColor, Mode=OneWay}" />
+                    </Rectangle.Fill>
+                </Rectangle>
+
+            </StackPanel>
+
+
+        </Grid>
+
+
+    </Grid>
+
+</UserControl>
