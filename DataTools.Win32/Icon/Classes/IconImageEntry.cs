@@ -40,7 +40,7 @@ namespace DataTools.Desktop
     public class IconImageEntry : IDisposable
     {
         internal ICONDIRENTRY _entry;
-        internal byte[] _image;
+        internal byte[] imageBytes;
         internal IntPtr _hIcon = IntPtr.Zero;
 
 
@@ -80,8 +80,8 @@ namespace DataTools.Desktop
                 // Throw New InvalidDataException("Reading low-bit icons is not supported")
             }
 
-            _image = new byte[_entry.dwImageSize];
-            Marshal.Copy(ptr, _image, 0, _entry.dwImageSize);
+            imageBytes = new byte[_entry.dwImageSize];
+            Marshal.Copy(ptr, imageBytes, 0, _entry.dwImageSize);
 
             // MemCpy(_image, ptr, _entry.dwImageSize)
 
@@ -102,8 +102,8 @@ namespace DataTools.Desktop
             }
 
             ptr = ptr + _entry.dwOffset;
-            _image = new byte[_entry.dwImageSize];
-            Marshal.Copy(ptr, _image, 0, _entry.dwImageSize);
+            imageBytes = new byte[_entry.dwImageSize];
+            Marshal.Copy(ptr, imageBytes, 0, _entry.dwImageSize);
 
             // MemCpy(_image, ptr, _entry.dwImageSize)
 
@@ -223,15 +223,14 @@ namespace DataTools.Desktop
         {
             get
             {
-                bool IsPngFormatRet = default;
-                if (_image is null)
+                if (imageBytes is null)
                     return false;
-                SafePtr mm = (SafePtr)_image;
+
+                SafePtr mm = (SafePtr)imageBytes;
                 int q = mm.IntAt(0L);
 
                 // The PNG moniker
-                IsPngFormatRet = q == 0x474E5089;
-                return IsPngFormatRet;
+                return q == 0x474E5089;
             }
         }
 
@@ -242,19 +241,21 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public Image ToImage()
         {
-            Image ToImageRet = default;
+            Image result;
+
             if (IsPngFormat)
             {
-                var s = new MemoryStream(_image);
-                ToImageRet = Image.FromStream(s);
+                var s = new MemoryStream(imageBytes);
+                result = Image.FromStream(s);
+                
                 s.Close();
             }
             else
             {
-                ToImageRet = Resources.IconToTransparentBitmap(_constructIcon());
+                result = Resources.IconToTransparentBitmap(_constructIcon());
             }
 
-            return ToImageRet;
+            return result;
         }
 
         /// <summary>
@@ -264,43 +265,60 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         private byte[] _makeBitmap()
         {
-            byte[] _makeBitmapRet = default;
+            byte[] bytesOut;
+            
             if (!IsPngFormat)
             {
-                _makeBitmapRet = _image;
-                return _makeBitmapRet;
+                bytesOut = imageBytes;
+                return bytesOut;
             }
 
             IntPtr bmp = default;
+        
             var hbmp = Resources.MakeDIBSection((Bitmap)ToImage(), ref bmp);
+            
             var mm = new SafePtr();
             var bm = new BITMAPINFOHEADER();
+            
             int maskSize;
+            
             int w = _entry.cWidth;
             int h = _entry.cHeight;
+            
             if (w == 0)
                 w = 256;
+            
             if (h == 0)
                 h = 256;
+            
             bm.biSize = 40;
             bm.biWidth = w;
             bm.biHeight = h * 2;
             bm.biPlanes = 1;
             bm.biBitCount = 32;
             bm.biSizeImage = w * h * 4;
+
             maskSize = (int)(Math.Max(w, 32) * h / 8d);
+
             mm.Alloc(bm.biSizeImage + 40 + maskSize);
+
             var ptr1 = mm.DangerousGetHandle() + 40;
             var ptr2 = mm.DangerousGetHandle() + 40 + bm.biSizeImage;
+
             Marshal.StructureToPtr(bm, mm.DangerousGetHandle(), false);
             Native.MemCpy(bmp, ptr1, bm.biSizeImage);
+
             bm = mm.ToStruct<BITMAPINFOHEADER>();
+
             _setMask(ptr1, ptr2, w, h);
             _entry.dwImageSize = (int)mm.Length;
-            _makeBitmapRet = (byte[])mm;
+
+            bytesOut = (byte[])mm;
+
             mm.Free();
             DeleteObject(hbmp);
-            return _makeBitmapRet;
+
+            return bytesOut;
         }
 
         /// <summary>
@@ -317,7 +335,7 @@ namespace DataTools.Desktop
                 _hIcon = IntPtr.Zero;
             }
 
-            MemPtr mm = (MemPtr)_image;
+            MemPtr mm = (MemPtr)imageBytes;
             var bmp = mm.ToStruct<BITMAPINFOHEADER>();
 
             IntPtr hBmp;
@@ -533,15 +551,15 @@ namespace DataTools.Desktop
             _entry.wBitsPixel = 32;
             _entry.wColorPlanes = 1;
 
-            _image = new byte[(int)(s.Length - 1L) + 1];
-            _image = s.ToArray();
+            imageBytes = new byte[(int)(s.Length - 1L) + 1];
+            imageBytes = s.ToArray();
 
             if (asBmp)
             {
-                _image = _makeBitmap();
+                imageBytes = _makeBitmap();
             }
 
-            _entry.dwImageSize = _image.Length;
+            _entry.dwImageSize = imageBytes.Length;
 
             s.Close();
         }

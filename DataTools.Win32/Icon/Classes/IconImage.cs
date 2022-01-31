@@ -293,7 +293,7 @@ namespace DataTools.Desktop
             }
 
             foreach (var e in _entries)
-                bl = bl + e._image;
+                bl = bl + e.imageBytes;
 
             // write the icon file
             stream.Write((byte[])bl, 0, (int)bl.Length);
