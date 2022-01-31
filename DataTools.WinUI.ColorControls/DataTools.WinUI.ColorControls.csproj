@@ -5,7 +5,6 @@
     <RootNamespace>DataTools.WinUI.ColorControls</RootNamespace>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
     <UseWinUI>true</UseWinUI>
-	  <UseWindowsForms>true</UseWindowsForms>
 	  <AssemblyVersion>7.0.2.2022</AssemblyVersion>
 	  <FileVersion>7.0.2.2022</FileVersion>
 	  <Authors>Nathaniel Moschkin</Authors>

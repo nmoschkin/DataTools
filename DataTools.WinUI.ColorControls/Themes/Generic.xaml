@@ -3,15 +3,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:DataTools.WinUI.ColorControls">
 
-    <Style TargetType="local:ColorElement" >
+    <Style TargetType="local:ColorElement">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="local:ColorElement">
                     <Border
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}">
-                    </Border>
+                        BorderThickness="{TemplateBinding BorderThickness}" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
