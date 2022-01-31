@@ -28,5 +28,12 @@ Most of the code is well-documented.
 
 I will be using SandCastle Help Compiler to create a new Wiki for this very different project.
 
+**Important**
+
+ - Some features in the hardware libraries depend on compiling native to your platform to function properly (compiling to x64 on 64-bit systems.)
+ - Many features require elevated administrative access.
+
+__Hardware disk information features require the platform to be correct (especially for interrogating virtual disks), and for elevated access to be present.__
+
 The Demo Project is the **SysInfoTool** project.  
 
