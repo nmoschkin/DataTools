@@ -13,80 +13,81 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+
 using DataTools.Desktop;
 using DataTools.Win32;
 
 namespace DataTools.Computer
 {
 
-    
+
     /// <summary>
-/// Encapsulates a hierarchical representation of all visible devices on the system.
-/// </summary>
-/// <remarks></remarks>
+    /// Encapsulates a hierarchical representation of all visible devices on the system.
+    /// </summary>
+    /// <remarks></remarks>
     public class HardwareCollection : ObservableCollection<object>
     {
-        private DeviceClassEnum _Class;
-        private System.Drawing.Icon _Icon;
+        private DeviceClassEnum deviceClass;
+        private System.Drawing.Icon? icon;
 
         /// <summary>
-    /// Returns the class device enumeration for this device collection.
-    /// </summary>
-    /// <value></value>
-    /// <returns></returns>
-    /// <remarks></remarks>
+        /// Returns the class device enumeration for this device collection.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public DeviceClassEnum DeviceClass
         {
             get
             {
-                return _Class;
+                return deviceClass;
             }
 
             private set
             {
-                _Class = value;
+                deviceClass = value;
             }
         }
 
         /// <summary>
-    /// Returns the class description associated with this device collection.
-    /// </summary>
-    /// <value></value>
-    /// <returns></returns>
-    /// <remarks></remarks>
+        /// Returns the class description associated with this device collection.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public string Description
         {
             get
             {
-                return FileTools.GetEnumDescription(DeviceClass);
+                return DevEnumHelpers.GetEnumDescription(DeviceClass);
             }
         }
 
         /// <summary>
-    /// Returns the class icon associated with this device collection.
-    /// </summary>
-    /// <value></value>
-    /// <returns></returns>
-    /// <remarks></remarks>
+        /// Returns the class icon associated with this device collection.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public System.Drawing.Icon ClassIcon
         {
             get
             {
-                return _Icon;
+                return icon;
             }
 
             private set
             {
-                _Icon = value;
+                icon = value;
             }
         }
 
         /// <summary>
-    /// For the heirarchical data arrangement, returns the members of this collection instance.
-    /// </summary>
-    /// <value></value>
-    /// <returns></returns>
-    /// <remarks></remarks>
+        /// For the heirarchical data arrangement, returns the members of this collection instance.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public ObservableCollection<object> LinkedChildren
         {
             get
@@ -96,10 +97,10 @@ namespace DataTools.Computer
         }
 
         /// <summary>
-    /// Enumerates all computer devices on the system and creates a coherent hierarchy divided into device class sections.
-    /// </summary>
-    /// <returns>A hierarchical enumeration of all visible devices on the system.</returns>
-    /// <remarks></remarks>
+        /// Enumerates all computer devices on the system and creates a coherent hierarchy divided into device class sections.
+        /// </summary>
+        /// <returns>A hierarchical enumeration of all visible devices on the system.</returns>
+        /// <remarks></remarks>
         public static HardwareCollection CreateComputerHierarchy()
         {
             var c = new List<DeviceInfo>();
@@ -145,19 +146,19 @@ namespace DataTools.Computer
     }
 
     /// <summary>
-/// Compare two DeviceInfo-derived objects by DeviceClass (alphabetically).
-/// </summary>
-/// <remarks></remarks>
+    /// Compare two DeviceInfo-derived objects by DeviceClass (alphabetically).
+    /// </summary>
+    /// <remarks></remarks>
     public class HardwareObjectSorter : IComparer<DeviceInfo>
     {
 
         /// <summary>
-    /// Compare two DeviceInfo-derived objects by DeviceClass (alphabetically).
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns></returns>
-    /// <remarks></remarks>
+        /// Compare two DeviceInfo-derived objects by DeviceClass (alphabetically).
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public int Compare(DeviceInfo a, DeviceInfo b)
         {
             if (a.DeviceClass.ToString() == b.DeviceClass.ToString())
@@ -176,7 +177,7 @@ namespace DataTools.Computer
                 return string.Compare(a.DeviceClass.ToString(), b.DeviceClass.ToString());
             }
 
-            
+
         }
     }
 }

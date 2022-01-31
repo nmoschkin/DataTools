@@ -440,7 +440,7 @@ namespace DataTools.Hardware.Usb
         {
             get
             {
-                return FileTools.GetEnumDescription(_HidPage);
+                return DevEnumHelpers.GetEnumDescription(_HidPage);
             }
         }
 
