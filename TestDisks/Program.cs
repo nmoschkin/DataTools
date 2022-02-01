@@ -33,7 +33,7 @@ namespace TestNetwork
 
                         if (gptInfo?.Header.IsValid ?? false)
                         {
-                            Console.WriteLine("Successfully read raw GPT disk.  Total partitions: " + gptInfo?.Partitions.Length.ToString());
+                            Console.WriteLine("Successfully read raw GPT disk.  Total logical partitions: " + gptInfo?.Partitions.Length.ToString());
                         }
                     }
                     else if (disk.DiskLayout.PartitionStyle == DataTools.Win32.Disk.Partition.PartitionStyle.Mbr)
@@ -43,7 +43,7 @@ namespace TestNetwork
                             RawMbrDisk.RAW_MBR_INFO? mbrInfo = default;
                             RawMbrDisk.ReadRawMbrDisk(disk.DevicePath, disk.SectorSize, out mbrInfo);
 
-                            Console.WriteLine("Successfully read raw MBR disk.  Total partitions: " + mbrInfo?.PartitionCount.ToString());
+                            Console.WriteLine("Successfully read raw MBR disk.  Total logical partitions: " + mbrInfo?.PartitionCount.ToString());
 
                         }
                         catch { }

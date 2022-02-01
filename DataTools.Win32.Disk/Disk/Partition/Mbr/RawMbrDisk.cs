@@ -152,7 +152,8 @@ namespace DataTools.Win32.Disk.Partition.Mbr
 			rawInfo.PrimaryPartitionCount = pc;
 			rawInfo.ExtendedPartitionCount = exParts.Count;
 
-			rawInfo.PartitionCount = pc + exParts.Count - 1;
+			if (exParts.Count > 0) pc -= 1;
+			rawInfo.PartitionCount = pc + exParts.Count;
 
 			rawMbrInfo = rawInfo;
             // we have succeeded.
