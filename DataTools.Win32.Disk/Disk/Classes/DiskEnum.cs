@@ -121,17 +121,31 @@ namespace DataTools.Win32.Disk
                     else if (inf.Type != StorageType.Optical)
                     {
                         disk = IO.CreateFile(inf.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
+
                         if (disk != DevProp.INVALID_HANDLE_VALUE)
                         {
                             hHeap.Length = 128L;
                             hHeap.ZeroMemory();
+
                             NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_DISK_GET_LENGTH_INFO, default, 0U, hHeap.handle, (uint)hHeap.Length, ref bytesReturned, default);
+
                             inf.DiskLayout = DiskLayoutInfo.CreateLayout(disk);
                             inf.Size = hHeap.LongAt(0L);
+
                             hHeap.Length = Marshal.SizeOf(diskNumber);
                             hHeap.ZeroMemory();
+
                             bytesReturned = 0U;
+
                             NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_STORAGE_GET_DEVICE_NUMBER, default, 0U, hHeap.handle, (uint)hHeap.Length, ref bytesReturned, default);
+
+                            var res = DiskGeometry.GetDiskGeometry(null, disk, out DISK_GEOMETRY_EX? georet);
+
+                            if (res && georet is DISK_GEOMETRY_EX geometry)
+                            {
+                                inf.SectorSize = (int)geometry.Geometry.BytesPerSector;
+                            }
+
                             if (bytesReturned > 0L)
                             {
                                 diskNumber = hHeap.ToStruct<NativeDisk.STORAGE_DEVICE_NUMBER>();
