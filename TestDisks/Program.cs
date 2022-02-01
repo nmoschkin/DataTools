@@ -1,7 +1,8 @@
 ﻿
 
 
-using DataTools.Disk.Partition.Mbr;
+using DataTools.Win32.Disk.Partition.Mbr;
+using DataTools.Win32.Disk.Partition.Gpt;
 using DataTools.Win32;
 using DataTools.Win32.Disk;
 
@@ -27,20 +28,23 @@ namespace TestNetwork
                 {
                     if (disk.DiskLayout.PartitionStyle == DataTools.Win32.Disk.Partition.PartitionStyle.Gpt)
                     {
-                        RawGptDisk.RAW_GPT_DISK gptInfo = default;
-                        RawGptDisk.ReadRawGptDisk(disk.DevicePath, ref gptInfo);
+                        RawGptDisk.RAW_GPT_DISK? gptInfo = default;
+                        RawGptDisk.ReadRawGptDisk(disk.DevicePath, out gptInfo);
 
-                        if (gptInfo.Header.IsValid)
+                        if (gptInfo?.Header.IsValid ?? false)
                         {
-                            Console.WriteLine("Successfully read raw GPT disk.  Total partitions: " + gptInfo.Partitions.Length.ToString());
+                            Console.WriteLine("Successfully read raw GPT disk.  Total partitions: " + gptInfo?.Partitions.Length.ToString());
                         }
                     }
                     else if (disk.DiskLayout.PartitionStyle == DataTools.Win32.Disk.Partition.PartitionStyle.Mbr)
                     {
                         try
                         {
-                            RawMbrDisk.MBR mbrInfo = default;
-                            RawMbrDisk.ReadRawMbrDisk(disk.DevicePath, ref mbrInfo);
+                            RawMbrDisk.RAW_MBR_INFO? mbrInfo = default;
+                            RawMbrDisk.ReadRawMbrDisk(disk.DevicePath, disk.SectorSize, out mbrInfo);
+
+                            Console.WriteLine("Successfully read raw MBR disk.  Total partitions: " + mbrInfo?.PartitionCount.ToString());
+
                         }
                         catch { }
                     }
