@@ -283,7 +283,7 @@ namespace DataTools.Win32.Disk.Partition
 
             var pex = new MemPtr();
             var pexBegin = new MemPtr();
-            PARTITION_INFORMATION_EX[] pOut = null;
+            List<PARTITION_INFORMATION_EX> pOut = null;
             DRIVE_LAYOUT_INFORMATION_EX lay;
             int pexLen = Marshal.SizeOf<PARTITION_INFORMATION_EX>();
             int i;
@@ -322,19 +322,34 @@ namespace DataTools.Win32.Disk.Partition
             lay = pex.ToStruct<DRIVE_LAYOUT_INFORMATION_EX>();
             pexBegin.Handle = pex.Handle + 48;
             c = (int)lay.ParititionCount;
-            pOut = new PARTITION_INFORMATION_EX[c + 1];
+            pOut = new List<PARTITION_INFORMATION_EX>();
 
             for (i = 0; i < c; i++)
             {
-                pOut[i] = pexBegin.ToStruct<PARTITION_INFORMATION_EX>();
+                var testPart = pexBegin.ToStruct<PARTITION_INFORMATION_EX>();
+                
+                if (lay.PartitionStyle == PartitionStyle.Mbr)
+                {
+                    if (testPart.Mbr.PartitionType != 0 && testPart.Mbr.PartitionType != 0x5 && testPart.Mbr.PartitionType != 0x0f)
+                    {
+                        pOut.Add(testPart);
+                    }
+                }
+                else
+                {
+                    pOut.Add(testPart);
+                }
                 pexBegin = pexBegin + pexLen;
             }
 
             pex.Free();
             if (!hf)
                 User32.CloseHandle(hfile);
+            
+            lay.ParititionCount = (uint)pOut.Count;
+
             layInfo = lay;
-            return pOut;
+            return pOut.ToArray();
         }
     }
 }
