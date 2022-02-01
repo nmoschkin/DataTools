@@ -10,7 +10,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTools.Disk.Partition.Mbr
+namespace DataTools.Win32.Disk.Partition.Mbr
 {
     public static class RawMbrDisk
     {
@@ -45,17 +45,33 @@ namespace DataTools.Disk.Partition.Mbr
 			public byte[] BootSignature; //0x55 0xAA for bootable
 		}
 
-        /// <summary>
-        /// Retrieve the partition table of a GPT-layout disk, manually.
-        /// Must be Administrator.
-        /// </summary>
-        /// <param name="inf">DiskDeviceInfo object to the physical disk to read.</param>
-        /// <param name="gptInfo">Receives the drive layout information.</param>
-        /// <returns>True if successful.</returns>
-        /// <remarks></remarks>
-        public static bool ReadRawMbrDisk(string devicePath, ref MBR mbrInfo)
+		public struct RAW_MBR_INFO
+        {
+			public MBR Mbr;
+			public uint SectorSize;
+
+			public Partition[] Extended;
+			public int PrimaryPartitionCount;
+			public int ExtendedPartitionCount;
+			public int PartitionCount;
+        }
+
+		/// <summary>
+		/// Retrieve the partition table of a MBR-layout disk, manually.
+		/// Must be Administrator.
+		/// </summary>
+		/// <param name="devicePath">Device Path of Disk Device.</param>
+		/// <param name="rawMbrInfo">Receives the drive layout information.</param>
+		/// <returns>True if successful.</returns>
+		/// <remarks></remarks>
+		public static bool ReadRawMbrDisk(string devicePath, int sectorSize, out RAW_MBR_INFO? rawMbrInfo)
         {
 
+			MBR mbrInfo;
+			RAW_MBR_INFO rawInfo = new RAW_MBR_INFO();
+
+			rawMbrInfo = null;
+			int pc = 0;
 
             // Demand Administrator for accessing a raw disk.
             AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
@@ -72,60 +88,73 @@ namespace DataTools.Disk.Partition.Mbr
             var mm = new SafePtr(bps);
 			var p = mm;
 
-            var res = IO.ReadFile(hfile, mm.DangerousGetHandle(), bps, ref br, IntPtr.Zero);
+            var res = IO.ReadFile(hfile, mm, bps, ref br, IntPtr.Zero);
 			if (!res || br == 0)
             {
 				throw new NativeException();
             }
 
 			mbrInfo = mm.ToStruct<MBR>();
+			
+			rawInfo.Mbr = mbrInfo;
+			rawInfo.SectorSize = (uint)sectorSize;
+
+			List<Partition> exParts = new List<Partition>();
 
 			foreach (var part in mbrInfo.PartTable)
             {
-				
+				if (part.PartType != 0) pc++;
 				var partTypes = PartitionCodeInfo.FindByCode(part.PartType);
 
 				if (part.PartType == 0x05 || part.PartType == 0x0f)
                 {
+
+					long ebrStart = part.StartLBA * sectorSize;
+					long newFace = 0;
+					IO.SetFilePointerEx(hfile, ebrStart, ref newFace, IO.FilePointerMoveMethod.Begin);
+
+					mm.ZeroMemory();
+					res = IO.ReadFile(hfile, mm, bps, ref br, IntPtr.Zero);
+					
+					if (!res || br == 0)
+					{
+						throw new NativeException();
+					}
+
+					MBR ebrInfo = default;
+
+					do
+					{
+						ebrInfo = mm.ToStruct<MBR>();
+						exParts.Add(ebrInfo.PartTable[0]);
+
+						if (ebrInfo.PartTable[1].StartLBA != 0)
+						{
+							var nextEbrStart = ebrStart + (sectorSize * ebrInfo.PartTable[1].StartLBA);
+							IO.SetFilePointerEx(hfile, nextEbrStart, ref newFace, IO.FilePointerMoveMethod.Begin);
+
+							mm.ZeroMemory();
+							res = IO.ReadFile(hfile, mm, bps, ref br, IntPtr.Zero);
+						}
+
+					} while (ebrInfo.PartTable[1].StartLBA != 0);
+
 					// Extended partition 
 					// Let's read this info, too.
 
-                }
+				}
 
-            }
-
-			//mbrInfo.Code = p.ToByteArray(0, 440);			
-			//p += 440;
-
-			//mbrInfo.DiskSig = p.UIntAt(0);
-			//p += 4;
-			
-			//mbrInfo.Reserved = p.UShortAt(0);
-			//p += 2;
-
-			//mbrInfo.PartTable = new Partition[4];
-
-			//var psize = Marshal.SizeOf<Partition>();
-
-			//for (var i = 0; i < 4; i++)
-            //         {
-			//	mbrInfo.PartTable[i] = p.ToStruct<Partition>();
-			//	p += psize;
-            //         }
-
-			//mbrInfo.BootSignature = p.ToByteArray(0, 2); //0x55 0xAA for bootable
-
-			//mbrInfo.status = mm.At(); 
-			//mbrInfo.StartAddrHead = mm.At();
-			//mbrInfo.StartAddrCylSec = mm.At();
-			//mbrInfo.PartType = mm.At();
-			//mbrInfo.EndAddrHead = mm.At();
-			//mbrInfo.EndAddrCylSec = mm.At();
-			//mbrInfo.StartLBA = mm.At();
-			//mbrInfo.EndLBA = mm.At();  
+			}
 
 			User32.CloseHandle(hfile);
+			rawInfo.Extended = exParts.ToArray();
 
+			rawInfo.PrimaryPartitionCount = pc;
+			rawInfo.ExtendedPartitionCount = exParts.Count;
+
+			rawInfo.PartitionCount = pc + exParts.Count - 1;
+
+			rawMbrInfo = rawInfo;
             // we have succeeded.
             return true;
         }
