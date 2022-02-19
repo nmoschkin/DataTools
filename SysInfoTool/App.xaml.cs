@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataTools.Win32.Usb.Usb.Classes;
+
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;

@@ -21,7 +21,7 @@ namespace DataTools.Win32.Disk
         /// <param name="layInfo">Optionally receives the layout information.</param>
         /// <returns>An array of PARTITION_INFORMATION_EX structures.</returns>
         /// <remarks></remarks>
-        public static bool GetDiskGeometry(string devicePath, IntPtr hfile, out DISK_GEOMETRY_EX? geometry)
+        public static bool GetDiskGeometry(string? devicePath, IntPtr hfile, out DISK_GEOMETRY_EX? geometry)
         {
             bool hf = false;
             geometry = null;
@@ -30,9 +30,13 @@ namespace DataTools.Win32.Disk
             {
                 hf = true;
             }
-            else
+            else if (devicePath != null)
             {
                 hfile = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, 0, IntPtr.Zero);
+            }
+            else
+            {
+                return false;
             }
 
             var pex = new SafePtr();

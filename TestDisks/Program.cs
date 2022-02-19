@@ -15,8 +15,6 @@ namespace TestNetwork
         [STAThread]
         public static void Main(string[] args)
         {
-
-
             var disks = DataTools.Win32.Disk.DiskDeviceInfo.EnumDisks();
             
             foreach (var disk in disks)

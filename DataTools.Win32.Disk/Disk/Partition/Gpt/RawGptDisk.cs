@@ -29,47 +29,6 @@ namespace DataTools.Win32.Disk.Partition.Gpt
     public static class RawGptDisk
     {
 
-       
-        [StructLayout(LayoutKind.Sequential)]
-        public struct DISK_GEOMETRY
-        {
-            public long Cylinders;
-            public MEDIA_TYPE MediaType;
-            public uint TracksPerCylinder;
-            public uint SectorsPerTrack;
-            public uint BytesPerSector;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct DISK_GEOMETRY_EX
-        {
-            public DISK_GEOMETRY Geometry;
-            public ulong DiskSize;
-            public byte Data;
-        }
-
-        /// <summary>
-        /// Retrieves the disk geometry of the specified disk.
-        /// </summary>
-        /// <param name="hfile">Handle to a valid, open disk.</param>
-        /// <param name="geo">Receives the disk geometry information.</param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static bool DiskGeometry(IntPtr hfile, ref DISK_GEOMETRY_EX geo)
-        {
-            if (hfile == IO.INVALID_HANDLE_VALUE)
-                return false;
-            MemPtr mm = new MemPtr();
-            uint l = 0U;
-            uint cb = 0U;
-            l = (uint)Marshal.SizeOf<DISK_GEOMETRY_EX>();
-            mm.Alloc(l);
-            NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, IntPtr.Zero, 0, mm.Handle, l, ref cb, IntPtr.Zero);
-            geo = mm.ToStruct<DISK_GEOMETRY_EX>();
-            mm.Free();
-            return true;
-        }
-
         /// <summary>
         /// Retrieve the partition table of a GPT-layout disk, manually.
         /// Must be Administrator.
@@ -89,16 +48,26 @@ namespace DataTools.Win32.Disk.Partition.Gpt
 
 
             var hfile = IO.CreateFile(devicePath, IO.GENERIC_READ | IO.GENERIC_WRITE, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_FLAG_NO_BUFFERING | IO.FILE_FLAG_RANDOM_ACCESS, IntPtr.Zero);
+
             if (hfile == IO.INVALID_HANDLE_VALUE)
                 return false;
-            DISK_GEOMETRY_EX geo = default;
+
+            DISK_GEOMETRY_EX? outGeo = default;
 
             // get the disk geometry to retrieve the sector (LBA) size.
-            if (!DiskGeometry(hfile, ref geo))
+            if (!DiskGeometry.GetDiskGeometry(null, hfile, out outGeo))
             {
                 User32.CloseHandle(hfile);
                 return false;
             }
+
+            if (outGeo == null)
+            {
+                User32.CloseHandle(hfile);
+                return false;
+            }
+
+            var geo = (DISK_GEOMETRY_EX)outGeo;
 
             // sector size (usually 512 bytes)
             uint bps = geo.Geometry.BytesPerSector;

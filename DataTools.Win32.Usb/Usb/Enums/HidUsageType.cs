@@ -11,53 +11,66 @@
 // ************************************************* ''
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace DataTools.Win32
 {
-    public enum hid_usage_type
+    [Flags]
+    public enum HidUsageType
     {
+        /// <summary>
+        /// Reserved
+        /// </summary>
+        [Description("Reserved")]
+        Reserved = 0,
 
         /// <summary>
-        /// Application collection
+        /// Application Collection
         /// </summary>
-        /// <remarks></remarks>
-        CA,
+        [Description("Application Collection")]
+        CA = 0x1,
 
         /// <summary>
-        /// Logical collection
+        /// Logical Collection
         /// </summary>
-        /// <remarks></remarks>
-        CL,
+        [Description("Logical Collection")]
+        CL = 0x2,
 
         /// <summary>
-        /// Physical collection
+        /// Physical Collection
         /// </summary>
-        /// <remarks></remarks>
-        CP,
+        [Description("Physical Collection")]
+        CP = 0x4,
 
         /// <summary>
         /// Dynamic Flag
         /// </summary>
-        /// <remarks></remarks>
-        DF,
+        [Description("Dynamic Flag")]
+        DF = 0x8,
 
         /// <summary>
         /// Dynamic Value
         /// </summary>
-        /// <remarks></remarks>
-        DV,
+        [Description("Dynamic Value")]
+        DV = 0x10,
 
         /// <summary>
         /// Static Flag
         /// </summary>
-        /// <remarks></remarks>
-        SF,
+        [Description("Static Flag")]
+        SF = 0x20,
 
         /// <summary>
         /// Static Value
         /// </summary>
-        /// <remarks></remarks>
-        SV
+        [Description("Static Value")]
+        SV = 0x40,
+
+        /// <summary>
+        /// Item
+        /// </summary>
+        [Description("Item")]
+        Item = 0x80
     }
 }

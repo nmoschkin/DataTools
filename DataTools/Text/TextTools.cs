@@ -16,6 +16,7 @@ using System.Text;
 
 using System.Reflection;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace DataTools.Text
 {
@@ -2597,6 +2598,82 @@ namespace DataTools.Text
             return asc.ToString();
         }
 
+        /// <summary>
+        /// Print enumeration or flags descriptions.
+        /// </summary>
+        /// <typeparam name="T">The Enum type</typeparam>
+        /// <param name="val">The value to print</param>
+        /// <returns>An enum description or a comma-separated list of flag descriptions.</returns>
+        /// <remarks>
+        /// This function utilizes <see cref="System.ComponentModel.DescriptionAttribute"/>.
+        /// </remarks>
+        public static string PrintEnumDesc<T>(T val) where T : Enum
+        {
+            var t = val.GetType();
+            var fs = t.GetFields(BindingFlags.Static | BindingFlags.Public);
+            var hfta = t.GetCustomAttribute(typeof(FlagsAttribute));
+
+            bool flags = false;
+            if (hfta != null) flags = true;
+
+            
+
+            if (flags)
+            {
+                var sb = new StringBuilder();
+                var p = false;
+
+                foreach (var f in fs)
+                {
+                    var x = (T)f.GetValue(null);
+                    
+                    if (x.GetHashCode() == 0) continue;
+
+                    if (val.HasFlag(x))
+                    {
+                        if (p) sb.Append(", ");
+                        p = true;
+
+                        var desc = (DescriptionAttribute)f.GetCustomAttribute(typeof(DescriptionAttribute));
+                        if (desc != null)
+                        {
+                            sb.Append(desc.Description);
+                        }
+                        else
+                        {
+                            sb.Append(x.ToString());
+                        }
+
+                    }
+                }
+
+                return sb.ToString();
+
+            }
+            else
+            {
+                foreach (var f in fs)
+                {
+                    var x = (T)f.GetValue(null);
+
+                    if (x.Equals(val))
+                    {
+                        var desc = (DescriptionAttribute)f.GetCustomAttribute(typeof(DescriptionAttribute));
+                        if (desc != null)
+                        {
+                            return desc.Description;
+                        }
+                        else
+                        {
+                            return x.ToString();
+                        }
+                    }
+                }
+            }
+            
+            return val.ToString();
+            
+        }
     }
 
 
