@@ -16,7 +16,7 @@ using System.Runtime.InteropServices;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential, Pack = LibUsb.gPack)]
-    public struct usb_hid_descriptor
+    public struct UsbHidDescriptor
     {
 
         /// <summary>

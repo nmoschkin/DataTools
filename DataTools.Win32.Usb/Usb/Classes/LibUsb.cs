@@ -495,12 +495,12 @@ namespace DataTools.Win32
             public IntPtr extra;
             public int extralen;
 
-            public usb_hid_descriptor hidDescriptor
+            public UsbHidDescriptor hidDescriptor
             {
                 get
                 {
                     SafePtr mm = (SafePtr)extra_desc;
-                    return mm.ToStruct<usb_hid_descriptor>();
+                    return mm.ToStruct<UsbHidDescriptor>();
                 }
             }
 

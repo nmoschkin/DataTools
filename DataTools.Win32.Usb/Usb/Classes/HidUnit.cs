@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 
 namespace DataTools.Win32
 {
-    public class hid_unit
+    public class HidUnit
     {
         protected string _physical;
         protected string _hidunit;
@@ -77,7 +77,7 @@ namespace DataTools.Win32
             }
         }
 
-        internal hid_unit(string d, string p, string h, int u, int e, int s)
+        internal HidUnit(string d, string p, string h, int u, int e, int s)
         {
             _desc = d;
             _physical = p;
