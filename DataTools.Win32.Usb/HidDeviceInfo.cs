@@ -33,6 +33,10 @@ namespace DataTools.Hardware.Usb
         protected string _HidManufacturer;
 
 
+        /// <summary>
+        /// Enumarate all HID class devices on the local machine.
+        /// </summary>
+        /// <returns></returns>
         public static HidDeviceInfo[] EnumerateHidDevices()
         {
             return DeviceEnum.EnumerateDevices<HidDeviceInfo>(DevProp.GUID_DEVINTERFACE_HID);

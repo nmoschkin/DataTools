@@ -1261,5 +1261,6 @@ namespace DataTools.Win32
 
         // Public Declare Function usb_free_async Lib "libusb0.dll" (context As IntPtr) As USBRESULT
 
+
     }
 }

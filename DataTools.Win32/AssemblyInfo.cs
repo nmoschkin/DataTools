@@ -12,4 +12,5 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("DataTools.Win32.Display")]
 [assembly: InternalsVisibleTo("DataTools.Win32.Processor")]
 [assembly: InternalsVisibleTo("DataTools.Win32.FileSystem")]
+[assembly: InternalsVisibleTo("TestHid")]
 

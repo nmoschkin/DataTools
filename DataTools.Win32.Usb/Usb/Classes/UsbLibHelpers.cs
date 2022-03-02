@@ -10,6 +10,8 @@
 // Licensed Under the MIT License   
 // ************************************************* ''
 
+using DataTools.Win32.Usb;
+
 using System;
 using System.ComponentModel;
 using System.Reflection;
@@ -32,6 +34,13 @@ namespace DataTools.Win32
         public static extern bool HidD_GetProductString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
         [DllImport("hid.dll")]
         public static extern bool HidD_GetInputReport(IntPtr HidDeviceObject, IntPtr ReportBuffer, int ReportBufferLength);
+
+        [DllImport("hid.dll")]
+        public static extern bool HidD_GetAttributes(IntPtr HidDeviceObject, out HidAttributes attributes);
+
+        [DllImport("hid.dll")]
+        public static extern bool HidP_GetCaps(IntPtr ppd, out HidCaps attributes);
+
         [DllImport("hid.dll")]
         public static extern bool HidD_GetFeature(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
         [DllImport("hid.dll", EntryPoint = "HidD_GetFeature")]
