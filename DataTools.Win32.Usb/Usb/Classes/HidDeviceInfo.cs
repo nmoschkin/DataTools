@@ -26,32 +26,46 @@ namespace DataTools.Win32.Usb
     /// <remarks></remarks>
     public class HidDeviceInfo : DeviceInfo
     {
-        protected HidUsagePage _HidPage;
-        protected string _SerialNumber;
-        protected string _ProductString;
-        protected string _PhysicalDescriptor;
-        protected string _HidManufacturer;
+        protected HidUsagePage hidPage;
 
-        protected HidPValueCaps[] _FeatureValueCaps;
-        protected HidPValueCaps[] _InputValueCaps;
-        protected HidPValueCaps[] _OutputValueCaps;
+        protected string serialNumber = "";
+        protected string productString = "";
+        protected string physicalDescriptor = "";
+        protected string hidManufacturer = "";
 
+        protected HidPValueCaps[]? featureValCaps;
+        protected HidPValueCaps[]? inputValCaps;
+        protected HidPValueCaps[]? outputValCaps;
 
-
-        protected HidPButtonCaps[] _FeatureButtonCaps;
-        protected HidPButtonCaps[] _InputButtonCaps;
-        protected HidPButtonCaps[] _OutputButtonCaps;
+        protected HidPButtonCaps[]? featureBtnCaps;
+        protected HidPButtonCaps[]? inputBtnCaps;
+        protected HidPButtonCaps[]? outputBtnCaps;
 
 
         /// <summary>
         /// Enumarate all HID class devices on the local machine.
         /// </summary>
+        /// <param name="populateDevCaps"><see cref="true"/> to enumerate all device capabilities for each device.</param>
         /// <returns></returns>
-        public static HidDeviceInfo[] EnumerateHidDevices()
+        public static HidDeviceInfo[] EnumerateHidDevices(bool populateDevCaps = false)
         {
-            return DeviceEnum.EnumerateDevices<HidDeviceInfo>(DevProp.GUID_DEVINTERFACE_HID);
+            var result = DeviceEnum.EnumerateDevices<HidDeviceInfo>(DevProp.GUID_DEVINTERFACE_HID);
+
+            if (populateDevCaps)
+            {
+                foreach (var device in result)
+                {
+                    device.PopulateDeviceCaps();
+                }
+            }
+
+            return result;
         }
         
+        /// <summary>
+        /// Populate All Device Capabilities
+        /// </summary>
+        /// <returns></returns>
         public bool PopulateDeviceCaps()
         {
             return UsbLibHelpers.PopulateDeviceCaps(this);
@@ -317,23 +331,23 @@ namespace DataTools.Win32.Usb
         {
             get
             {
-                if (_HidManufacturer is null)
+                if (hidManufacturer is null)
                 {
                     var dev = HidFeatures.OpenHid(this);
                     MemPtr mm = new MemPtr();
                     mm.AllocZero(512L);
                     UsbLibHelpers.HidD_GetManufacturerString(dev, mm, (int)mm.Length);
-                    _HidManufacturer = mm.GetString(0L);
+                    hidManufacturer = mm.GetString(0L);
                     mm.Free();
                     HidFeatures.CloseHid(dev);
                 }
 
-                return _HidManufacturer;
+                return hidManufacturer;
             }
 
             internal set
             {
-                _HidManufacturer = value;
+                hidManufacturer = value;
             }
         }
 
@@ -347,23 +361,23 @@ namespace DataTools.Win32.Usb
         {
             get
             {
-                if (_SerialNumber is null)
+                if (serialNumber is null)
                 {
                     var dev = HidFeatures.OpenHid(this);
                     MemPtr mm = new MemPtr();
                     mm.AllocZero(512L);
                     UsbLibHelpers.HidD_GetSerialNumberString(dev, mm, (int)mm.Length);
-                    _SerialNumber = (string)mm;
+                    serialNumber = (string)mm;
                     mm.Free();
                     HidFeatures.CloseHid(dev);
                 }
 
-                return _SerialNumber;
+                return serialNumber;
             }
 
             internal set
             {
-                _SerialNumber = value;
+                serialNumber = value;
             }
         }
 
@@ -377,23 +391,23 @@ namespace DataTools.Win32.Usb
         {
             get
             {
-                if (_ProductString is null)
+                if (productString is null)
                 {
                     var dev = HidFeatures.OpenHid(this);
                     MemPtr mm = new MemPtr();
                     mm.AllocZero(512L);
                     UsbLibHelpers.HidD_GetProductString(dev, mm, (int)mm.Length);
-                    _ProductString = (string)mm;
+                    productString = (string)mm;
                     mm.Free();
                     HidFeatures.CloseHid(dev);
                 }
 
-                return _ProductString;
+                return productString;
             }
 
             internal set
             {
-                _ProductString = value;
+                productString = value;
             }
         }
 
@@ -429,23 +443,23 @@ namespace DataTools.Win32.Usb
         {
             get
             {
-                if (_PhysicalDescriptor is null)
+                if (physicalDescriptor is null)
                 {
                     var dev = HidFeatures.OpenHid(this);
                     MemPtr mm = new MemPtr();
                     mm.AllocZero(512L);
                     UsbLibHelpers.HidD_GetPhysicalDescriptor(dev, mm, (int)mm.Length);
-                    _PhysicalDescriptor = (string)mm;
+                    physicalDescriptor = (string)mm;
                     mm.Free();
                     HidFeatures.CloseHid(dev);
                 }
 
-                return _PhysicalDescriptor;
+                return physicalDescriptor;
             }
 
             internal set
             {
-                _PhysicalDescriptor = value;
+                physicalDescriptor = value;
             }
         }
 
@@ -459,7 +473,7 @@ namespace DataTools.Win32.Usb
         {
             get
             {
-                return DevEnumHelpers.GetEnumDescription(_HidPage);
+                return DevEnumHelpers.GetEnumDescription(hidPage);
             }
         }
 
@@ -473,52 +487,66 @@ namespace DataTools.Win32.Usb
         {
             get
             {
-                return _HidPage;
+                return hidPage;
             }
         }
 
-
+        /// <summary>
+        /// HID Feature Value Capabilities
+        /// </summary>
         public HidPValueCaps[] FeatureValueCaps
         {
-            get => _FeatureValueCaps;
-            internal set => _FeatureValueCaps = value;  
+            get => featureValCaps ?? new HidPValueCaps[0];
+            internal set => featureValCaps = value;  
         }
 
+        /// <summary>
+        /// HID Input Value Capabilities
+        /// </summary>
         public HidPValueCaps[] InputValueCaps
         {
-            get => _InputValueCaps;
-            internal set => _InputValueCaps = value;
+            get => inputValCaps ?? new HidPValueCaps[0];
+            internal set => inputValCaps = value;
         }
 
+        /// <summary>
+        /// HID Output Value Capabilities
+        /// </summary>
         public HidPValueCaps[] OutputValueCaps
         {
-            get => _OutputValueCaps;
-            internal set => _OutputValueCaps = value;
+            get => outputValCaps ?? new HidPValueCaps[0];
+            internal set => outputValCaps = value;
 
         }
 
 
-
+        /// <summary>
+        /// HID Feature Button Capabilities
+        /// </summary>
         public HidPButtonCaps[] FeatureButtonCaps
         {
-            get => _FeatureButtonCaps;
-            internal set => _FeatureButtonCaps = value;
+            get => featureBtnCaps ?? new HidPButtonCaps[0];
+            internal set => featureBtnCaps = value;
         }
 
+        /// <summary>
+        /// HID Feature Input Capabilities
+        /// </summary>
         public HidPButtonCaps[] InputButtonCaps
         {
-            get => _InputButtonCaps;
-            internal set => _InputButtonCaps = value;
+            get => inputBtnCaps ?? new HidPButtonCaps[0];
+            internal set => inputBtnCaps = value;
         }
 
+        /// <summary>
+        /// HID Output Button Capabilities
+        /// </summary>
         public HidPButtonCaps[] OutputButtonCaps
         {
-            get => _OutputButtonCaps;
-            internal set => _OutputButtonCaps = value;
+            get => outputBtnCaps ?? new HidPButtonCaps[0];
+            internal set => outputBtnCaps = value;
 
         }
-
-
 
         protected override void ParseHw()
         {
@@ -537,17 +565,17 @@ namespace DataTools.Win32.Usb
                         ushort hp;
                         if (ushort.TryParse(v[1].Replace("_U", ""), System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture.NumberFormat, out hp))
                         {
-                            _HidPage = (HidUsagePage)(hp);
-                            if ((int)_HidPage > 0xFF)
+                            hidPage = (HidUsagePage)(hp);
+                            if ((int)hidPage > 0xFF)
                             {
-                                _HidPage = HidUsagePage.Reserved;
+                                hidPage = HidUsagePage.Reserved;
                                 if (v.Length > 2)
                                 {
                                     if (ushort.TryParse(v[1].Replace("_U", ""), System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture.NumberFormat, out hp))
                                     {
-                                        _HidPage = (HidUsagePage)(hp);
-                                        if ((int)_HidPage > 0xFF)
-                                            _HidPage = HidUsagePage.Reserved;
+                                        hidPage = (HidUsagePage)(hp);
+                                        if ((int)hidPage > 0xFF)
+                                            hidPage = HidUsagePage.Reserved;
                                     }
                                 }
 

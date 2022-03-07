@@ -78,7 +78,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestDisks", "TestDisks\Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataTools.PluginFramework", "DataTools.PluginFramework\DataTools.PluginFramework.csproj", "{C1EEA3D7-6F5E-4FE3-AD8A-ECFE68569C91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestHid", "TestHid\TestHid.csproj", "{D33B6397-072D-4E0F-97F7-99BF76D6A567}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestHid", "TestHid\TestHid.csproj", "{D33B6397-072D-4E0F-97F7-99BF76D6A567}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

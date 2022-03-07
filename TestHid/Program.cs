@@ -23,7 +23,7 @@ namespace TestHid
             var hids = HidDeviceInfo.EnumerateHidDevices();
 
 
-            var battery = hids.Where((e) => e.DeviceClass == DeviceClassEnum.Battery).ToList().First();
+            var battery = hids.Where((e) => e.DeviceClass == DeviceClassEnum.Battery).ToList().FirstOrDefault();
 
             battery.PopulateDeviceCaps();
 
@@ -40,7 +40,7 @@ namespace TestHid
                 if (feature.UsagePage == (HidUsagePage)0x84)
                 {
 
-                    var usage = psys.Where((x) => x.UsageId == feature.Usage).First(); 
+                    var usage = psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault(); 
 
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
@@ -48,7 +48,7 @@ namespace TestHid
                     if (usage != null)
                     {
                         Console.WriteLine($"Found Power Device Usage {usage}, Value: {result}");
-                        var lusage = psys.Where((x) => x.UsageId == feature.LinkUsage).First();
+                        var lusage = psys.Where((x) => x.UsageId == feature.LinkUsage && x.UsageName != "Reserved").FirstOrDefault();
                         if (lusage != null)
                         {
                             Console.WriteLine($"Linked Usage: {lusage}");
@@ -57,7 +57,7 @@ namespace TestHid
                 }
                 else if (feature.UsagePage == (HidUsagePage)0x85)
                 {
-                    var usage = bsys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = bsys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
 
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
@@ -65,7 +65,7 @@ namespace TestHid
                     if (usage != null)
                     {
                         Console.WriteLine($"Found Battery Device Usage {usage}, Value: {result}");
-                        var lusage = bsys.Where((x) => x.UsageId == feature.LinkUsage).First();
+                        var lusage = bsys.Where((x) => x.UsageId == feature.LinkUsage && x.UsageName != "Reserved").FirstOrDefault();
                         if (lusage != null)
                         {
                             Console.WriteLine($"Linked Usage: {lusage}");
@@ -84,14 +84,14 @@ namespace TestHid
                 }
                 if (feature.UsagePage == (HidUsagePage)0x84)
                 {
-                    var usage = psys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
 
                     if (usage != null)
                     {
                         Console.WriteLine($"Found Power Device Usage {usage}, Value: {result}");
-                        var lusage = psys.Where((x) => x.UsageId == feature.LinkUsage).First();
+                        var lusage = psys.Where((x) => x.UsageId == feature.LinkUsage).FirstOrDefault();
                         if (lusage != null)
                         {
                             Console.WriteLine($"Linked Usage: {lusage}");
@@ -100,7 +100,7 @@ namespace TestHid
                 }
                 else if (feature.UsagePage == (HidUsagePage)0x85)
                 {
-                    var usage = bsys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = bsys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
 
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
@@ -108,7 +108,7 @@ namespace TestHid
                     if (usage != null)
                     {
                         Console.WriteLine($"Found Battery Device Usage {usage}, Value: {result}");
-                        var lusage = bsys.Where((x) => x.UsageId == feature.LinkUsage).First();
+                        var lusage = bsys.Where((x) => x.UsageId == feature.LinkUsage && x.UsageName != "Reserved").FirstOrDefault();
                         if (lusage != null)
                         {
                             Console.WriteLine($"Linked Usage: {lusage}");
@@ -126,14 +126,14 @@ namespace TestHid
                 }
                 if (feature.UsagePage == (HidUsagePage)0x84)
                 {
-                    var usage = psys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
 
                     if (usage != null)
                     {
                         Console.WriteLine($"Found Power Device Usage {usage}, Value: {result}");
-                        var lusage = psys.Where((x) => x.UsageId == feature.LinkUsage).First();
+                        var lusage = psys.Where((x) => x.UsageId == feature.LinkUsage && x.UsageName != "Reserved").FirstOrDefault();
                         if (lusage != null)
                         {
                             Console.WriteLine($"Linked Usage: {lusage}");
@@ -142,7 +142,7 @@ namespace TestHid
                 }
                 else if (feature.UsagePage == (HidUsagePage)0x85)
                 {
-                    var usage = bsys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = bsys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
 
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
@@ -150,7 +150,7 @@ namespace TestHid
                     if (usage != null)
                     {
                         Console.WriteLine($"Found Battery Device Usage {usage}, Value: {result}");
-                        var lusage = bsys.Where((x) => x.UsageId == feature.LinkUsage).First();
+                        var lusage = bsys.Where((x) => x.UsageId == feature.LinkUsage && x.UsageName != "Reserved").FirstOrDefault();
                         if (lusage != null)
                         {
                             Console.WriteLine($"Linked Usage: {lusage}");
@@ -170,14 +170,14 @@ namespace TestHid
                 }
                 if (feature.UsagePage == (HidUsagePage)0x84)
                 {
-                    var usage = psys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
 
                     if (usage != null)
                     {
                         Console.WriteLine($"Found Power Device Usage {usage}, Value: {result}");
-                        var lusage = psys.Where((x) => x.UsageId == feature.LinkUsage).First();
+                        var lusage = psys.Where((x) => x.UsageId == feature.LinkUsage && x.UsageName != "Reserved").FirstOrDefault();
                         if (lusage != null)
                         {
                             Console.WriteLine($"Linked Usage: {lusage}");
@@ -186,7 +186,7 @@ namespace TestHid
                 }
                 else if (feature.UsagePage == (HidUsagePage)0x85)
                 {
-                    var usage = bsys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = bsys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
 
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
@@ -194,7 +194,7 @@ namespace TestHid
                     if (usage != null)
                     {
                         Console.WriteLine($"Found Battery Device Usage {usage}, Value: {result}");
-                        var lusage = bsys.Where((x) => x.UsageId == feature.LinkUsage).First();
+                        var lusage = bsys.Where((x) => x.UsageId == feature.LinkUsage && x.UsageName != "Reserved").FirstOrDefault();
                         if (lusage != null)
                         {
                             Console.WriteLine($"Linked Usage: {lusage}");
@@ -214,7 +214,7 @@ namespace TestHid
                 }
                 if (feature.UsagePage == (HidUsagePage)0x84)
                 {
-                    var usage = psys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
 
@@ -225,7 +225,7 @@ namespace TestHid
                 }
                 else if (feature.UsagePage == (HidUsagePage)0x85)
                 {
-                    var usage = psys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
 
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);
@@ -250,7 +250,7 @@ namespace TestHid
                 }
                 if (feature.UsagePage == (HidUsagePage)0x84)
                 {
-                    var usage = psys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
                     int result = 0;
 
                     
@@ -263,7 +263,7 @@ namespace TestHid
                 }
                 else if (feature.UsagePage == (HidUsagePage)0x85)
                 {
-                    var usage = psys.Where((x) => x.UsageId == feature.Usage).First();
+                    var usage = psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
 
                     int result = 0;
                     battery.HidGetFeature(feature.ReportID, ref result);

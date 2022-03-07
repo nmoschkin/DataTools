@@ -29,40 +29,43 @@ namespace DataTools.Win32
     
     internal static class UsbLibHelpers
     {
-        public static LibUsb.usb_bus[] busses;
-        public static LibUsb.usb_device[] devices;
 
         [DllImport("hid.dll")]
-        public static extern bool HidD_GetProductString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        internal static extern bool HidD_GetProductString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        
         [DllImport("hid.dll")]
-        public static extern bool HidD_GetInputReport(IntPtr HidDeviceObject, IntPtr ReportBuffer, int ReportBufferLength);
+        internal static extern bool HidD_GetInputReport(IntPtr HidDeviceObject, IntPtr ReportBuffer, int ReportBufferLength);
 
         [DllImport("hid.dll")]
-        public static extern bool HidD_GetAttributes(IntPtr HidDeviceObject, out HidAttributes attributes);
+        internal static extern bool HidD_GetAttributes(IntPtr HidDeviceObject, out HidAttributes attributes);
 
         [DllImport("hid.dll")]
-        public static extern bool HidP_GetCaps(IntPtr ppd, out HidCaps attributes);
+        internal static extern bool HidP_GetCaps(IntPtr ppd, out HidCaps attributes);
 
         [DllImport("hid.dll")]
-        public static extern bool HidD_GetFeature(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        internal static extern bool HidD_GetFeature(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        
         [DllImport("hid.dll", EntryPoint = "HidD_GetFeature")]
-        public static extern bool HidD_GetFeatureL(IntPtr HidDeviceObject, ref long Buffer, int BufferLength);
+        internal static extern bool HidD_GetFeatureL(IntPtr HidDeviceObject, ref long Buffer, int BufferLength);
+        
         [DllImport("hid.dll")]
-        public static extern bool HidD_SetFeature(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        internal static extern bool HidD_SetFeature(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        
         [DllImport("hid.dll")]
-        public static extern bool HidD_GetManufacturerString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        internal static extern bool HidD_GetManufacturerString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        
         [DllImport("hid.dll")]
-        public static extern bool HidD_GetSerialNumberString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        internal static extern bool HidD_GetSerialNumberString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
         [DllImport("hid.dll")]
-        public static extern bool HidD_GetPhysicalDescriptor(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
+        internal static extern bool HidD_GetPhysicalDescriptor(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
         [DllImport("hid.dll")]
-        public static extern bool HidD_GetPreparsedData(IntPtr HidDeviceObject, ref IntPtr PreparsedData);
+        internal static extern bool HidD_GetPreparsedData(IntPtr HidDeviceObject, ref IntPtr PreparsedData);
         [DllImport("hid.dll")]
-        public static extern bool HidD_FreePreparsedData(IntPtr PreparsedData);
+        internal static extern bool HidD_FreePreparsedData(IntPtr PreparsedData);
 
 
         [DllImport("hid.dll")]
-        public static extern bool HidP_GetValueCaps(
+        internal static extern bool HidP_GetValueCaps(
           HidPReportType ReportType,
           ref HidPValueCaps[] ValueCaps,
           ref ushort ValueCapsLength,
@@ -71,7 +74,7 @@ namespace DataTools.Win32
 
 
         [DllImport("hid.dll")]
-        public static extern bool HidP_GetValueCaps(
+        internal static extern bool HidP_GetValueCaps(
           HidPReportType ReportType,
           IntPtr ValueCaps,
           ref ushort ValueCapsLength,
@@ -80,7 +83,7 @@ namespace DataTools.Win32
 
 
         [DllImport("hid.dll")]
-        public static extern bool HidP_GetButtonCaps(
+        internal static extern bool HidP_GetButtonCaps(
           HidPReportType ReportType,
           ref HidPButtonCaps[] ValueCaps,
           ref ushort ValueCapsLength,
@@ -89,7 +92,7 @@ namespace DataTools.Win32
 
 
         [DllImport("hid.dll")]
-        public static extern bool HidP_GetButtonCaps(
+        internal static extern bool HidP_GetButtonCaps(
           HidPReportType ReportType,
           IntPtr ValueCaps,
           ref ushort ValueCapsLength,
