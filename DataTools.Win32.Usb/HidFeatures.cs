@@ -19,7 +19,7 @@ using System;
 using DataTools.Win32;
 using DataTools.Win32.Memory;
 
-namespace DataTools.Hardware.Usb
+namespace DataTools.Win32.Usb
 {
     public static class HidFeatures
     {

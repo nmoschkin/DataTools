@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTools.Win32.Usb.Usb.Classes
+namespace DataTools.Win32.Usb
 {
     public class HidPageInfo : IReadOnlyList<HidUsageInfo>
     {

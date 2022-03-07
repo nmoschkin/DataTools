@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-namespace DataTools.Win32.Usb.Usb.Classes
+namespace DataTools.Win32.Usb
 {
     public class HidPowerDevicePageInfo : HidPageInfo
     {
@@ -101,7 +101,7 @@ namespace DataTools.Win32.Usb.Usb.Classes
 
         public HidPowerDevicePageInfo()
         {
-
+            this.PageID = 0x84;
 
             Parse(0x01, "iName", "SV", "I,F", "R/W", "4.1.1");
             Parse(0x02, "PresentStatus", "CL", "N/A", "4.1.1");

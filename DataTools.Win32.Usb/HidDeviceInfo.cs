@@ -13,10 +13,10 @@
 using System;
 
 using DataTools.Text;
-using DataTools.Win32;
 using DataTools.Win32.Memory;
 
-namespace DataTools.Hardware.Usb
+
+namespace DataTools.Win32.Usb
 {
 
 
@@ -32,6 +32,16 @@ namespace DataTools.Hardware.Usb
         protected string _PhysicalDescriptor;
         protected string _HidManufacturer;
 
+        protected HidPValueCaps[] _FeatureValueCaps;
+        protected HidPValueCaps[] _InputValueCaps;
+        protected HidPValueCaps[] _OutputValueCaps;
+
+
+
+        protected HidPButtonCaps[] _FeatureButtonCaps;
+        protected HidPButtonCaps[] _InputButtonCaps;
+        protected HidPButtonCaps[] _OutputButtonCaps;
+
 
         /// <summary>
         /// Enumarate all HID class devices on the local machine.
@@ -42,6 +52,11 @@ namespace DataTools.Hardware.Usb
             return DeviceEnum.EnumerateDevices<HidDeviceInfo>(DevProp.GUID_DEVINTERFACE_HID);
         }
         
+        public bool PopulateDeviceCaps()
+        {
+            return UsbLibHelpers.PopulateDeviceCaps(this);
+        }
+
         /// <summary>
         /// Returns the raw byte data for a Hid feature code.
         /// </summary>
@@ -461,6 +476,49 @@ namespace DataTools.Hardware.Usb
                 return _HidPage;
             }
         }
+
+
+        public HidPValueCaps[] FeatureValueCaps
+        {
+            get => _FeatureValueCaps;
+            internal set => _FeatureValueCaps = value;  
+        }
+
+        public HidPValueCaps[] InputValueCaps
+        {
+            get => _InputValueCaps;
+            internal set => _InputValueCaps = value;
+        }
+
+        public HidPValueCaps[] OutputValueCaps
+        {
+            get => _OutputValueCaps;
+            internal set => _OutputValueCaps = value;
+
+        }
+
+
+
+        public HidPButtonCaps[] FeatureButtonCaps
+        {
+            get => _FeatureButtonCaps;
+            internal set => _FeatureButtonCaps = value;
+        }
+
+        public HidPButtonCaps[] InputButtonCaps
+        {
+            get => _InputButtonCaps;
+            internal set => _InputButtonCaps = value;
+        }
+
+        public HidPButtonCaps[] OutputButtonCaps
+        {
+            get => _OutputButtonCaps;
+            internal set => _OutputButtonCaps = value;
+
+        }
+
+
 
         protected override void ParseHw()
         {

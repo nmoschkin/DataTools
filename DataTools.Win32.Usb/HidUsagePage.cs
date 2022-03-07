@@ -16,7 +16,7 @@
 
 using System.ComponentModel;
 
-namespace DataTools.Hardware.Usb
+namespace DataTools.Win32.Usb
 {
 
     /// <summary>
