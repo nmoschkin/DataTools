@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 
 using DataTools.Win32.Memory;
 
-namespace DataTools.Win32
+namespace DataTools.Win32.Usb
 {
     
     internal static class LibUsb

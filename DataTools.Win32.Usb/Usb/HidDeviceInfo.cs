@@ -79,28 +79,38 @@ namespace DataTools.Win32.Usb
         /// <param name="expectedSize">The expected size, in bytes, of the result.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool HidGetFeature(byte featureCode, ref byte[] result, int expectedSize)
+        public bool HidGetFeature(byte featureCode, out byte[] result, int expectedSize)
         {
-            bool HidGetFeatureRet = default;
+            bool res = default;
+
             var hfile = HidFeatures.OpenHid(this);
+
             if (hfile == IntPtr.Zero)
+            {
+                result = new byte[0];
                 return false;
-            var mm = new MemPtr();
-            mm.Alloc(expectedSize + 1);
-            mm.ByteAt(0L) = featureCode;
-            if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, expectedSize))
-            {
-                HidGetFeatureRet = false;
-            }
-            else
-            {
-                HidGetFeatureRet = true;
-                result = mm.ToByteArray(1L, expectedSize);
             }
 
-            HidFeatures.CloseHid(hfile);
-            mm.Free();
-            return HidGetFeatureRet;
+            using (var mm = new SafePtr())
+            {
+                mm.Alloc(expectedSize + 1);
+                mm.ByteAt(0L) = featureCode;
+
+                if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, expectedSize))
+                {
+                    res = false;
+                    result = new byte[0];
+                }
+                else
+                {
+                    res = true;
+                    result = mm.ToByteArray(1L, expectedSize);
+                }
+
+                HidFeatures.CloseHid(hfile);
+            }
+
+            return res;
         }
 
         /// <summary>

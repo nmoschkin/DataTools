@@ -7,13 +7,18 @@ using System.Threading.Tasks;
 
 namespace DataTools.Win32.Usb
 {
-    public class HidPageInfo : IReadOnlyList<HidUsageInfo>
+    public class HidUsagePageInfo : IReadOnlyList<HidUsageInfo>
     {
-
 
         protected List<HidUsageInfo> _items = new List<HidUsageInfo>();
 
         public int PageID { get; protected set; }
+
+
+        public HidUsagePageInfo(int pageId)
+        {
+            PageID = pageId;
+        }
 
         public HidUsageInfo this[int index] => ((IReadOnlyList<HidUsageInfo>)_items)[index];
 

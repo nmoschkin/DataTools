@@ -13,7 +13,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace DataTools.Win32
+namespace DataTools.Win32.Usb
 {
     [StructLayout(LayoutKind.Sequential, Pack = LibUsb.gPack)]
     public struct UsbHidDescriptor

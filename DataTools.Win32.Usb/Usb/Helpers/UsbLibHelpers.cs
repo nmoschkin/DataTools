@@ -23,7 +23,7 @@ using static DataTools.Win32.User32;
 
 [assembly: InternalsVisibleTo("TLModel")]
 
-namespace DataTools.Win32
+namespace DataTools.Win32.Usb
 {
     
     

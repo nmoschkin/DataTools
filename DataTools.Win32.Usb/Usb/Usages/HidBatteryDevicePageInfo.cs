@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace DataTools.Win32.Usb
 {
-    public class HidBatterySystemPageInfo : HidPageInfo
+    public class HidBatteryDevicePageInfo : HidUsagePageInfo
     {
+        public static HidBatteryDevicePageInfo Instance { get; protected set; }
 
+        static HidBatteryDevicePageInfo()
+        {
+            Instance = new HidBatteryDevicePageInfo();
+        }
 
         protected void Parse(params object[] values)
         {
@@ -115,11 +120,8 @@ namespace DataTools.Win32.Usb
 
         }
 
-
-        public HidBatterySystemPageInfo()
+        protected HidBatteryDevicePageInfo() : base(0x85)
         {
-            PageID = 0x85;
-
             Parse(0, "Undefined");
             Parse(0x01, "SMBBatteryMode", "CL", "", "N/A", "4.2.1");
             Parse(0x02, "SMBBatteryStatus", "CL", "", "N/A", "4.2.1");

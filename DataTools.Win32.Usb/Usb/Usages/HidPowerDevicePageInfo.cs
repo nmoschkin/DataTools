@@ -7,8 +7,15 @@ using System.Windows.Markup;
 
 namespace DataTools.Win32.Usb
 {
-    public class HidPowerDevicePageInfo : HidPageInfo
+    public class HidPowerDevicePageInfo : HidUsagePageInfo
     {
+
+        public static HidPowerDevicePageInfo Instance { get; protected set; }
+
+        static HidPowerDevicePageInfo()
+        {
+            Instance = new HidPowerDevicePageInfo();
+        }
 
         protected void Parse(params object[] values)
         {
@@ -82,7 +89,7 @@ namespace DataTools.Win32.Usb
 
                 }
 
-                _items.Add(new HidUsageInfo()
+                _items.Add(new HidPowerUsageInfo()
                 {
                     UsageId = (ushort)(int)values[0],
                     UsageName = sname,
@@ -99,10 +106,8 @@ namespace DataTools.Win32.Usb
             
         }
 
-        public HidPowerDevicePageInfo()
+        protected HidPowerDevicePageInfo() : base(0x84)
         {
-            this.PageID = 0x84;
-
             Parse(0x01, "iName", "SV", "I,F", "R/W", "4.1.1");
             Parse(0x02, "PresentStatus", "CL", "N/A", "4.1.1");
             Parse(0x03, "ChangedStatus", "CL", "N/A", "4.1.1");
@@ -111,7 +116,7 @@ namespace DataTools.Win32.Usb
             Parse("06-0F", "Reserved");
             Parse(0x10, "BatterySystem", "CP", "N/A", "4.1.1");
             Parse(0x11, "BatterySystemID", "SV", "I,F", "R/W", "4.1.1");
-            Parse(0x12, "Battery", "CP", "N/A", "4.1.1");
+            Parse(0x12, "Battery", "CP", "N/A", "4.1.1", "DC");
             Parse(0x13, "BatteryID", "SV", "I,F", "R/W", "4.1.1");
             Parse(0x14, "Charger", "CP", "N/A", "4.1.1");
             Parse(0x15, "ChargerID", "SV", "I,F", "R/W", "4.1.1");
