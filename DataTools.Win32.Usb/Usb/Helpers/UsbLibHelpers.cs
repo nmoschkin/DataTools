@@ -25,9 +25,10 @@ using static DataTools.Win32.User32;
 
 namespace DataTools.Win32.Usb
 {
-    
-    
-    internal static class UsbLibHelpers
+    /// <summary>
+    /// Various helper functions for interfacing with the USB HID system.
+    /// </summary>
+    public static class UsbLibHelpers
     {
 
         [DllImport("hid.dll")]
@@ -100,6 +101,12 @@ namespace DataTools.Win32.Usb
         );
 
 
+        /// <summary>
+        /// Get the button caps for the specified report type.
+        /// </summary>
+        /// <param name="reportType">The <see cref="HidPReportType"/>.</param>
+        /// <param name="ppd">The pointer to preparsed data.</param>
+        /// <returns>An array of <see cref="HidPButtonCaps"/> structures.</returns>
         public static HidPButtonCaps[] GetButtonCaps(HidPReportType reportType, IntPtr ppd)
         {
             ushort ncaps = 0;
@@ -128,6 +135,12 @@ namespace DataTools.Win32.Usb
 
 
 
+        /// <summary>
+        /// Get the value caps for the specified report type.
+        /// </summary>
+        /// <param name="reportType">The <see cref="HidPReportType"/>.</param>
+        /// <param name="ppd">The pointer to preparsed data.</param>
+        /// <returns>An array of <see cref="HidPValueCaps"/> structures.</returns>
         public static HidPValueCaps[] GetValueCaps(HidPReportType reportType, IntPtr ppd)
         {
             ushort ncaps = 0;
@@ -155,7 +168,11 @@ namespace DataTools.Win32.Usb
 
         }
 
-
+        /// <summary>
+        /// Populate all device capabilities for the given HID class device object.
+        /// </summary>
+        /// <param name="device">The device to populate.</param>
+        /// <returns>True if the device was successfully opened and read.</returns>
         public static bool PopulateDeviceCaps(HidDeviceInfo device)
         {
 
@@ -220,6 +237,11 @@ namespace DataTools.Win32.Usb
             return true;
         }
 
+        /// <summary>
+        /// Link value capabilities by grouped collection or linked usage.
+        /// </summary>
+        /// <param name="valCaps">The value capabilities structures to link</param>
+        /// <returns>A new <see cref="Dictionary{TKey, TValue}"/> where the key is a tuple of <see cref="HidUsagePage"/> and <see cref="int"/> and the value is a <see cref="IList{T}"/> of <see cref="HidPValueCaps"/>.</returns>
         public static Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> LinkValueCollections(IList<HidPValueCaps> valCaps)
         {
             var result = new Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>();
@@ -255,12 +277,16 @@ namespace DataTools.Win32.Usb
             return result;
         }
 
-
-        public static Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> LinkButtonCollections(IList<HidPButtonCaps> valCaps)
+        /// <summary>
+        /// Link button capabilities by grouped collection or linked usage.
+        /// </summary>
+        /// <param name="btnCaps">The button capabilities structures to link</param>
+        /// <returns>A new <see cref="Dictionary{TKey, TValue}"/> where the key is a tuple of <see cref="HidUsagePage"/> and <see cref="int"/> and the value is a <see cref="IList{T}"/> of <see cref="HidPButtonCaps"/>.</returns>
+        public static Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> LinkButtonCollections(IList<HidPButtonCaps> btnCaps)
         {
             var result = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
 
-            foreach (var item in valCaps)
+            foreach (var item in btnCaps)
             {
 
 

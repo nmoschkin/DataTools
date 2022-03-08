@@ -14,6 +14,15 @@ namespace DataTools.Win32.Usb
 
         protected Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? powerCollections;
 
+        /// <summary>
+        /// Create a <see cref="HidPowerDeviceInfo"/> object from an existing <see cref="HidDeviceInfo"/> object.
+        /// </summary>
+        /// <param name="device">The device information to instantiate from.</param>
+        /// <returns>A new <see cref="HidPowerDeviceInfo"/> object.</returns>
+        /// <exception cref="ArgumentException">Thrown if the device class is not 'battery.'</exception>
+        /// <remarks>
+        /// The incoming object must be of device class 'Battery'.
+        /// </remarks>
         public static HidPowerDeviceInfo CreateFromHidDevice(HidDeviceInfo device)
         {
             if (device.DeviceClass != DeviceClassEnum.Battery) throw new ArgumentException($"{nameof(device)} must have a device class of {DeviceClassEnum.Battery}");
@@ -26,6 +35,9 @@ namespace DataTools.Win32.Usb
             return result;
         }
 
+        /// <summary>
+        /// Create the power usage page collections.
+        /// </summary>
         public void CreatePowerCollection()
         {
             var cd = GetCollection(LinkedFeatureValues);
@@ -44,11 +56,24 @@ namespace DataTools.Win32.Usb
             protected internal set => powerCollections = value;
         }
 
+        /// <summary>
+        /// Retrieve dynamic values live from the device.
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? RefreshDynamicValues()
         {
             return GetFeatureValues(HidUsageType.CP | HidUsageType.CL, HidUsageType.DV);
         }
 
+        /// <summary>
+        /// Retrieve values live from the device by collection and usage type.
+        /// </summary>
+        /// <param name="collectionType">The collection type or types to return.</param>
+        /// <param name="usageType">The usage types to return.</param>
+        /// <returns><see cref="Dictionary{HidPowerUsageInfo, List{HidPowerUsageInfo}}"/> of live values organized by usage collection.</returns>
+        /// <remarks>
+        /// The <paramref name="collectionType"/> and <paramref name="usageType"/> properties can be OR'd to retrieve more than one kind of value set.
+        /// </remarks>
         public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? GetFeatureValues(HidUsageType collectionType, HidUsageType usageType)
         {
             var result = new Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>();
@@ -63,7 +88,7 @@ namespace DataTools.Win32.Usb
                         if ((usageType & item.UsageType) == item.UsageType)
                         {
                             int res = 0;
-                            var b = HidGetFeature(item.ReportID, ref res);
+                            var b = HidGetFeature(item.ReportID, out res);
                             if (b)
                             {
                                 item.Value = res;
@@ -88,14 +113,14 @@ namespace DataTools.Win32.Usb
 
 
         /// <summary>
-        /// Create a collection from the linked list.
+        /// Create a power device collection from the pre-populated linked list of collections and usages.
         /// </summary>
         /// <param name="data">The linked usage data.</param>
         /// <param name="currDict">The dictionary to add to.</param>
         /// <returns>
         /// Either <paramref name="currDict"/> or a new dictionary.
         /// </returns>
-        protected internal Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> data, Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? currDict = null)
+        public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> data, Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? currDict = null)
         {
             var result = currDict ?? new Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>();
 

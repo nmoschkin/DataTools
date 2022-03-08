@@ -98,7 +98,7 @@ namespace TestHid
                     }
 
                     int ires = 0;
-                    battery.HidGetFeature(feature.ReportID, ref ires);
+                    battery.HidGetFeature(feature.ReportID, out ires);
 
                     if (usage != null)
                     {
@@ -150,7 +150,7 @@ namespace TestHid
 
                     int ires = 0;
 
-                    battery.HidGetFeature(feature.ReportID, ref ires);
+                    battery.HidGetFeature(feature.ReportID, out ires);
 
                     if (usage != null)
                     {

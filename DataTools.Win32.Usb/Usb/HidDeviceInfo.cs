@@ -89,7 +89,7 @@ namespace DataTools.Win32.Usb
         /// <remarks></remarks>
         public bool HidGetFeature(byte featureCode, out byte[] result, int expectedSize)
         {
-            bool res = default;
+            bool success = false;
 
             var hfile = HidFeatures.OpenHid(this);
 
@@ -106,19 +106,19 @@ namespace DataTools.Win32.Usb
 
                 if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, expectedSize))
                 {
-                    res = false;
+                    success = false;
                     result = new byte[0];
                 }
                 else
                 {
-                    res = true;
+                    success = true;
                     result = mm.ToByteArray(1L, expectedSize);
                 }
 
                 HidFeatures.CloseHid(hfile);
             }
 
-            return res;
+            return success;
         }
 
         /// <summary>
@@ -128,28 +128,34 @@ namespace DataTools.Win32.Usb
         /// <param name="result">Receives the result of the operation.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool HidGetFeature(byte featureCode, ref short result)
+        public bool HidGetFeature(byte featureCode, out short result)
         {
-            bool HidGetFeatureRet = default;
+            result = 0;
+            
+            bool success;
+
             var hfile = HidFeatures.OpenHid(this);
-            if (hfile == IntPtr.Zero)
-                return false;
-            var mm = new MemPtr();
-            mm.Alloc(3L);
-            mm.ByteAt(0L) = featureCode;
-            if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 3))
+            
+            if (hfile == IntPtr.Zero) return false;
+
+            using (var mm = new SafePtr())
             {
-                HidGetFeatureRet = false;
-            }
-            else
-            {
-                HidGetFeatureRet = true;
-                result = mm.ShortAtAbsolute(1L);
+                mm.Alloc(3L);
+                mm.ByteAt(0L) = featureCode;
+
+                if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 3))
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                    result = mm.ShortAtAbsolute(1L);
+                }
             }
 
-            mm.Free();
             HidFeatures.CloseHid(hfile);
-            return HidGetFeatureRet;
+            return success;
         }
 
         /// <summary>
@@ -159,28 +165,35 @@ namespace DataTools.Win32.Usb
         /// <param name="result">Receives the result of the operation.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool HidGetFeature(byte featureCode, ref int result)
+        public bool HidGetFeature(byte featureCode, out int result)
         {
-            bool HidGetFeatureRet = default;
+            result = 0;
+            
+            bool success;
+            
             var hfile = HidFeatures.OpenHid(this);
-            if (hfile == IntPtr.Zero)
-                return false;
-            var mm = new MemPtr();
-            mm.Alloc(5L);
-            mm.ByteAt(0L) = featureCode;
-            if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 5))
+            
+            if (hfile == IntPtr.Zero) return false;
+
+            using (var mm = new SafePtr())
             {
-                HidGetFeatureRet = false;
-            }
-            else
-            {
-                HidGetFeatureRet = true;
-                result = mm.IntAtAbsolute(1L);
+                mm.Alloc(5L);
+                mm.ByteAt(0L) = featureCode;
+
+                if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 5))
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                    result = mm.IntAtAbsolute(1L);
+                }
             }
 
-            mm.Free();
             HidFeatures.CloseHid(hfile);
-            return HidGetFeatureRet;
+
+            return success;
         }
 
         /// <summary>
@@ -190,28 +203,34 @@ namespace DataTools.Win32.Usb
         /// <param name="result">Receives the result of the operation.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool HidGetFeature(byte featureCode, ref long result)
+        public bool HidGetFeature(byte featureCode, out long result)
         {
-            bool HidGetFeatureRet = default;
+            result = 0;
+            bool success;
+
             var hfile = HidFeatures.OpenHid(this);
-            if (hfile == IntPtr.Zero)
-                return false;
-            var mm = new MemPtr();
-            mm.Alloc(9L);
-            mm.ByteAt(0L) = featureCode;
-            if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 9))
+
+            if (hfile == IntPtr.Zero) return false;
+
+            using(var mm = new SafePtr())
             {
-                HidGetFeatureRet = false;
-            }
-            else
-            {
-                HidGetFeatureRet = true;
-                result = mm.LongAtAbsolute(1L);
+                mm.Alloc(9L);
+                mm.ByteAt(0L) = featureCode;
+
+                if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 9))
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                    result = mm.LongAtAbsolute(1L);
+                }
             }
 
-            mm.Free();
             HidFeatures.CloseHid(hfile);
-            return HidGetFeatureRet;
+
+            return success;
         }
 
         /// <summary>
@@ -223,26 +242,30 @@ namespace DataTools.Win32.Usb
         /// <remarks></remarks>
         public bool HidSetFeature(byte featureCode, byte[] value)
         {
-            bool HidSetFeatureRet = default;
-            var hfile = HidFeatures.OpenHid(this);
-            if (hfile == IntPtr.Zero)
-                return false;
-            var mm = new MemPtr();
-            mm.Alloc(value.Length + 1);
-            mm.FromByteArray(value, 1L);
-            mm.ByteAt(0L) = featureCode;
-            if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, (int)mm.Length))
-            {
-                HidSetFeatureRet = false;
-            }
-            else
-            {
-                HidSetFeatureRet = true;
-            }
+            bool success;
 
-            mm.Free();
+            var hfile = HidFeatures.OpenHid(this);
+
+            if (hfile == IntPtr.Zero) return false;
+
+            using (var mm = new SafePtr())
+            {
+                mm.Alloc(value.Length + 1);
+                mm.FromByteArray(value, 1L);
+                mm.ByteAt(0L) = featureCode;
+
+                if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, (int)mm.Length))
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                }
+            }
+            
             HidFeatures.CloseHid(hfile);
-            return HidSetFeatureRet;
+            return success;
         }
 
         /// <summary>
@@ -254,26 +277,29 @@ namespace DataTools.Win32.Usb
         /// <remarks></remarks>
         public bool HidSetFeature(byte featureCode, short value)
         {
-            bool HidSetFeatureRet = default;
+            bool success;
             var hfile = HidFeatures.OpenHid(this);
-            if (hfile == IntPtr.Zero)
-                return false;
-            var mm = new MemPtr();
-            mm.Alloc(3L);
-            mm.ByteAt(0L) = featureCode;
-            mm.ShortAtAbsolute(1L) = value;
-            if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 3))
+
+            if (hfile == IntPtr.Zero) return false;
+
+            using (var mm = new SafePtr())
             {
-                HidSetFeatureRet = false;
-            }
-            else
-            {
-                HidSetFeatureRet = true;
+                mm.Alloc(3L);
+                mm.ByteAt(0L) = featureCode;
+                mm.ShortAtAbsolute(1L) = value;
+                if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 3))
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                }
+
+                HidFeatures.CloseHid(hfile);
             }
 
-            HidFeatures.CloseHid(hfile);
-            mm.Free();
-            return HidSetFeatureRet;
+            return success;
         }
 
         /// <summary>
@@ -285,26 +311,32 @@ namespace DataTools.Win32.Usb
         /// <remarks></remarks>
         public bool HidSetFeature(byte featureCode, int value)
         {
-            bool HidSetFeatureRet = default;
+            bool success;
+            
             var hfile = HidFeatures.OpenHid(this);
-            if (hfile == IntPtr.Zero)
-                return false;
-            var mm = new MemPtr();
-            mm.Alloc(5L);
-            mm.ByteAt(0L) = featureCode;
-            mm.IntAtAbsolute(1L) = value;
-            if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 5))
+
+            if (hfile == IntPtr.Zero) return false;
+
+            using (var mm = new SafePtr())
             {
-                HidSetFeatureRet = false;
-            }
-            else
-            {
-                HidSetFeatureRet = true;
+                mm.Alloc(5L);
+                mm.ByteAt(0L) = featureCode;
+                mm.IntAtAbsolute(1L) = value;
+
+                if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 5))
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                }
+
+                HidFeatures.CloseHid(hfile);
+
             }
 
-            HidFeatures.CloseHid(hfile);
-            mm.Free();
-            return HidSetFeatureRet;
+            return success;
         }
 
         /// <summary>
@@ -316,26 +348,30 @@ namespace DataTools.Win32.Usb
         /// <remarks></remarks>
         public bool HidSetFeature(byte featureCode, long value)
         {
-            bool HidSetFeatureRet = default;
+            bool success;
+            
             var hfile = HidFeatures.OpenHid(this);
-            if (hfile == IntPtr.Zero)
-                return false;
-            var mm = new MemPtr();
-            mm.Alloc(9L);
-            mm.ByteAt(0L) = featureCode;
-            mm.LongAtAbsolute(1L) = value;
-            if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 9))
+
+            if (hfile == IntPtr.Zero) return false;
+            
+            using (var mm = new SafePtr())
             {
-                HidSetFeatureRet = false;
-            }
-            else
-            {
-                HidSetFeatureRet = true;
+                mm.Alloc(9L);
+                mm.ByteAt(0L) = featureCode;
+                mm.LongAtAbsolute(1L) = value;
+                if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 9))
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                }
+
+                HidFeatures.CloseHid(hfile);
             }
 
-            HidFeatures.CloseHid(hfile);
-            mm.Free();
-            return HidSetFeatureRet;
+            return success;
         }
 
         
@@ -351,13 +387,20 @@ namespace DataTools.Win32.Usb
             {
                 if (hidManufacturer is null)
                 {
-                    var dev = HidFeatures.OpenHid(this);
-                    MemPtr mm = new MemPtr();
-                    mm.AllocZero(512L);
-                    UsbLibHelpers.HidD_GetManufacturerString(dev, mm, (int)mm.Length);
-                    hidManufacturer = mm.GetString(0L);
-                    mm.Free();
-                    HidFeatures.CloseHid(dev);
+
+                    using (var mm = new SafePtr())
+                    {
+                        var dev = HidFeatures.OpenHid(this);
+
+                        mm.AllocZero(512L);
+
+                        UsbLibHelpers.HidD_GetManufacturerString(dev, mm, (int)mm.Length);
+
+                        hidManufacturer = mm.GetString(0L);
+
+                        HidFeatures.CloseHid(dev);
+                    }
+
                 }
 
                 return hidManufacturer;
@@ -381,13 +424,18 @@ namespace DataTools.Win32.Usb
             {
                 if (serialNumber is null)
                 {
-                    var dev = HidFeatures.OpenHid(this);
-                    MemPtr mm = new MemPtr();
-                    mm.AllocZero(512L);
-                    UsbLibHelpers.HidD_GetSerialNumberString(dev, mm, (int)mm.Length);
-                    serialNumber = (string)mm;
-                    mm.Free();
-                    HidFeatures.CloseHid(dev);
+                    using (var mm = new SafePtr())
+                    {
+                        var dev = HidFeatures.OpenHid(this);
+
+                        mm.AllocZero(512L);
+
+                        UsbLibHelpers.HidD_GetSerialNumberString(dev, mm, (int)mm.Length);
+
+                        serialNumber = (string)mm;
+
+                        HidFeatures.CloseHid(dev);
+                    }
                 }
 
                 return serialNumber;
@@ -411,13 +459,18 @@ namespace DataTools.Win32.Usb
             {
                 if (productString is null)
                 {
-                    var dev = HidFeatures.OpenHid(this);
-                    MemPtr mm = new MemPtr();
-                    mm.AllocZero(512L);
-                    UsbLibHelpers.HidD_GetProductString(dev, mm, (int)mm.Length);
-                    productString = (string)mm;
-                    mm.Free();
-                    HidFeatures.CloseHid(dev);
+                    using (var mm = new SafePtr())
+                    {
+                        var dev = HidFeatures.OpenHid(this);
+
+                        mm.AllocZero(512L);
+
+                        UsbLibHelpers.HidD_GetProductString(dev, mm, (int)mm.Length);
+
+                        productString = (string)mm;
+
+                        HidFeatures.CloseHid(dev);
+                    }
                 }
 
                 return productString;
@@ -463,13 +516,18 @@ namespace DataTools.Win32.Usb
             {
                 if (physicalDescriptor is null)
                 {
-                    var dev = HidFeatures.OpenHid(this);
-                    MemPtr mm = new MemPtr();
-                    mm.AllocZero(512L);
-                    UsbLibHelpers.HidD_GetPhysicalDescriptor(dev, mm, (int)mm.Length);
-                    physicalDescriptor = (string)mm;
-                    mm.Free();
-                    HidFeatures.CloseHid(dev);
+                    using (var mm = new SafePtr())
+                    {
+                        var dev = HidFeatures.OpenHid(this);
+
+                        mm.AllocZero(512L);
+
+                        UsbLibHelpers.HidD_GetPhysicalDescriptor(dev, mm, (int)mm.Length);
+
+                        physicalDescriptor = (string)mm;
+
+                        HidFeatures.CloseHid(dev);
+                    }
                 }
 
                 return physicalDescriptor;
