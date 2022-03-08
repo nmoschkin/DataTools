@@ -24,16 +24,19 @@ namespace TestHid
 
             var battery = hids.Where((e) => e.DeviceClass == DeviceClassEnum.Battery).ToList().FirstOrDefault();
 
-            battery.PopulateDeviceCaps();
+            if (battery != null)
+            {
+                battery.PopulateDeviceCaps();
 
-            PrintValCaps(battery, battery.FeatureValueCaps);
-            PrintValCaps(battery, battery.InputValueCaps);
-            PrintValCaps(battery, battery.OutputValueCaps);
+                PrintValCaps(battery, battery.FeatureValueCaps);
+                PrintValCaps(battery, battery.InputValueCaps);
+                PrintValCaps(battery, battery.OutputValueCaps);
 
 
-            PrintButtonCaps(battery, battery.FeatureButtonCaps);
-            PrintButtonCaps(battery, battery.InputButtonCaps);
-            PrintButtonCaps(battery, battery.OutputButtonCaps);
+                PrintButtonCaps(battery, battery.FeatureButtonCaps);
+                PrintButtonCaps(battery, battery.InputButtonCaps);
+                PrintButtonCaps(battery, battery.OutputButtonCaps);
+            }
 
         }
 
