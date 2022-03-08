@@ -19,29 +19,6 @@ namespace TestHid
 
         public static void Main(string[] args)
         {
-
-            //var f1 = @"C:\Users\theim\Desktop\Projects\Precise\pubmed_ids.txt";
-            //var f2 = @"C:\Users\theim\Desktop\Projects\Precise\eutils_ids.txt";
-
-
-            //var l1 = File.ReadAllLines(f1) ?? new string[0]; 
-            //var l2 = File.ReadAllLines(f2) ?? new string[0];
-
-            //var ds1 = new DataSet<string>(l1);
-            //var ds2 = new DataSet<string>(l2);
-
-            //var ds3 = ds1 & ds2;
-
-
-            //foreach(var l in ds3)
-            //{
-            //    Console.WriteLine(l);   
-            //}
-
-
-
-
-
             var hids = HidDeviceInfo.EnumerateHidDevices();
 
 
@@ -57,8 +34,6 @@ namespace TestHid
             PrintButtonCaps(battery, battery.FeatureButtonCaps);
             PrintButtonCaps(battery, battery.InputButtonCaps);
             PrintButtonCaps(battery, battery.OutputButtonCaps);
-
-
 
         }
 
