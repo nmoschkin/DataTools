@@ -41,6 +41,14 @@ namespace DataTools.Win32.Usb
         protected HidPButtonCaps[]? inputBtnCaps;
         protected HidPButtonCaps[]? outputBtnCaps;
 
+        protected Dictionary<int, IList<HidPValueCaps>> featureValMap = new Dictionary<int, IList<HidPValueCaps>>();
+        protected Dictionary<int, IList<HidPValueCaps>> inputValMap = new Dictionary<int, IList<HidPValueCaps>>();
+        protected Dictionary<int, IList<HidPValueCaps>> outputValMap = new Dictionary<int, IList<HidPValueCaps>>();
+
+        protected Dictionary<int, IList<HidPButtonCaps>> featureBtnMap = new Dictionary<int, IList<HidPButtonCaps>>();
+        protected Dictionary<int, IList<HidPButtonCaps>> inputBtnMap = new Dictionary<int, IList<HidPButtonCaps>>();
+        protected Dictionary<int, IList<HidPButtonCaps>> outputBtnMap = new Dictionary<int, IList<HidPButtonCaps>>();
+
 
         /// <summary>
         /// Enumarate all HID class devices on the local machine.
@@ -557,6 +565,63 @@ namespace DataTools.Win32.Usb
             internal set => outputBtnCaps = value;
 
         }
+
+        /// <summary>
+        /// Usage Linked Feature Values
+        /// </summary>
+        public Dictionary<int, IList<HidPValueCaps>> LinkedFeatureValues
+        {
+            get => featureValMap;
+            internal set => featureValMap = value;
+        }
+
+        /// <summary>
+        /// Usage Linked Input Values
+        /// </summary>
+        public Dictionary<int, IList<HidPValueCaps>> LinkedInputValues
+        {
+            get => inputValMap;
+            internal set => inputValMap = value;
+        }
+
+        /// <summary>
+        /// Usage Linked Output Values
+        /// </summary>
+        public Dictionary<int, IList<HidPValueCaps>> LinkedOutputValues
+        {
+            get => outputValMap;
+            internal set => outputValMap = value;
+        }
+
+
+        /// <summary>
+        /// Usage Linked Feature Buttons
+        /// </summary>
+        public Dictionary<int, IList<HidPButtonCaps>> LinkedFeatureButtons
+        {
+            get => featureBtnMap;
+            internal set => featureBtnMap = value;
+        }
+
+        /// <summary>
+        /// Usage Linked Input Buttons
+        /// </summary>
+        public Dictionary<int, IList<HidPButtonCaps>> LinkedInputButtons
+        {
+            get => inputBtnMap;
+            internal set => inputBtnMap = value;
+        }
+
+        /// <summary>
+        /// Usage Linked Output Buttons
+        /// </summary>
+        public Dictionary<int, IList<HidPButtonCaps>> LinkedOutputButtons
+        {
+            get => outputBtnMap;
+            internal set => outputBtnMap = value;
+        }
+
+
 
         protected override void ParseHw()
         {
