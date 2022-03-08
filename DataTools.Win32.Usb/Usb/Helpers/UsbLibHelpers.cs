@@ -220,21 +220,22 @@ namespace DataTools.Win32.Usb
             return true;
         }
 
-        public static Dictionary<int, IList<HidPValueCaps>> LinkValueCollections(IList<HidPValueCaps> valCaps)
+        public static Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> LinkValueCollections(IList<HidPValueCaps> valCaps)
         {
-            var result = new Dictionary<int, IList<HidPValueCaps>>();
+            var result = new Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>();
 
             foreach (var item in valCaps)
             {
                 if (item.LinkUsage != 0)
                 {
-                    if (!result.TryGetValue(item.LinkUsage, out var list))
+                    if (!result.TryGetValue((item.UsagePage, item.LinkUsage), out var list))
                     {
                         list = new List<HidPValueCaps>();
-                        result.Add(item.LinkUsage, list);
+                        result.Add((item.UsagePage, item.LinkUsage), list);
                     }
 
-                    list.Add(item);
+                    var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
+                    if (test.Usage == 0) list.Add(item);
                 }
             }
 
@@ -242,21 +243,23 @@ namespace DataTools.Win32.Usb
         }
 
 
-        public static Dictionary<int, IList<HidPButtonCaps>> LinkButtonCollections(IList<HidPButtonCaps> valCaps)
+        public static Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> LinkButtonCollections(IList<HidPButtonCaps> valCaps)
         {
-            var result = new Dictionary<int, IList<HidPButtonCaps>>();
+            var result = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
 
             foreach (var item in valCaps)
             {
+                
                 if (item.LinkUsage != 0)
                 {
-                    if (!result.TryGetValue(item.LinkUsage, out var list))
+                    if (!result.TryGetValue((item.UsagePage, item.LinkUsage), out var list))
                     {
                         list = new List<HidPButtonCaps>();
-                        result.Add(item.LinkUsage, list);
+                        result.Add((item.UsagePage, item.LinkUsage), list);
                     }
 
-                    list.Add(item);
+                    var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
+                    if (test.Usage == 0) list.Add(item);
                 }
             }
 

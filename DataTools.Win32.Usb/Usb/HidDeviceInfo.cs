@@ -41,13 +41,13 @@ namespace DataTools.Win32.Usb
         protected HidPButtonCaps[]? inputBtnCaps;
         protected HidPButtonCaps[]? outputBtnCaps;
 
-        protected Dictionary<int, IList<HidPValueCaps>> featureValMap = new Dictionary<int, IList<HidPValueCaps>>();
-        protected Dictionary<int, IList<HidPValueCaps>> inputValMap = new Dictionary<int, IList<HidPValueCaps>>();
-        protected Dictionary<int, IList<HidPValueCaps>> outputValMap = new Dictionary<int, IList<HidPValueCaps>>();
+        protected Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> featureValMap = new Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>();
+        protected Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> inputValMap = new Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>();
+        protected Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> outputValMap = new Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>();
 
-        protected Dictionary<int, IList<HidPButtonCaps>> featureBtnMap = new Dictionary<int, IList<HidPButtonCaps>>();
-        protected Dictionary<int, IList<HidPButtonCaps>> inputBtnMap = new Dictionary<int, IList<HidPButtonCaps>>();
-        protected Dictionary<int, IList<HidPButtonCaps>> outputBtnMap = new Dictionary<int, IList<HidPButtonCaps>>();
+        protected Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> featureBtnMap = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
+        protected Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> inputBtnMap = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
+        protected Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> outputBtnMap = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
 
 
         /// <summary>
@@ -569,7 +569,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Usage Linked Feature Values
         /// </summary>
-        public Dictionary<int, IList<HidPValueCaps>> LinkedFeatureValues
+        public Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> LinkedFeatureValues
         {
             get => featureValMap;
             internal set => featureValMap = value;
@@ -578,7 +578,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Usage Linked Input Values
         /// </summary>
-        public Dictionary<int, IList<HidPValueCaps>> LinkedInputValues
+        public Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> LinkedInputValues
         {
             get => inputValMap;
             internal set => inputValMap = value;
@@ -587,7 +587,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Usage Linked Output Values
         /// </summary>
-        public Dictionary<int, IList<HidPValueCaps>> LinkedOutputValues
+        public Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> LinkedOutputValues
         {
             get => outputValMap;
             internal set => outputValMap = value;
@@ -597,7 +597,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Usage Linked Feature Buttons
         /// </summary>
-        public Dictionary<int, IList<HidPButtonCaps>> LinkedFeatureButtons
+        public Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> LinkedFeatureButtons
         {
             get => featureBtnMap;
             internal set => featureBtnMap = value;
@@ -606,7 +606,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Usage Linked Input Buttons
         /// </summary>
-        public Dictionary<int, IList<HidPButtonCaps>> LinkedInputButtons
+        public Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> LinkedInputButtons
         {
             get => inputBtnMap;
             internal set => inputBtnMap = value;
@@ -615,7 +615,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Usage Linked Output Buttons
         /// </summary>
-        public Dictionary<int, IList<HidPButtonCaps>> LinkedOutputButtons
+        public Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> LinkedOutputButtons
         {
             get => outputBtnMap;
             internal set => outputBtnMap = value;

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTools.Win32.Usb.Usb.Power
+namespace DataTools.Win32.Usb
 {
     /// <summary>
     /// An object that represents a HID power device or battery on the local machine.
@@ -16,6 +16,8 @@ namespace DataTools.Win32.Usb.Usb.Power
 
         public static HidPowerDeviceInfo CreateFromHidDevice(HidDeviceInfo device)
         {
+            if (device.DeviceClass != DeviceClassEnum.Battery) throw new ArgumentException($"{nameof(device)} must have a device class of {DeviceClassEnum.Battery}");
+            
             var result = device.CopyTo<HidPowerDeviceInfo>();
 
             result.PopulateDeviceCaps();
@@ -50,7 +52,7 @@ namespace DataTools.Win32.Usb.Usb.Power
         /// <returns>
         /// Either <paramref name="currDict"/> or a new dictionary.
         /// </returns>
-        protected internal Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>> GetCollection(Dictionary<int, IList<HidPValueCaps>> data, Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? currDict = null)
+        protected internal Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> data, Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? currDict = null)
         {
             var result = currDict ?? new Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>();
 
@@ -59,12 +61,11 @@ namespace DataTools.Win32.Usb.Usb.Power
 
             foreach (var kv in data)
             {
-                var valcap = kv.Key;
+                var page = kv.Key.Item1;
+                var valcap = kv.Key.Item2;
                 var list = kv.Value;
-
-                var testVal = list.FirstOrDefault();
                 
-                if (testVal.UsagePage == HidUsagePage.PowerDevice1)
+                if (page == HidUsagePage.PowerDevice2)
                 {
                     var bitem = bref.Where((x) => x.UsageId == valcap).FirstOrDefault();
                     if (bitem == null) continue;
@@ -81,7 +82,7 @@ namespace DataTools.Win32.Usb.Usb.Power
 
                     result.Add((HidPowerUsageInfo)bitem.Clone(), l);
                 }
-                else if (testVal.UsagePage == HidUsagePage.PowerDevice2)
+                else if (page == HidUsagePage.PowerDevice1)
                 {
                     var pitem = pref.Where((x) => x.UsageId == valcap).FirstOrDefault();
                     if (pitem == null) continue;

@@ -24,6 +24,9 @@ namespace TestHid
 
             var battery = hids.Where((e) => e.DeviceClass == DeviceClassEnum.Battery).ToList().FirstOrDefault();
 
+
+            var batt2 = HidPowerDeviceInfo.CreateFromHidDevice(battery);
+
             if (battery != null)
             {
                 battery.PopulateDeviceCaps();
@@ -31,7 +34,6 @@ namespace TestHid
                 PrintValCaps(battery, battery.FeatureValueCaps);
                 PrintValCaps(battery, battery.InputValueCaps);
                 PrintValCaps(battery, battery.OutputValueCaps);
-
 
                 PrintButtonCaps(battery, battery.FeatureButtonCaps);
                 PrintButtonCaps(battery, battery.InputButtonCaps);
