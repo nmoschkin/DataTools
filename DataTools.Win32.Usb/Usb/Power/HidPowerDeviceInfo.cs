@@ -44,6 +44,49 @@ namespace DataTools.Win32.Usb
             protected internal set => powerCollections = value;
         }
 
+        public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? RefreshDynamicValues()
+        {
+            return GetFeatureValues(HidUsageType.CP | HidUsageType.CL, HidUsageType.DV);
+        }
+
+        public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? GetFeatureValues(HidUsageType collectionType, HidUsageType usageType)
+        {
+            var result = new Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>();
+            if (PowerCollections == null) return null;
+
+            foreach(var kvp in PowerCollections)
+            {
+                if ((collectionType & kvp.Key.UsageType) == kvp.Key.UsageType)
+                {
+                    foreach (var item in kvp.Value)
+                    {
+                        if ((usageType & item.UsageType) == item.UsageType)
+                        {
+                            int res = 0;
+                            var b = HidGetFeature(item.ReportID, ref res);
+                            if (b)
+                            {
+                                item.Value = res;
+
+                                if (!result.TryGetValue(kvp.Key, out List<HidPowerUsageInfo>? col))
+                                {
+                                    col = new List<HidPowerUsageInfo>();
+                                    result.Add(kvp.Key, col);
+                                }
+
+                                col.Add(item);
+                            }
+
+                        }
+                    }
+
+                }
+            }
+
+            return result;
+        }
+
+
         /// <summary>
         /// Create a collection from the linked list.
         /// </summary>
@@ -67,7 +110,7 @@ namespace DataTools.Win32.Usb
                 
                 if (page == HidUsagePage.PowerDevice2)
                 {
-                    var bitem = bref.Where((x) => x.UsageId == valcap).FirstOrDefault();
+                    var bitem = bref.Where((x) => x.UsageId == valcap && x.UsageName != "Reserved").FirstOrDefault();
                     if (bitem == null) continue;
 
                     var l = new List<HidPowerUsageInfo>();
@@ -76,15 +119,16 @@ namespace DataTools.Win32.Usb
                     {
                         var bitem2 = bref.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
                         if (bitem2 == null) continue;
-
-                        l.Add((HidPowerUsageInfo)bitem2.Clone());
+                        var newItem = (HidPowerUsageInfo)bitem2.Clone();
+                        newItem.ReportID = item.ReportID;
+                        l.Add(newItem);
                     }
 
                     result.Add((HidPowerUsageInfo)bitem.Clone(), l);
                 }
                 else if (page == HidUsagePage.PowerDevice1)
                 {
-                    var pitem = pref.Where((x) => x.UsageId == valcap).FirstOrDefault();
+                    var pitem = pref.Where((x) => x.UsageId == valcap && x.UsageName != "Reserved").FirstOrDefault();
                     if (pitem == null) continue;
 
                     var l = new List<HidPowerUsageInfo>();
@@ -94,7 +138,9 @@ namespace DataTools.Win32.Usb
                         var pitem2 = pref.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
                         if (pitem2 == null) continue;
 
-                        l.Add((HidPowerUsageInfo)pitem2.Clone());
+                        var newItem = (HidPowerUsageInfo)pitem2.Clone();
+                        newItem.ReportID = item.ReportID;
+                        l.Add(newItem);
                     }
 
                     result.Add((HidPowerUsageInfo)pitem.Clone(), l);

@@ -75,6 +75,13 @@ namespace DataTools.Win32.Usb
         /// </summary>
         public virtual bool AccessWrite { get; set; }
 
+
+        /// <summary>
+        /// Gets or Sets the discovered ReportID
+        /// </summary>
+        public virtual byte ReportID { get; set; }
+
+
         public override string ToString()
         {
             var text = UsageName ?? "";

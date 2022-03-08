@@ -27,17 +27,47 @@ namespace TestHid
 
             var batt2 = HidPowerDeviceInfo.CreateFromHidDevice(battery);
 
-            if (battery != null)
+            Console.Clear();
+            Console.CursorVisible = false;
+            Console.WindowHeight = 60;
+            Task.Delay(1000).Wait();    
+
+            while(true)
             {
-                battery.PopulateDeviceCaps();
+                Console.CursorLeft = 0;
+                Console.CursorTop = 0;
 
-                PrintValCaps(battery, battery.FeatureValueCaps);
-                PrintValCaps(battery, battery.InputValueCaps);
-                PrintValCaps(battery, battery.OutputValueCaps);
+                if (Console.KeyAvailable) break;
 
-                PrintButtonCaps(battery, battery.FeatureButtonCaps);
-                PrintButtonCaps(battery, battery.InputButtonCaps);
-                PrintButtonCaps(battery, battery.OutputButtonCaps);
+                var vals = batt2.RefreshDynamicValues();
+
+                foreach (var val in vals)
+                {
+                    Console.WriteLine(val.Key.UsageName + $" ({val.Key.UsageId:X2})       ");
+
+                    foreach (var item in val.Value)
+                    {
+
+                        if (item.UsageName.Contains("Time"))
+                        {
+                            Console.WriteLine($"    {item.UsageName}: {new TimeSpan(0, 0, item.Value)}       ");
+                        }
+                        else
+                        {
+                            double vv = item.Value;
+
+                            if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
+                            {
+                                vv /= 10;
+                            }
+
+                            Console.WriteLine($"    {item.UsageName}: {vv}            ");
+                        }
+                    }
+
+                    Console.WriteLine();
+                    Task.Delay(500);
+                }
             }
 
         }

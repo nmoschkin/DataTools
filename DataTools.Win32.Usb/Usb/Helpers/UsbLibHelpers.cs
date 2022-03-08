@@ -226,6 +226,18 @@ namespace DataTools.Win32.Usb
 
             foreach (var item in valCaps)
             {
+                if (item.LinkCollection != 0)
+                {
+                    if (!result.TryGetValue((item.UsagePage, item.LinkCollection), out var list))
+                    {
+                        list = new List<HidPValueCaps>();
+                        result.Add((item.UsagePage, item.LinkCollection), list);
+                    }
+
+                    var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
+                    if (test.Usage == 0) list.Add(item);
+                }
+                
                 if (item.LinkUsage != 0)
                 {
                     if (!result.TryGetValue((item.UsagePage, item.LinkUsage), out var list))
@@ -237,6 +249,7 @@ namespace DataTools.Win32.Usb
                     var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
                     if (test.Usage == 0) list.Add(item);
                 }
+
             }
 
             return result;
@@ -249,7 +262,19 @@ namespace DataTools.Win32.Usb
 
             foreach (var item in valCaps)
             {
-                
+
+
+                if (item.LinkCollection != 0)
+                {
+                    if (!result.TryGetValue((item.UsagePage, item.LinkCollection), out var list))
+                    {
+                        list = new List<HidPButtonCaps>();
+                        result.Add((item.UsagePage, item.LinkCollection), list);
+                    }
+
+                    var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
+                    if (test.Usage == 0) list.Add(item);
+                }
                 if (item.LinkUsage != 0)
                 {
                     if (!result.TryGetValue((item.UsagePage, item.LinkUsage), out var list))
