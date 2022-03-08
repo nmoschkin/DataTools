@@ -8,7 +8,7 @@
     xmlns:interop="clr-namespace:DataTools.Computer;assembly=DataTools.Computer"
     xmlns:local="clr-namespace:SysInfoTool"
     xmlns:pt="http://propertytools.org/wpf"
-    xmlns:usb="clr-namespace:DataTools.Hardware.Usb;assembly=DataTools.Win32.Usb"
+    xmlns:usb="clr-namespace:DataTools.Win32.Usb;assembly=DataTools.Win32.Usb"
     xmlns:wf="clr-namespace:System.Windows.Forms;assembly=System.Windows.Forms"
     x:Name="HardwareView"
     Title="Hardware"

@@ -1,4 +1,4 @@
-﻿using DataTools.Win32.Usb.Usb.Classes;
+﻿using DataTools.Win32.Usb;
 
 using System;
 using System.Collections.Generic;

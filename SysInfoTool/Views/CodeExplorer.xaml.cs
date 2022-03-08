@@ -1,4 +1,4 @@
-﻿using DataTools.Hardware.Usb;
+﻿using DataTools.Win32.Usb;
 using System;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;

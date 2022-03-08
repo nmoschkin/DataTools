@@ -2,7 +2,7 @@
 using DataTools.Hardware;
 using DataTools.Hardware.Printers;
 using DataTools.Hardware.Processor;
-using DataTools.Hardware.Usb;
+using DataTools.Win32.Usb;
 using DataTools.Win32;
 using DataTools.Win32.Disk;
 using DataTools.Win32.Display;
