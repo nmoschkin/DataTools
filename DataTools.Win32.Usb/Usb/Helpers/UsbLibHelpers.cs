@@ -175,14 +175,22 @@ namespace DataTools.Win32.Usb
 
 
                 var featBtn = GetButtonCaps(HidPReportType.HidP_Feature, ppd);
-                var featVal = GetValueCaps(HidPReportType.HidP_Feature, ppd);
+                var fbmap = LinkButtonCollections(featBtn);
 
+                var featVal = GetValueCaps(HidPReportType.HidP_Feature, ppd);
+                var fvmap = LinkValueCollections(featVal);
 
                 var inBtn = GetButtonCaps(HidPReportType.HidP_Input, ppd);
+                var ibmap = LinkButtonCollections(inBtn);
+
                 var inVal = GetValueCaps(HidPReportType.HidP_Input, ppd);
+                var ivmap = LinkValueCollections(inVal);
 
                 var outBtn = GetButtonCaps(HidPReportType.HidP_Output, ppd);
+                var obmap = LinkButtonCollections(outBtn);
+
                 var outVal = GetValueCaps(HidPReportType.HidP_Output, ppd);
+                var ovmap = LinkValueCollections(outVal);
 
                 device.FeatureButtonCaps = featBtn;
                 device.FeatureValueCaps = featVal;
@@ -190,6 +198,15 @@ namespace DataTools.Win32.Usb
                 device.InputValueCaps = inVal;
                 device.OutputButtonCaps = outBtn;
                 device.OutputValueCaps = outVal;
+
+                device.LinkedFeatureButtons = fbmap;
+                device.LinkedFeatureValues = fvmap;
+
+                device.LinkedInputButtons = ibmap;
+                device.LinkedInputValues = ivmap;
+
+                device.LinkedOutputButtons = obmap;
+                device.LinkedOutputValues = ovmap;
 
                 HidD_FreePreparsedData(ppd);
                 CloseHandle(hHid);
@@ -203,6 +220,48 @@ namespace DataTools.Win32.Usb
             return true;
         }
 
+        public static Dictionary<int, IList<HidPValueCaps>> LinkValueCollections(IList<HidPValueCaps> valCaps)
+        {
+            var result = new Dictionary<int, IList<HidPValueCaps>>();
+
+            foreach (var item in valCaps)
+            {
+                if (item.LinkUsage != 0)
+                {
+                    if (!result.TryGetValue(item.LinkUsage, out var list))
+                    {
+                        list = new List<HidPValueCaps>();
+                        result.Add(item.LinkUsage, list);
+                    }
+
+                    list.Add(item);
+                }
+            }
+
+            return result;
+        }
+
+
+        public static Dictionary<int, IList<HidPButtonCaps>> LinkButtonCollections(IList<HidPButtonCaps> valCaps)
+        {
+            var result = new Dictionary<int, IList<HidPButtonCaps>>();
+
+            foreach (var item in valCaps)
+            {
+                if (item.LinkUsage != 0)
+                {
+                    if (!result.TryGetValue(item.LinkUsage, out var list))
+                    {
+                        list = new List<HidPButtonCaps>();
+                        result.Add(item.LinkUsage, list);
+                    }
+
+                    list.Add(item);
+                }
+            }
+
+            return result;
+        }
 
     }
 }
