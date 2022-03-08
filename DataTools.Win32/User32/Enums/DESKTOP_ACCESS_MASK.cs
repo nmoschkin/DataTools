@@ -31,7 +31,7 @@ using DataTools.Win32;
 
 namespace DataTools.Win32
 {
-    internal enum DESKTOP_ACCESS_MASK
+    public enum DESKTOP_ACCESS_MASK
     {
 
         /// <summary>

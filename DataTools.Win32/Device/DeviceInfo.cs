@@ -29,9 +29,12 @@ namespace DataTools.Win32
     public class DeviceInfo
     {
         internal SP_DEVINFO_DATA _devInfo;
+
         protected string[] _HardwareIds;
+
         internal ushort _Vid;
         internal ushort _Pid;
+
         protected string _DevicePath;
         protected string _FriendlyName;
         protected string _InstanceId;
@@ -46,22 +49,29 @@ namespace DataTools.Win32
         protected Guid _ModelId;
         protected string _BusReportedDeviceDesc;
         protected string _ClassName;
+
         protected Guid _DeviceInterfaceClassGuid;
         protected DeviceInterfaceClassEnum _DeviceInterfaceClass;
         protected Guid _DeviceClassGuid;
         protected DeviceClassEnum _DeviceClass;
+
         protected System.Drawing.Icon _DeviceClassIcon;
+
         protected string _Parent;
         protected string[] _Children;
+
         protected DeviceRemovalPolicy _RemovalPolicy;
         protected bool _SafeRemovalRequired;
         protected DeviceCharacteristcs _Characteristics;
         protected DateTime _InstallDate;
         protected BusType _BusType;
+
         protected string _VenderId = null;
         protected string _ProductId = null;
+
         protected System.Drawing.Icon _DeviceIcon;
         //protected System.Windows.Media.Imaging.BitmapSource _DeviceIcon;
+
         protected DeviceInfo[] _LinkedChildren;
         protected DeviceInfo _LinkedParent;
 
@@ -918,6 +928,38 @@ namespace DataTools.Win32
             {
                 return d;
             }
+        }
+
+        /// <summary>
+        /// Copy this Device Info class into another device info derived class.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="DeviceInfo"/> derived destination type.</typeparam>
+        /// <param name="obj">The object to copy into.</param>
+        public virtual void CopyTo<T>(T obj) where T: DeviceInfo
+        {
+            var f = GetType().GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+
+            foreach (var field in f)
+            {
+                var field2 = typeof(T).GetField(field.Name, BindingFlags.Instance | BindingFlags.NonPublic);
+                if (field2 != null)
+                {
+                    field2.SetValue(obj, field.GetValue(this));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Create a new <see cref="DeviceInfo"/> derived class from the data in this object.
+        /// </summary>
+        /// <returns>
+        /// A new <typeparamref name="T"/> object.
+        /// </returns>
+        public virtual T CopyTo<T>() where T: DeviceInfo, new()
+        {
+            var result = new T();
+            CopyTo(result);
+            return result;
         }
     }
 }

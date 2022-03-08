@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct W32POINT
+    public struct W32POINT
     {
         public int x;
         public int y;

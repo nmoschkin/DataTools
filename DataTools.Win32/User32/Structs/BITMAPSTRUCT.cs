@@ -32,7 +32,7 @@ using DataTools.Win32;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct BITMAPSTRUCT
+    public struct BITMAPSTRUCT
     {
         public int bmStructure;
         public int bmWidth;

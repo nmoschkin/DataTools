@@ -32,7 +32,7 @@ using DataTools.Win32;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct MENUITEMINFO
+    public struct MENUITEMINFO
     {
         public int cbSize;
         public int fMask;

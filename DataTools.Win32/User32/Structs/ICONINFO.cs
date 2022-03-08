@@ -32,7 +32,7 @@ using DataTools.Win32;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ICONINFO
+    public struct ICONINFO
     {
         public int fIcon;
         public int xHotspot;

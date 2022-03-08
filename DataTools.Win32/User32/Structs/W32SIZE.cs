@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct W32SIZE
+    public struct W32SIZE
     {
         public int cx;
         public int cy;

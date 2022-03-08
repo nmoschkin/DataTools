@@ -32,7 +32,7 @@ using DataTools.Win32;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct IMAGEINFO
+    public struct IMAGEINFO
     {
         public IntPtr hbmImage;
         public IntPtr hbmMask;

@@ -31,7 +31,7 @@ using DataTools.Win32;
 
 namespace DataTools.Win32
 {
-    internal enum ReplaceFileFlags : uint
+    public enum ReplaceFileFlags : uint
     {
 
         /// <summary>

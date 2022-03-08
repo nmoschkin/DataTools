@@ -31,7 +31,7 @@ using DataTools.Win32;
 
 namespace DataTools.Win32
 {
-    internal struct MENUBARINFO
+    public struct MENUBARINFO
     {
         public int cbSize;
         [MarshalAs(UnmanagedType.Struct)]

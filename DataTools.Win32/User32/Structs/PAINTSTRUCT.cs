@@ -32,7 +32,7 @@ using DataTools.Win32;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct PAINTSTRUCT
+    public struct PAINTSTRUCT
     {
         public IntPtr hDC;
         public int fErase;

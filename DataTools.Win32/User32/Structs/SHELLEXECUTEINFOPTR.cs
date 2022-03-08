@@ -32,7 +32,7 @@ using DataTools.Win32;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct SHELLEXECUTEINFOPTR
+    public struct SHELLEXECUTEINFOPTR
     {
         public int cbSize;
         public uint fMask;

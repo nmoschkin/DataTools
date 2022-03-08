@@ -32,7 +32,7 @@ using DataTools.Win32;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct SHFILEINFO
+    public struct SHFILEINFO
     {
         public IntPtr hIcon;           // out: icon
         public int iIcon;          // out: icon index

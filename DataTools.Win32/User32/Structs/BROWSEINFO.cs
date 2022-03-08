@@ -33,7 +33,7 @@ namespace DataTools.Win32
 {
     // system browser-for-folder info structure
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct BROWSEINFO
+    public struct BROWSEINFO
     {
         public int hWndOwner;
         public int pidlRoot;
