@@ -141,7 +141,7 @@ namespace DataTools.Win32.Display
         /// <remarks></remarks>
         public static MonitorDeviceInfo[] EnumMonitors()
         {
-            var minf = _internalEnumerateDevices<MonitorDeviceInfo>(DevProp.GUID_DEVINTERFACE_MONITOR, ClassDevFlags.DeviceInterface | ClassDevFlags.Present);
+            var minf = InternalEnumerateDevices<MonitorDeviceInfo>(DevProp.GUID_DEVINTERFACE_MONITOR, ClassDevFlags.DeviceInterface | ClassDevFlags.Present);
             var mon = new Monitors();
 
             DISPLAY_DEVICE dd;

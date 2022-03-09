@@ -30,7 +30,7 @@ namespace DataTools.Computer
         public static ObservableCollection<object> _internalEnumComputerExhaustive()
         {
             var col = new ObservableCollection<object>();
-            var comp = _internalGetComputer();
+            var comp = InternalGetComputer();
             var vol = DiskDeviceInfo.EnumVolumes();
             var dsk = DiskDeviceInfo.EnumDisks();
             var net = DeviceEnum.EnumerateDevices<DeviceInfo>(DevProp.GUID_DEVINTERFACE_NET);

@@ -41,7 +41,7 @@ namespace DataTools.Hardware
         public static BluetoothDeviceInfo[] EnumBluetoothRadios()
         {
             var bth = Bluetooth._internalEnumBluetoothRadios();
-            var p = _internalEnumerateDevices<BluetoothDeviceInfo>(Bluetooth.GUID_BTHPORT_DEVICE_INTERFACE, ClassDevFlags.DeviceInterface | ClassDevFlags.Present);
+            var p = InternalEnumerateDevices<BluetoothDeviceInfo>(Bluetooth.GUID_BTHPORT_DEVICE_INTERFACE, ClassDevFlags.DeviceInterface | ClassDevFlags.Present);
             if (p is object && p.Count() > 0)
             {
                 foreach (var x in p)
@@ -85,7 +85,7 @@ namespace DataTools.Hardware
 
             var bth = Bluetooth._internalEnumBluetoothDevices();
 
-            var p = _internalEnumerateDevices<BluetoothDeviceInfo>(DevProp.GUID_DEVCLASS_BLUETOOTH, ClassDevFlags.Present);
+            var p = InternalEnumerateDevices<BluetoothDeviceInfo>(DevProp.GUID_DEVCLASS_BLUETOOTH, ClassDevFlags.Present);
 
             if (p != null && p.Length > 0)
             {

@@ -48,20 +48,20 @@ namespace DataTools.Win32.Disk
                 foreach (var inf in info)
                 {
 
-                    object caps = _internalGetProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32);
+                    object caps = GetDeviceProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32);
 
                     if (caps != null)
                     {
-                        inf.Capabilities = (DeviceCapabilities)caps;
+                        inf.Capabilities = (DeviceCapabilities)(int)caps;
                     }
                     if (inf.Capabilities == DeviceCapabilities.None)
                     {
 
-                        caps = (_internalGetProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32, useClassId: true));
+                        caps = (GetDeviceProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32, useClassId: true));
 
                         if (caps != null)
                         {
-                            inf.Capabilities = (DeviceCapabilities)caps;
+                            inf.Capabilities = (DeviceCapabilities)(int)caps;
                         }
                     }
 

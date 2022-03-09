@@ -719,6 +719,7 @@ namespace DataTools.Win32
                 {
                     if (_DeviceClassIcon is null)
                         return null;
+                    
                     _DeviceIcon = _DeviceClassIcon;
                 }
 
