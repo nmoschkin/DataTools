@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
@@ -22,12 +24,57 @@ namespace DataTools.ColorControls
     public partial class NamedColorPicker : ComboBox
     {
 
-        NamedColorViewModel vm;
+        internal protected NamedColorViewModel vm;
+
+        new public NamedColorViewModel SelectedItem
+        {
+            get { return (NamedColorViewModel)GetValue(SelectedItemProperty); }
+            set { SetValue(SelectedItemProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for SelectedItem.  This enables animation, styling, binding, etc...
+        new public static readonly DependencyProperty SelectedItemProperty =
+            DependencyProperty.Register("SelectedItem", typeof(NamedColorViewModel), typeof(NamedColorPicker), new PropertyMetadata(null, OnSelectedItemChanged));
+
+
+        protected static void OnSelectedItemChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (sender is ComboBox cb)
+            {
+                cb.SelectedItem = e.NewValue;
+            }
+        }
+
+        new public ListCollectionView ItemsSource
+        {
+            get { return (ListCollectionView)GetValue(ItemsSourceProperty); }
+            set { SetValue(ItemsSourceProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ItemsSource.  This enables animation, styling, binding, etc...
+        new public static readonly DependencyProperty ItemsSourceProperty =
+            DependencyProperty.Register("ItemsSource", typeof(ListCollectionView), typeof(NamedColorPicker), new PropertyMetadata(null, OnItemsSourceChanged));
+
+        protected static void OnItemsSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (sender is ComboBox cb)
+            {
+                cb.ItemsSource = (IEnumerable)e.NewValue;
+            }
+        }
+
         public NamedColorPicker()
         {
             InitializeComponent();
-            vm = new NamedColorViewModel();
-            ItemsSource = vm.AllNamedColors;
+
+            DataContext = vm = new NamedColorViewModel();            
+            
+            SetBinding(ItemsSourceProperty, new Binding(nameof(NamedColorViewModel.AllNamedColors)));
+            SetBinding(SelectedItemProperty, new Binding(nameof(NamedColorViewModel.SelectedColor)));
         }
+
+
+
+
     }
 }

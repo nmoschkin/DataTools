@@ -15,11 +15,15 @@ namespace DataTools.ColorControls
     public class NamedColorViewModel : ObservableBase
     {
         NamedColor source;
+
+        NamedColorViewModel selColor;
+
         public static ReadOnlyCollection<NamedColorViewModel> GlobalCatalog { get; private set; }
 
         public ListCollectionView AllNamedColors { get; private set; }
 
         private string category;
+        private bool isSourceList;
 
         static NamedColorViewModel()
         {
@@ -34,7 +38,9 @@ namespace DataTools.ColorControls
 
         public NamedColorViewModel()
         {
+            isSourceList = true;
             var l = new List<NamedColorViewModel>();
+        
             foreach (var clr in GlobalCatalog)
             {
                 l.Add(clr);
@@ -44,11 +50,23 @@ namespace DataTools.ColorControls
             AllNamedColors.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
         }
 
+
         public NamedColorViewModel(NamedColor source)
         {
+            isSourceList = false;
             Source = source;
         }
 
+        public NamedColorViewModel SelectedColor
+        {
+            get => selColor;
+            set
+            {
+                SetProperty(ref selColor, value);
+            }
+        }
+
+        public bool IsSourceList => isSourceList;
 
         public NamedColor Source
         {

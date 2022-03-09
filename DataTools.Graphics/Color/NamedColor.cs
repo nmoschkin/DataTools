@@ -270,6 +270,14 @@ namespace DataTools.Graphics
             ExtraInfo = extra;
         }
 
+        public NamedColor(UniColor color, string extra = null)
+        {
+
+            Name = color.ToString("whr");
+            Color = color;
+            extraInfo = extra;
+        }
+
         public static implicit operator System.Drawing.Color(NamedColor c)
         {
             return c.Color;
