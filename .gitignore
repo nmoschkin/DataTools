@@ -48,6 +48,9 @@ Generated\ Files/
 TestResult.xml
 nunit-*.xml
 
+Scratchpad/
+DataTools_scr.sln
+
 # Build Results of an ATL Project
 [Dd]ebugPS/
 [Rr]eleasePS/
