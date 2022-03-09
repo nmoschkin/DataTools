@@ -2585,7 +2585,11 @@ namespace DataTools.Win32
                 hFind = BluetoothFindFirstDevice(ref btparam, ref brInfo);
                 if (hFind == IntPtr.Zero)
                 {
-                    User32.CloseHandle(hRadio);
+                    try
+                    {
+                        User32.CloseHandle(hRadio);
+                    }
+                    catch { }
                     BluetoothFindRadioClose(radFind);
                     bl.ToArray();
                 }
@@ -2601,7 +2605,11 @@ namespace DataTools.Win32
                 }
                 while (fr == true);
                 BluetoothFindDeviceClose(hFind);
-                User32.CloseHandle(hRadio);
+                try
+                {
+                    User32.CloseHandle(hRadio);
+                }
+                catch { }
                 frad = BluetoothFindNextRadio(radFind, out hRadio);
             }
             while (frad == true);

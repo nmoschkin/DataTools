@@ -285,7 +285,7 @@ namespace DataTools.SystemInformation
         /// <returns></returns>
         public static DeviceInfo[] EnumComPorts()
         {
-            var p = _internalEnumerateDevices<DeviceInfo>(DevProp.GUID_DEVINTERFACE_COMPORT, ClassDevFlags.DeviceInterface | ClassDevFlags.Present);
+            var p = InternalEnumerateDevices<DeviceInfo>(DevProp.GUID_DEVINTERFACE_COMPORT, ClassDevFlags.DeviceInterface | ClassDevFlags.Present);
             if (p is object && p.Count() > 0)
             {
                 foreach (var x in p)

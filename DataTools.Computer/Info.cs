@@ -2,7 +2,7 @@
 using DataTools.Hardware;
 using DataTools.Hardware.Printers;
 using DataTools.Hardware.Processor;
-using DataTools.Hardware.Usb;
+using DataTools.Win32.Usb;
 using DataTools.Win32;
 using DataTools.Win32.Disk;
 using DataTools.Win32.Display;
@@ -30,7 +30,7 @@ namespace DataTools.Computer
         public static ObservableCollection<object> _internalEnumComputerExhaustive()
         {
             var col = new ObservableCollection<object>();
-            var comp = _internalGetComputer();
+            var comp = InternalGetComputer();
             var vol = DiskDeviceInfo.EnumVolumes();
             var dsk = DiskDeviceInfo.EnumDisks();
             var net = DeviceEnum.EnumerateDevices<DeviceInfo>(DevProp.GUID_DEVINTERFACE_NET);

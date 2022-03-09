@@ -122,7 +122,25 @@ namespace DataTools.Computer
             }
 
             // sort all top-level devices by their device class.
-            c.Sort(new HardwareObjectSorter());
+            c.Sort((a, b) =>
+            {
+                if (a.DeviceClass.ToString() == b.DeviceClass.ToString())
+                {
+                    if (a.FriendlyName == b.FriendlyName)
+                    {
+                        return string.Compare(a.InstanceId, b.InstanceId);
+                    }
+                    else
+                    {
+                        return string.Compare(a.FriendlyName, b.FriendlyName);
+                    }
+                }
+                else
+                {
+                    return string.Compare(a.DeviceClass.ToString(), b.DeviceClass.ToString());
+                }
+            });
+ 
             foreach (var x in c)
             {
 
@@ -131,9 +149,12 @@ namespace DataTools.Computer
                 {
                     chw = x.DeviceClass;
                     f.Add(g);
+
                     g = new HardwareCollection();
+
                     g.DeviceClass = chw;
                     g.ClassIcon = x.DeviceClassIcon;
+                    
                 }
 
                 g.Add(x);

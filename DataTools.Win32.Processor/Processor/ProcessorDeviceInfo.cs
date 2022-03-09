@@ -24,7 +24,7 @@ namespace DataTools.Hardware.Processor
 
         public static ProcessorDeviceInfo[] EnumProcessors()
         {
-            var p = _internalEnumerateDevices<ProcessorDeviceInfo>(DevProp.GUID_DEVCLASS_PROCESSOR, ClassDevFlags.Present);
+            var p = InternalEnumerateDevices<ProcessorDeviceInfo>(DevProp.GUID_DEVCLASS_PROCESSOR, ClassDevFlags.Present);
 
             if (p != null && p.Length > 0)
             {

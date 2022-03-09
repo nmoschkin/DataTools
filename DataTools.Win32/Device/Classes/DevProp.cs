@@ -66,37 +66,6 @@ namespace DataTools.Win32
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true, CallingConvention = CallingConvention.StdCall, PreserveSig = true)]
         public static extern bool SetupDiEnumDeviceInfo(IntPtr DeviceInfoSet, uint MemberIndex, out SP_DEVINFO_DATA DeviceInfoData);
 
-        // <DllImport("setupapi.dll", EntryPoint:="SetupDiGetDeviceInterfaceDetailW", CharSet:=CharSet.Unicode, SetLastError:=True, _
-        // CallingConvention:=CallingConvention.StdCall, PreserveSig:=True)>
-        // Public Function SetupDiGetDeviceInterfaceDetail _
-        // (DeviceInfoSet As IntPtr, _
-        // <MarshalAs(UnmanagedType.Struct)> DeviceInterfaceData As SP_DEVICE_INTERFACE_DATA, _
-        // DeviceInterfaceDetailData As SafeHandle, _
-        // DeviceInterfaceDetailDataSize As UInteger, _
-        // ByRef RequiredSize As UInteger, _
-        // DeviceInfoData As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
-        // End Function
-
-        // <DllImport("setupapi.dll", EntryPoint:="SetupDiGetDeviceInterfaceDetailW", CharSet:=CharSet.Unicode, SetLastError:=True, _
-        // CallingConvention:=CallingConvention.StdCall, PreserveSig:=True)>
-        // Public Function SetupDiGetDeviceInterfaceDetail _
-        // (DeviceInfoSet As IntPtr, _
-        // <MarshalAs(UnmanagedType.Struct)> DeviceInterfaceData As SP_DEVICE_INTERFACE_DATA, _
-        // DeviceInterfaceDetailData As SafeHandle, _
-        // DeviceInterfaceDetailDataSize As UInteger, _
-        // ByRef RequiredSize As UInteger, _
-        // <MarshalAs(UnmanagedType.Struct)> DeviceInfoData As SP_DEVINFO_DATA) As <MarshalAs(UnmanagedType.Bool)> Boolean
-        // End Function
-
-        // Public Declare Function SetupDiGetDeviceInterfaceDetail Lib "setupapi.dll" _
-        // Alias "SetupDiGetDeviceInterfaceDetailW" _
-        // (DeviceInfoSet As IntPtr, _
-        // ByRef DeviceInterfaceData As SP_DEVICE_INTERFACE_DATA, _
-        // ByRef DeviceInterfaceDetailData As SP_DEVICE_INTERFACE_DETAIL_DATA, _
-        // DeviceInterfaceDetailDataSize As UInteger, _
-        // ByRef RequiredSize As UInteger, _
-        // ByRef DeviceInfoData As SP_DEVINFO_DATA) As <MarshalAs(UnmanagedType.Bool)> Boolean
-
         [DllImport("setupapi.dll", EntryPoint = "SetupDiGetDeviceInterfaceDetailW")]
         public static extern bool SetupDiGetDeviceInterfaceDetail(
             IntPtr DeviceInfoSet,
@@ -105,27 +74,6 @@ namespace DataTools.Win32
             uint DeviceInterfaceDetailDataSize, 
             out uint RequiredSize, 
             IntPtr DeviceInfoData);
-
-        // Public Declare Function SetupDiGetDeviceInterfaceDetail Lib "setupapi.dll" _
-        // Alias "SetupDiGetDeviceInterfaceDetailW" _
-        // (DeviceInfoSet As IntPtr, _
-        // DeviceInterfaceData As IntPtr, _
-        // DeviceInterfaceDetailData As IntPtr, _
-        // DeviceInterfaceDetailDataSize As UInteger, _
-        // ByRef RequiredSize As UInteger, _
-        // DeviceInfoData As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
-
-        // Public Declare Function SetupDiGetDeviceInterfaceDetail Lib "setupapi.dll" _
-        // Alias "SetupDiGetDeviceInterfaceDetailW" _
-        // (DeviceInfoSet As IntPtr, _
-        // ByRef DeviceInterfaceData As SP_DEVICE_INTERFACE_DATA, _
-        // ByRef DeviceInterfaceDetailData As SP_DEVICE_INTERFACE_DETAIL_DATA, _
-        // DeviceInterfaceDetailDataSize As UInteger, _
-        // ByRef RequiredSize As UInteger, _
-        // DeviceInfoData As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
-
-
-        
         
         public readonly static Guid GUID_DEVCLASS_1394 = new Guid(0x6BDD1FC1, 0x810F, 0x11D0, 0xBE, 0xC7, 0x8, 0x0, 0x2B, 0xE2, 0x9, 0x2F);
         public readonly static Guid GUID_DEVCLASS_1394DEBUG = new Guid(0x66F250D6, 0x7801, 0x4A64, 0xB1, 0x39, 0xEE, 0xA8, 0xA, 0x45, 0xB, 0x24);

@@ -11,6 +11,8 @@ namespace DataTools.Win32.Usb
     {
         protected string name = "";
 
+        public int Value { get; set; }
+
         public override string? UsageName 
         {
             get => name;
