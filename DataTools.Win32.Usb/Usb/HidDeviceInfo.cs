@@ -379,7 +379,7 @@ namespace DataTools.Win32.Usb
         {
             get
             {
-                if (serialNumber is null)
+                if (string.IsNullOrEmpty(serialNumber))
                 {
                     var dev = HidFeatures.OpenHid(this);
                     MemPtr mm = new MemPtr();
