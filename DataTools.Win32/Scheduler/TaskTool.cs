@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Win32.TaskScheduler;
+using System.Security.Principal;
+using System.Security.Permissions;
 
 namespace DataTools.Scheduler
 {
@@ -20,12 +22,11 @@ namespace DataTools.Scheduler
         /// <param name="args">Optional arguments to pass to the program on startup.</param>
         /// <param name="runLevel">Optional <see cref="TaskRunLevel"/> to use to start the application.</param>
         public static void EnableOnStartup(string? args = null, TaskRunLevel runLevel = TaskRunLevel.LUA)
-        {
-
+        {            
             var task = TaskService.Instance.NewTask();
-            var exec = Process.GetCurrentProcess().MainModule.FileName;
+            var exec = AppDomain.CurrentDomain.BaseDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName + ".exe";
 
-            var asm = Assembly.GetExecutingAssembly().GetName().Name;
+            var asm = AppDomain.CurrentDomain.FriendlyName;
 
             task.Triggers.Add(new LogonTrigger());
 
@@ -44,7 +45,7 @@ namespace DataTools.Scheduler
         /// </summary>
         public static void DisableOnStartup()
         {
-            var asm = Assembly.GetExecutingAssembly().GetName().Name;
+            var asm = AppDomain.CurrentDomain.FriendlyName;
             TaskService.Instance.RootFolder.DeleteTask(asm, false);
         }
 
@@ -54,7 +55,7 @@ namespace DataTools.Scheduler
         /// <returns></returns>
         public static bool GetIsEnabled()
         {
-            var asm = Assembly.GetExecutingAssembly().GetName().Name;
+            var asm = AppDomain.CurrentDomain.FriendlyName;
 
             foreach (var t in TaskService.Instance.RootFolder.Tasks)
             {
