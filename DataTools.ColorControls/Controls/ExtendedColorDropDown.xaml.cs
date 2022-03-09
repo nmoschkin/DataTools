@@ -29,7 +29,10 @@ namespace DataTools.ColorControls
 
         private void BtnMore_Click(object sender, RoutedEventArgs e)
         {
-            var color = ColorDialog.OpenDialog(Ncp.SelectedItem?.Source.Color.GetWPFColor());
+
+            NamedColorViewModel? current = Ncp.SelectedItem as NamedColorViewModel;
+
+            var color = ColorDialog.OpenDialog(current?.Source.Color.GetWPFColor());
 
             if (color != null)
             {

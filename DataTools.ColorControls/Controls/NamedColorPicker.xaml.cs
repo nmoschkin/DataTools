@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Dynamic;
 using System.Linq;
 using System.Runtime.Intrinsics.X86;
@@ -26,6 +27,7 @@ namespace DataTools.ColorControls
 
         internal protected NamedColorViewModel vm;
 
+
         new public NamedColorViewModel SelectedItem
         {
             get { return (NamedColorViewModel)GetValue(SelectedItemProperty); }
@@ -39,42 +41,38 @@ namespace DataTools.ColorControls
 
         protected static void OnSelectedItemChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (sender is ComboBox cb)
+            if (sender is NamedColorPicker && sender is ComboBox cb && cb.SelectedItem != e.NewValue)
             {
                 cb.SelectedItem = e.NewValue;
             }
         }
 
-        new public ListCollectionView ItemsSource
+        new public IEnumerable ItemsSource
         {
-            get { return (ListCollectionView)GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for ItemsSource.  This enables animation, styling, binding, etc...
-        new public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(ListCollectionView), typeof(NamedColorPicker), new PropertyMetadata(null, OnItemsSourceChanged));
-
-        protected static void OnItemsSourceChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (sender is ComboBox cb)
+            get
             {
-                cb.ItemsSource = (IEnumerable)e.NewValue;
+                return (IEnumerable)GetValue(ItemsSourceProperty);
             }
         }
+
+        private static readonly DependencyPropertyKey ItemsSourcePropertyKey = DependencyProperty.RegisterReadOnly("ItemsSource", typeof(IEnumerable), typeof(NamedColorPicker), new PropertyMetadata(null));
+
+
+        new public static readonly DependencyProperty ItemsSourceProperty = ItemsSourcePropertyKey.DependencyProperty;
 
         public NamedColorPicker()
         {
             InitializeComponent();
 
-            DataContext = vm = new NamedColorViewModel();            
-            
-            SetBinding(ItemsSourceProperty, new Binding(nameof(NamedColorViewModel.AllNamedColors)));
-            SetBinding(SelectedItemProperty, new Binding(nameof(NamedColorViewModel.SelectedColor)));
+            vm = new NamedColorViewModel();
+            base.ItemsSource = vm.AllNamedColors;
+
+            DependencyPropertyDescriptor pdItemsSource = DependencyPropertyDescriptor.FromProperty(ComboBox.SelectedItemProperty, typeof(NamedColorPicker));
+            pdItemsSource.AddValueChanged(this, (sender, e) =>
+            {
+                SelectedItem = (NamedColorViewModel)base.SelectedItem;
+            });
         }
-
-
-
 
     }
 }

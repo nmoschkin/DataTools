@@ -389,6 +389,7 @@
                     Visibility="{Binding ShowNamedColors, Converter={StaticResource visConv}}" />
 
                 <local:NamedColorPicker
+                    x:Name="Ncp"
                     Grid.Row="1"
                     Width="{Binding ElementName=ColorSwatch, Path=ActualWidth}"
                     Height="32"

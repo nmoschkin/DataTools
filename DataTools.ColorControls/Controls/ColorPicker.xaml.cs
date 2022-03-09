@@ -196,6 +196,7 @@ namespace DataTools.ColorControls
             vm.PropertyChanged += Vm_PropertyChanged;
 
             ControlGrid.DataContext = vm;
+            Ncp.DataContext = vm;
             Rearrange();
         }
 
