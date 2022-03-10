@@ -101,7 +101,7 @@
                         ElementSize="10"
                         InvertSaturation="false"
                         Mode="HueBoxHorizontal"
-                        Tetrachromatic="true" />
+                        Tetrachromatic="false" />
 
                 </Grid>
 
