@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataTools.Win32.Usb
 {
-    public class HidBatteryDevicePageInfo : HidUsagePageInfo
+    public class HidBatteryDevicePageInfo : HidUsagePageInfo<HidBatteryUsageInfo>
     {
         public static HidBatteryDevicePageInfo Instance { get; protected set; }
 
@@ -15,7 +15,7 @@ namespace DataTools.Win32.Usb
             Instance = new HidBatteryDevicePageInfo();
         }
 
-        protected void Parse(params object[] values)
+        protected override void Parse(params object[] values)
         {
 
 
@@ -102,7 +102,7 @@ namespace DataTools.Win32.Usb
 
                 }
 
-                _items.Add(new HidBatteryUsageInfo()
+                items.Add(new HidBatteryUsageInfo()
                 {
                     UsageId = (ushort)(int)values[0],
                     UsageName = sname,

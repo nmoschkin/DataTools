@@ -7,31 +7,31 @@ using System.Threading.Tasks;
 
 namespace DataTools.Win32.Usb
 {
-    public class HidUsagePageInfo : IReadOnlyList<HidUsageInfo>
+    public abstract class HidUsagePageInfo<T> : IReadOnlyList<T> where T : HidUsageInfo, new()
     {
-
-        protected List<HidUsageInfo> _items = new List<HidUsageInfo>();
+        protected List<T> items = new List<T>();
 
         public int PageID { get; protected set; }
 
+        protected abstract void Parse(params object[] values);
 
-        public HidUsagePageInfo(int pageId)
+        protected HidUsagePageInfo(int pageId)
         {
             PageID = pageId;
         }
 
-        public HidUsageInfo this[int index] => ((IReadOnlyList<HidUsageInfo>)_items)[index];
+        public T this[int index] => ((IReadOnlyList<T>)items)[index];
 
-        public int Count => ((IReadOnlyCollection<HidUsageInfo>)_items).Count;
+        public int Count => ((IReadOnlyCollection<T>)items).Count;
 
-        public IEnumerator<HidUsageInfo> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
-            return ((IEnumerable<HidUsageInfo>)_items).GetEnumerator();
+            return ((IEnumerable<T>)items).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)_items).GetEnumerator();
+            return ((IEnumerable)items).GetEnumerator();
         }
 
     }
