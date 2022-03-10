@@ -10,6 +10,7 @@ using System.Runtime.InteropServices;
 
 using static DataTools.Win32.IO;
 using static DataTools.Win32.User32;
+using DataTools.Text;
 
 namespace TestHid
 {
@@ -43,14 +44,14 @@ namespace TestHid
 
                 foreach (var val in vals)
                 {
-                    Console.WriteLine(val.Key.UsageName + $" ({val.Key.UsageId:X2})                           ");
+                    Console.WriteLine(TextTools.Separate(val.Key.UsageName) + $" ({val.Key.UsageId:X2})                           ");
 
                     foreach (var item in val.Value)
                     {
 
                         if (item.UsageName.Contains("Time"))
                         {
-                            Console.WriteLine($"    {item.UsageName}: {new TimeSpan(0, 0, item.Value)}                           ");
+                            Console.WriteLine($"    {TextTools.Separate(item.UsageName)}: {new TimeSpan(0, 0, item.Value)}                           ");
                         }
                         else
                         {
@@ -61,7 +62,7 @@ namespace TestHid
                                 vv /= 10;
                             }
 
-                            Console.WriteLine($"    {item.UsageName}: {vv}                                                  ");
+                            Console.WriteLine($"    {TextTools.Separate(item.UsageName)}: {vv}                                                  ");
                         }
                     }
 

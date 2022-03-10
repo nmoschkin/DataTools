@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace DataTools.Win32
 {
-    public enum HidPReportType
+    public enum HidReportType
     {
-        HidP_Input,
-        HidP_Output,
-        HidP_Feature
+        Input = 0,
+        Output = 1,
+        Feature = 2
     }
 }

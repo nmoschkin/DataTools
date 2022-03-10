@@ -67,7 +67,7 @@ namespace DataTools.Win32.Usb
 
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetValueCaps(
-          HidPReportType ReportType,
+          HidReportType ReportType,
           ref HidPValueCaps[] ValueCaps,
           ref ushort ValueCapsLength,
           IntPtr PreparsedData
@@ -76,7 +76,7 @@ namespace DataTools.Win32.Usb
 
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetValueCaps(
-          HidPReportType ReportType,
+          HidReportType ReportType,
           IntPtr ValueCaps,
           ref ushort ValueCapsLength,
           IntPtr PreparsedData
@@ -85,7 +85,7 @@ namespace DataTools.Win32.Usb
 
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetButtonCaps(
-          HidPReportType ReportType,
+          HidReportType ReportType,
           ref HidPButtonCaps[] ValueCaps,
           ref ushort ValueCapsLength,
           IntPtr PreparsedData
@@ -94,7 +94,7 @@ namespace DataTools.Win32.Usb
 
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetButtonCaps(
-          HidPReportType ReportType,
+          HidReportType ReportType,
           IntPtr ValueCaps,
           ref ushort ValueCapsLength,
           IntPtr PreparsedData
@@ -104,10 +104,10 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Get the button caps for the specified report type.
         /// </summary>
-        /// <param name="reportType">The <see cref="HidPReportType"/>.</param>
+        /// <param name="reportType">The <see cref="HidReportType"/>.</param>
         /// <param name="ppd">The pointer to preparsed data.</param>
         /// <returns>An array of <see cref="HidPButtonCaps"/> structures.</returns>
-        public static HidPButtonCaps[] GetButtonCaps(HidPReportType reportType, IntPtr ppd)
+        public static HidPButtonCaps[] GetButtonCaps(HidReportType reportType, IntPtr ppd)
         {
             ushort ncaps = 0;
 
@@ -138,10 +138,10 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Get the value caps for the specified report type.
         /// </summary>
-        /// <param name="reportType">The <see cref="HidPReportType"/>.</param>
+        /// <param name="reportType">The <see cref="HidReportType"/>.</param>
         /// <param name="ppd">The pointer to preparsed data.</param>
         /// <returns>An array of <see cref="HidPValueCaps"/> structures.</returns>
-        public static HidPValueCaps[] GetValueCaps(HidPReportType reportType, IntPtr ppd)
+        public static HidPValueCaps[] GetValueCaps(HidReportType reportType, IntPtr ppd)
         {
             ushort ncaps = 0;
 
@@ -191,22 +191,22 @@ namespace DataTools.Win32.Usb
                 HidP_GetCaps(ppd, out caps);
 
 
-                var featBtn = GetButtonCaps(HidPReportType.HidP_Feature, ppd);
+                var featBtn = GetButtonCaps(HidReportType.Feature, ppd);
                 var fbmap = LinkButtonCollections(featBtn);
 
-                var featVal = GetValueCaps(HidPReportType.HidP_Feature, ppd);
+                var featVal = GetValueCaps(HidReportType.Feature, ppd);
                 var fvmap = LinkValueCollections(featVal);
 
-                var inBtn = GetButtonCaps(HidPReportType.HidP_Input, ppd);
+                var inBtn = GetButtonCaps(HidReportType.Input, ppd);
                 var ibmap = LinkButtonCollections(inBtn);
 
-                var inVal = GetValueCaps(HidPReportType.HidP_Input, ppd);
+                var inVal = GetValueCaps(HidReportType.Input, ppd);
                 var ivmap = LinkValueCollections(inVal);
 
-                var outBtn = GetButtonCaps(HidPReportType.HidP_Output, ppd);
+                var outBtn = GetButtonCaps(HidReportType.Output, ppd);
                 var obmap = LinkButtonCollections(outBtn);
 
-                var outVal = GetValueCaps(HidPReportType.HidP_Output, ppd);
+                var outVal = GetValueCaps(HidReportType.Output, ppd);
                 var ovmap = LinkValueCollections(outVal);
 
                 device.FeatureButtonCaps = featBtn;

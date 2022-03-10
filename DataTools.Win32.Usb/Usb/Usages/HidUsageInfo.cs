@@ -20,7 +20,7 @@ namespace DataTools.Win32.Usb
     /// <summary>
     /// Describes a usage or capability within a HID Usage Page
     /// </summary>
-    public class HidUsageInfo : ICloneable
+    public class HidUsageInfo : ICloneable, IComparable<HidUsageInfo>
     {
         /// <summary>
         /// The Usage ID
@@ -82,6 +82,11 @@ namespace DataTools.Win32.Usb
         public virtual byte ReportID { get; set; }
 
 
+        /// <summary>
+        /// Report Type
+        /// </summary>
+        public virtual HidReportType ReportType { get; set; }
+
         public override string ToString()
         {
             var text = UsageName ?? "";
@@ -126,10 +131,35 @@ namespace DataTools.Win32.Usb
 
         }
 
-        public object Clone()
+        public virtual object Clone()
         {
             return MemberwiseClone();
         }
 
+        public virtual object Clone(HidReportType reportType)
+        {
+            var ret = MemberwiseClone();
+            HidUsageInfo? rpt = (HidUsageInfo)ret;
+
+            if (rpt != null)
+            {
+                rpt.ReportType = reportType;
+            }
+
+            return ret;
+        }
+
+        public int CompareTo(HidUsageInfo? other)
+        {
+            if (other == null) return 1;
+
+            if (other.UsageId > UsageId) return -1;
+            if (other.UsageId < UsageId) return 1;
+
+            if (other.ReportID > ReportID) return -1;
+            if (other.ReportID < ReportID) return 1;
+
+            return string.Compare(ToString(), other.ToString());
+        }
     }
 }

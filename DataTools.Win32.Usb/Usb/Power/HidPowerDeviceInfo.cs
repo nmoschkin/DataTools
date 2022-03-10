@@ -40,9 +40,9 @@ namespace DataTools.Win32.Usb
         /// </summary>
         public void CreatePowerCollection()
         {
-            var cd = GetCollection(LinkedFeatureValues);
-            cd = GetCollection(LinkedInputValues, cd);
-            cd = GetCollection(LinkedOutputValues, cd);
+            var cd = GetCollection(LinkedFeatureValues, HidReportType.Feature);
+            cd = GetCollection(LinkedInputValues, HidReportType.Input, cd);
+            cd = GetCollection(LinkedOutputValues, HidReportType.Output, cd);
 
             PowerCollections = cd;
         }
@@ -81,7 +81,7 @@ namespace DataTools.Win32.Usb
 
             foreach(var kvp in PowerCollections)
             {
-                if ((collectionType & kvp.Key.UsageType) == kvp.Key.UsageType)
+                if ((collectionType & kvp.Key.UsageType) == kvp.Key.UsageType && kvp.Key.ReportType == HidReportType.Feature)
                 {
                     foreach (var item in kvp.Value)
                     {
@@ -120,7 +120,7 @@ namespace DataTools.Win32.Usb
         /// <returns>
         /// Either <paramref name="currDict"/> or a new dictionary.
         /// </returns>
-        public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> data, Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? currDict = null)
+        public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> data, HidReportType reportType, Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? currDict = null)
         {
             var result = currDict ?? new Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>();
 
@@ -144,12 +144,12 @@ namespace DataTools.Win32.Usb
                     {
                         var bitem2 = bref.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
                         if (bitem2 == null) continue;
-                        var newItem = (HidPowerUsageInfo)bitem2.Clone();
+                        var newItem = (HidPowerUsageInfo)bitem2.Clone(reportType);
                         newItem.ReportID = item.ReportID;
                         l.Add(newItem);
                     }
 
-                    result.Add((HidPowerUsageInfo)bitem.Clone(), l);
+                    result.Add((HidPowerUsageInfo)bitem.Clone(reportType), l);
                 }
                 else if (page == HidUsagePage.PowerDevice1)
                 {
@@ -163,12 +163,12 @@ namespace DataTools.Win32.Usb
                         var pitem2 = pref.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
                         if (pitem2 == null) continue;
 
-                        var newItem = (HidPowerUsageInfo)pitem2.Clone();
+                        var newItem = (HidPowerUsageInfo)pitem2.Clone(reportType);
                         newItem.ReportID = item.ReportID;
                         l.Add(newItem);
                     }
 
-                    result.Add((HidPowerUsageInfo)pitem.Clone(), l);
+                    result.Add((HidPowerUsageInfo)pitem.Clone(reportType), l);
                 }
             }
 
