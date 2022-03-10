@@ -7,7 +7,7 @@ using System.Windows.Markup;
 
 namespace DataTools.Win32.Usb
 {
-    public class HidPowerDevicePageInfo : HidUsagePageInfo
+    public class HidPowerDevicePageInfo : HidUsagePageInfo<HidPowerUsageInfo>
     {
 
         public static HidPowerDevicePageInfo Instance { get; protected set; }
@@ -17,7 +17,7 @@ namespace DataTools.Win32.Usb
             Instance = new HidPowerDevicePageInfo();
         }
 
-        protected void Parse(params object[] values)
+        protected override void Parse(params object[] values)
         {
 
 
@@ -89,7 +89,7 @@ namespace DataTools.Win32.Usb
 
                 }
 
-                _items.Add(new HidPowerUsageInfo()
+                items.Add(new HidPowerUsageInfo()
                 {
                     UsageId = (ushort)(int)values[0],
                     UsageName = sname,

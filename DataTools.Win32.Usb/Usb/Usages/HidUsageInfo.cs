@@ -86,6 +86,11 @@ namespace DataTools.Win32.Usb
         {
             var text = UsageName ?? "";
 
+            if (!string.IsNullOrEmpty(text))
+            {
+                text = TextTools.Separate(text);
+            }
+
             var iof = "";
             var rw = "";
             var ut = UsageType.ToString();
