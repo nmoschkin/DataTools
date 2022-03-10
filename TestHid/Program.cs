@@ -31,6 +31,10 @@ namespace TestHid
 
             var batt2 = HidPowerDeviceInfo.CreateFromHidDevice(battery);
 
+            var bstr = batt2.Manufacturer;
+            var bstr2 = batt2.HidManufacturer;
+            var astr = batt2.ProductString;
+
             Console.Clear();
             Console.CursorVisible = false;
             Console.WindowHeight = 60;
