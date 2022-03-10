@@ -392,7 +392,7 @@ namespace DataTools.Win32.Usb
                     {
                         var dev = HidFeatures.OpenHid(this);
 
-                        mm.AllocZero(512L);
+                        mm.AllocZero(4095L);
 
                         UsbLibHelpers.HidD_GetManufacturerString(dev, mm, (int)mm.Length);
 
@@ -428,7 +428,7 @@ namespace DataTools.Win32.Usb
                     {
                         var dev = HidFeatures.OpenHid(this);
 
-                        mm.AllocZero(512L);
+                        mm.AllocZero(4095L);
 
                         UsbLibHelpers.HidD_GetSerialNumberString(dev, mm, (int)mm.Length);
 
@@ -463,9 +463,11 @@ namespace DataTools.Win32.Usb
                     {
                         var dev = HidFeatures.OpenHid(this);
 
-                        mm.AllocZero(512L);
+                        mm.AllocZero(4095L);
+                        uint bytesReturned = 0;
+                        LibUsb.DeviceIoControl(dev, IoControl.IOCTL_HID_GET_PRODUCT_STRING, default, 0U, mm, (uint)mm.Length, ref bytesReturned, default);
 
-                        UsbLibHelpers.HidD_GetProductString(dev, mm, (int)mm.Length);
+                        // UsbLibHelpers.HidD_GetProductString(dev, mm, (int)mm.Length);
 
                         productString = (string)mm;
 

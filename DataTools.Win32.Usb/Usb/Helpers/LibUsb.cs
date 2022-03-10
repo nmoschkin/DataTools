@@ -29,7 +29,10 @@ namespace DataTools.Win32.Usb
         /// <remarks></remarks>
         public const int gPack = 1;
 
-        
+        [DllImport("kernel32.dll")]
+        public static extern bool DeviceIoControl(IntPtr hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, IntPtr lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, IntPtr lpOverlapped);
+
+
         public enum USBRESULT : int
         {
             /// <summary>

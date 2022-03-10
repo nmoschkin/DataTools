@@ -11,15 +11,18 @@ using System.Runtime.InteropServices;
 using static DataTools.Win32.IO;
 using static DataTools.Win32.User32;
 using DataTools.Text;
+using System.Text;
 
 namespace TestHid
 {
 
     public static class Program
     {
-
+        [STAThread]
         public static void Main(string[] args)
         {
+            
+
             var hids = HidDeviceInfo.EnumerateHidDevices();
 
 
@@ -31,7 +34,10 @@ namespace TestHid
             Console.Clear();
             Console.CursorVisible = false;
             Console.WindowHeight = 60;
-            Task.Delay(1000).Wait();    
+
+            Task.Delay(1000).Wait();
+
+            bool printed = false;
 
             while(true)
             {
@@ -67,8 +73,46 @@ namespace TestHid
                     }
 
                     Console.WriteLine("                                                                      ");
-                    Task.Delay(500);
                 }
+
+                if (!printed)
+                {
+
+                    var svals = batt2.GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.SV | HidUsageType.SF);
+
+                    foreach (var val in svals)
+                    {
+                        Console.WriteLine(TextTools.Separate(val.Key.UsageName) + $" ({val.Key.UsageId:X2})                           ");
+
+                        foreach (var item in val.Value)
+                        {
+
+                            if (item.UsageName.Contains("Time"))
+                            {
+                                Console.WriteLine($"    {TextTools.Separate(item.UsageName)}: {new TimeSpan(0, 0, item.Value)}                           ");
+                            }
+                            else
+                            {
+                                double vv = item.Value;
+
+                                if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
+                                {
+                                    vv /= 10;
+                                }
+
+                                Console.WriteLine($"    {TextTools.Separate(item.UsageName)}: {vv}                                                  ");
+                            }
+                        }
+
+                        Console.WriteLine("                                                                      ");
+                    }
+
+                    Console.WriteLine("                                                                      ");
+
+                    printed = true;
+                }
+
+                Task.Delay(500);
             }
 
         }
