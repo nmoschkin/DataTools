@@ -31,9 +31,10 @@ namespace TestHid
 
             var batt2 = HidPowerDeviceInfo.CreateFromHidDevice(battery);
 
-            var bstr = batt2.Manufacturer;
-            var bstr2 = batt2.HidManufacturer;
-            var astr = batt2.ProductString;
+            var mstr = batt2.Manufacturer;
+            var mstr2 = batt2.HidManufacturer;
+            var pstr = batt2.ProductString;
+            var sstr = batt2.SerialNumber;
 
             Console.Clear();
             Console.CursorVisible = false;
@@ -81,6 +82,12 @@ namespace TestHid
 
                 if (!printed)
                 {
+
+                    Console.WriteLine("       ");
+                    Console.WriteLine($"Product:       {pstr}       ");
+                    Console.WriteLine($"Serial Number: {sstr}       ");
+                    Console.WriteLine($"Manufacturer:  {mstr2}       ");
+                    Console.WriteLine("       ");
 
                     var svals = batt2.GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.SV | HidUsageType.SF);
 
