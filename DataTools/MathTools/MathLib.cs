@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
@@ -57,7 +58,11 @@ namespace DataTools.MathTools
         /// <param name="maxDenominator">The maximum possible value of the denominator.</param>
         /// <param name="addQuasiMark">Set to True to output the '~' symbol for fractions that are found below the maximum significant digit.</param>
         /// <returns>A string representing a whole number with a fraction.</returns>
-        /// <remarks>The maximum number of iterations required by this algorithm is O^(<paramref name="maxSignificantDigits"/> + <paramref name="maxDenominator"/>).</remarks>
+        /// <remarks>
+        /// The maximum number of iterations required by this algorithm is O^(<paramref name="maxSignificantDigits"/> + <paramref name="maxDenominator"/>).
+        /// <br /><br />
+        /// If a number is too small to fit inside a fraction with <paramref name="maxDenominator"/>, then the function will return 0.
+        /// </remarks>
         public static string PrintFraction(double value, int maxSignificantDigits = 7, int maxDenominator = 20, bool addQuasiMark = true)
         {
             double wholePart = 0.0d;
@@ -65,8 +70,6 @@ namespace DataTools.MathTools
             double testVal;
             double numerator;
             double denominator;
-
-            int orgden = maxDenominator;
 
             int currSig;
             int hSigFound = 1;
@@ -76,7 +79,7 @@ namespace DataTools.MathTools
 
             var lastTest = default(double);
 
-            if (value == 0)
+            if (Math.Round(value, maxSignificantDigits) == 0)
             {
                 return "0";
             }
@@ -111,7 +114,7 @@ namespace DataTools.MathTools
                     {                        
                         // create the test value.
                         testVal = Math.Round(numerator / denominator, currSig);
-                        if (testVal == workVal)
+                        if (testVal == workVal && testVal != 0)
                         {
                             // at this significant digit, the test and working values
                             // produce the same result, meaning that this is a viable
@@ -139,17 +142,18 @@ namespace DataTools.MathTools
 
             if (fi == 0)
             {
-                if (maxDenominator - orgden > maxSignificantDigits)
-                    return "NaN";
+                if (wholePart == 0) return "0";
 
-                maxDenominator++;
-                goto retry;
+                numerator = 0;
+                denominator = 0;
             }
-
-            // the best fit will be the last found fraction pair,
-            // which will have the closest approximation to the the original number,
-            // within the bounds of available significant digits.
-            (numerator, denominator) = foundFractions[fi - 1];
+            else
+            {
+                // the best fit will be the last found fraction pair,
+                // which will have the closest approximation to the the original number,
+                // within the bounds of available significant digits.
+                (numerator, denominator) = foundFractions[fi - 1];
+            }
 
             var sb = new StringBuilder();
 
@@ -158,7 +162,7 @@ namespace DataTools.MathTools
             // this is an approximation (with regard to the number of significant digits).
             if (addQuasiMark == true && hSigFound < maxSignificantDigits && lastTest != value)
             {
-                sb.Append("~ ");
+                sb.Append("~");
             }
 
             // If we have an integer component, add that to the output string.
@@ -167,12 +171,16 @@ namespace DataTools.MathTools
 
             if (wholePart > 0)
             {
-                sb.Append($"{wholePart} ");
+                if (sb.Length != 0) sb.Append(' ');
+                sb.Append($"{wholePart}");               
             }
 
             // Finally, add the fraction.
-            if (!(numerator == 1 && denominator == 1))
+            if (!(numerator == 1 && denominator == 1) && (numerator != 0 && denominator != 0))
+            {
+                if (sb.Length != 0) sb.Append(' ');
                 sb.Append($"{numerator}/{denominator}");
+            }
 
             // We're done!
             return sb.ToString();
