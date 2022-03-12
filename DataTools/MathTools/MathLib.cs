@@ -18,14 +18,7 @@ namespace DataTools.MathTools
         //
         // Duplication is prohibited, as is commercial use without prior written permission.
         // Copyright (C) 2015 Nathaniel Moschkin.  All Rights Reserved.
-
-        public const double MAX_VALUE = 1.7976931348623157E+308d;
-        public const double MIN_VALUE = 4.94065645841247E-324d;
-        public const int ProgressDiv = 17;
-        public static int[] OnBits = new int[32];
-        public static byte[,] LShiftTab = new byte[256, 8];
-        public static byte[,] RShiftTab = new byte[256, 8];
-
+                
         public static double InchesToMillimeters(double value)
         {
             return value * 25.4d;
@@ -65,7 +58,7 @@ namespace DataTools.MathTools
         /// <param name="addQuasiMark">Set to True to output the '~' symbol for fractions that are found below the maximum significant digit.</param>
         /// <returns>A string representing a whole number with a fraction.</returns>
         /// <remarks>The maximum number of iterations required by this algorithm is O^(<paramref name="maxSignificantDigits"/> + <paramref name="maxDenominator"/>).</remarks>
-        public static string PrintFraction(double value, int maxSignificantDigits = 7, int maxDenominator = 25, bool addQuasiMark = true)
+        public static string PrintFraction(double value, int maxSignificantDigits = 7, int maxDenominator = 20, bool addQuasiMark = true)
         {
             double wholePart = 0.0d;
             double workVal;
