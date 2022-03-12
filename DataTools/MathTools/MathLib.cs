@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 
 using DataTools.Text;
@@ -55,7 +56,7 @@ namespace DataTools.MathTools
 
 
         /// <summary>
-        /// Prints a fractional number from a decimal value.
+        /// Prints a fractional number from a double value.
         /// </summary>
         /// <param name="value">The value to convert to a fraction.</param>
         /// <param name="maxSignificantDigits">The maximum number of significant digits the number can be rounded to.</param>
@@ -63,19 +64,26 @@ namespace DataTools.MathTools
         /// <param name="addQuasiMark">Set to True to output the '~' symbol for fractions that are found below the maximum significant digit.</param>
         /// <returns>A string representing a whole number with a fraction.</returns>
         /// <remarks>The number of iterations required by this algorithm is greatly influenced by the size of the maximum denominator.</remarks>
-        public static string PrintFraction(decimal value, int maxSignificantDigits = 7, int maxDenominator = 25, bool addQuasiMark = true)
+        public static string PrintFraction(double value, int maxSignificantDigits = 7, int maxDenominator = 25, bool addQuasiMark = true)
         {
-            decimal wholePart = 0.0m;
-            decimal workVal;
-            decimal testVal;
-            decimal numerator;
-            decimal denominator;
+            double wholePart = 0.0d;
+            double workVal;
+            double testVal;
+            double numerator;
+            double denominator;
+
+            int orgden = maxDenominator;
+
             int currSig;
             int hSigFound = 1;
+            
             var foundFractions = new List<int[]>();
+            
             string output = "";
-            var lastTest = default(decimal);
-            if (value == decimal.Zero)
+            
+            var lastTest = default(double);
+          
+            if (value == 0)
             {
                 return "0";
             }
@@ -87,13 +95,15 @@ namespace DataTools.MathTools
                 value -= wholePart;
 
                 // if there is no fractional component, there's no reason to go on.
-                if (value == 0m)
+                if (value == 0d)
                     return wholePart.ToString("0");
             }
 
             if (maxSignificantDigits > 28)
                 maxSignificantDigits = 28;
             // Go from 1 to the maximum number of significant digits.
+
+            retry:            
             
             for (currSig = 1; currSig <= maxSignificantDigits; currSig++)
             {
@@ -102,11 +112,11 @@ namespace DataTools.MathTools
                 workVal = Math.Round(value, currSig);
 
                 // iterate the numerator to the maximum denominator value.
-                for (numerator = 1m; numerator <= maxDenominator; numerator++)
+                for (numerator = 1; numerator <= maxDenominator; numerator++)
                 {
 
                     // iterate the denomenator to the maximum denominator value.
-                    for (denominator = 1m; denominator <= maxDenominator; denominator++)
+                    for (denominator = 1; denominator <= maxDenominator; denominator++)
                     {
 
                         // create the test value.
@@ -137,6 +147,14 @@ namespace DataTools.MathTools
                 ;
             }
 
+            if (foundFractions.Count == 0)
+            {
+                if (maxDenominator - orgden > maxSignificantDigits)
+                    return "None found";
+
+                maxDenominator++;
+                goto retry;
+            }
 
             // the best fit will be the last found fraction pair,
             // which will have the closest approximation to the the original number,
@@ -153,22 +171,108 @@ namespace DataTools.MathTools
             }
 
             // If we have an integer component, add that to the output string.
-            if (numerator == 1m && denominator == 1m)
-                wholePart = wholePart + 1m;
-            if (wholePart > 0m)
+            if (numerator == 1 && denominator == 1)
+                wholePart = wholePart + 1;
+            if (wholePart > 0)
             {
                 output += wholePart + " ";
             }
 
             // Finally, add the fraction.
-            if (!(numerator == 1m && denominator == 1m))
+            if (!(numerator == 1 && denominator == 1))
                 output += string.Format("{0}/{1}", numerator.ToString("0"), denominator.ToString("0"));
 
             // We're done!
             return output;
         }
 
-        
+        /// <summary>
+        /// Prints a fractional number from a decimal value.
+        /// </summary>
+        /// <param name="value">The value to convert to a fraction.</param>
+        /// <param name="accuracy">The maximum number of significant digits the number can be rounded to.</param>
+        /// <param name="addQuasiMark">Set to True to output the '~' symbol for fractions that are found below the maximum significant digit.</param>
+        /// <returns>A string representing a whole number with a fraction.</returns>
+        /// <remarks>The number of iterations required by this algorithm is greatly influenced by the size of the maximum denominator.</remarks>
+        public static string PrintFraction(double value, double accuracy = 0.001, bool addQuasiMark = true)
+        {
+            if (accuracy <= 0.0 || accuracy >= 1.0)
+            {
+                throw new ArgumentOutOfRangeException("accuracy", "Must be > 0 and < 1.");
+            }
+            double orgVal = value;
+            int sign = Math.Sign(value);
+
+            if (sign == -1)
+            {
+                value = Math.Abs(value);
+            }
+
+            // Accuracy is the maximum relative error; convert to absolute maxError
+            double maxError = accuracy; // sign == 0 ? accuracy : value * accuracy;
+            
+            int n = (int)Math.Floor(value);
+            value -= n;
+
+            if (value < maxError)
+            {
+                return $"{sign * n}/1";
+            }
+
+            if (1 - maxError < value)
+            {
+                return $"{sign * (n + 1)}/1";
+            }
+
+
+            // The lower fraction is 0/1
+            int lower_n = 0;
+            int lower_d = 1;
+
+            // The upper fraction is 1/1
+            int upper_n = 1;
+            int upper_d = 1;
+
+            while (true)
+            {
+                // The middle fraction is (lower_n + upper_n) / (lower_d + upper_d)
+                int middle_n = lower_n + upper_n;
+                int middle_d = lower_d + upper_d;
+
+                if (middle_d * (value + maxError) < middle_n)
+                {
+                    // real + error < middle : middle is our new upper
+                    upper_n = middle_n;
+                    upper_d = middle_d;
+                }
+                else if (middle_n < (value - maxError) * middle_d)
+                {
+                    // middle < real - error : middle is our new lower
+                    lower_n = middle_n;
+                    lower_d = middle_d;
+                }
+                else
+                {
+                    // Middle is our best fraction
+
+                    var s = "";
+                    if (addQuasiMark && ((n * sign) + ((double)middle_n/middle_d) != orgVal))
+                    {
+                        s = "~ ";
+                    }
+
+                    if (n != 0)
+                        return $"{s}{n * sign} {middle_n}/{middle_d}";
+                    else
+                        return $"{s}{middle_n}/{middle_d}";
+                }
+            }
+
+            // We're done!
+        }
+
+
+
         /// <summary>
         /// Find the greatest common factor between a group of integers.
         /// </summary>
@@ -180,7 +284,7 @@ namespace DataTools.MathTools
             int candidate = values[0];
 
             int i, c = values.Length;
-            int min, max, mod;
+            int min, max;
 
             int gcf = -1;
 
@@ -196,16 +300,16 @@ namespace DataTools.MathTools
                     max = values[i - 1];
                 }
 
-                // find the remaineder.
-                mod = max % min;
-
-
-                while (mod != 0)
+                while (max != min)
                 {
-                    // just keep taking the remainder until it's zero, the last number we used is the candidate.
-                    max = min;
-                    min = mod;
-                    mod = max % min;
+                    if (max < min)
+                    {
+                        min = min - max;
+                    }
+                    else
+                    {
+                        max = max - min;
+                    }
                 }
 
                 candidate = min;
