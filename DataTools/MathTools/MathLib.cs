@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
+using System.Text;
 
 using DataTools.Text;
 
@@ -56,14 +57,14 @@ namespace DataTools.MathTools
 
 
         /// <summary>
-        /// Prints a fractional number from a double value.
+        /// Prints a fractional number from a double value. (More Consistently Human-Readable Version)
         /// </summary>
         /// <param name="value">The value to convert to a fraction.</param>
         /// <param name="maxSignificantDigits">The maximum number of significant digits the number can be rounded to.</param>
         /// <param name="maxDenominator">The maximum possible value of the denominator.</param>
         /// <param name="addQuasiMark">Set to True to output the '~' symbol for fractions that are found below the maximum significant digit.</param>
         /// <returns>A string representing a whole number with a fraction.</returns>
-        /// <remarks>The number of iterations required by this algorithm is greatly influenced by the size of the maximum denominator.</remarks>
+        /// <remarks>The maximum number of iterations required by this algorithm is O^(<paramref name="maxSignificantDigits"/> + <paramref name="maxDenominator"/>).</remarks>
         public static string PrintFraction(double value, int maxSignificantDigits = 7, int maxDenominator = 25, bool addQuasiMark = true)
         {
             double wholePart = 0.0d;
@@ -76,13 +77,12 @@ namespace DataTools.MathTools
 
             int currSig;
             int hSigFound = 1;
-            
-            var foundFractions = new List<int[]>();
-            
-            string output = "";
-            
+
+            int fi = 0;
+            var foundFractions = new (int, int)[maxSignificantDigits];
+
             var lastTest = default(double);
-          
+
             if (value == 0)
             {
                 return "0";
@@ -99,26 +99,23 @@ namespace DataTools.MathTools
                     return wholePart.ToString("0");
             }
 
-            if (maxSignificantDigits > 28)
-                maxSignificantDigits = 28;
+            if (maxSignificantDigits > 18)
+                maxSignificantDigits = 18;
+            
             // Go from 1 to the maximum number of significant digits.
-
             retry:            
             
             for (currSig = 1; currSig <= maxSignificantDigits; currSig++)
             {
-
                 // get the rounded, working value for the test.
                 workVal = Math.Round(value, currSig);
 
                 // iterate the numerator to the maximum denominator value.
-                for (numerator = 1; numerator <= maxDenominator; numerator++)
+                for (numerator = 1; numerator < maxDenominator; numerator++)
                 {
-
                     // iterate the denomenator to the maximum denominator value.
                     for (denominator = 1; denominator <= maxDenominator; denominator++)
-                    {
-
+                    {                        
                         // create the test value.
                         testVal = Math.Round(numerator / denominator, currSig);
                         if (testVal == workVal)
@@ -133,8 +130,8 @@ namespace DataTools.MathTools
                             hSigFound = currSig;
 
                             // add the compatible pair to a list
-                            foundFractions.Add(new int[] { (int)numerator, (int)denominator });
-
+                            foundFractions[fi++] = (((int)numerator, (int)denominator));
+        
                             // break to the next significant digit, there's
                             // no reason to do any more work.
                             lastTest = testVal;
@@ -147,10 +144,10 @@ namespace DataTools.MathTools
                 ;
             }
 
-            if (foundFractions.Count == 0)
+            if (fi == 0)
             {
                 if (maxDenominator - orgden > maxSignificantDigits)
-                    return "None found";
+                    return "NaN";
 
                 maxDenominator++;
                 goto retry;
@@ -159,35 +156,37 @@ namespace DataTools.MathTools
             // the best fit will be the last found fraction pair,
             // which will have the closest approximation to the the original number,
             // within the bounds of available significant digits.
-            numerator = foundFractions[foundFractions.Count - 1][0];
-            denominator = foundFractions[foundFractions.Count - 1][1];
+            (numerator, denominator) = foundFractions[fi - 1];
+
+            var sb = new StringBuilder();
 
             // if the higest found fraction was below the maximum number of significant digits,
             // we will optionally add the "~" (quasi) mark to the output string to indicate that
             // this is an approximation (with regard to the number of significant digits).
             if (addQuasiMark == true && hSigFound < maxSignificantDigits && lastTest != value)
             {
-                output += "~ ";
+                sb.Append("~ ");
             }
 
             // If we have an integer component, add that to the output string.
             if (numerator == 1 && denominator == 1)
                 wholePart = wholePart + 1;
+
             if (wholePart > 0)
             {
-                output += wholePart + " ";
+                sb.Append($"{wholePart} ");
             }
 
             // Finally, add the fraction.
             if (!(numerator == 1 && denominator == 1))
-                output += string.Format("{0}/{1}", numerator.ToString("0"), denominator.ToString("0"));
+                sb.Append($"{numerator}/{denominator}");
 
             // We're done!
-            return output;
+            return sb.ToString();
         }
 
         /// <summary>
-        /// Prints a fractional number from a decimal value.
+        /// Prints a fractional number from a double value (Stern-Brocot Tree Version).
         /// </summary>
         /// <param name="value">The value to convert to a fraction.</param>
         /// <param name="accuracy">The maximum number of significant digits the number can be rounded to.</param>
