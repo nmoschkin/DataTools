@@ -1,5 +1,5 @@
 ﻿// Basic Math Functions
-// Copyright (C) 2015 Nathaniel Moschkin
+// Copyright (C) 2022 Nathaniel Moschkin
 
 using System;
 using System.Collections.Generic;
