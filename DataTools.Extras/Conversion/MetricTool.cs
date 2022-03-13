@@ -8,7 +8,8 @@ using System.Runtime.InteropServices;
 using DataTools.MathTools;
 using DataTools.Text;
 using static DataTools.Text.TextTools;
-
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace DataTools.Extras.Conversion
 {
@@ -19,11 +20,10 @@ namespace DataTools.Extras.Conversion
     public class MetricTool
     {
 
-
         public static readonly string[] Prefixes = new string[] { "", "deci", "centi", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto", "deca", "hecto", "kilo", "mega", "giga", "tera", "peta", "exa", "zetta", "yotta", "kibi", "mebi", "gibi", "tebi", "pebi", "exbi", "zebi", "yobi" };
         public static readonly string[] ShortPrefixes = new string[] { "", "d", "c", "m", "μ", "n", "p", "f", "a", "z", "y", "da", "h", "k", "M", "G", "T", "P", "E", "Z", "Y", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi" };
         public static readonly double[] Multipliers = new double[] { Pow(10d, 0d), Pow(10d, -1), Pow(10d, -2), Pow(10d, -3), Pow(10d, -6), Pow(10d, -9), Pow(10d, -12), Pow(10d, -15), Pow(10d, -18), Pow(10d, -21), Pow(10d, -24), Pow(10d, 1d), Pow(10d, 2d), Pow(10d, 3d), Pow(10d, 6d), Pow(10d, 9d), Pow(10d, 12d), Pow(10d, 15d), Pow(10d, 18d), Pow(10d, 21d), Pow(10d, 24d), Pow(2d, 10d), Pow(2d, 20d), Pow(2d, 30d), Pow(2d, 40d), Pow(2d, 50d), Pow(2d, 60d), Pow(2d, 70d), Pow(2d, 80d) };
-
+        
         private static int roundingDigits = 4;
 
         private MetricInfo info = new MetricInfo();
@@ -915,8 +915,7 @@ namespace DataTools.Extras.Conversion
             // ' each category starts with its base unit, and then modifying units come next alphabetically, by category alphabetically
             if (BaseUnitsFirst == false)
             {
-                var loopTo = c;
-                for (i = 0; i <= loopTo; i++)
+                for (i = 0; i < c; i++)
                 {
                     s2 = GetUnitNames(s1[i]);
                     d = s2.Length - 1;
@@ -932,8 +931,8 @@ namespace DataTools.Extras.Conversion
                     }
 
                     d = s2.Length - 1;
-                    var loopTo2 = d;
-                    for (j = 0; j <= loopTo2; j++)
+
+                    for (j = 0; j < d; j++)
                     {
                         objUnit = FindUnit(s2[j], s1[i]);
                         if (objUnit.IsBase == false)
@@ -947,8 +946,7 @@ namespace DataTools.Extras.Conversion
             else
             {
                 // ' this is the alternative way, listing all base units by category alphabetically, first, then all other units by category alphabetically
-                var loopTo3 = c;
-                for (i = 0; i <= loopTo3; i++)
+                for (i = 0; i < c; i++)
                 {
                     s2 = GetUnitNames(s1[i]);
                     d = s2.Length - 1;
@@ -964,13 +962,11 @@ namespace DataTools.Extras.Conversion
                     }
                 }
 
-                var loopTo5 = c;
-                for (i = 0; i <= loopTo5; i++)
+                for (i = 0; i < c; i++)
                 {
                     s2 = GetUnitNames(s1[i]);
                     d = s2.Length - 1;
-                    var loopTo6 = d;
-                    for (j = 0; j <= loopTo6; j++)
+                    for (j = 0; j < d; j++)
                     {
                         objUnit = FindUnit(s2[j], s1[i]);
                         if (objUnit.IsBase == false)
@@ -1011,7 +1007,6 @@ namespace DataTools.Extras.Conversion
         public static string[] GetCategories()
         {
             string[] s = null;
-
             int c = -1;
 
             foreach (MetricUnit u in units)
@@ -1182,5 +1177,54 @@ namespace DataTools.Extras.Conversion
 
             return null;
         }
+
+        public static MetricUnit IdentifyUnit(string text)
+        {
+            foreach (var unit in units)
+            {
+                if (text == unit.Prefix) return unit;
+            }
+
+            foreach (var p in ShortPrefixes)
+            {
+                foreach (var unit in units)
+                {
+                    var ups = unit.Prefix.Split(',');
+
+                    foreach (var up in ups)
+                    {
+                        if (text == p + up)
+                        {
+                            var nu = (MetricUnit)unit.Clone();
+                            var i = ((IList<string>)ShortPrefixes).IndexOf(p);
+                            var m = Multipliers[i];
+
+                            nu.Modifies = unit.Name;
+                            nu.Name = Prefixes[i] + nu.Name.ToLower();
+                            nu.PluralName = Prefixes[i] + nu.PluralName.ToLower();
+                            nu.IsBase = false;
+
+                            if (nu.Multiplier != 0)
+                            {
+                                nu.Multiplier *= m;
+                            }
+                            else
+                            {
+                                nu.Multiplier = m;
+                            }
+
+                            nu.Prefix = text;
+
+                            return nu;
+                        }
+
+                    }
+
+                }
+            }
+
+            return null;
+        }
+        
     }
 }
