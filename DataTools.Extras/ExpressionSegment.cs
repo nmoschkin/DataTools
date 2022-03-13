@@ -11,7 +11,7 @@ using System.Text;
 
 using static DataTools.Text.TextTools;
 
-namespace DataTools.Extras
+namespace DataTools.Extras.Expressions
 {
 
     /// <summary>
@@ -106,12 +106,12 @@ namespace DataTools.Extras
     public enum StorageMode
     {
         /// <summary>
-        /// Literal values are stored as <see cref="System.Double"/> values.
+        /// Literal values are stored as <see cref="double"/> values.
         /// </summary>
         AsDouble,
 
         /// <summary>
-        /// Literal values are stored as <see cref="System.Decimal"/> values.
+        /// Literal values are stored as <see cref="decimal"/> values.
         /// </summary>
         AsDecimal
     }
@@ -151,7 +151,8 @@ namespace DataTools.Extras
         /// Instantiate a new <see cref="ExpressionSegment"/> object with the specified string.
         /// </summary>
         /// <param name="value">The expression string to evaluate.</param>
-        public ExpressionSegment(string value) : this(value, null, null, StorageMode.AsDouble)
+        /// <param name="varSym">The variable symbol (default is "$").</param>
+        public ExpressionSegment(string value, string varSym = "$") : this(value, null, null, StorageMode.AsDouble, varSym)
         {
         }
 
@@ -160,7 +161,7 @@ namespace DataTools.Extras
         /// </summary>
         /// <param name="value">The expression string to evaluate.</param>
         /// <param name="ci">The <see cref="System.Globalization.CultureInfo"/> context to use.</param>
-        public ExpressionSegment(string value, CultureInfo ci) : this(value, null, ci, StorageMode.AsDouble)
+        public ExpressionSegment(string value, CultureInfo ci, string varSym = "$") : this(value, null, ci, StorageMode.AsDouble, varSym)
         {
         }
 
@@ -170,7 +171,7 @@ namespace DataTools.Extras
         /// <param name="value">The expression string to evaluate.</param>
         /// <param name="ci">The <see cref="System.Globalization.CultureInfo"/> context to use.</param>
         /// <param name="mode">The storage mode (double or decimal) for literal values.</param>
-        public ExpressionSegment(string value, CultureInfo ci, StorageMode mode) : this(value, null, ci, mode)
+        public ExpressionSegment(string value, CultureInfo ci, StorageMode mode, string varSym = "$") : this(value, null, ci, mode, varSym)
         {
         }
 
@@ -179,7 +180,7 @@ namespace DataTools.Extras
         /// </summary>
         /// <param name="value">The expression string to evaluate.</param>
         /// <param name="mode">The storage mode (double or decimal) for literal values.</param>
-        public ExpressionSegment(string value, StorageMode mode) : this(value, null, null, mode)
+        public ExpressionSegment(string value, StorageMode mode, string varSym = "$") : this(value, null, null, mode, varSym)
         {
         }
 
@@ -191,9 +192,10 @@ namespace DataTools.Extras
         {
         }
 
-        private ExpressionSegment(string value, ExpressionSegment parent, CultureInfo ci, StorageMode mode)
+        private ExpressionSegment(string value, ExpressionSegment parent, CultureInfo ci, StorageMode mode, string varSym)
         {
-            this.storageMode = mode;
+            storageMode = mode;
+            this.varSym = varSym;
             this.ci = ci ?? this.ci ?? CultureInfo.CurrentCulture;
             this.parent = parent;
 
@@ -211,12 +213,12 @@ namespace DataTools.Extras
                 {
                     if (sb.Length > 0)
                     {
-                        parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode));
+                        parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym));
                         sb.Clear();
                     }
 
                     var val = TextBetween(value, i, sc1, sc2, out b, out e);
-                    parts.Add(new ExpressionSegment(val, this, ci, mode)
+                    parts.Add(new ExpressionSegment(val, this, ci, mode, varSym)
                     {
                         partType = PartType.Composite
                     });
@@ -235,7 +237,7 @@ namespace DataTools.Extras
                 {
                     if (sb.Length > 0)
                     {
-                        parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode));
+                        parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym));
                         sb.Clear();
                     }
                 }
@@ -243,9 +245,9 @@ namespace DataTools.Extras
                 {
                     if (double.TryParse(sb.ToString(), NumberStyles.Any, ci, out double doubleTest))
                     {
-                        if ((sb.ToString() + value[i] != "0x") && !double.TryParse(sb.ToString() + value[i], NumberStyles.Any, ci, out _))
+                        if (sb.ToString() + value[i] != "0x" && !double.TryParse(sb.ToString() + value[i], NumberStyles.Any, ci, out _))
                         {
-                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode)
+                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym)
                             {
                                 partType = PartType.Literal,
                                 Value = doubleTest,
@@ -258,7 +260,7 @@ namespace DataTools.Extras
                     {
                         if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "0x" && !long.TryParse(sb.ToString().Substring(2) + value[i], NumberStyles.AllowHexSpecifier, ci, out _))
                         {
-                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode)
+                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym)
                             {
                                 partType = PartType.Literal,
                                 Value = longTest,
@@ -271,7 +273,7 @@ namespace DataTools.Extras
                     {
                         if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "&H" && !long.TryParse(sb.ToString().Substring(2) + value[i], NumberStyles.AllowHexSpecifier, ci, out _))
                         {
-                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode)
+                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym)
                             {
                                 partType = PartType.Literal,
                                 Value = longTest,
@@ -284,7 +286,7 @@ namespace DataTools.Extras
                     {
                         if (sb.Length > 1 && sb.ToString().Substring(0, 1) == "#" && !long.TryParse(sb.ToString().Substring(1) + value[i], NumberStyles.AllowHexSpecifier, ci, out _))
                         {
-                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode)
+                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym)
                             {
                                 partType = PartType.Literal,
                                 Value = longTest,
@@ -308,22 +310,22 @@ namespace DataTools.Extras
                     if (double.TryParse(sb.ToString(), NumberStyles.Any, ci, out double doubleTest))
                     {
                         partType = PartType.Literal;
-                        this.Value = doubleTest;
+                        Value = doubleTest;
                     }
                     else if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "0x" && long.TryParse(sb.ToString().Substring(2), NumberStyles.AllowHexSpecifier, ci, out long longTest))
                     {
                         partType = PartType.Literal;
-                        this.Value = longTest;
+                        Value = longTest;
                     }
                     else if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "&H" && long.TryParse(sb.ToString().Substring(2), NumberStyles.AllowHexSpecifier, ci, out longTest))
                     {
                         partType = PartType.Literal;
-                        this.Value = longTest;
+                        Value = longTest;
                     }
                     else if (sb.Length > 1 && sb.ToString().Substring(0, 1) == "#" && long.TryParse(sb.ToString().Substring(1), NumberStyles.AllowHexSpecifier, ci, out longTest))
                     {
                         partType = PartType.Literal;
-                        this.Value = longTest;
+                        Value = longTest;
                     }
 
                     monoVal = sb.ToString();
@@ -331,7 +333,7 @@ namespace DataTools.Extras
                 }
                 else
                 {
-                    var newPart = new ExpressionSegment(sb.ToString(), this, ci, mode);
+                    var newPart = new ExpressionSegment(sb.ToString(), this, ci, mode, varSym);
 
                     if (double.TryParse(sb.ToString(), NumberStyles.Any, ci, out double doubleTest))
                     {
@@ -392,7 +394,7 @@ namespace DataTools.Extras
                             partType = PartType.Unit;
                             unit = idunit;
                         }
-                        else if (string.IsNullOrEmpty(VariableSymbol))
+                        else if (partType != PartType.Literal && string.IsNullOrEmpty(VariableSymbol))
                         {
                             partType = PartType.Variable;
                         }
@@ -452,12 +454,12 @@ namespace DataTools.Extras
         public ExpressionSegment Parent => parent;
 
         /// <summary>
-        /// Gets the <see cref="DataTools.Extras.PartType"/> of the <see cref="ExpressionSegment"/>.
+        /// Gets the <see cref="Expressions.PartType"/> of the <see cref="ExpressionSegment"/>.
         /// </summary>
         public PartType PartType => partType;
 
         /// <summary>
-        /// Gets the <see cref="DataTools.Extras.Position"/> of the current <see cref="ExpressionSegment"/> in terms of the parent expression (left-hand, right-hand, or expression).
+        /// Gets the <see cref="Expressions.Position"/> of the current <see cref="ExpressionSegment"/> in terms of the parent expression (left-hand, right-hand, or expression).
         /// </summary>
         public Position Position
         {
@@ -473,7 +475,7 @@ namespace DataTools.Extras
         }
 
         /// <summary>
-        /// Gets or sets the value <see cref="DataTools.Extras.StorageMode"/> (double or decimal) of the <see cref="ExpressionSegment"/> literals.
+        /// Gets or sets the value <see cref="Expressions.StorageMode"/> (double or decimal) of the <see cref="ExpressionSegment"/> literals.
         /// </summary>
         /// <remarks>
         /// Only the root node can dictate the storage mode. Setting this value on a child node will bubble up to the root node.
@@ -521,7 +523,7 @@ namespace DataTools.Extras
                     }
                     else if (v is double d)
                     {
-                        v = (double)d;
+                        v = d;
                     }
                     else if (v is decimal de)
                     {
@@ -572,7 +574,7 @@ namespace DataTools.Extras
                     }
                     else if (v is decimal de)
                     {
-                        v = (decimal)de;
+                        v = de;
                     }
                     else if (v is long l)
                     {
@@ -641,6 +643,418 @@ namespace DataTools.Extras
         #endregion Public Properties
 
         #region Public Methods
+
+        /// <summary>
+        /// Check that the unit form is compatible with the unit form of the specified object.
+        /// </summary>
+        /// <param name="other">The object to compare.</param>
+        /// <returns>True if the unit forms are compatible.</returns>
+        public bool CheckUnitsMatch(ExpressionSegment other)
+        {
+            var lh = this;
+            var rh = other;
+
+            if (lh.parts.Count > 0)
+            {
+                var ucmp1 = lh.parts.Where((p) => (p.PartType & PartType.Unit) == PartType.Unit).ToList();
+                var ucmp2 = lh.parts.Where((p) => (p.PartType & PartType.Unit) == PartType.Unit).ToList();
+
+                if (ucmp1.Count != ucmp2.Count) return false;
+
+                int c = ucmp1.Count;
+                for (int i = 0; i < c; i++)
+                {
+                    if (ucmp1[i].partType != ucmp2[i].partType) return false;
+
+                    if ((ucmp1[i].partType & PartType.Composite) == PartType.Composite)
+                    {
+                        if (!ucmp1[i].CheckUnitsMatch(ucmp1[i])) return false;
+                    }
+                }
+
+
+                return true;
+            }
+            else if ((lh.PartType & PartType.Unit) == PartType.Unit)
+            {
+                return lh.Unit.Measures == rh.Unit.Measures;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        /// <summary>
+        /// Clones the current <see cref="ExpressionSegment"/> to a new expression.
+        /// </summary>
+        /// <returns>A new <see cref="ExpressionSegment"/>.</returns>
+        /// <remarks>
+        /// <see cref="Parent"/> is set to null for all new cloned segment roots.
+        /// </remarks>
+        public ExpressionSegment Clone()
+        {
+            var itemNew = (ExpressionSegment)MemberwiseClone();
+
+            itemNew.parts = new List<ExpressionSegment>();
+            itemNew.parent = null;
+
+            if (value != null)
+            {
+                if (value is ICloneable cl)
+                {
+                    itemNew.value = cl.Clone();
+                }
+            }
+
+            foreach (var item in parts)
+            {
+                var addItem = item.Clone();
+                addItem.parent = itemNew;
+                itemNew.parts.Add(addItem);
+            }
+
+            return itemNew;
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ExpressionSegment es)
+            {
+                if (es.partType == partType)
+                {
+                    if (partType == PartType.Literal)
+                    {
+                        return Equals(value, es.value);
+                    }
+                    else if (partType == PartType.Unit)
+                    {
+                        return es.Unit.Equals(es.Unit);
+                    }
+                    else
+                    {
+                        return es.ToString() == ToString();
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if (partType == PartType.Literal && value != null)
+            {
+                return value.Equals(obj);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return ToString().GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets the expression root for the specified side.
+        /// </summary>
+        /// <param name="side">The side of the expression.</param>
+        /// <returns>An <see cref="ExpressionSegment"/> root.</returns>
+        public ExpressionSegment GetSide(Position side)
+        {
+            if (side == Position.Expression) return Clone();
+
+            var res = parts.Where((p) => p.Position == side).ToList();
+            if (res.Count == 1) return res[0].Clone();
+
+            var es = new ExpressionSegment();
+
+            es.position = Position.Expression;
+            es.partType = PartType.Composite;
+
+            foreach (var item in res)
+            {
+                var newItem = item.Clone();
+                newItem.parent = es;
+                es.parts.Add(newItem);
+            }
+
+            return es;
+        }
+
+        /// <summary>
+        /// Check whether this root has left-hand and right-hand sides and the units match.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasMatchingUnits()
+        {
+            if (partType != PartType.Equation) return false;
+
+            var lh = GetSide(Position.LeftHand);
+            var rh = GetSide(Position.RightHand);
+
+            return lh.CheckUnitsMatch(rh);
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            if (!IsComposite)
+            {
+                sb.Append(monoVal);
+            }
+            else
+            {
+                foreach (var item in parts)
+                {
+                    if (sb.Length > 0) sb.Append(" ");
+
+                    sb.Append(item.ToString());
+                }
+            }
+
+            if (partType == PartType.Composite && Parent != null)
+            {
+                return $"({sb})";
+            }
+            else
+            {
+                return sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Gets the literal value as a decimal number.
+        /// </summary>
+        /// <returns>A decimal number or null if the value cannot be coerced to a decimal.</returns>
+        public decimal? ValueToDecimal()
+        {
+            if (value is double d)
+            {
+                return (decimal)d;
+            }
+            else if (value is decimal de)
+            {
+                return de;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the literal value as a double number.
+        /// </summary>
+        /// <returns>A double number or null if the value cannot be coerced to a double.</returns>
+        public double? ValueToDouble()
+        {
+            if (value is double d)
+            {
+                return d;
+            }
+            else if (value is decimal de)
+            {
+                return (double)de;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the literal value as a string.
+        /// </summary>
+        /// <returns></returns>
+        public string ValueToString()
+        {
+            return monoVal ?? value?.ToString();
+        }
+
+        #endregion Public Methods
+
+        #region Private Methods
+
+        /// <summary>
+        /// Check the integrity of the expression and determine if it is solvable.
+        /// </summary>
+        private void CheckIntegrity()
+        {
+            var mode = 0;
+            bool ef;
+
+            if (partType == PartType.Composite && parts.Count >= 3)
+            {
+                int c = parts.Count;
+                int i;
+
+                ExpressionSegment es;
+
+                int? startIdx = null;
+                int? stopIdx = null;
+
+                int j;
+                int eqs = 0;
+
+                bool di;
+
+                for (i = 0; i < c; i++)
+                {
+                    di = false;
+
+                    if (parts[i].partType == PartType.Unit)
+                    {
+                        if (i == 0)
+                        {
+                            di = true;
+                        }
+                        else
+                        {
+                            if (parts[i - 1].partType != PartType.Literal && parts[i - 1].partType != PartType.Variable)
+                            {
+                                di = true;
+                            }
+                        }
+                    }
+
+                    if (di)
+                    {
+                        var exp = new ExpressionSegment("1");
+                        exp.parent = this;
+
+                        parts.Insert(i, exp);
+                        c++;
+                        i++;
+                    }
+                }
+
+                for (j = 0; j < c;)
+                {
+                    if (parts[j].partType == PartType.Equality || parts[j].partType == PartType.Assignment)
+                    {
+                        eqs++;
+                    }
+
+                    for (i = j; i < c; i++)
+                    {
+                        if (mode == 0 && (parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
+                        {
+                            if (startIdx == null) startIdx = i;
+                            mode = 1;
+                        }
+                        else if (mode == 1 && parts[i].partType == PartType.Unit)
+                        {
+                            mode = 2;
+                        }
+                        else if (mode == 2 && parts[i].partType == PartType.Operator)
+                        {
+                            mode = 3;
+                        }
+                        else if (mode == 3 && (parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
+                        {
+                            mode = 4;
+                        }
+                        else if (mode == 4 && parts[i].partType == PartType.Unit)
+                        {
+                            mode = 2;
+                            stopIdx = i;
+                        }
+                        else if (mode != 0)
+                        {
+                            mode = 0;
+                            break;
+                        }
+                    }
+
+                    if (startIdx != null && stopIdx != null)
+                    {
+                        es = new ExpressionSegment();
+
+                        es.partType = PartType.CompositeUnit;
+                        es.parent = this;
+                        es.ci = ci;
+                        es.storageMode = storageMode;
+
+                        for (i = startIdx.Value; i <= stopIdx.Value; i++)
+                        {
+                            parts[i].parent = es;
+                            es.parts.Add(parts[i]);
+                        }
+
+                        parts.RemoveRange(startIdx.Value + 1, stopIdx.Value - startIdx.Value);
+                        parts[startIdx.Value] = es;
+
+                        j = startIdx.Value + 1;
+                        c = parts.Count;
+
+                        mode = 0;
+                        startIdx = stopIdx = null;
+                    }
+                    else
+                    {
+                        j++;
+                    }
+                }
+
+                ef = eqs == 1;
+
+                if (ef)
+                {
+                    ef = false;
+                    partType = PartType.Equation;
+
+                    for (i = 0; i < c; i++)
+                    {
+                        if (parts[i].partType == PartType.Equality || parts[i].partType == PartType.Assignment)
+                        {
+                            ef = true;
+                        }
+                        else
+                        {
+                            if (ef)
+                            {
+                                parts[i].position = Position.RightHand;
+                            }
+                            else
+                            {
+                                parts[i].position = Position.LeftHand;
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Check if the expression is solvable.
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckSolvable()
+        {
+            var i = parts.Count((e) => e.partType == PartType.Assignment || e.partType == PartType.Equality);
+            if (i == 1)
+            {
+                return HasMatchingUnits();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        #endregion Private Methods
+
+        #region Operators
 
         public static explicit operator decimal(ExpressionSegment val)
         {
@@ -747,373 +1161,7 @@ namespace DataTools.Extras
             return false;
         }
 
-        /// <summary>
-        /// Check that the unit form is compatible with the unit form of the specified object.
-        /// </summary>
-        /// <param name="other">The object to compare.</param>
-        /// <returns>True if the unit forms are compatible.</returns>
-        public bool CheckUnitsMatch(ExpressionSegment other)
-        {
-            var lh = this;
-            var rh = other;
+        #endregion
 
-            if (lh.parts.Count > 0)
-            {
-                var ucmp1 = lh.parts.Where((p) => (p.PartType & PartType.Unit) == PartType.Unit).ToList();
-                var ucmp2 = lh.parts.Where((p) => (p.PartType & PartType.Unit) == PartType.Unit).ToList();
-
-                if (ucmp1.Count != ucmp2.Count) return false;
-
-                int c = ucmp1.Count;
-                for (int i = 0; i < c; i++)
-                {
-                    if (ucmp1[i].partType != ucmp2[i].partType) return false;
-
-                    if ((ucmp1[i].partType & PartType.Composite) == PartType.Composite)
-                    {
-                        if (!ucmp1[i].CheckUnitsMatch(ucmp1[i])) return false;
-                    }
-                }
-
-
-                return true;
-            }
-            else if ((lh.PartType & PartType.Unit) == PartType.Unit)
-            {
-                return lh.Unit.Measures == rh.Unit.Measures;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
-
-        /// <summary>
-        /// Clones the current <see cref="ExpressionSegment"/> to a new expression.
-        /// </summary>
-        /// <returns>A new <see cref="ExpressionSegment"/>.</returns>
-        /// <remarks>
-        /// <see cref="Parent"/> is set to null for all new cloned segment roots.
-        /// </remarks>
-        public ExpressionSegment Clone()
-        {
-            var itemNew = (ExpressionSegment)MemberwiseClone();
-
-            itemNew.parts = new List<ExpressionSegment>();
-            itemNew.parent = null;
-
-            if (value != null)
-            {
-                if (value is ICloneable cl)
-                {
-                    itemNew.value = cl.Clone();
-                }
-            }
-
-            foreach (var item in parts)
-            {
-                var addItem = item.Clone();
-                addItem.parent = itemNew;
-                itemNew.parts.Add(addItem);
-            }
-
-            return itemNew;
-        }
-
-        object ICloneable.Clone()
-        {
-            return Clone();
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is ExpressionSegment es)
-            {
-                if (es.partType == partType)
-                {
-                    if (partType == PartType.Literal)
-                    {
-                        return object.Equals(value, es.value);
-                    }
-                    else if (partType == PartType.Unit)
-                    {
-                        return es.Unit.Equals(es.Unit);
-                    }
-                    else
-                    {
-                        return es.ToString() == ToString();
-                    }
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else if (partType == PartType.Literal && value != null)
-            {
-                return value.Equals(obj);
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public override int GetHashCode()
-        {
-            return ToString().GetHashCode();
-        }
-
-        /// <summary>
-        /// Gets the expression root for the specified side.
-        /// </summary>
-        /// <param name="side">The side of the expression.</param>
-        /// <returns>An <see cref="ExpressionSegment"/> root.</returns>
-        public ExpressionSegment GetSide(Position side)
-        {
-            if (side == Position.Expression) return this.Clone();
-
-            var res = parts.Where((p) => p.Position == side).ToList();
-            if (res.Count == 1) return res[0].Clone();
-
-            var es = new ExpressionSegment();
-
-            es.position = Position.Expression;
-            es.partType = PartType.Composite;
-
-            foreach (var item in res)
-            {
-                var newItem = item.Clone();
-                newItem.parent = es;
-                es.parts.Add(newItem);
-            }
-
-            return es;
-        }
-
-        /// <summary>
-        /// Check whether this root has left-hand and right-hand sides and the units match.
-        /// </summary>
-        /// <returns></returns>
-        public bool HasMatchingUnits()
-        {
-            if (partType != PartType.Equation) return false;
-
-            var lh = GetSide(Position.LeftHand);
-            var rh = GetSide(Position.RightHand);
-
-            return lh.CheckUnitsMatch(rh);
-        }
-
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
-
-            if (!IsComposite)
-            {
-                sb.Append(monoVal);
-            }
-            else
-            {
-                foreach (var item in parts)
-                {
-                    if (sb.Length > 0) sb.Append(" ");
-
-                    sb.Append(item.ToString());
-                }
-            }
-
-            if (this.partType == PartType.Composite && this.Parent != null)
-            {
-                return $"({sb})";
-            }
-            else
-            {
-                return sb.ToString();
-            }
-        }
-
-        /// <summary>
-        /// Gets the literal value as a decimal number.
-        /// </summary>
-        /// <returns>A decimal number or null if the value cannot be coerced to a decimal.</returns>
-        public decimal? ValueToDecimal()
-        {
-            if (value is double d)
-            {
-                return (decimal)d;
-            }
-            else if (value is decimal de)
-            {
-                return de;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Gets the literal value as a double number.
-        /// </summary>
-        /// <returns>A double number or null if the value cannot be coerced to a double.</returns>
-        public double? ValueToDouble()
-        {
-            if (value is double d)
-            {
-                return d;
-            }
-            else if (value is decimal de)
-            {
-                return (double)de;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Gets the literal value as a string.
-        /// </summary>
-        /// <returns></returns>
-        public string ValueToString()
-        {
-            return monoVal ?? value?.ToString();
-        }
-
-        #endregion Public Methods
-
-        #region Private Methods
-
-        /// <summary>
-        /// Check the integrity of the expression and determine if it is solvable.
-        /// </summary>
-        private void CheckIntegrity()
-        {
-            var mode = 0;
-            bool ef;
-
-            if (partType == PartType.Composite && parts.Count >= 3)
-            {
-                int c = parts.Count;
-                int i;
-
-                ExpressionSegment es;
-
-                int? startIdx = null;
-                int? stopIdx = null;
-
-                int j;
-                int eqs = 0;
-                for (j = 0; j < c;)
-                {
-                    if (parts[j].partType == PartType.Equality || parts[j].partType == PartType.Assignment)
-                    {
-                        eqs++;
-                    }
-
-                    for (i = j; i < c; i++)
-                    {
-                        if (mode == 0 && parts[i].partType == PartType.Unit)
-                        {
-                            if (startIdx == null) startIdx = i;
-                            mode = 1;
-                        }
-                        else if (mode == 1 && parts[i].partType == PartType.Operator)
-                        {
-                            mode = 2;
-                        }
-                        else if (mode == 2 && parts[i].partType == PartType.Unit)
-                        {
-                            mode = 1;
-                            stopIdx = i;
-                        }
-                        else if (mode != 0)
-                        {
-                            mode = 0;
-                            break;
-                        }
-                    }
-
-                    if (startIdx != null && stopIdx != null)
-                    {
-                        es = new ExpressionSegment();
-
-                        es.partType = PartType.CompositeUnit;
-                        es.parent = this;
-                        es.ci = ci;
-                        es.storageMode = storageMode;
-
-                        for (i = startIdx.Value; i <= stopIdx.Value; i++)
-                        {
-                            parts[i].parent = es;
-                            es.parts.Add(parts[i]);
-                        }
-
-                        parts.RemoveRange(startIdx.Value + 1, stopIdx.Value - startIdx.Value);
-                        parts[startIdx.Value] = es;
-
-                        j = startIdx.Value + 1;
-                        c = parts.Count;
-
-                        mode = 0;
-                        startIdx = stopIdx = null;
-                    }
-                    else
-                    {
-                        j++;
-                    }
-                }
-
-                ef = eqs == 1;
-
-                if (ef)
-                {
-                    ef = false;
-                    partType = PartType.Equation;
-
-                    for (i = 0; i < c; i++)
-                    {
-                        if (parts[i].partType == PartType.Equality || parts[i].partType == PartType.Assignment)
-                        {
-                            ef = true;
-                        }
-                        else
-                        {
-                            if (ef)
-                            {
-                                parts[i].position = Position.RightHand;
-                            }
-                            else
-                            {
-                                parts[i].position = Position.LeftHand;
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Check if the expression is solvable.
-        /// </summary>
-        /// <returns></returns>
-        private bool CheckSolvable()
-        {
-            var i = parts.Count((e) => e.partType == PartType.Assignment || e.partType == PartType.Equality);
-            if (i == 1)
-            {
-                return HasMatchingUnits();
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        #endregion Private Methods
     }
 }

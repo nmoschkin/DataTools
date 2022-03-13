@@ -140,7 +140,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Area",
@@ -153,7 +154,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Area",
@@ -166,7 +168,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Area",
@@ -179,7 +182,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Area",
@@ -192,7 +196,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "BinaryData",
@@ -218,7 +223,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Length",
@@ -231,7 +237,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Length",
@@ -257,7 +264,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Length",
@@ -283,7 +291,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Length",
@@ -296,7 +305,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Length",
@@ -309,7 +319,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Length",
@@ -322,7 +333,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Mass",
@@ -348,7 +360,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Mass",
@@ -361,7 +374,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Mass",
@@ -374,7 +388,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Mass",
@@ -387,7 +402,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "ThermodynamicTemperature",
@@ -413,7 +429,8 @@
     "offset": 459.67,
     "offsetFirst": true,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Time",
@@ -426,7 +443,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Time",
@@ -439,7 +457,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Time",
@@ -452,7 +471,8 @@
     "offset": 2160000.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Time",
@@ -517,7 +537,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Time",
@@ -530,7 +551,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Volume",
@@ -543,7 +565,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Volume",
@@ -556,7 +579,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Volume",
@@ -569,7 +593,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Volume",
@@ -582,7 +607,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Volume",
@@ -595,7 +621,8 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   },
   {
     "measures": "Volume",
@@ -608,6 +635,7 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": ""
+    "equation": "",
+    "isSI": false
   }
 ]

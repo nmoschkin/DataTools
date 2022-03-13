@@ -1621,6 +1621,63 @@ namespace DataTools.Text
 
         }
 
+
+        /// <summary>
+        /// Strips out everything else from a string and returns only the numbers.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="culture"></param>
+        /// <param name="hex"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public static string NumbersOnly(string input, System.Globalization.CultureInfo culture = null, bool hex = false)
+        {
+            if (culture is null)
+            {
+                culture = System.Globalization.CultureInfo.CurrentCulture;
+            }
+
+            char[] ch;
+            var sb = new System.Text.StringBuilder();
+            int i;
+            string scan;
+            int cs = '0';
+            for (i = 0; i <= 9; i++)
+                sb.Append((char)(cs + i));
+            if (hex)
+            {
+                cs = 'A';
+                for (i = 0; i <= 5; i++)
+                    sb.Append((char)(cs + i));
+                cs = 'a';
+                for (i = 0; i <= 5; i++)
+                    sb.Append((char)(cs + i));
+            }
+
+            sb.Append(culture.NumberFormat.NumberDecimalSeparator);
+            sb.Append(culture.NumberFormat.CurrencyDecimalSeparator);
+            sb.Append(culture.NumberFormat.PercentDecimalSeparator);
+            sb.Append(culture.NumberFormat.NegativeSign);
+            sb.Append(culture.NumberFormat.PositiveSign);
+
+            ch = input.ToCharArray();
+            scan = sb.ToString();
+
+            cs = ch.Length;
+
+            for (i = 0; i < cs; i++)
+            {
+                if (scan.Contains(ch[i].ToString()))
+                {
+                    sb.Append(ch[i]);
+                }
+            }
+
+            return sb.ToString();
+        }
+
+
+
         /// <summary>
         /// Returns all words in a string as an array of strings.
         /// </summary>

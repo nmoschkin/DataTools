@@ -15,11 +15,9 @@ namespace DataTools.MathTools
 {
     public static class MathLib
     {
-        // Extended mathematic process library for Visual Basic
-        //
-        // Duplication is prohibited, as is commercial use without prior written permission.
-        // Copyright (C) 2015 Nathaniel Moschkin.  All Rights Reserved.
-                
+        // Copyright (C) 2022 Nathaniel Moschkin.  All Rights Reserved.
+        // MIT License
+        // 
         public static double InchesToMillimeters(double value)
         {
             return value * 25.4d;
@@ -336,145 +334,7 @@ namespace DataTools.MathTools
             return gcf;
         }
 
-        /// <summary>
-        /// Strips the units from a number, returns both, cleaned.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="unit"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static string StripUnit(string text, ref string unit)
-        {
-            var ch = text.ToCharArray();
-            int i;
-            int c = ch.Count() - 1;
-
-            unit = null;
-
-            for (i = c; i >= 0; i -= 1)
-            {
-                if (TextTools.IsNumber(ch[i]))
-                {
-                    if (i == c)
-                        return text.Trim();
-
-                    unit = text.Substring(i + 1).Trim();
-                    text = text.Substring(0, i + 1).Trim();
-
-                    break;
-                }
-            }
-
-            return text;
-        }
-
-        /// <summary>
-        /// Parse any string into an array of numbers with their optional unit markers.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="returnUnits"></param>
-        /// <param name="validunits"></param>
-        /// <param name="validSeparators"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static double[] ParseArrayOfNumbersWithUnits(string input, [Optional, DefaultParameterValue(null)] ref string[] returnUnits, string[] validunits = null, string validSeparators = ",x;:")
-        {
-            if (validunits is null)
-            {
-                validunits = new[] { "in", "mm", "'", "\"", "ft" };
-            }
-
-            var vc = validSeparators.ToCharArray();
-            int i;
-            int c;
-            var sb = new System.Text.StringBuilder();
-            var retVal = new List<double>();
-            var ru = new List<string>();
-            string s;
-            var exp = new MathExpressionParser();
-            input = input.ToLower();
-            c = vc.Count();
-
-            for (i = 1; i < c; i++)
-                input = input.Replace(vc[i], vc[0]);
-
-            var parse = TextTools.Split(input, vc[0].ToString());
-
-            c = parse.Count();
-
-            string su = null;
-
-            for (i = 0; i < c; i++)
-            {
-                s = parse[i].Trim();
-
-                s = StripUnit(s, ref su);
-
-                ru.Add(su);
-
-                string argErrorText = null;
-
-                retVal.Add(exp.ParseExpression(s, ErrorText: ref argErrorText));
-            }
-
-            returnUnits = ru.ToArray();
-            return retVal.ToArray();
-        }
-
-        /// <summary>
-        /// Strips out everything else from a string and returns only the numbers.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <param name="culture"></param>
-        /// <param name="hex"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static string NumbersOnly(string input, System.Globalization.CultureInfo culture = null, bool hex = false)
-        {
-            if (culture is null)
-            {
-                culture = System.Globalization.CultureInfo.CurrentCulture;
-            }
-
-            char[] ch;
-            var sb = new System.Text.StringBuilder();
-            int i;
-            string scan;
-            int cs = '0';
-            for (i = 0; i <= 9; i++)
-                sb.Append((char)(cs + i));
-            if (hex)
-            {
-                cs = 'A';
-                for (i = 0; i <= 5; i++)
-                    sb.Append((char)(cs + i));
-                cs = 'a';
-                for (i = 0; i <= 5; i++)
-                    sb.Append((char)(cs + i));
-            }
-
-            sb.Append(culture.NumberFormat.NumberDecimalSeparator);
-            sb.Append(culture.NumberFormat.CurrencyDecimalSeparator);
-            sb.Append(culture.NumberFormat.PercentDecimalSeparator);
-            sb.Append(culture.NumberFormat.NegativeSign);
-            sb.Append(culture.NumberFormat.PositiveSign);
-
-            ch = input.ToCharArray();
-            scan = sb.ToString();
-
-            cs = ch.Length;
-
-            for (i = 0; i < cs; i++)
-            {
-                if (scan.Contains(ch[i]))
-                {
-                    sb.Append(ch[i]);
-                }
-            }
-
-            return sb.ToString();
-        }
-
+      
         /// <summary>
         /// Swap nibbles
         /// </summary>

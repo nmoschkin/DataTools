@@ -15,154 +15,33 @@ namespace DataTools.Extras.Conversion
     
     public class MetricUnit : ICloneable
     {
-        private string measures = "";
+        #region Private Fields
 
-        [JsonProperty("measures")]
-        public string Measures
-        {
-            get
-            {
-                return measures;
-            }
-            set
-            {
-                measures = TitleCase(value);
-            }
-        }
-
-        private string name = "";
-
-        [JsonProperty("name")]
-        public string Name
-        {
-            get
-            {
-                return name;
-            }
-
-            set
-            {
-                name = TitleCase(value);
-            }
-        }
-
-        private string prefix = "";
-
-        [JsonProperty("prefix")]
-        public string Prefix
-        {
-            get
-            {
-                return prefix;
-            }
-
-            set
-            {
-                prefix = value;
-            }
-        }
-
-        private string pluralName = "";
-
-        [JsonProperty("pluralName")]
-        public string PluralName
-        {
-            get
-            {
-                return pluralName;
-            }
-
-            set
-            {
-                pluralName = TitleCase(value);
-            }
-        }
-
-        // ' Indicates this is a base unit to which all other units in this category convert
+        private bool derived = false;
+        private string equation = "";
         private bool isBase = false;
 
-        [JsonProperty("isBase")]
-        public bool IsBase
-        {
-            get
-            {
-                return isBase;
-            }
+        private string measures = "";
 
-            set
-            {
-                isBase = value;
-            }
-        }
-
-        // ' for derived bases.  $ is used to denote a variable.
         private string modifies = "";
-
-        [JsonProperty("modifies")]
-        public string Modifies
-        {
-            get
-            {
-                return modifies;
-            }
-
-            set
-            {
-                modifies = TitleCase(value);
-            }
-        }
 
         private double multiplier = 0.0d;
 
-        [JsonProperty("multiplier")]
-        public double Multiplier
-        {
-            get
-            {
-                return multiplier;
-            }
-
-            set
-            {
-                multiplier = value;
-            }
-        }
+        private string name = "";
 
         private double offset = 0.0d;
 
-        [JsonProperty("offset")]
-        public double Offset
-        {
-            get
-            {
-                return offset;
-            }
-
-            set
-            {
-                offset = value;
-            }
-        }
-
         private bool offsetFirst = false;
 
-        [JsonProperty("offsetFirst")]
-        public bool OffsetFirst
-        {
-            get
-            {
-                return offsetFirst;
-            }
+        private string pluralName = "";
 
-            set
-            {
-                offsetFirst = value;
-            }
-        }
+        private string prefix = "";
 
-        // ' Set to True for derived bases with equations.
+        private bool isSI = true;
 
-        private bool derived = false;
+        #endregion Private Fields
+
+        #region Public Properties
 
         [JsonProperty("derived")]
         public bool Derived
@@ -179,9 +58,6 @@ namespace DataTools.Extras.Conversion
         }
 
         // ' Equation for derived bases.  $ is used to denote a variable.
-
-        private string equation = "";
-
         [JsonProperty("equation")]
         public string Equation
         {
@@ -196,19 +72,149 @@ namespace DataTools.Extras.Conversion
             }
         }
 
+        [JsonProperty("isBase")]
+        public bool IsBase
+        {
+            get
+            {
+                return isBase;
+            }
+
+            set
+            {
+                isBase = value;
+            }
+        }
+
+        [JsonProperty("isSI")]
+        public bool IsSI
+        {
+            get => isSI;
+            set
+            {
+                if (isSI != value)
+                {
+                    isSI = value;
+                }
+            }
+        }
+
+        [JsonProperty("measures")]
+        public string Measures
+        {
+            get
+            {
+                return measures;
+            }
+            set
+            {
+                measures = TitleCase(value);
+            }
+        }
+        [JsonProperty("modifies")]
+        public string Modifies
+        {
+            get
+            {
+                return modifies;
+            }
+
+            set
+            {
+                modifies = TitleCase(value);
+            }
+        }
+
+        [JsonProperty("multiplier")]
+        public double Multiplier
+        {
+            get
+            {
+                return multiplier;
+            }
+
+            set
+            {
+                multiplier = value;
+            }
+        }
+
+        [JsonProperty("name")]
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+
+            set
+            {
+                name = TitleCase(value);
+            }
+        }
+        [JsonProperty("offset")]
+        public double Offset
+        {
+            get
+            {
+                return offset;
+            }
+
+            set
+            {
+                offset = value;
+            }
+        }
+
+        [JsonProperty("offsetFirst")]
+        public bool OffsetFirst
+        {
+            get
+            {
+                return offsetFirst;
+            }
+
+            set
+            {
+                offsetFirst = value;
+            }
+        }
+
+        [JsonProperty("pluralName")]
+        public string PluralName
+        {
+            get
+            {
+                return pluralName;
+            }
+
+            set
+            {
+                pluralName = TitleCase(value);
+            }
+        }
+
+        [JsonProperty("prefix")]
+        public string Prefix
+        {
+            get
+            {
+                return prefix;
+            }
+
+            set
+            {
+                prefix = value;
+            }
+        }
+
+        #endregion Public Properties
+
+        #region Public Methods
+
         public object Clone()
         {
             return MemberwiseClone();
-        }
-
-        public override string ToString()
-        {
-            return PluralName + " (" + Measures + ")";
-        }
-
-        public override int GetHashCode()
-        {
-            return JsonConvert.SerializeObject(this).GetHashCode();
         }
 
         public override bool Equals(object obj)
@@ -222,5 +228,17 @@ namespace DataTools.Extras.Conversion
                 return false;
             }
         }
+
+        public override int GetHashCode()
+        {
+            return JsonConvert.SerializeObject(this).GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return PluralName + " (" + Measures + ")";
+        }
+
+        #endregion Public Methods
     }
 }

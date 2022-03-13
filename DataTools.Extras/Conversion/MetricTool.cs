@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
@@ -20,20 +20,66 @@ namespace DataTools.Extras.Conversion
     public class MetricTool
     {
 
+        #region Public Fields
+
+        public static readonly double[] Multipliers = new double[] { Pow(10d, 0d), Pow(10d, -1), Pow(10d, -2), Pow(10d, -3), Pow(10d, -6), Pow(10d, -9), Pow(10d, -12), Pow(10d, -15), Pow(10d, -18), Pow(10d, -21), Pow(10d, -24), Pow(10d, 1d), Pow(10d, 2d), Pow(10d, 3d), Pow(10d, 6d), Pow(10d, 9d), Pow(10d, 12d), Pow(10d, 15d), Pow(10d, 18d), Pow(10d, 21d), Pow(10d, 24d), Pow(2d, 10d), Pow(2d, 20d), Pow(2d, 30d), Pow(2d, 40d), Pow(2d, 50d), Pow(2d, 60d), Pow(2d, 70d), Pow(2d, 80d) };
         public static readonly string[] Prefixes = new string[] { "", "deci", "centi", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto", "deca", "hecto", "kilo", "mega", "giga", "tera", "peta", "exa", "zetta", "yotta", "kibi", "mebi", "gibi", "tebi", "pebi", "exbi", "zebi", "yobi" };
         public static readonly string[] ShortPrefixes = new string[] { "", "d", "c", "m", "μ", "n", "p", "f", "a", "z", "y", "da", "h", "k", "M", "G", "T", "P", "E", "Z", "Y", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi" };
-        public static readonly double[] Multipliers = new double[] { Pow(10d, 0d), Pow(10d, -1), Pow(10d, -2), Pow(10d, -3), Pow(10d, -6), Pow(10d, -9), Pow(10d, -12), Pow(10d, -15), Pow(10d, -18), Pow(10d, -21), Pow(10d, -24), Pow(10d, 1d), Pow(10d, 2d), Pow(10d, 3d), Pow(10d, 6d), Pow(10d, 9d), Pow(10d, 12d), Pow(10d, 15d), Pow(10d, 18d), Pow(10d, 21d), Pow(10d, 24d), Pow(2d, 10d), Pow(2d, 20d), Pow(2d, 30d), Pow(2d, 40d), Pow(2d, 50d), Pow(2d, 60d), Pow(2d, 70d), Pow(2d, 80d) };
-        
+
+        #endregion Public Fields
+
+        #region Private Fields
+
         private static int roundingDigits = 4;
 
-        private MetricInfo info = new MetricInfo();
+        private static UnitCollection units = new UnitCollection();
+
         private string convert;
-        private bool longFormat = true;
+
         private MetricInfo[] convIn;
         private MetricInfo[] convOut;
+
+        private MetricInfo info = new MetricInfo();
+
+        private bool longFormat = true;
+
         private UnitCollection myUnits;
 
-        private static UnitCollection units = new UnitCollection();
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        static MetricTool()
+        {
+            SortCategories(true);
+        }
+
+        public MetricTool(bool WithOwnUnits = false)
+        {
+            if (WithOwnUnits)
+                myUnits = GetUnits();
+
+            info.BaseValue = 0d;
+            info.Multiplier = 1d;
+            info.Value = 0d;
+        }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        [Browsable(true)]
+        public static int RoundingDigits
+        {
+            get
+            {
+                return roundingDigits;
+            }
+            set
+            {
+                roundingDigits = value;
+            }
+        }
 
         [Browsable(true)]
         public static UnitCollection Units
@@ -41,6 +87,21 @@ namespace DataTools.Extras.Conversion
             get
             {
                 return units;
+            }
+        }
+
+        [Browsable(true)]
+        public UnitCollection AvailableUnits
+        {
+            get
+            {
+                if (myUnits is null)
+                    return units;
+                return myUnits;
+            }
+            set
+            {
+                myUnits = value;
             }
         }
 
@@ -71,54 +132,6 @@ namespace DataTools.Extras.Conversion
         }
 
         [Browsable(true)]
-        public bool LongFormat
-        {
-            get
-            {
-                return longFormat;
-            }
-            set
-            {
-                longFormat = value;
-
-                MetricInfo[] argInputInfo = null;
-                MetricInfo[] argOutputInfo = null;
-
-                Convert(Query, out argInputInfo, out argOutputInfo);
-
-                Format = Format;
-            }
-        }
-
-        [Browsable(true)]
-        public static int RoundingDigits
-        {
-            get
-            {
-                return roundingDigits;
-            }
-            set
-            {
-                roundingDigits = value;
-            }
-        }
-
-        [Browsable(true)]
-        public UnitCollection AvailableUnits
-        {
-            get
-            {
-                if (myUnits is null)
-                    return units;
-                return myUnits;
-            }
-            set
-            {
-                myUnits = value;
-            }
-        }
-
-        [Browsable(true)]
         public string Format
         {
             get
@@ -137,6 +150,782 @@ namespace DataTools.Extras.Conversion
             {
                 Parse(value, ref info);
             }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="MetricInfo"/> object.
+        /// </summary>
+        /// <returns></returns>
+        [Browsable(true)]
+        public MetricInfo Info
+        {
+            get
+            {
+                return info;
+            }
+
+            set
+            {
+                info = value;
+            }
+        }
+
+        [Browsable(true)]
+        public bool LongFormat
+        {
+            get
+            {
+                return longFormat;
+            }
+            set
+            {
+                longFormat = value;
+
+                MetricInfo[] argInputInfo = null;
+                MetricInfo[] argOutputInfo = null;
+
+                Convert(Query, out argInputInfo, out argOutputInfo);
+
+                Format = Format;
+            }
+        }
+        /// <summary>
+        /// Get or set the conversion query.
+        /// </summary>
+        /// <returns></returns>
+        public string Query
+        {
+            get
+            {
+                return convert;
+            }
+
+            set
+            {
+                MetricInfo[] argInputInfo = null;
+                MetricInfo[] argOutputInfo = null;
+                Convert(value, out argInputInfo, out argOutputInfo);
+            }
+        }
+
+        /// <summary>
+        /// Returns the value in the current unit.
+        /// </summary>
+        /// <returns></returns>
+        [Browsable(true)]
+        public double Value
+        {
+            get
+            {
+                return info.Value;
+            }
+        }
+
+        #endregion Public Properties
+
+        #region Public Methods
+
+        public static void AddUnit(MetricUnit unit)
+        {
+            units.Add(unit);
+        }
+
+        public static MetricUnit CreateUnit(string measures = "", string name = "", string pluralName = "", string prefix = "", string modifies = "", double multiplier = 0.0d, double offset = 0.0d, bool offsetFirst = false, bool isBase = false)
+        {
+            var b = new MetricUnit();
+
+            b.Measures = measures;
+            b.IsBase = isBase;
+            b.Name = name;
+            b.PluralName = pluralName;
+            b.Prefix = prefix;
+            b.Modifies = modifies;
+            b.Multiplier = multiplier;
+            b.Offset = offset;
+            b.OffsetFirst = offsetFirst;
+
+            units.Add(b);
+
+            return b;
+        }
+
+        [Description("Find an exact unit.")]
+        public static MetricUnit FindUnit(string Unit, string MustMeasure = "")
+        {
+            string[] s;
+            int i;
+            int c;
+            foreach (MetricUnit u in units)
+            {
+                if ((u.Measures.ToLower() ?? "") == (MustMeasure.ToLower() ?? "") | string.IsNullOrEmpty(MustMeasure))
+                {
+                    if ((u.Name.ToLower() ?? "") == (Unit.ToLower() ?? ""))
+                        return (MetricUnit)u.Clone();
+                    if ((u.PluralName.ToLower() ?? "") == (Unit.ToLower() ?? ""))
+                        return (MetricUnit)u.Clone();
+                    s = Split(u.Prefix, ",");
+                    c = s.Length - 1;
+                    var loopTo = c;
+                    for (i = 0; i <= loopTo; i++)
+                    {
+                        if ((s[i] ?? "") == (Unit ?? ""))
+                            return (MetricUnit)u.Clone();
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        [Description("Get the base unit for a specific category.")]
+        public static MetricUnit GetBaseUnit(string Category)
+        {
+            foreach (MetricUnit u in units)
+            {
+                if (u.IsBase == true & (u.Measures.ToLower() ?? "") == (Category.ToLower() ?? ""))
+                    return (MetricUnit)u.Clone();
+            }
+
+            return null;
+        }
+
+        [Description("Get all base unit names.")]
+        public static string[] GetBaseUnitNames()
+        {
+            string[] c = null;
+            int n = 0;
+            foreach (MetricUnit u in units)
+            {
+                if (u.IsBase == true)
+                {
+                    Array.Resize(ref c, n + 1);
+                    c[n] = TitleCase(u.Name);
+                    n += 1;
+                }
+            }
+
+            Array.Sort(c);
+            return c;
+        }
+
+        [Description("Get all base units for all categories.")]
+        public static UnitCollection GetBaseUnits()
+        {
+            var c = new UnitCollection();
+            foreach (MetricUnit u in units)
+            {
+                if (u.IsBase == true)
+                    c.Add((MetricUnit)u.Clone());
+            }
+
+            return c;
+        }
+
+        public static string[] GetCategories()
+        {
+            string[] s = null;
+            int c = -1;
+
+            foreach (MetricUnit u in units)
+            {
+                if (c == -1)
+                {
+                    s = new string[1];
+                    s[0] = TitleCase(u.Measures);
+                    c = 1;
+                }
+                else if (s.Contains(TitleCase(u.Measures)) == false)
+                {
+                    Array.Resize(ref s, c + 1);
+                    s[c] = TitleCase(u.Measures);
+                    c += 1;
+                }
+            }
+
+            Array.Sort(s);
+            return s;
+        }
+
+        public static double GetMultiplier(string prefix)
+        {
+            int i;
+            int c;
+
+            c = Prefixes.Length;
+
+
+            if (prefix.Length <= 2)
+            {
+                for (i = 0; i < c; i++)
+                {
+                    if ((prefix ?? "") == (ShortPrefixes[i] ?? ""))
+                    {
+                        return Multipliers[i];
+                    }
+                }
+            }
+
+            prefix = prefix.ToLower();
+
+            for (i = 0; i < c; i++)
+            {
+                if ((prefix ?? "") == (Prefixes[i] ?? ""))
+                {
+                    return Multipliers[i];
+                }
+            }
+
+            // it's always safe to return 1
+            return 1d;
+        }
+
+        public static MetricUnit GetUnitByName(string name)
+        {
+            var res = Units.Where((e) => e.Name.ToLower() == name.ToLower()).FirstOrDefault();
+            return res;
+        }
+
+        [Description("Get all unit names for a category.")]
+        public static string[] GetUnitNames(string Category, bool ExcludeBaseUnit = false)
+        {
+            string[] c = null;
+            int n = 0;
+            foreach (MetricUnit u in units)
+            {
+                if ((u.Measures.ToLower() ?? "") == (Category.ToLower() ?? "") & (u.IsBase == false | ExcludeBaseUnit == false))
+                {
+                    Array.Resize(ref c, n + 1);
+                    c[n] = TitleCase(u.Name);
+                    n += 1;
+                }
+            }
+
+            Array.Sort(c);
+            return c;
+        }
+
+        [Description("Get all units for a category.")]
+        public static UnitCollection GetUnits(string Category = "")
+        {
+            var uc = new UnitCollection();
+            MetricUnit[] a;
+            int i;
+            int c;
+            a = units.ToArray();
+            c = a.Length - 1;
+            Category = TitleCase(Category);
+            var loopTo = c;
+            for (i = 0; i <= loopTo; i++)
+            {
+                if ((a[i].Measures ?? "") == (Category ?? "") | string.IsNullOrEmpty(Category))
+                {
+                    uc.Add((MetricUnit)a[i].Clone());
+                }
+            }
+
+            return uc;
+        }
+
+        [Description("Get all units for a category as an array.")]
+        public static MetricUnit[] GetUnitsArray(string Category = "")
+        {
+            MetricUnit[] a;
+            int i;
+            int c;
+            MetricUnit[] b = null;
+            int n = 0;
+            a = units.ToArray();
+            c = a.Length - 1;
+            Category = Category.ToLower();
+            var loopTo = c;
+            for (i = 0; i <= loopTo; i++)
+            {
+                if (NoSpace(a[i].Measures.ToLower()) == Category | string.IsNullOrEmpty(Category))
+                {
+                    Array.Resize(ref b, n + 1);
+                    b[n] = (MetricUnit)a[i].Clone();
+                    n += 1;
+                }
+            }
+
+            return b;
+        }
+
+        public static bool HasCategory(string Category)
+        {
+            foreach (MetricUnit u in units)
+            {
+                if ((u.Measures.ToLower() ?? "") == (Category.ToLower() ?? ""))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static MetricUnit IdentifyUnit(string text)
+        {
+            foreach (var unit in units)
+            {
+                if (text == unit.Prefix) return unit;
+            }
+
+            foreach (var p in ShortPrefixes)
+            {
+                foreach (var unit in units)
+                {
+                    var ups = unit.Prefix.Split(',');
+
+                    foreach (var up in ups)
+                    {
+                        if (text == p + up)
+                        {
+                            var nu = (MetricUnit)unit.Clone();
+                            var i = ((IList<string>)ShortPrefixes).IndexOf(p);
+                            var m = Multipliers[i];
+
+                            nu.Modifies = unit.Name;
+                            nu.Name = Prefixes[i] + nu.Name.ToLower();
+                            nu.PluralName = Prefixes[i] + nu.PluralName.ToLower();
+                            nu.IsBase = false;
+
+                            if (nu.Multiplier != 0)
+                            {
+                                nu.Multiplier *= m;
+                            }
+                            else
+                            {
+                                nu.Multiplier = m;
+                            }
+
+                            nu.Prefix = text;
+
+                            return nu;
+                        }
+
+                    }
+
+                }
+            }
+
+            return null;
+        }
+
+        public static double Parse(string value, ref MetricInfo info, string MustMeasure = "", bool parseMath = true)
+        {
+            MathExpressionParser mMath = default;
+            MetricUnit[] arrUnits;
+
+            bool markFail = false;
+
+            char[] valueChars;
+
+            int charLen;
+
+            string[] arrStr;
+
+            string textVar;
+
+            double retVal;
+
+            string procStr;
+            string postProcStr;
+
+            int n1;
+            int n2 = 0;
+
+            int i;
+            int a, b, c;
+
+            int x;
+            int y;
+
+            if (parseMath)
+                mMath = new MathExpressionParser();
+
+            if (MustMeasure is object)
+                MustMeasure = MustMeasure.ToLower();
+
+            if (info is null || info.Name is null)
+            {
+                info = new MetricInfo();
+                if (string.IsNullOrEmpty(MustMeasure) == false)
+                {
+                    Parse(value, ref info, parseMath: parseMath);
+                }
+            }
+
+            value = value.Trim();
+            valueChars = value.ToCharArray();
+            charLen = valueChars.Length - 1;
+
+            if (string.IsNullOrEmpty(value))
+                return 0d;
+
+            if (parseMath == false)
+            {
+                while (!IsNumber(valueChars[charLen]))
+                {
+                    charLen -= 1;
+                    if (charLen < 0)
+                        break;
+                }
+            }
+            else
+            {
+                while (!IsNumber(valueChars[charLen]) || (valueChars[charLen] == ')'))
+                {
+                    charLen -= 1;
+                    if (charLen < 0)
+                        break;
+                }
+            }
+
+            if (charLen < 0)
+                return default;
+
+            procStr = value.Substring(charLen + 1).Trim();
+
+            value = value.Substring(0, charLen + 1);
+
+            i = 0;
+
+            if (parseMath)
+            {
+                mMath.ParseOperations(value);
+                retVal = mMath.Value;
+            }
+            else if (IsHex(value, ref i))
+            {
+                retVal = i;
+            }
+            else
+            {
+                retVal = FVal(value) ?? double.NaN;
+            }
+
+            if (procStr.Length > 1)
+            {
+                if (procStr.Substring(procStr.Length - 1) == ".")
+                    procStr = procStr.Substring(0, procStr.Length - 1);
+            }
+
+            retVal = Round(retVal, roundingDigits);
+            postProcStr = procStr.ToLower();
+
+            info.Value = retVal;
+
+            if (!string.IsNullOrEmpty(MustMeasure))
+            {
+                arrUnits = GetUnitsArray(MustMeasure);
+            }
+            else
+            {
+                arrUnits = Units.ToArray();
+            }
+
+            if (arrUnits is null)
+                return double.NaN;
+
+            b = arrUnits.Length;
+
+            for (n1 = 0; n1 < b; n1++)
+            {
+                if (string.IsNullOrEmpty(arrUnits[n1].Prefix))
+                {
+                    arrStr = new string[1];
+                    arrStr[0] = "";
+                }
+                else
+                {
+                    arrStr = Split(arrUnits[n1].Prefix, ",");
+                }
+
+                a = ShortPrefixes.Length;
+
+                for (n2 = 0; n2 < a; n2++)
+                {
+                    y = arrStr.Length;
+
+                    for (x = 0; x < y; x++)
+                    {
+                        arrStr[x] = arrStr[x].Trim();
+
+                        textVar = ShortPrefixes[n2] + arrStr[x];
+
+                        if ((procStr ?? "") == (textVar ?? "") | (procStr ?? "") == (textVar + "s" ?? ""))
+                        {
+                            if (string.IsNullOrEmpty(MustMeasure) | (MustMeasure ?? "") == (arrUnits[n1].Measures.ToLower() ?? ""))
+                            {
+                                info.ShortName = ShortPrefixes[n2] + arrStr[0];
+                                info.Name = Prefixes[n2] + arrUnits[n1].Name;
+
+                                break;
+                            }
+                            // we found it!
+                        }
+                    }
+
+                    if (x < y)
+                        break;
+                }
+
+                if (n2 < ShortPrefixes.Length)
+                    break;
+
+                c = Prefixes.Length;
+
+                for (n2 = 0; n2 < c; n2++)
+                {
+                    textVar = Prefixes[n2] + arrUnits[n1].Name.ToLower();
+                    if ((postProcStr ?? "") == (textVar ?? "") || (postProcStr ?? "") == (textVar + "s" ?? ""))
+                    {
+                        if (string.IsNullOrEmpty(MustMeasure) | (MustMeasure ?? "") == (arrUnits[n1].Measures.ToLower() ?? ""))
+                        {
+                            info.Name = textVar;
+                            info.ShortName = ShortPrefixes[n2] + arrStr[0];
+                            break;
+                            // we found it!
+                        }
+                    }
+
+                    textVar = Prefixes[n2] + arrUnits[n1].PluralName.ToLower();
+                    if ((postProcStr ?? "") == (textVar ?? "") || (postProcStr ?? "") == (textVar + "s" ?? ""))
+                    {
+                        if (string.IsNullOrEmpty(MustMeasure) | (MustMeasure ?? "") == (arrUnits[n1].Measures.ToLower() ?? ""))
+                        {
+                            info.PluralName = textVar;
+                            info.ShortName = ShortPrefixes[n2] + arrStr[0];
+                            info.Name = Prefixes[n2] + arrUnits[n1].Name.ToLower();
+                            break;
+                            // we found it!
+                        }
+                    }
+                }
+
+                if (n2 < Prefixes.Length)
+                    break;
+            }
+
+            if (n1 < Units.Count & n2 < Prefixes.Length)
+            {
+                info.Unit = arrUnits[n1];
+                info.Multiplier = Multipliers[n2];
+                info.BaseValue = info.Value * info.Multiplier;
+                info.BaseUnit = arrUnits[n1].Name;
+                info.Measures = arrUnits[n1].Measures;
+                info.Format = "" + info.Value.ToString("#,##0.##") + " ";
+
+                info.Name = TitleCase(info.Name);
+
+                if (info.Value != 1d & !string.IsNullOrEmpty(arrUnits[n1].PluralName))
+                {
+                    info.Format += TitleCase(Prefixes[n2] + arrUnits[n1].PluralName.ToLower());
+                }
+                else
+                {
+                    info.Format += TitleCase(info.Name);
+                }
+
+                info.ShortFormat = "" + info.Value.ToString("#,##0.##") + " " + info.ShortName;
+
+                if (!string.IsNullOrEmpty(arrUnits[n1].Modifies))
+                {
+                    if (arrUnits[n1].OffsetFirst == true)
+                    {
+                        info.BaseValue += arrUnits[n1].Offset;
+                        info.BaseValue *= arrUnits[n1].Multiplier;
+                    }
+                    else
+                    {
+                        info.BaseValue *= arrUnits[n1].Multiplier;
+                        info.BaseValue += arrUnits[n1].Offset;
+                    }
+
+                    info.BaseUnit = arrUnits[n1].Modifies;
+                }
+
+                if (!string.IsNullOrEmpty(arrUnits[n1].PluralName))
+                {
+                    if (string.IsNullOrEmpty(Prefixes[n2]))
+                    {
+                        info.PluralName = TitleCase(arrUnits[n1].PluralName);
+                    }
+                    else
+                    {
+                        info.PluralName = TitleCase(Prefixes[n2] + arrUnits[n1].PluralName.ToLower());
+                    }
+                }
+            }
+
+            if (markFail)
+                return double.NaN;
+            return info.Value;
+        }
+
+
+        public static bool GetBaseValue(double value, MetricUnit unit, out double? baseValue, out MetricUnit baseUnit)
+        {
+            baseValue = null;
+            baseUnit = null;
+
+            if (unit.IsBase)
+            {
+                baseValue = Round(value, roundingDigits);
+                baseUnit = (MetricUnit)unit.Clone();
+
+                return true;
+            }
+
+            var bUnit = Units.Where((e) => e.Name == unit.Modifies).FirstOrDefault();
+            double bv = value;
+
+            if (bUnit == null) return false;
+
+            if (unit.OffsetFirst)
+            {
+                bv = bv + unit.Offset;
+                if (unit.Multiplier != 0) bv = bv * unit.Multiplier;
+            }
+            else
+            {
+                if (unit.Multiplier != 0) bv = bv * unit.Multiplier;
+                bv = bv + unit.Offset;
+
+            }
+
+            return GetBaseValue(bv, bUnit, out baseValue, out baseUnit);
+        }
+
+
+        public static bool GetBaseValue(decimal value, MetricUnit unit, out decimal? baseValue, out MetricUnit baseUnit)
+        {
+            baseValue = null;
+            baseUnit = null;
+
+            if (unit.IsBase)
+            {
+                baseValue = Round(value, roundingDigits);
+                baseUnit = (MetricUnit)unit.Clone();
+
+                return true;
+            }
+
+            var bUnit = Units.Where((e) => e.Name == unit.Modifies).FirstOrDefault();
+            decimal bv = value;
+
+            if (bUnit == null) return false;
+
+            if (unit.OffsetFirst)
+            {
+                bv = bv + (decimal)unit.Offset;
+                if (unit.Multiplier != 0) bv = bv * (decimal)unit.Multiplier;
+            }
+            else
+            {
+                if (unit.Multiplier != 0) bv = bv * (decimal)unit.Multiplier;
+                bv = bv + (decimal)unit.Offset;
+            }
+
+            return GetBaseValue(bv, unit, out baseValue, out baseUnit);
+        }
+
+        public static bool GetDerivedValue(double baseValue, MetricUnit targetUnit, out double? value)
+        {
+            value = null;
+
+            if (targetUnit.IsBase)
+            {
+                value = baseValue;
+                return true;
+            }
+
+            var unitChain = new List<MetricUnit>();
+            var sMod = targetUnit.Modifies;
+
+            unitChain.Add(targetUnit);
+
+            while (true)
+            {                
+                var bUnit = Units.Where((e) => e.Name == sMod).FirstOrDefault();
+                if (bUnit == null) break;
+
+                unitChain.Add(bUnit);
+                sMod = bUnit.Modifies;
+
+                if (bUnit.IsBase) break;
+            }
+
+            unitChain.Reverse();
+            double nv = baseValue;
+
+            foreach(var unit in unitChain)
+            {
+                if (unit.OffsetFirst)
+                {
+                    if (unit.Multiplier != 0) nv /= unit.Multiplier;
+                    nv = nv - unit.Offset;
+                }
+                else
+                {
+                    nv = nv - unit.Offset;
+                    if (unit.Multiplier != 0) nv /= unit.Multiplier;
+                }
+            }
+
+            value = Round(nv, roundingDigits);
+            return true;
+        }
+
+        public static bool GetDerivedValue(decimal baseValue, MetricUnit targetUnit, out decimal? value)
+        {
+            value = null;
+
+            if (targetUnit.IsBase)
+            {
+                value = baseValue;
+                return true;
+            }
+
+            var unitChain = new List<MetricUnit>();
+            var sMod = targetUnit.Modifies;
+
+            while (true)
+            {
+                var bUnit = Units.Where((e) => e.Name == sMod).FirstOrDefault();
+                if (bUnit == null) break;
+
+                unitChain.Add(bUnit);
+                sMod = bUnit.Modifies;
+
+                if (bUnit.IsBase) break;
+            }
+
+            unitChain.Reverse();
+            decimal nv = baseValue;
+
+            foreach (var unit in unitChain)
+            {
+                if (unit.OffsetFirst)
+                {
+                    if (unit.Multiplier != 0) nv /= (decimal)unit.Multiplier;
+                    nv = nv - (decimal)unit.Offset;
+                }
+                else
+                {
+                    nv = nv - (decimal)unit.Offset;
+                    if (unit.Multiplier != 0) nv /= (decimal)unit.Multiplier;
+                }
+            }
+
+            value = Round(nv, roundingDigits);
+            return true;
+        }
+
+        public static void WordsTest(string Example)
+        {
+            string[] s;
+            s = Words(Example);
+            Console.WriteLine("There are " + s.Length + " words, starting with " + s[0]);
         }
 
         public MetricInfo ApplyEquation(MetricUnit u, ref string ErrorText, params double[] vars)
@@ -187,72 +976,6 @@ namespace DataTools.Extras.Conversion
             return objInfo;
         }
 
-        /// <summary>
-        /// Discerns whether or not a value is an x per y (or x/y) value and returns the parsed contents.
-        /// </summary>
-        /// <param name="value">Value string to analyze.</param>
-        /// <param name="MustMeasure">Imperitive measurement units array.  The string must match this many units of these exact types to parse correctly.</param>
-        /// <returns>Parsed MetricInfo array.</returns>
-        /// <remarks></remarks>
-        public MetricInfo[] IsPer(string value, MetricInfo[] MustMeasure = null, bool parseMath = true)
-        {
-            string[] s;
-            int i = 0;
-            MetricInfo[] m = null;
-            bool boo = false;
-            string[] perScan;
-            if (parseMath)
-            {
-                perScan = new[] { "per" };
-            }
-            else
-            {
-                perScan = new[] { "per", "/" };
-            }
-
-            foreach (var pp in perScan)
-            {
-                if (value.IndexOf(pp) != -1)
-                {
-                    s = Split(value, pp);
-                    m = new MetricInfo[s.Length];
-                    var loopTo = s.Length - 1;
-                    for (i = 0; i <= loopTo; i++)
-                    {
-                        m[i] = new MetricInfo();
-                        s[i] = s[i].Trim();
-                        if (i != 0)
-                        {
-                            if (double.IsNaN(FVal(s[i]) ?? double.NaN))
-                                s[i] = "1 " + s[i];
-                        }
-
-                        if (MustMeasure is null)
-                        {
-                            Parse(s[i], ref m[i]);
-                        }
-                        else if (i <= MustMeasure.Length - 1)
-                            Parse(s[i], ref m[i], MustMeasure[i].Measures);
-                    }
-
-                    boo = true;
-                }
-            }
-
-            if (!boo)
-            {
-                m = new[] { new MetricInfo() };
-                if (MustMeasure is null)
-                {
-                    Parse(value, ref m[0]);
-                }
-                else if (i <= MustMeasure.Length - 1)
-                    Parse(value, ref m[0], MustMeasure[i].Measures);
-            }
-
-            return m;
-        }
-
         public bool ComparePer(MetricInfo[] m1, MetricInfo[] m2)
         {
             int i;
@@ -269,56 +992,6 @@ namespace DataTools.Extras.Conversion
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Get or set the conversion query.
-        /// </summary>
-        /// <returns></returns>
-        public string Query
-        {
-            get
-            {
-                return convert;
-            }
-
-            set
-            {                
-                MetricInfo[] argInputInfo = null;
-                MetricInfo[] argOutputInfo = null;
-                Convert(value, out argInputInfo, out argOutputInfo);
-            }
-        }
-
-        /// <summary>
-        /// Returns the value in the current unit.
-        /// </summary>
-        /// <returns></returns>
-        [Browsable(true)]
-        public double Value
-        {
-            get
-            {
-                return info.Value;
-            }
-        }
-
-        /// <summary>
-        /// Returns the <see cref="MetricInfo"/> object.
-        /// </summary>
-        /// <returns></returns>
-        [Browsable(true)]
-        public MetricInfo Info
-        {
-            get
-            {
-                return info;
-            }
-
-            set
-            {
-                info = value;
-            }
         }
 
         public double Convert(MetricInfo inputValue, string outputType, ref MetricInfo outputValue)
@@ -383,9 +1056,9 @@ namespace DataTools.Extras.Conversion
 
             double v = 0.0d;
             double[] vv;
-            
+
             inputInfo = outputInfo = null;
-                
+
             MetricInfo[] i1;
             MetricInfo[] i2;
 
@@ -590,312 +1263,75 @@ namespace DataTools.Extras.Conversion
             outputInfo = (MetricInfo[])i2.Clone();
         }
 
-        public static void WordsTest(string Example)
+        /// <summary>
+        /// Discerns whether or not a value is an x per y (or x/y) value and returns the parsed contents.
+        /// </summary>
+        /// <param name="value">Value string to analyze.</param>
+        /// <param name="MustMeasure">Imperitive measurement units array.  The string must match this many units of these exact types to parse correctly.</param>
+        /// <returns>Parsed MetricInfo array.</returns>
+        /// <remarks></remarks>
+        public MetricInfo[] IsPer(string value, MetricInfo[] MustMeasure = null, bool parseMath = true)
         {
             string[] s;
-            s = Words(Example);
-            Console.WriteLine("There are " + s.Length + " words, starting with " + s[0]);
-        }
-
-        public static double GetMultiplier(string prefix)
-        {
-            int i;
-            int c;
-
-            c = Prefixes.Length;
-
-
-            if (prefix.Length <= 2)
-            {
-                for (i = 0; i < c; i++)
-                {
-                    if ((prefix ?? "") == (ShortPrefixes[i] ?? ""))
-                    {
-                        return Multipliers[i];
-                    }
-                }
-            }
-
-            prefix = prefix.ToLower();
-
-            for (i = 0; i < c; i++)
-            {
-                if ((prefix ?? "") == (Prefixes[i] ?? ""))
-                {
-                    return Multipliers[i];
-                }
-            }
-
-            // it's always safe to return 1
-            return 1d;
-        }
-
-        public static double Parse(string value, ref MetricInfo info, string MustMeasure = "", bool parseMath = true)
-        {
-            MathExpressionParser mMath = default;
-            MetricUnit[] arrUnits;
-
-            bool markFail = false;
-
-            char[] valueChars;
-
-            int charLen;
-
-            string[] arrStr;
-
-            string textVar;
-
-            double retVal;
-
-            string procStr;
-            string postProcStr;
-
-            int n1;
-            int n2 = 0;
-
-            int i;
-            int a, b, c;
-
-            int x;
-            int y;
-
-            if (parseMath)
-                mMath = new MathExpressionParser();
-            
-            if (MustMeasure is object)
-                MustMeasure = MustMeasure.ToLower();
-            
-            if (info is null || info.Name is null)
-            {
-                info = new MetricInfo();
-                if (string.IsNullOrEmpty(MustMeasure) == false)
-                {
-                    Parse(value, ref info, parseMath: parseMath);
-                }
-            }
-
-            value = value.Trim();
-            valueChars = value.ToCharArray();
-            charLen = valueChars.Length - 1;
-
-            if (string.IsNullOrEmpty(value))
-                return 0d;
-
-            if (parseMath == false)
-            {
-                while (!IsNumber(valueChars[charLen]))
-                {
-                    charLen -= 1;
-                    if (charLen < 0)
-                        break;
-                }
-            }
-            else
-            {
-                while (!IsNumber(valueChars[charLen]) || (valueChars[charLen] == ')'))
-                {
-                    charLen -= 1;
-                    if (charLen < 0)
-                        break;
-                }
-            }
-
-            if (charLen < 0)
-                return default;
-            
-            procStr = value.Substring(charLen + 1).Trim();
-            
-            value = value.Substring(0, charLen + 1);
-            
-            i = 0;
-
+            int i = 0;
+            MetricInfo[] m = null;
+            bool boo = false;
+            string[] perScan;
             if (parseMath)
             {
-                mMath.ParseOperations(value);
-                retVal = mMath.Value;
-            }
-            else if (IsHex(value, ref i))
-            {
-                retVal = i;
+                perScan = new[] { "per" };
             }
             else
             {
-                retVal = FVal(value) ?? double.NaN;
+                perScan = new[] { "per", "/" };
             }
 
-            if (procStr.Length > 1)
+            foreach (var pp in perScan)
             {
-                if (procStr.Substring(procStr.Length - 1) == ".")
-                    procStr = procStr.Substring(0, procStr.Length - 1);
-            }
-
-            retVal = Round(retVal, roundingDigits);
-            postProcStr = procStr.ToLower();
-            
-            info.Value = retVal;
-
-            if (!string.IsNullOrEmpty(MustMeasure))
-            {
-                arrUnits = GetUnitsArray(MustMeasure);
-            }
-            else
-            {
-                arrUnits = Units.ToArray();
-            }
-
-            if (arrUnits is null)
-                return double.NaN;
-            
-            b = arrUnits.Length;
-            
-            for (n1 = 0; n1 < b; n1++)
-            {
-                if (string.IsNullOrEmpty(arrUnits[n1].Prefix))
+                if (value.IndexOf(pp) != -1)
                 {
-                    arrStr = new string[1];
-                    arrStr[0] = "";
-                }
-                else
-                {
-                    arrStr = Split(arrUnits[n1].Prefix, ",");
-                }
-
-                a = ShortPrefixes.Length;
-
-                for (n2 = 0; n2 < a; n2++)
-                {
-                    y = arrStr.Length;
-                    
-                    for (x = 0; x < y; x++)
+                    s = Split(value, pp);
+                    m = new MetricInfo[s.Length];
+                    var loopTo = s.Length - 1;
+                    for (i = 0; i <= loopTo; i++)
                     {
-                        arrStr[x] = arrStr[x].Trim();
-
-                        textVar = ShortPrefixes[n2] + arrStr[x];
-
-                        if ((procStr ?? "") == (textVar ?? "") | (procStr ?? "") == (textVar + "s" ?? ""))
+                        m[i] = new MetricInfo();
+                        s[i] = s[i].Trim();
+                        if (i != 0)
                         {
-                            if (string.IsNullOrEmpty(MustMeasure) | (MustMeasure ?? "") == (arrUnits[n1].Measures.ToLower() ?? ""))
-                            {
-                                info.ShortName = ShortPrefixes[n2] + arrStr[0];
-                                info.Name = Prefixes[n2] + arrUnits[n1].Name;
-                            
-                                break;
-                            }
-                            // we found it!
+                            if (double.IsNaN(FVal(s[i]) ?? double.NaN))
+                                s[i] = "1 " + s[i];
                         }
-                    }
 
-                    if (x < y)
-                        break;
-                }
-
-                if (n2 < ShortPrefixes.Length)
-                    break;
-
-                c = Prefixes.Length;
-
-                for (n2 = 0; n2 < c; n2++)
-                {
-                    textVar = Prefixes[n2] + arrUnits[n1].Name.ToLower();
-                    if ((postProcStr ?? "") == (textVar ?? "") || (postProcStr ?? "") == (textVar + "s" ?? ""))
-                    {
-                        if (string.IsNullOrEmpty(MustMeasure) | (MustMeasure ?? "") == (arrUnits[n1].Measures.ToLower() ?? ""))
+                        if (MustMeasure is null)
                         {
-                            info.Name = textVar;
-                            info.ShortName = ShortPrefixes[n2] + arrStr[0];
-                            break;
-                            // we found it!
+                            Parse(s[i], ref m[i]);
                         }
+                        else if (i <= MustMeasure.Length - 1)
+                            Parse(s[i], ref m[i], MustMeasure[i].Measures);
                     }
 
-                    textVar = Prefixes[n2] + arrUnits[n1].PluralName.ToLower();
-                    if ((postProcStr ?? "") == (textVar ?? "") || (postProcStr ?? "") == (textVar + "s" ?? ""))
-                    {
-                        if (string.IsNullOrEmpty(MustMeasure) | (MustMeasure ?? "") == (arrUnits[n1].Measures.ToLower() ?? ""))
-                        {
-                            info.PluralName = textVar;
-                            info.ShortName = ShortPrefixes[n2] + arrStr[0];
-                            info.Name = Prefixes[n2] + arrUnits[n1].Name.ToLower();
-                            break;
-                            // we found it!
-                        }
-                    }
+                    boo = true;
                 }
-
-                if (n2 < Prefixes.Length)
-                    break;
             }
 
-            if (n1 < Units.Count & n2 < Prefixes.Length)
+            if (!boo)
             {
-                info.Unit = arrUnits[n1];
-                info.Multiplier = Multipliers[n2];
-                info.BaseValue = info.Value * info.Multiplier;
-                info.BaseUnit = arrUnits[n1].Name;
-                info.Measures = arrUnits[n1].Measures;
-                info.Format = "" + info.Value.ToString("#,##0.##") + " ";
-
-                info.Name = TitleCase(info.Name);
-
-                if (info.Value != 1d & !string.IsNullOrEmpty(arrUnits[n1].PluralName))
+                m = new[] { new MetricInfo() };
+                if (MustMeasure is null)
                 {
-                    info.Format += TitleCase(Prefixes[n2] + arrUnits[n1].PluralName.ToLower());
+                    Parse(value, ref m[0]);
                 }
-                else
-                {
-                    info.Format += TitleCase(info.Name);
-                }
-
-                info.ShortFormat = "" + info.Value.ToString("#,##0.##") + " " + info.ShortName;
-
-                if (!string.IsNullOrEmpty(arrUnits[n1].Modifies))
-                {
-                    if (arrUnits[n1].OffsetFirst == true)
-                    {
-                        info.BaseValue += arrUnits[n1].Offset;
-                        info.BaseValue *= arrUnits[n1].Multiplier;
-                    }
-                    else
-                    {
-                        info.BaseValue *= arrUnits[n1].Multiplier;
-                        info.BaseValue += arrUnits[n1].Offset;
-                    }
-
-                    info.BaseUnit = arrUnits[n1].Modifies;
-                }
-
-                if (!string.IsNullOrEmpty(arrUnits[n1].PluralName))
-                {
-                    if (string.IsNullOrEmpty(Prefixes[n2]))
-                    {
-                        info.PluralName = TitleCase(arrUnits[n1].PluralName);
-                    }
-                    else
-                    {
-                        info.PluralName = TitleCase(Prefixes[n2] + arrUnits[n1].PluralName.ToLower());
-                    }
-                }
+                else if (i <= MustMeasure.Length - 1)
+                    Parse(value, ref m[0], MustMeasure[i].Measures);
             }
 
-            if (markFail)
-                return double.NaN;
-            return info.Value;
+            return m;
         }
 
-        public MetricTool(bool WithOwnUnits = false)
-        {
-            if (WithOwnUnits)
-                myUnits = GetUnits();
+        #endregion Public Methods
 
-            info.BaseValue = 0d;
-            info.Multiplier = 1d;
-            info.Value = 0d;
-        }
-
-        static MetricTool()
-        {
-            SortCategories(true);
-        }
+        #region Private Methods
 
         private static void SortCategories(bool BaseUnitsFirst = false)
         {
@@ -979,252 +1415,6 @@ namespace DataTools.Extras.Conversion
             }
         }
 
-
-        public static void AddUnit(MetricUnit unit)
-        {
-            units.Add(unit);
-        }
-
-        public static MetricUnit CreateUnit(string measures = "", string name = "", string pluralName = "", string prefix = "", string modifies = "", double multiplier = 0.0d, double offset = 0.0d, bool offsetFirst = false, bool isBase = false)
-        {
-            var b = new MetricUnit();
-
-            b.Measures = measures;
-            b.IsBase = isBase;
-            b.Name = name;
-            b.PluralName = pluralName;
-            b.Prefix = prefix;
-            b.Modifies = modifies;
-            b.Multiplier = multiplier;
-            b.Offset = offset;
-            b.OffsetFirst = offsetFirst;
-
-            units.Add(b);
-
-            return b;
-        }
-
-        public static string[] GetCategories()
-        {
-            string[] s = null;
-            int c = -1;
-
-            foreach (MetricUnit u in units)
-            {
-                if (c == -1)
-                {
-                    s = new string[1];
-                    s[0] = TitleCase(u.Measures);
-                    c = 1;
-                }
-                else if (s.Contains(TitleCase(u.Measures)) == false)
-                {
-                    Array.Resize(ref s, c + 1);
-                    s[c] = TitleCase(u.Measures);
-                    c += 1;
-                }
-            }
-
-            Array.Sort(s);
-            return s;
-        }
-
-        [Description("Get all unit names for a category.")]
-        public static string[] GetUnitNames(string Category, bool ExcludeBaseUnit = false)
-        {
-            string[] c = null;
-            int n = 0;
-            foreach (MetricUnit u in units)
-            {
-                if ((u.Measures.ToLower() ?? "") == (Category.ToLower() ?? "") & (u.IsBase == false | ExcludeBaseUnit == false))
-                {
-                    Array.Resize(ref c, n + 1);
-                    c[n] = TitleCase(u.Name);
-                    n += 1;
-                }
-            }
-
-            Array.Sort(c);
-            return c;
-        }
-
-        [Description("Get all base unit names.")]
-        public static string[] GetBaseUnitNames()
-        {
-            string[] c = null;
-            int n = 0;
-            foreach (MetricUnit u in units)
-            {
-                if (u.IsBase == true)
-                {
-                    Array.Resize(ref c, n + 1);
-                    c[n] = TitleCase(u.Name);
-                    n += 1;
-                }
-            }
-
-            Array.Sort(c);
-            return c;
-        }
-
-        public static bool HasCategory(string Category)
-        {
-            foreach (MetricUnit u in units)
-            {
-                if ((u.Measures.ToLower() ?? "") == (Category.ToLower() ?? ""))
-                    return true;
-            }
-
-            return false;
-        }
-
-        [Description("Get all base units for all categories.")]
-        public static UnitCollection GetBaseUnits()
-        {
-            var c = new UnitCollection();
-            foreach (MetricUnit u in units)
-            {
-                if (u.IsBase == true)
-                    c.Add((MetricUnit)u.Clone());
-            }
-
-            return c;
-        }
-
-        [Description("Get all units for a category.")]
-        public static UnitCollection GetUnits(string Category = "")
-        {
-            var uc = new UnitCollection();
-            MetricUnit[] a;
-            int i;
-            int c;
-            a = units.ToArray();
-            c = a.Length - 1;
-            Category = TitleCase(Category);
-            var loopTo = c;
-            for (i = 0; i <= loopTo; i++)
-            {
-                if ((a[i].Measures ?? "") == (Category ?? "") | string.IsNullOrEmpty(Category))
-                {
-                    uc.Add((MetricUnit)a[i].Clone());
-                }
-            }
-
-            return uc;
-        }
-
-        [Description("Get all units for a category as an array.")]
-        public static MetricUnit[] GetUnitsArray(string Category = "")
-        {
-            MetricUnit[] a;
-            int i;
-            int c;
-            MetricUnit[] b = null;
-            int n = 0;
-            a = units.ToArray();
-            c = a.Length - 1;
-            Category = Category.ToLower();
-            var loopTo = c;
-            for (i = 0; i <= loopTo; i++)
-            {
-                if (NoSpace(a[i].Measures.ToLower()) == Category | string.IsNullOrEmpty(Category))
-                {
-                    Array.Resize(ref b, n + 1);
-                    b[n] = (MetricUnit)a[i].Clone();
-                    n += 1;
-                }
-            }
-
-            return b;
-        }
-
-        [Description("Get the base unit for a specific category.")]
-        public static MetricUnit GetBaseUnit(string Category)
-        {
-            foreach (MetricUnit u in units)
-            {
-                if (u.IsBase == true & (u.Measures.ToLower() ?? "") == (Category.ToLower() ?? ""))
-                    return (MetricUnit)u.Clone();
-            }
-
-            return null;
-        }
-
-        [Description("Find an exact unit.")]
-        public static MetricUnit FindUnit(string Unit, string MustMeasure = "")
-        {
-            string[] s;
-            int i;
-            int c;
-            foreach (MetricUnit u in units)
-            {
-                if ((u.Measures.ToLower() ?? "") == (MustMeasure.ToLower() ?? "") | string.IsNullOrEmpty(MustMeasure))
-                {
-                    if ((u.Name.ToLower() ?? "") == (Unit.ToLower() ?? ""))
-                        return (MetricUnit)u.Clone();
-                    if ((u.PluralName.ToLower() ?? "") == (Unit.ToLower() ?? ""))
-                        return (MetricUnit)u.Clone();
-                    s = Split(u.Prefix, ",");
-                    c = s.Length - 1;
-                    var loopTo = c;
-                    for (i = 0; i <= loopTo; i++)
-                    {
-                        if ((s[i] ?? "") == (Unit ?? ""))
-                            return (MetricUnit)u.Clone();
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        public static MetricUnit IdentifyUnit(string text)
-        {
-            foreach (var unit in units)
-            {
-                if (text == unit.Prefix) return unit;
-            }
-
-            foreach (var p in ShortPrefixes)
-            {
-                foreach (var unit in units)
-                {
-                    var ups = unit.Prefix.Split(',');
-
-                    foreach (var up in ups)
-                    {
-                        if (text == p + up)
-                        {
-                            var nu = (MetricUnit)unit.Clone();
-                            var i = ((IList<string>)ShortPrefixes).IndexOf(p);
-                            var m = Multipliers[i];
-
-                            nu.Modifies = unit.Name;
-                            nu.Name = Prefixes[i] + nu.Name.ToLower();
-                            nu.PluralName = Prefixes[i] + nu.PluralName.ToLower();
-                            nu.IsBase = false;
-
-                            if (nu.Multiplier != 0)
-                            {
-                                nu.Multiplier *= m;
-                            }
-                            else
-                            {
-                                nu.Multiplier = m;
-                            }
-
-                            nu.Prefix = text;
-
-                            return nu;
-                        }
-
-                    }
-
-                }
-            }
-
-            return null;
-        }
-        
+        #endregion Private Methods
     }
 }
