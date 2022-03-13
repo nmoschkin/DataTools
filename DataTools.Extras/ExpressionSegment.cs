@@ -36,7 +36,7 @@ namespace DataTools.Extras
         RightHand,
     }
 
-    public class ExpressionSegment
+    public class ExpressionSegment : ICloneable
     {
         public static readonly string[] Operations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "^", "exp", "abs", "sqrt", "*", "/", @"\", "mod", "%", "+", "-" };
 
@@ -52,7 +52,15 @@ namespace DataTools.Extras
 
         public Position Position
         {
-            get => Parent?.Position ?? position;            
+            get
+            {
+                if (parent != null && parent.Position != Position.Expression)
+                {
+                    return parent.Position;
+                }
+
+                return position;
+            }
         }
 
         public object Value
@@ -123,22 +131,104 @@ namespace DataTools.Extras
             }
         }
 
+        public bool Solvable
+        {
+            get
+            {
+                if (parts.Count >= 3)
+                {
+                    return CheckUnits();
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
         public virtual CultureInfo CultureInfo => ci;
 
-        //public double CalculateValue(Dictionary<string, double> variables = null)
-        //{
-        //    if (monoVal != null)
-        //    {
-        //        if (variables.TryGetValue(monoVal, out var value))
-        //        {
-        //            return value;
-        //        }
-        //        else if (IsNumber(monoVal))
-        //        {
-        //            return FVal(monoVal) ?? 0d;
-        //        }
-        //    }
-        //}
+        public ExpressionSegment GetSide(Position side)
+        {
+            if (side == Position.Expression) return this.Clone();
+
+            var res = parts.Where((p) => p.Position == side).ToList();
+            if (res.Count == 1) return res[0].Clone();
+
+            var es = new ExpressionSegment();
+
+            es.position = Position.Expression;
+            es.partType = PartType.Composite;
+
+            foreach (var item in res)
+            {
+                var newItem = item.Clone();
+                newItem.parent = es;
+                es.parts.Add(newItem);
+            }
+
+            return es;
+        }
+
+        public bool UnitsMatch(ExpressionSegment other)
+        {
+            var lh = this;
+            var rh = other;
+
+            if (lh.parts.Count > 0)
+            {
+                var ucmp1 = lh.parts.Where((p) => (p.PartType & PartType.Unit) == PartType.Unit).ToList();
+                var ucmp2 = lh.parts.Where((p) => (p.PartType & PartType.Unit) == PartType.Unit).ToList();
+
+                if (ucmp1.Count != ucmp2.Count) return false;
+
+                int c = ucmp1.Count;
+                for (int i = 0; i < c; i++)
+                {
+                    if (ucmp1[i].partType != ucmp2[i].partType) return false;
+
+                    if ((ucmp1[i].partType & PartType.Composite) == PartType.Composite)
+                    {
+                        if (!ucmp1[i].UnitsMatch(ucmp1[i])) return false;   
+                    }
+                }
+
+
+                return true;
+            }
+            else if ((lh.PartType & PartType.Unit) == PartType.Unit)
+            {
+                return lh.Unit.Measures == rh.Unit.Measures;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+
+        public bool HasMatchingUnits()
+        {
+            var lh = GetSide(Position.LeftHand);
+            var rh = GetSide(Position.RightHand);
+
+            return lh.UnitsMatch(rh);
+
+        }
+
+        protected bool CheckUnits()
+        {
+            var i = parts.Count((e) => e.partType == PartType.Assignment || e.partType == PartType.Equality);
+            if (i == 1)
+            {
+                return HasMatchingUnits();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
 
         public ExpressionSegment(string value) : this(value, null, null)
         {
@@ -150,6 +240,7 @@ namespace DataTools.Extras
         private ExpressionSegment()
         {
         }
+
 
         protected ExpressionSegment(string value, ExpressionSegment parent, CultureInfo ci)
         {
@@ -483,6 +574,43 @@ namespace DataTools.Extras
             {
                 return sb.ToString();
             }
+        }
+
+        /// <summary>
+        /// Clones the current expression segment to a new expression.
+        /// </summary>
+        /// <returns>A new expression segment.</returns>
+        /// <remarks>
+        /// <see cref="Parent"/> is set to null for all new cloned segment roots.
+        /// </remarks>
+        public ExpressionSegment Clone()
+        {
+            var itemNew = (ExpressionSegment)MemberwiseClone();
+
+            itemNew.parts = new List<ExpressionSegment>();
+            itemNew.parent = null;
+
+            if (value != null)
+            {
+                if (value is ICloneable cl)
+                {
+                    itemNew.value = cl.Clone();
+                }
+            }
+
+            foreach (var item in parts)
+            {
+                var addItem = item.Clone();
+                addItem.parent = itemNew;
+                itemNew.parts.Add(addItem);
+            }
+
+            return itemNew;
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
         }
 
         public static implicit operator string(ExpressionSegment val)
