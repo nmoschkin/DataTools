@@ -190,7 +190,7 @@ namespace DataTools.MathTools
             for (i = 0; i < c; i++)
             {
                 valUnit = TextTools.FVal(s[i]);
-                if (valUnit is null)
+                if (double.IsNaN(valUnit ?? double.NaN))
                 {
                     if (i == 0)
                     {

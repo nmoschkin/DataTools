@@ -643,6 +643,87 @@ namespace DataTools.Text
         }
 
 
+        public static string TextBetween(string value, int startPos, char start, char stop, out int? idxStart, out int? idxStop)
+        {
+            idxStart = null;
+            idxStop = null;
+
+            var chars = value.ToCharArray();
+
+            bool inQuote = false;
+            bool inQuote2 = false;
+            bool inSpan = false;
+
+            int level = 0;
+            StringBuilder sb = new StringBuilder();
+            
+            if (startPos < 0 || startPos >= value.Length - 2) throw new ArgumentOutOfRangeException(nameof(startPos));
+
+            for (int i = startPos; i < chars.Length; i++)
+            {
+                char c = chars[i];
+                if (c == '"')
+                {
+                    inQuote = true;
+                }
+                else if (inQuote)
+                {
+                    if (c == '"')
+                    {
+                        if (chars[i - 1] != '\\')
+                        {
+                            inQuote = false;
+                        }
+                    }
+                }
+                else if (c == '\'')
+                {
+                    inQuote2 = true;
+                }
+                else if (inQuote2)
+                {
+                    if (c == '\'')
+                    {
+                        if (chars[i - 1] != '\\')
+                        {
+                            inQuote2 = false;
+                        }
+                    }
+                }
+                else if (!inQuote && !inQuote2)
+                {
+                    if (c == start)
+                    {
+                        if (level == 0)
+                        {
+                            idxStart = i;
+                            inSpan = true;
+                            level++;
+                            continue;
+                        }
+
+                        level++;
+                    }
+                    else if (c == stop)
+                    {
+                        level--;
+                        if (level == 0)
+                        {
+                            idxStop = i;
+                            break;
+                        }
+                    }
+                }
+                
+                if (inSpan)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.ToString();
+        }
+
         /// <summary>
         /// Function to retrieve a quote from a string of data. 
         /// The quote character must be: exactly one before, exactly at, or anywhere after the location specified by 'index'.  
@@ -716,7 +797,10 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static bool IsNumber(object o, bool noTrim = false)
         {
-
+            if (o is char ch)
+            {
+                return char.IsNumber(ch);
+            }
             if (o is string subject)
             {
                 if (!noTrim)
@@ -1014,11 +1098,15 @@ namespace DataTools.Text
         /// <returns>An numeric primitive (either a Long or a Double).</returns>
         /// <remarks></remarks>
         public static double? FVal(string value)
-        {
-
+        {            
             double o;
 
             value = value.Trim();
+            if (value.Contains(" "))
+            {
+                var sp = value.Split(' ');
+                value = sp[0];  
+            }
 
             if (value.Length < 2)
             {
@@ -1447,7 +1535,7 @@ namespace DataTools.Text
         /// <param name="NoStickyChars">Characters that under no circumstances should stick to adjacent characters.</param>
         /// <returns>Processed text.</returns>
         /// <remarks></remarks>
-        public static string SpaceOperators(string value, string Operators = "/\\&^%*-+()[]{}", string SepChars = null, string StickyCharsLeft = "", string StickyCharsRight = "+-", string NoStickyChars = "")
+        public static string SpaceOperators(string value, string Operators = "/\\&^%*-+^!?|", string SepChars = null, string StickyCharsLeft = "", string StickyCharsRight = "!+-?", string NoStickyChars = "")
         {
             int i = 0;
             int c = 0;
