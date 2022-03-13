@@ -205,5 +205,22 @@ namespace DataTools.Extras.Conversion
         {
             return PluralName + " (" + Measures + ")";
         }
+
+        public override int GetHashCode()
+        {
+            return JsonConvert.SerializeObject(this).GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is MetricUnit mu)
+            {
+                return JsonConvert.SerializeObject(this) == JsonConvert.SerializeObject(mu);
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
