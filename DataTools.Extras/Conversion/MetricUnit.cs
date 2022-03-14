@@ -108,7 +108,7 @@ namespace DataTools.Extras.Conversion
             }
             set
             {
-                measures = TitleCase(value);
+                measures = (value);
             }
         }
         [JsonProperty("modifies")]
@@ -121,7 +121,7 @@ namespace DataTools.Extras.Conversion
 
             set
             {
-                modifies = TitleCase(value);
+                modifies = (value);
             }
         }
 
@@ -149,7 +149,7 @@ namespace DataTools.Extras.Conversion
 
             set
             {
-                name = TitleCase(value);
+                name = (value);
             }
         }
         [JsonProperty("offset")]
@@ -190,7 +190,7 @@ namespace DataTools.Extras.Conversion
 
             set
             {
-                pluralName = TitleCase(value);
+                pluralName = (value);
             }
         }
 
@@ -236,7 +236,7 @@ namespace DataTools.Extras.Conversion
 
         public override string ToString()
         {
-            return PluralName + " (" + Measures + ")";
+            return (string.IsNullOrEmpty(PluralName) ? Name : PluralName) + " (" + Separate(Measures) + ")";
         }
 
         #endregion Public Methods

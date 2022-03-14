@@ -1,4 +1,7 @@
 ﻿using DataTools.Extras.Conversion;
+using DataTools.Extras.Converters;
+
+using Newtonsoft.Json;
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +11,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml.XPath;
 
 using static DataTools.Text.TextTools;
 
@@ -18,6 +22,7 @@ namespace DataTools.Extras.Expressions
     /// Flags for the type of <see cref="ExpressionSegment"/>.
     /// </summary>
     [Flags]
+    [JsonConverter(typeof(EnumToStringConverter<PartType>))]
     public enum PartType
     {
         /// <summary>
@@ -64,6 +69,11 @@ namespace DataTools.Extras.Expressions
         CompositeUnit = 0x21,
 
         /// <summary>
+        /// Indicates the expression segment represents a unit/value pair.
+        /// </summary>
+        UnitValuePair = 0x23,
+
+        /// <summary>
         /// Indicates that the expression segment tests for equality, and has exactly one left-hand part and exactly one right-hand part.
         /// </summary>
         Equality = 0x44,
@@ -82,6 +92,7 @@ namespace DataTools.Extras.Expressions
     /// <summary>
     /// Positional indicator for an <see cref="ExpressionSegment"/>.
     /// </summary>
+    [JsonConverter(typeof(EnumToStringConverter<Position>))]
     public enum Position
     {
         /// <summary>
@@ -103,6 +114,7 @@ namespace DataTools.Extras.Expressions
     /// <summary>
     /// Indicates how literal values are stored in an <see cref="ExpressionSegment"/>.
     /// </summary>
+    [JsonConverter(typeof(EnumToStringConverter<StorageMode>))]
     public enum StorageMode
     {
         /// <summary>
@@ -124,6 +136,8 @@ namespace DataTools.Extras.Expressions
         #region Public Fields
 
         public static readonly string[] Operations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "^", "exp", "abs", "sqrt", "*", "/", @"\", "mod", "%", "+", "-" };
+        public static readonly string[] UnitaryOperations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "abs", "sqrt" };
+        public static readonly string[] ProductOperations = new[] { "^", "exp", "*", "/", @"\", "mod", "%", "+", "-" };
 
         #endregion Public Fields
 
@@ -430,6 +444,30 @@ namespace DataTools.Extras.Expressions
             }
         }
 
+        public bool IsProductOperator
+        {
+            get
+            {
+                return partType == PartType.Operator && ((IList<string>)ProductOperations).Contains(monoVal);
+            }
+        }
+
+        public bool IsUnitaryOperator
+        {
+            get
+            {
+                return partType == PartType.Operator && ((IList<string>)UnitaryOperations).Contains(monoVal);
+            }
+        }
+
+        public bool IsOperator
+        {
+            get
+            {
+                return partType == PartType.Operator;
+            }
+        }
+
         /// <summary>
         /// Gets a value indicating that the expression is solvable.
         /// </summary>
@@ -451,6 +489,7 @@ namespace DataTools.Extras.Expressions
         /// <summary>
         /// Gets the parent expression of this <see cref="ExpressionSegment"/>, or null if root.
         /// </summary>
+        [JsonIgnore]
         public ExpressionSegment Parent => parent;
 
         /// <summary>
@@ -803,6 +842,81 @@ namespace DataTools.Extras.Expressions
             return lh.CheckUnitsMatch(rh);
         }
 
+        //public bool SolveFor(string forVar, out double answer, Dictionary<string, double> variables = null)
+        //{
+        //    if (parent == null && !IsSolvable) 
+        //    {
+        //        answer = double.NaN;
+        //        return false;
+        //    }
+
+        //    if (partType == PartType.Literal)
+        //    {
+        //        answer = ValueToDouble() ?? 0;
+        //        return true;
+        //    }
+        //    else if (IsComposite)
+        //    {
+        //        int i, c = parts.Count;
+        //        double apart = double.NaN;
+
+        //        for (i = 0; i< c; i++)
+        //        {
+        //            if (parts[i].IsComposite)
+        //            {
+        //                var b = parts[i].SolveFor(forVar, out apart, variables);
+        //                if  (b == false)
+        //                {
+        //                    answer = double.NaN;
+        //                    return false;
+        //                }
+        //            }
+        //            else if (parts[i].partType == PartType.Literal)
+        //            {
+        //                apart = parts[i].ValueToDouble() ?? double.NaN;
+        //                if (double.IsNaN(apart))
+        //                {
+        //                    answer = double.NaN;
+        //                    return false;
+        //                }
+        //            }
+        //            else if (parts[i].partType == PartType.Operator)
+        //            {
+
+        //            }
+
+
+        //        }
+        //    }
+
+        //}
+
+        public List<(ExpressionSegment, ExpressionSegment)> GetValueUnitPairs()
+        {
+            if (parent == null && !IsSolvable) return null;
+
+            List<(ExpressionSegment, ExpressionSegment)> result = new List<(ExpressionSegment, ExpressionSegment)>();
+
+            int i, c = parts.Count;
+
+            for (i = 0; i < c; i++)
+            {
+                if ((parts[i].partType & PartType.Composite) == PartType.Composite)
+                {
+                    result.AddRange(parts[i].GetValueUnitPairs());
+                }
+                else if (i > 0)
+                {
+                    if (parts[i].partType == PartType.Unit)
+                    {
+                        result.Add((parts[i - 1], parts[i]));   
+                    }
+                }
+            }
+
+            return result;
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -919,7 +1033,7 @@ namespace DataTools.Extras.Expressions
                         }
                         else
                         {
-                            if (parts[i - 1].partType != PartType.Literal && parts[i - 1].partType != PartType.Variable)
+                            if (parts[i - 1].partType != PartType.Composite && parts[i - 1].partType != PartType.Literal && parts[i - 1].partType != PartType.Variable)
                             {
                                 di = true;
                             }
@@ -946,7 +1060,7 @@ namespace DataTools.Extras.Expressions
 
                     for (i = j; i < c; i++)
                     {
-                        if (mode == 0 && (parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
+                        if (mode == 0 && (parts[i].partType == PartType.Composite || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
                         {
                             if (startIdx == null) startIdx = i;
                             mode = 1;
@@ -959,7 +1073,7 @@ namespace DataTools.Extras.Expressions
                         {
                             mode = 3;
                         }
-                        else if (mode == 3 && (parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
+                        else if (mode == 3 && (parts[i].partType == PartType.Composite || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
                         {
                             mode = 4;
                         }
@@ -1033,6 +1147,48 @@ namespace DataTools.Extras.Expressions
                 }
             }
 
+            if (parts.Count > 1) BreakupUnits();
+        }
+
+        private void BreakupUnits()
+        {
+            int i, c = parts.Count;
+
+            for (i = 0; i < c; i++)
+            {
+                if (parts[i].parts.Count > 1)
+                {
+                    parts[i].BreakupUnits();
+                }
+
+                if (i < (c - 1))
+                {
+                    if ((parts[i + 1].partType == PartType.Unit) && (parts[i].partType == PartType.Composite || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
+                    {
+                        // Make a pair
+                        var es = new ExpressionSegment();
+
+                        es.parent = this;
+                        es.partType = PartType.UnitValuePair;
+
+                        var epart = parts[i];
+                        var upart = parts[i + 1];
+
+                        parts.RemoveRange(i, 2);
+
+                        epart.parent = es;
+                        upart.parent = es;
+
+                        es.parts.Add(epart);
+                        es.parts.Add(upart);
+
+                        parts.Insert(i, es);
+                        c -= 1;
+                    }
+
+                    
+                }
+            }
         }
 
         /// <summary>
