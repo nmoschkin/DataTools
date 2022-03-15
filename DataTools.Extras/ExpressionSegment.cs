@@ -1365,6 +1365,15 @@ namespace DataTools.Extras.Expressions
         {
 
             int opcount = parts.Count((p) => p.partType == PartType.Operator);
+            ExpressionSegment es;
+            IList<string> cops = OperationOrders;
+
+            int i, c = cops.Count;
+            int j, d;
+            string[] pops;
+
+            ExpressionSegment p1, p2, p3;
+
             if (opcount == 1)
             {
                 if ((partType & PartType.Composite) == PartType.Composite)
@@ -1374,13 +1383,6 @@ namespace DataTools.Extras.Expressions
             }
             else if (opcount > 1)
             {
-                IList<string> cops = OperationOrders;
-
-                int i, c = cops.Count;
-                int j, d;
-                string[] pops;
-
-                ExpressionSegment es, p1, p2, p3;
 
                 for (i = 0; i < c; i++)
                 {
@@ -1397,88 +1399,79 @@ namespace DataTools.Extras.Expressions
                         {
                             if (pops.Contains(parts[j].monoVal))
                             {
-                                switch (parts[j].monoVal)
+                                if (parts[j].IsUnitaryOperator)
                                 {
-                                    case "abs":
-                                    case "sqrt":
-                                    case "root":
-                                    case "log":
-                                    case "log10":
-                                    case "sin":
-                                    case "cos":
-                                    case "tan":
-                                    case "asin":
-                                    case "acos":
-                                    case "atan":
+                                    var oj = j;
+                                    while (parts[j].IsUnitaryOperator && j < d - 2)
+                                    {
+                                        j++;
+                                    }
+                                    j--;
+                                    if (j == d - 1)
+                                    {
+                                        ErrorText = "Unexpected identifier '" + cops[i] + "' in expression '" + ToString() + "'";
+                                        throw new SyntaxErrorException(errorText);
+                                        //return;
 
-                                        if (j == d - 1)
-                                        {
-                                            ErrorText = "Unexpected identifier '" + cops[i] + "' in expression '" + ToString() + "'";
-                                            throw new SyntaxErrorException(errorText);
-                                            //return;
+                                    }
 
-                                        }
+                                    p1 = parts[j];
+                                    p2 = parts[j + 1];
 
-                                        p1 = parts[j];
-                                        p2 = parts[j + 1];
+                                    es = new ExpressionSegment();
 
-                                        es = new ExpressionSegment();
+                                    es.ci = ci;
+                                    es.parent = this;
+                                    es.partType = PartType.Executive;
+                                    es.storageMode = storageMode;
+                                    es.position = position;
 
-                                        es.ci = ci;
-                                        es.parent = this;
-                                        es.partType = PartType.Executive;
-                                        es.storageMode = storageMode;
-                                        es.position = position;
+                                    p1.parent = p2.parent = es;
+                                    --d;
 
-                                        p1.parent = p2.parent = es;
-                                        d -= 1;
+                                    es.parts.Add(p1);
+                                    es.parts.Add(p2);
 
-                                        es.parts.Add(p1);
-                                        es.parts.Add(p2);
+                                    parts.RemoveRange(j, 2);
+                                    parts.Insert(j, es);                                        
 
-                                        parts.RemoveRange(j, 2);
-                                        parts.Insert(j, es);
+                                    if (j >= d - 2) break;
 
-                                        if (j >= d - 2) break;
-
-                                        break;
-
-                                    default:
-                                        if (j == 0 || j == d - 1)
-                                        {
-                                            ErrorText = "Unexpected identifier '" + cops[i] + "' in expression '" + ToString() + "'";
-                                            throw new SyntaxErrorException(errorText);
-                                            //return;
-                                        }
+                                }
+                                else 
+                                { 
+                                    if (j == 0 || j == d - 1)
+                                    {
+                                        ErrorText = "Unexpected identifier '" + cops[i] + "' in expression '" + ToString() + "'";
+                                        throw new SyntaxErrorException(errorText);
+                                        //return;
+                                    }
 
 
-                                        p1 = parts[j];
-                                        p2 = parts[j + 1];
-                                        p3 = parts[j - 1];
+                                    p1 = parts[j];
+                                    p2 = parts[j + 1];
+                                    p3 = parts[j - 1];
 
-                                        es = new ExpressionSegment();
+                                    es = new ExpressionSegment();
 
-                                        es.ci = ci;
-                                        es.parent = this;
-                                        es.partType = PartType.Executive;
-                                        es.storageMode = storageMode;
-                                        es.position = position;
+                                    es.ci = ci;
+                                    es.parent = this;
+                                    es.partType = PartType.Executive;
+                                    es.storageMode = storageMode;
+                                    es.position = position;
 
-                                        p1.parent = p2.parent = p3.parent = es;
-                                        es.parts.Add(p3);
-                                        es.parts.Add(p1);
-                                        es.parts.Add(p2);
+                                    p1.parent = p2.parent = p3.parent = es;
+                                    es.parts.Add(p3);
+                                    es.parts.Add(p1);
+                                    es.parts.Add(p2);
 
-                                        parts.RemoveRange(j - 1, 3);
-                                        parts.Insert(j - 1, es);
+                                    parts.RemoveRange(j - 1, 3);
+                                    parts.Insert(j - 1, es);
 
-                                        d -= 2;
-                                        j -= 1;
+                                    d -= 2;
+                                    j -= 1;
 
-                                        if (j >= d - 2) break;
-
-                                        break;
-
+                                    if (j >= d - 2) break;
                                 }
                             }
                         }
@@ -1494,19 +1487,52 @@ namespace DataTools.Extras.Expressions
                 }
             }
 
-
-            foreach (var part in parts)
+            d = parts.Count;
+            for (j = 0; j < d; j++)
             {
-                if (((part.partType & PartType.Executive) == PartType.Executive) || part.parts.Count < 2) continue;
-                opcount = part.parts.Count((p) => p.partType == PartType.Operator);
-                if (opcount == 1)
-                {
-                    if ((part.partType & PartType.Composite) == PartType.Composite)
-                        part.partType |= PartType.Executive;
-                    else
-                        part.partType = PartType.Executive;
+                var part = parts[j];
 
+                if ((part.partType & PartType.Executive) == PartType.Executive)
+                {
+                    // do this weird little check where we ensure that the left side of a unitary operator is another operator
+                    if (part.parts.Count == 3 && part.parts[1].IsUnitaryOperator)
+                    {
+                        es = new ExpressionSegment("*", part, ci, storageMode, varSym);
+                        part.parts.Insert(1, es);
+                        es = new ExpressionSegment();
+
+                        part.parts[1].parent = es;
+                        part.parts[2].parent = es;
+
+                        es.parts.Add(part.parts[2]);
+                        es.parts.Add(part.parts[3]);
+                        es.partType = PartType.Executive;
+                        es.parent = this;
+                        es.ci = ci;
+                        es.varSym = varSym;
+                        es.position = position;
+
+                        part.parts.RemoveRange(2, 2);
+                        part.parts.Add(es);
+                    }
                 }
+                else if (part.parts.Count < 2)
+                {
+                    continue;
+                }
+                else
+                {
+                    opcount = part.parts.Count((p) => p.partType == PartType.Operator);
+                    if (opcount == 1)
+                    {
+                        if ((part.partType & PartType.Composite) == PartType.Composite)
+                            part.partType |= PartType.Executive;
+                        else
+                            part.partType = PartType.Executive;
+
+                    }
+                }
+                j++;
             }
         }
 
