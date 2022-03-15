@@ -137,6 +137,7 @@ namespace DataTools.Extras.Expressions
         #region Public Fields
 
         public static readonly string[] Operations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "^", "exp", "abs", "sqrt", "root", "*", "/", @"\", "mod", "%", "+", "-" };
+        public static readonly string[] OperationOrders = new[] { "log,log10,sin,cos,tan,asin,acos,atan,abs", "^,exp,sqrt,root", "mod,%", "*,/,\\", "+,-" };
         public static readonly string[] UnitaryOperations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "abs", "sqrt", "root" };
         public static readonly string[] ProductOperations = new[] { "^", "exp", "*", "/", @"\", "mod", "%", "+", "-" };
 
@@ -821,6 +822,198 @@ namespace DataTools.Extras.Expressions
             }
         }
 
+        public double? Execute()
+        {
+            double? execVal = null;
+            double pValA = 0, pValB = 0;
+
+            if (partType != PartType.Executive)
+            {
+                return null;
+            }
+
+            if (parts.Count == 2)
+            {
+                if (parts[1].partType == PartType.Executive)
+                {
+                    execVal = parts[1].Execute();
+                }
+                else if (parts[1].partType == PartType.UnitValuePair)
+                {
+                    execVal = parts[1].parts.LastOrDefault()?.ValueToDouble();
+                }
+                else if (parts[1].partType == PartType.Literal)
+                {
+                    execVal = parts[1].ValueToDouble();
+                }
+                else
+                {
+                    return null;
+                }
+
+                if (execVal == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    pValA = (double)execVal;
+                }
+
+                switch (parts[0].monoVal)
+                {
+
+                    case "abs":
+
+                        execVal = Math.Abs(pValA);
+                        break;
+
+                    case "sqrt":
+                    case "root":
+
+                        execVal = Math.Sqrt(pValA);
+                        break;
+
+                    case "log":
+
+                        execVal = Math.Log(pValA);
+                        break;
+
+                    case "log10":
+
+                        execVal = Math.Log10(pValA);
+                        break;
+
+                    case "sin":
+
+                        execVal = Math.Sin(pValA);
+                        break;
+
+                    case "cos":
+
+                        execVal = Math.Cos(pValA);
+                        break;
+
+                    case "tan":
+
+                        execVal = Math.Tan(pValA);
+                        break;
+
+                    case "asin":
+
+                        execVal = Math.Asin(pValA);
+                        break;
+
+                    case "acos":
+
+                        execVal = Math.Acos(pValA);
+                        break;
+
+                    case "atan":
+
+                        execVal = Math.Atan(pValA);
+                        break;
+
+                }
+            }
+            else if (parts.Count == 3)
+            {
+
+                if (parts[0].partType == PartType.Executive)
+                {
+                    execVal = parts[0].Execute();
+                }
+                else if (parts[0].partType == PartType.UnitValuePair)
+                {
+                    execVal = parts[0].parts.LastOrDefault()?.ValueToDouble();
+                }
+                else if (parts[0].partType == PartType.Literal)
+                {
+                    execVal = parts[0].ValueToDouble();
+                }
+                else
+                {
+                    return null;
+                }
+
+                if (execVal == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    pValA = (double)execVal;
+                }
+
+                if (parts[2].partType == PartType.Executive)
+                {
+                    execVal = parts[2].Execute();
+                }
+                else if (parts[2].partType == PartType.UnitValuePair)
+                {
+                    execVal = parts[2].parts.LastOrDefault()?.ValueToDouble();
+                }
+                else if (parts[2].partType == PartType.Literal)
+                {
+                    execVal = parts[2].ValueToDouble();
+                }
+                else
+                {
+                    return null;
+                }
+
+                if (execVal == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    pValB = (double)execVal;
+                }
+
+                switch (parts[1].monoVal)
+                {
+                    case "exp":
+                    case "^":
+
+                        execVal = Math.Pow(pValA, pValB);
+                        break;
+
+                    case "*":
+                        execVal = pValA * pValB;
+                        break;
+
+                    case "/":
+                        execVal = pValA / pValB;
+                        break;
+
+                    case "\\":
+                        execVal = ((int)pValA) / ((int)pValB);
+                        break;
+
+                    case "%":
+                    case "mod":
+                        execVal = pValA % pValB;
+                        break;
+
+                    case "+":
+                        execVal = pValA + pValB;
+                        break;
+
+                    case "-":
+                        execVal = pValA - pValB;
+                        break;
+
+                }
+
+
+
+            }
+
+            return execVal;
+        }
+
+
         public override int GetHashCode()
         {
             return ToString().GetHashCode();
@@ -1227,10 +1420,11 @@ namespace DataTools.Extras.Expressions
             }
             else if (opcount > 1)
             {
-                IList<string> cops = Operations;
+                IList<string> cops = OperationOrders;
 
-                int i, c = Operations.Length;
+                int i, c = cops.Count;
                 int j, d;
+                string[] pops;
 
                 ExpressionSegment es, p1, p2, p3;
 
@@ -1239,17 +1433,21 @@ namespace DataTools.Extras.Expressions
                     if (parts.Count((p) => p.partType == PartType.Operator) < 2) break;
                     d = parts.Count;
 
+                    pops = cops[i].Split(',');
+
                     for (j = 0; j < d; j++)
                     {
                         if (parts.Count((p) => p.partType == PartType.Operator) < 2) break;
+
                         if (parts[j].partType == PartType.Operator)
                         {
-                            if (parts[j].monoVal == cops[i])
+                            if (pops.Contains(parts[j].monoVal))
                             {
-                                switch (cops[i] ?? "")
+                                switch (parts[j].monoVal)
                                 {
                                     case "abs":
                                     case "sqrt":
+                                    case "root":
                                     case "log":
                                     case "log10":
                                     case "sin":
