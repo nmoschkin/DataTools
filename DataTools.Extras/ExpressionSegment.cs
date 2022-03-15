@@ -72,7 +72,7 @@ namespace DataTools.Extras.Expressions
         /// <summary>
         /// Indicates the expression segment represents a unit/value pair.
         /// </summary>
-        UnitValuePair = 0x23,
+        ValueUnitPair = 0x23,
 
         /// <summary>
         /// Indicates that the expression segment tests for equality, and has exactly one left-hand part and exactly one right-hand part.
@@ -838,9 +838,9 @@ namespace DataTools.Extras.Expressions
                 {
                     execVal = parts[1].Execute();
                 }
-                else if (parts[1].partType == PartType.UnitValuePair)
+                else if (parts[1].partType == PartType.ValueUnitPair)
                 {
-                    execVal = parts[1].parts.LastOrDefault()?.ValueToDouble();
+                    execVal = parts[1].parts.FirstOrDefault()?.ValueToDouble();
                 }
                 else if (parts[1].partType == PartType.Literal)
                 {
@@ -923,9 +923,9 @@ namespace DataTools.Extras.Expressions
                 {
                     execVal = parts[0].Execute();
                 }
-                else if (parts[0].partType == PartType.UnitValuePair)
+                else if (parts[0].partType == PartType.ValueUnitPair)
                 {
-                    execVal = parts[0].parts.LastOrDefault()?.ValueToDouble();
+                    execVal = parts[0].parts.FirstOrDefault()?.ValueToDouble();
                 }
                 else if (parts[0].partType == PartType.Literal)
                 {
@@ -949,9 +949,9 @@ namespace DataTools.Extras.Expressions
                 {
                     execVal = parts[2].Execute();
                 }
-                else if (parts[2].partType == PartType.UnitValuePair)
+                else if (parts[2].partType == PartType.ValueUnitPair)
                 {
-                    execVal = parts[2].parts.LastOrDefault()?.ValueToDouble();
+                    execVal = parts[2].parts.FirstOrDefault()?.ValueToDouble();
                 }
                 else if (parts[2].partType == PartType.Literal)
                 {
@@ -1338,7 +1338,7 @@ namespace DataTools.Extras.Expressions
                         var es = new ExpressionSegment();
 
                         es.parent = this;
-                        es.partType = PartType.UnitValuePair;
+                        es.partType = PartType.ValueUnitPair;
 
                         var epart = parts[i];
                         var upart = parts[i + 1];
