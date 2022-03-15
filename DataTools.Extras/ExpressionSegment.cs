@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace DataTools.Extras.Expressions
         /// <summary>
         /// Indicates the expression segment represents a sign value.
         /// </summary>
-        Sign = 0x8,
+        Executive = 0x8,
 
         /// <summary>
         /// Indicates the expression segment represents a variable. 
@@ -135,8 +136,8 @@ namespace DataTools.Extras.Expressions
     {
         #region Public Fields
 
-        public static readonly string[] Operations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "^", "exp", "abs", "sqrt", "*", "/", @"\", "mod", "%", "+", "-" };
-        public static readonly string[] UnitaryOperations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "abs", "sqrt" };
+        public static readonly string[] Operations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "^", "exp", "abs", "sqrt", "root", "*", "/", @"\", "mod", "%", "+", "-" };
+        public static readonly string[] UnitaryOperations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "abs", "sqrt", "root" };
         public static readonly string[] ProductOperations = new[] { "^", "exp", "*", "/", @"\", "mod", "%", "+", "-" };
 
         #endregion Public Fields
@@ -156,6 +157,7 @@ namespace DataTools.Extras.Expressions
         private MetricUnit unit = null;
         private object value = null;
         private string varSym = "$";
+        private string errorText = "";
 
         #endregion Private Fields
 
@@ -415,7 +417,7 @@ namespace DataTools.Extras.Expressions
                     }
                 }
 
-                CheckIntegrity();
+                FormalizeStructure();
             }
         }
 
@@ -432,6 +434,15 @@ namespace DataTools.Extras.Expressions
         /// Gets the current cultural context used for parsing numeric literals.
         /// </summary>
         public CultureInfo CultureInfo => ci;
+
+        public string ErrorText
+        {
+            get => errorText;
+            private set
+            {
+                errorText = value;
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating that this expression is a composite expression.
@@ -457,6 +468,14 @@ namespace DataTools.Extras.Expressions
             get
             {
                 return partType == PartType.Operator && ((IList<string>)UnitaryOperations).Contains(monoVal);
+            }
+        }
+
+        public bool IsNumeric
+        {
+            get
+            {
+                return ((value != null) && (value.GetType().IsPrimitive || value.GetType().IsEnum));
             }
         }
 
@@ -553,6 +572,12 @@ namespace DataTools.Extras.Expressions
             set
             {
                 object v = value;
+                if (v is string s)
+                {
+                    monoVal = s;
+                    this.value = null;
+                    return;
+                }
 
                 if (storageMode == StorageMode.AsDouble)
                 {
@@ -999,9 +1024,9 @@ namespace DataTools.Extras.Expressions
         #region Private Methods
 
         /// <summary>
-        /// Check the integrity of the expression and determine if it is solvable.
+        /// Check the integrity of the expression, formalize the structure, and determine if it is solvable.
         /// </summary>
-        private void CheckIntegrity()
+        private void FormalizeStructure()
         {
             var mode = 0;
             bool ef;
@@ -1042,9 +1067,8 @@ namespace DataTools.Extras.Expressions
 
                     if (di)
                     {
-                        var exp = new ExpressionSegment("1");
+                        var exp = new ExpressionSegment("1", ci, storageMode, varSym);
                         exp.parent = this;
-
                         parts.Insert(i, exp);
                         c++;
                         i++;
@@ -1147,10 +1171,11 @@ namespace DataTools.Extras.Expressions
                 }
             }
 
-            if (parts.Count > 1) BreakupUnits();
+            if (parts.Count > 1) MakeUnitValuePairs();
+            GroupByOrderOps();
         }
 
-        private void BreakupUnits()
+        private void MakeUnitValuePairs()
         {
             int i, c = parts.Count;
 
@@ -1158,7 +1183,7 @@ namespace DataTools.Extras.Expressions
             {
                 if (parts[i].parts.Count > 1)
                 {
-                    parts[i].BreakupUnits();
+                    parts[i].MakeUnitValuePairs();
                 }
 
                 if (i < (c - 1))
@@ -1189,6 +1214,138 @@ namespace DataTools.Extras.Expressions
                     
                 }
             }
+
+        }
+
+        private void GroupByOrderOps()
+        {
+
+            int opcount = parts.Count((p) => p.partType == PartType.Operator);
+            if (opcount == 1)
+            {
+                partType = PartType.Executive;
+            }
+            else if (opcount > 1)
+            {
+                IList<string> cops = Operations;
+
+                int i, c = Operations.Length;
+                int j, d;
+
+                ExpressionSegment es, p1, p2, p3;
+
+                for (i = 0; i < c; i++)
+                {
+                    if (parts.Count((p) => p.partType == PartType.Operator) < 2) break;
+                    d = parts.Count;
+
+                    for (j = 0; j < d; j++)
+                    {
+                        if (parts.Count((p) => p.partType == PartType.Operator) < 2) break;
+                        if (parts[j].partType == PartType.Operator)
+                        {
+                            if (parts[j].monoVal == cops[i])
+                            {
+                                switch (cops[i] ?? "")
+                                {
+                                    case "abs":
+                                    case "sqrt":
+                                    case "log":
+                                    case "log10":
+                                    case "sin":
+                                    case "cos":
+                                    case "tan":
+                                    case "asin":
+                                    case "acos":
+                                    case "atan":
+
+                                        if (j == d - 1)
+                                        {
+                                            ErrorText = "Unexpected identifier '" + cops[i] + "' in expression '" + ToString() + "'";
+                                            throw new SyntaxErrorException(errorText);
+                                            //return;
+
+                                        }
+
+                                        p1 = parts[j];
+                                        p2 = parts[j + 1];
+
+                                        es = new ExpressionSegment();
+
+                                        es.ci = ci;
+                                        es.parent = this;
+                                        es.partType = PartType.Executive;
+                                        es.storageMode = storageMode;
+                                        es.position = position;
+
+                                        p1.parent = p2.parent = es;
+                                        d -= 1;
+
+                                        es.parts.Add(p1);
+                                        es.parts.Add(p2);
+
+                                        parts.RemoveRange(j, 2);
+                                        parts.Insert(j, es);
+
+                                        if (j >= d - 2) break;
+
+                                        break;
+
+                                    default:
+                                        if (j == 0 || j == d - 1)
+                                        {
+                                            ErrorText = "Unexpected identifier '" + cops[i] + "' in expression '" + ToString() + "'";
+                                            throw new SyntaxErrorException(errorText);
+                                            //return;
+                                        }
+
+
+                                        p1 = parts[j];
+                                        p2 = parts[j + 1];
+                                        p3 = parts[j - 1];
+
+                                        es = new ExpressionSegment();
+
+                                        es.ci = ci;
+                                        es.parent = this;
+                                        es.partType = PartType.Executive;
+                                        es.storageMode = storageMode;
+                                        es.position = position;
+
+                                        p1.parent = p2.parent = p3.parent = es;
+                                        es.parts.Add(p3);
+                                        es.parts.Add(p1);
+                                        es.parts.Add(p2);
+
+                                        parts.RemoveRange(j - 1, 3);
+                                        parts.Insert(j - 1, es);
+
+                                        d -= 2;
+                                        j -= 1;
+
+                                        if (j >= d - 2) break;
+
+                                        break;
+
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (parts.Count((p) => p.partType == PartType.Operator) == 1) partType = PartType.Executive;
+            }
+
+
+            foreach (var part in parts)
+            {
+                if (part.partType == PartType.Executive || part.parts.Count < 2) continue;
+                opcount = part.parts.Count((p) => p.partType == PartType.Operator);
+                if (opcount == 1)
+                {
+                    part.partType = PartType.Executive;
+                }
+            }
         }
 
         /// <summary>
@@ -1198,9 +1355,13 @@ namespace DataTools.Extras.Expressions
         private bool CheckSolvable()
         {
             var i = parts.Count((e) => e.partType == PartType.Assignment || e.partType == PartType.Equality);
-            if (i == 1)
+            if (i == 1 && parts[0].PartType != PartType.Assignment && parts[0].PartType != PartType.Equality)
             {
                 return HasMatchingUnits();
+            }
+            else if (partType == PartType.Executive)
+            {
+                return true;
             }
             else
             {
