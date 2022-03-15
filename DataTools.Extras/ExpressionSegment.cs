@@ -235,10 +235,9 @@ namespace DataTools.Extras.Expressions
                     }
 
                     var val = TextBetween(value, i, sc1, sc2, out b, out e);
-                    parts.Add(new ExpressionSegment(val, this, ci, mode, varSym)
-                    {
-                        partType = PartType.Composite
-                    });
+                    var seg = new ExpressionSegment(val, this, ci, mode, varSym);
+                    parts.Add(seg);
+                    seg.partType = seg.partType | PartType.Composite;
 
                     if (b is int && e is int n)
                     {
@@ -418,8 +417,9 @@ namespace DataTools.Extras.Expressions
                     }
                 }
 
-                FormalizeStructure();
             }
+
+            FormalizeStructure();
         }
 
         #endregion Private Constructors
@@ -827,14 +827,14 @@ namespace DataTools.Extras.Expressions
             double? execVal = null;
             double pValA = 0, pValB = 0;
 
-            if (partType != PartType.Executive)
+            if ((partType & PartType.Executive) != PartType.Executive)
             {
                 return null;
             }
 
             if (parts.Count == 2)
             {
-                if (parts[1].partType == PartType.Executive)
+                if ((parts[1].partType & PartType.Executive) == PartType.Executive)
                 {
                     execVal = parts[1].Execute();
                 }
@@ -919,7 +919,7 @@ namespace DataTools.Extras.Expressions
             else if (parts.Count == 3)
             {
 
-                if (parts[0].partType == PartType.Executive)
+                if ((parts[0].partType & PartType.Executive) == PartType.Executive)
                 {
                     execVal = parts[0].Execute();
                 }
@@ -945,7 +945,7 @@ namespace DataTools.Extras.Expressions
                     pValA = (double)execVal;
                 }
 
-                if (parts[2].partType == PartType.Executive)
+                if ((parts[2].partType & PartType.Executive) == PartType.Executive)
                 {
                     execVal = parts[2].Execute();
                 }
@@ -1060,55 +1060,6 @@ namespace DataTools.Extras.Expressions
             return lh.CheckUnitsMatch(rh);
         }
 
-        //public bool SolveFor(string forVar, out double answer, Dictionary<string, double> variables = null)
-        //{
-        //    if (parent == null && !IsSolvable) 
-        //    {
-        //        answer = double.NaN;
-        //        return false;
-        //    }
-
-        //    if (partType == PartType.Literal)
-        //    {
-        //        answer = ValueToDouble() ?? 0;
-        //        return true;
-        //    }
-        //    else if (IsComposite)
-        //    {
-        //        int i, c = parts.Count;
-        //        double apart = double.NaN;
-
-        //        for (i = 0; i< c; i++)
-        //        {
-        //            if (parts[i].IsComposite)
-        //            {
-        //                var b = parts[i].SolveFor(forVar, out apart, variables);
-        //                if  (b == false)
-        //                {
-        //                    answer = double.NaN;
-        //                    return false;
-        //                }
-        //            }
-        //            else if (parts[i].partType == PartType.Literal)
-        //            {
-        //                apart = parts[i].ValueToDouble() ?? double.NaN;
-        //                if (double.IsNaN(apart))
-        //                {
-        //                    answer = double.NaN;
-        //                    return false;
-        //                }
-        //            }
-        //            else if (parts[i].partType == PartType.Operator)
-        //            {
-
-        //            }
-
-
-        //        }
-        //    }
-
-        //}
-
         public List<(ExpressionSegment, ExpressionSegment)> GetValueUnitPairs()
         {
             if (parent == null && !IsSolvable) return null;
@@ -1153,7 +1104,7 @@ namespace DataTools.Extras.Expressions
                 }
             }
 
-            if (partType == PartType.Composite && Parent != null)
+            if ((partType & PartType.Composite) == PartType.Composite && Parent != null)
             {
                 return $"({sb})";
             }
@@ -1416,7 +1367,10 @@ namespace DataTools.Extras.Expressions
             int opcount = parts.Count((p) => p.partType == PartType.Operator);
             if (opcount == 1)
             {
-                partType = PartType.Executive;
+                if ((partType & PartType.Composite) == PartType.Composite)
+                    partType |= PartType.Executive;
+                else
+                    partType = PartType.Executive;
             }
             else if (opcount > 1)
             {
@@ -1531,17 +1485,27 @@ namespace DataTools.Extras.Expressions
                     }
                 }
 
-                if (parts.Count((p) => p.partType == PartType.Operator) == 1) partType = PartType.Executive;
+                if (parts.Count((p) => p.partType == PartType.Operator) == 1)
+                {
+                    if (partType == PartType.Composite)
+                        partType |= PartType.Executive;
+                    else
+                        partType = PartType.Executive;
+                }
             }
 
 
             foreach (var part in parts)
             {
-                if (part.partType == PartType.Executive || part.parts.Count < 2) continue;
+                if (((part.partType & PartType.Executive) == PartType.Executive) || part.parts.Count < 2) continue;
                 opcount = part.parts.Count((p) => p.partType == PartType.Operator);
                 if (opcount == 1)
                 {
-                    part.partType = PartType.Executive;
+                    if ((part.partType & PartType.Composite) == PartType.Composite)
+                        part.partType |= PartType.Executive;
+                    else
+                        part.partType = PartType.Executive;
+
                 }
             }
         }
@@ -1557,7 +1521,7 @@ namespace DataTools.Extras.Expressions
             {
                 return HasMatchingUnits();
             }
-            else if (partType == PartType.Executive)
+            else if ((partType & PartType.Executive) == PartType.Executive)
             {
                 return true;
             }
