@@ -657,6 +657,31 @@ namespace DataTools.MathTools
             return d;
         }
 
+        public static double Sum(params double[] vars)
+        {
+            double d = 0d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0d;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d += vars[i];
+            return d;
+        }
+
+        public static decimal Sum(params decimal[] vars)
+        {
+            decimal d = 0m;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0m;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d += vars[i];
+            return d;
+        }
 
     }
 

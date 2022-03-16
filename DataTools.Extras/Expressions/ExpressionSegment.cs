@@ -147,9 +147,9 @@ namespace DataTools.Extras.Expressions
     {
         #region Public Fields
 
-        public static readonly string[] Operations = new[] { "floor", "ceil", "min", "max", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "^", "exp", "abs", "sqrt", "root", "*", "/", @"\", "mod", "%", "+", "-" };
-        public static readonly string[] OperationOrders = new[] { "floor,ceil,log,log10,sin,cos,tan,sinh,cosh,tanh,asin,acos,atan,abs", "^,exp,sqrt,root", "mod,%", "*,/,\\", "+,-" };
-        public static readonly string[] UnitaryOperations = new[] { "max", "min", "floor", "ceil", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "abs", "sqrt", "root" };
+        public static readonly string[] Operations = new[] { "round", "floor", "ceil", "min", "max", "sum", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "atan2", "^", "exp", "abs", "sqrt", "root", "*", "/", @"\", "mod", "%", "+", "-" };
+        public static readonly string[] OperationOrders = new[] { "round,floor,ceil,sum,max,min,log,log10,sin,cos,tan,sinh,cosh,tanh,asin,acos,atan,atan2,abs", "^,exp,sqrt,root", "mod,%", "*,/,\\", "+,-" };
+        public static readonly string[] UnitaryOperations = new[] { "round", "max", "min", "floor", "ceil", "sum", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "atan2", "abs", "sqrt", "root" };
         public static readonly string[] ProductOperations = new[] { "^", "exp", "*", "/", @"\", "mod", "%", "+", "-" };
 
         #endregion Public Fields
@@ -1056,6 +1056,36 @@ namespace DataTools.Extras.Expressions
 
                 switch (parts[0].monoVal)
                 {
+                    case "round":
+
+                        if (pars != null && pars.Count == 2)
+                        {
+                            execVal = Math.Round(pars[0], (int)pars[1]);
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
+                        break;
+
+
+                    case "sum":
+                        
+                        if (pars != null)
+                        {
+                            execVal = Sum(pars.ToArray());
+                        }
+                        else if (execVal != null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
+                        break;
 
                     case "min":
 
@@ -1069,7 +1099,7 @@ namespace DataTools.Extras.Expressions
                         }
                         else
                         {
-                            throw new SyntaxErrorException("Cannot parse parameters for unitary operator");
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
                         }
 
                         break;
@@ -1086,7 +1116,7 @@ namespace DataTools.Extras.Expressions
                         }
                         else
                         {
-                            throw new SyntaxErrorException("Cannot parse parameters for unitary operator");
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
                         }
 
                         break;
@@ -1106,7 +1136,6 @@ namespace DataTools.Extras.Expressions
                         break;
 
                     case "sqrt":
-                    case "root":
 
                         execVal = Math.Sqrt(pValA);
                         break;
@@ -1164,6 +1193,39 @@ namespace DataTools.Extras.Expressions
                     case "atan":
 
                         execVal = Math.Atan(pValA);
+                        break;
+
+                    case "atan2":
+
+                        if (pars != null && pars.Count == 2)
+                        {
+                            execVal = Math.Atan2(pars[0], pars[1]);
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
+                        break;
+
+                    case "root":
+
+                        if (pars != null && pars.Count == 2)
+                        {
+                            if (pars[1] == 2)
+                            {
+                                execVal = Math.Sqrt(pars[0]);
+                            }
+                            else 
+                            {
+                                execVal = Math.Pow(pars[0], 1 / pars[1]);
+                            }
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
                         break;
 
                 }
@@ -1273,8 +1335,6 @@ namespace DataTools.Extras.Expressions
                         break;
 
                 }
-
-
 
             }
 
