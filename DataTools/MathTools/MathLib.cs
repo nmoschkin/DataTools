@@ -369,6 +369,296 @@ namespace DataTools.MathTools
             return BitConverter.ToInt32(b, 0);
         }
 
+
+        public static double Min(params double[] vars)
+        {
+            double d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return double.NaN;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static double Max(params double[] vars)
+        {
+            double d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return double.NaN;
+            d = vars[0];
+
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static float Min(params float[] vars)
+        {
+            float d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return float.NaN;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static float Max(params float[] vars)
+        {
+            float d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return float.NaN;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static decimal Min(params decimal[] vars)
+        {
+            decimal d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return decimal.Zero;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static decimal Max(params decimal[] vars)
+        {
+            decimal d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return decimal.Zero;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static long Min(params long[] vars)
+        {
+            long d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0L;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static long Max(params long[] vars)
+        {
+            long d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0L;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static int Min(params int[] vars)
+        {
+            int d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static int Max(params int[] vars)
+        {
+            int d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static short Min(params short[] vars)
+        {
+            short d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static short Max(params short[] vars)
+        {
+            short d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static byte Min(params byte[] vars)
+        {
+            byte d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static byte Max(params byte[] vars)
+        {
+            byte d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static ulong Min(params ulong[] vars)
+        {
+            ulong d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0UL;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static ulong Max(params ulong[] vars)
+        {
+            ulong d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0UL;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static uint Min(params uint[] vars)
+        {
+            uint d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0U;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static uint Max(params uint[] vars)
+        {
+            uint d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0U;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static ushort Min(params ushort[] vars)
+        {
+            ushort d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static ushort Max(params ushort[] vars)
+        {
+            ushort d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+        public static sbyte Min(params sbyte[] vars)
+        {
+            sbyte d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Min(d, vars[i]);
+            return d;
+        }
+
+        public static sbyte Max(params sbyte[] vars)
+        {
+            sbyte d;
+            int i;
+            int c = vars.Length;
+            if (c <= 0)
+                return 0;
+            d = vars[0];
+            for (i = 1; i < c; i++)
+                d = Math.Max(d, vars[i]);
+            return d;
+        }
+
+
     }
+
 
 }

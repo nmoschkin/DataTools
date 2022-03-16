@@ -15,6 +15,7 @@ using System.Text;
 using System.Xml.XPath;
 
 using static DataTools.Text.TextTools;
+using static DataTools.MathTools.MathLib;
 
 namespace DataTools.Extras.Expressions
 {
@@ -35,6 +36,11 @@ namespace DataTools.Extras.Expressions
         /// Inidicates the expression segment is a composite of two or more subordinate expressions.
         /// </summary>
         Composite = 0x1,
+
+        /// <summary>
+        /// Indicates the expression is wrapped in parenthesis.
+        /// </summary>
+        Parenthesis = 0x201,
 
         /// <summary>
         /// Indicates the expression segment represents a literal value.
@@ -58,6 +64,11 @@ namespace DataTools.Extras.Expressions
         /// If the <see cref="ExpressionSegment.VariableSymbol"/> is null or empty, then simple phrases will be interpreted as variables.
         /// </remarks>
         Variable = 0x10,
+
+        /// <summary>
+        /// Indicates the expression is a solitary or comma-separated literal or variable value inside of a composite.
+        /// </summary>
+        Parameter = 0x100,
 
         /// <summary>
         /// Indicates the expression segment represents a recognized unit of measurement.
@@ -136,14 +147,16 @@ namespace DataTools.Extras.Expressions
     {
         #region Public Fields
 
-        public static readonly string[] Operations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "^", "exp", "abs", "sqrt", "root", "*", "/", @"\", "mod", "%", "+", "-" };
-        public static readonly string[] OperationOrders = new[] { "log,log10,sin,cos,tan,asin,acos,atan,abs", "^,exp,sqrt,root", "mod,%", "*,/,\\", "+,-" };
-        public static readonly string[] UnitaryOperations = new[] { "log", "log10", "sin", "cos", "tan", "asin", "acos", "atan", "abs", "sqrt", "root" };
+        public static readonly string[] Operations = new[] { "floor", "ceil", "min", "max", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "^", "exp", "abs", "sqrt", "root", "*", "/", @"\", "mod", "%", "+", "-" };
+        public static readonly string[] OperationOrders = new[] { "floor,ceil,log,log10,sin,cos,tan,sinh,cosh,tanh,asin,acos,atan,abs", "^,exp,sqrt,root", "mod,%", "*,/,\\", "+,-" };
+        public static readonly string[] UnitaryOperations = new[] { "max", "min", "floor", "ceil", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "abs", "sqrt", "root" };
         public static readonly string[] ProductOperations = new[] { "^", "exp", "*", "/", @"\", "mod", "%", "+", "-" };
 
         #endregion Public Fields
 
         #region Private Fields
+
+        private static Dictionary<string, object> constants = new Dictionary<string, object>();
 
         private CultureInfo ci = CultureInfo.CurrentCulture;
         private string monoVal = null;
@@ -160,7 +173,26 @@ namespace DataTools.Extras.Expressions
         private string varSym = "$";
         private string errorText = "";
 
+        private Dictionary<string, object> variables;
+
+
         #endregion Private Fields
+
+        #region Static Constructor
+
+
+        static ExpressionSegment()
+        {
+            // Add some common mathematical constants.
+
+            constants.Add("pi", Math.PI);
+            constants.Add("phi", 1.618033988749894d);
+            constants.Add("π", Math.PI);
+            constants.Add("φ", 1.618033988749894d);
+            constants.Add("rad", 180d / Math.PI);
+
+        }
+        #endregion
 
         #region Public Constructors
 
@@ -216,6 +248,8 @@ namespace DataTools.Extras.Expressions
             this.ci = ci ?? this.ci ?? CultureInfo.CurrentCulture;
             this.parent = parent;
 
+            bool hasp = false;
+
             value = SpaceOperators(OneSpace(value));
 
             int? b, e;
@@ -235,9 +269,47 @@ namespace DataTools.Extras.Expressions
                     }
 
                     var val = TextBetween(value, i, sc1, sc2, out b, out e);
-                    var seg = new ExpressionSegment(val, this, ci, mode, varSym);
-                    parts.Add(seg);
-                    seg.partType = seg.partType | PartType.Composite;
+
+                    var tseg = Split(val, ",", true);
+                    
+                    if (tseg.Length == 1)
+                    {
+                        var seg = new ExpressionSegment(val, this, ci, mode, varSym);
+
+                        seg.partType = seg.partType | PartType.Parenthesis;
+
+                        var tp = parts.LastOrDefault();
+                        if (tp != null)
+                        {
+                            if (tp.IsUnitaryOperator)
+                            {
+                                seg.partType = seg.partType | PartType.Parameter;
+                            }
+                        }
+
+                        parts.Add(seg);
+                    }
+                    else
+                    {
+                        var seg = new ExpressionSegment();
+                        
+                        seg.partType = PartType.Parameter | PartType.Parenthesis;
+                        seg.parent = this;
+                        seg.ci = ci;
+                        seg.varSym = varSym;
+                        seg.position = position;
+                        seg.storageMode = StorageMode;
+
+                        parts.Add(seg);
+
+                        foreach (var val2 in tseg)
+                        {
+                            var seg2 = new ExpressionSegment(val2, seg, ci, mode, varSym);
+                            seg2.partType |= PartType.Parameter;
+                            seg.parts.Add(seg2);
+                        }
+
+                    }
 
                     if (b is int && e is int n)
                     {
@@ -246,7 +318,19 @@ namespace DataTools.Extras.Expressions
                     }
                     else
                     {
-                        throw new SyntaxErrorException($"Open parenthesis missing closing parenthesis at position {i}");
+                        ErrorText = $"Open parenthesis missing closing parenthesis at position {i} of string '{value}'";
+                        throw new SyntaxErrorException(ErrorText);
+                    }
+                }
+                else if (value[i] == ',')
+                {
+                    if (sb.Length > 0)
+                    {
+                        var part = new ExpressionSegment(sb.ToString(), this, ci, mode, varSym);
+                        parts.Add(part);
+                        part.partType = part.partType | PartType.Parameter;
+                        hasp = true;
+                        sb.Clear();
                     }
                 }
                 else if (value[i] == ' ')
@@ -376,6 +460,11 @@ namespace DataTools.Extras.Expressions
                         newPart.monoVal = sb.ToString();
                     }
 
+                    if (hasp)
+                    {
+                        newPart.partType = newPart.partType | PartType.Parameter;
+                    }
+
                     parts.Add(newPart);
 
                     if (parent == null)
@@ -419,12 +508,63 @@ namespace DataTools.Extras.Expressions
 
             }
 
+            if (parent == null)
+            {
+                variables = new Dictionary<string, object>();
+            }
+
             FormalizeStructure();
         }
 
         #endregion Private Constructors
 
         #region Public Properties
+
+        /// <summary>
+        /// Gets or sets variables dynamically.
+        /// </summary>
+        /// <param name="key">The variable key name.</param>
+        /// <returns></returns>
+        public object this[string key]
+        {
+            get
+            {
+                if (Variables != null && Variables.TryGetValue(key, out var value))
+                {
+                    return value;
+                }
+
+                return null;
+            }
+            set
+            {
+                if (Variables == null)
+                {
+                    Variables = new Dictionary<string, object>();
+                }
+
+                if (Variables.ContainsKey(key))
+                {
+                    Variables[key] = value;
+                }
+                else
+                {
+                    Variables.Add(key, value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a list of global constants that are used throughout the system.
+        /// </summary>
+        public static Dictionary<string, object> Constants
+        {
+            get => constants;
+            set
+            {
+                constants = value;
+            }
+        }
 
         /// <summary>
         /// Gets the components of a composite <see cref="ExpressionSegment"/>.
@@ -495,7 +635,7 @@ namespace DataTools.Extras.Expressions
         {
             get
             {
-                if (parts.Count >= 3)
+                if (parts.Count >= 2)
                 {
                     return CheckSolvable();
                 }
@@ -686,6 +826,23 @@ namespace DataTools.Extras.Expressions
         }
 
         /// <summary>
+        /// Gets or sets the variables to use for solving equations.
+        /// </summary>
+        public Dictionary<string, object> Variables
+        {
+            get => parent?.Variables ?? variables;
+            set
+            {
+                if (parent != null)
+                {
+                    parent.Variables = value;
+                }
+
+                variables = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the expression-wide variable symbol.
         /// </summary>
         /// <remarks>
@@ -825,10 +982,27 @@ namespace DataTools.Extras.Expressions
         public double? Execute()
         {
             double? execVal = null;
-            double pValA = 0, pValB = 0;
+            double pValA, pValB;
+
+            List<double> pars = null;
 
             if ((partType & PartType.Executive) != PartType.Executive)
             {
+                if ((partType & PartType.Literal) == PartType.Literal)
+                {
+                    return ValueToDouble();
+                }
+                else if ((partType & PartType.Variable) == PartType.Variable)
+                {
+                    if (Variables.TryGetValue(monoVal, out object v))
+                    {
+                        if (v != null && double.TryParse(v.ToString(), out double dd))
+                        {
+                            return dd;
+                        }
+                    }
+                }
+
                 return null;
             }
 
@@ -842,26 +1016,89 @@ namespace DataTools.Extras.Expressions
                 {
                     execVal = parts[1].parts.FirstOrDefault()?.ValueToDouble();
                 }
-                else if (parts[1].partType == PartType.Literal)
+                else if ((parts[1].partType & PartType.Literal) == PartType.Literal)
                 {
                     execVal = parts[1].ValueToDouble();
+                }
+                else if ((parts[1].partType & PartType.Variable) == PartType.Variable)
+                {
+                    var obj = this[parts[1].monoVal];
+                    if (obj != null && double.TryParse(obj.ToString(), out double dd))
+                    {
+                        execVal = dd;
+                    }
+                }
+                else if ((parts[1].partType & PartType.Parameter) == PartType.Parameter)
+                {
+                    pars = new List<double>();
+                    foreach (var examine in parts[1].parts)
+                    {
+                        pars.Add(examine.Execute() ?? 0);
+                    }
                 }
                 else
                 {
                     return null;
                 }
 
-                if (execVal == null)
+                if (execVal == null && pars == null)
                 {
                     return null;
                 }
-                else
+                else if (execVal != null)
                 {
                     pValA = (double)execVal;
+                }
+                else
+                {
+                    pValA = double.NaN;
                 }
 
                 switch (parts[0].monoVal)
                 {
+
+                    case "min":
+
+                        if (pars != null)
+                        {
+                            execVal = Min(pars.ToArray());
+                        }
+                        else if (execVal != null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException("Cannot parse parameters for unitary operator");
+                        }
+
+                        break;
+
+                    case "max":
+
+                        if (pars != null)
+                        {
+                            execVal = Max(pars.ToArray());
+                        }
+                        else if (execVal != null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException("Cannot parse parameters for unitary operator");
+                        }
+
+                        break;
+
+
+                    case "floor":
+                        execVal = Math.Floor(pValA);
+                        break;
+
+                    case "ceil":
+                        execVal = Math.Ceiling(pValA);
+                        break;
 
                     case "abs":
 
@@ -899,6 +1136,21 @@ namespace DataTools.Extras.Expressions
                         execVal = Math.Tan(pValA);
                         break;
 
+                    case "sinh":
+
+                        execVal = Math.Sinh(pValA);
+                        break;
+
+                    case "cosh":
+
+                        execVal = Math.Cosh(pValA);
+                        break;
+
+                    case "tanh":
+
+                        execVal = Math.Tanh(pValA);
+                        break;
+
                     case "asin":
 
                         execVal = Math.Asin(pValA);
@@ -931,6 +1183,14 @@ namespace DataTools.Extras.Expressions
                 {
                     execVal = parts[0].ValueToDouble();
                 }
+                else if ((parts[0].partType & PartType.Variable) == PartType.Variable)
+                {
+                    var obj = this[parts[0].monoVal];
+                    if (obj != null && double.TryParse(obj.ToString(), out double dd))
+                    {
+                        execVal = dd;
+                    }
+                }
                 else
                 {
                     return null;
@@ -956,6 +1216,14 @@ namespace DataTools.Extras.Expressions
                 else if (parts[2].partType == PartType.Literal)
                 {
                     execVal = parts[2].ValueToDouble();
+                }
+                else if ((parts[2].partType & PartType.Variable) == PartType.Variable)
+                {
+                    var obj = this[parts[2].monoVal];
+                    if (obj != null && double.TryParse(obj.ToString(), out double dd))
+                    {
+                        execVal = dd;
+                    }
                 }
                 else
                 {
@@ -1096,15 +1364,51 @@ namespace DataTools.Extras.Expressions
             }
             else
             {
+                bool hasp = false;
+                bool unit = false;
+                if (parts.Count == 3 && (parts[1].partType & PartType.Operator) == PartType.Operator)
+                {
+                    if (parts[1].monoVal == "^")
+                    {
+                        return $"{parts[0]}{parts[1]}{parts[2]}";
+                    }
+                }
                 foreach (var item in parts)
                 {
-                    if (sb.Length > 0) sb.Append(" ");
+                    
+                    if (hasp)
+                    {
+                        if (sb.Length > 0) sb.Append(", ");
+
+                    }
+                    else
+                    {
+                        if (sb.Length > 0 && !unit) sb.Append(" ");
+                    }
+
+                    if ((item.partType & PartType.Parameter) == PartType.Parameter)
+                    {
+                        hasp = true;
+                    }
+                    else
+                    {
+                        if (item.IsUnitaryOperator)
+                        {
+                            unit = true;
+                        }
+                        else
+                        {
+                            unit = false;
+                        }
+
+                        hasp = false;
+                    }
 
                     sb.Append(item.ToString());
                 }
             }
 
-            if ((partType & PartType.Composite) == PartType.Composite && Parent != null)
+            if ((partType & PartType.Parenthesis) == PartType.Parenthesis && Parent != null)
             {
                 return $"({sb})";
             }
@@ -1315,6 +1619,14 @@ namespace DataTools.Extras.Expressions
                 }
             }
 
+            if (parts.Count == 1 && (partType & PartType.Composite) != 0)
+            {
+                if (((parts[0].partType & PartType.Variable) != 0) || ((parts[0].partType & PartType.Literal) != 0))
+                {
+                    parts[0].partType = parts[0].partType | PartType.Parameter;
+                }
+            }
+
             if (parts.Count > 1) MakeUnitValuePairs();
             GroupByOrderOps();
         }
@@ -1379,11 +1691,49 @@ namespace DataTools.Extras.Expressions
                 if ((partType & PartType.Composite) == PartType.Composite)
                     partType |= PartType.Executive;
                 else
-                    partType = PartType.Executive;
+                    partType |= PartType.Executive;
+
+                if (parts.Count == 2)
+                {
+                    if (!parts[0].IsUnitaryOperator)
+                    {
+                        ErrorText = "Unexpected identifier '" + parts[0] + "' in expression '" + ToString() + "'";
+                        throw new SyntaxErrorException(errorText);
+                    }
+                    else if ((parts[1].partType & PartType.Composite) == 0)
+                    {
+                        ErrorText = "Unexpected identifier '" + parts[1] + "' in expression '" + ToString() + "'";
+                        throw new SyntaxErrorException(errorText);
+                    }
+
+                }
+                else if (parts.Count == 3 && parts[1].IsUnitaryOperator)
+                {
+                    es = new ExpressionSegment("*");
+                    parts.Insert(1, es);
+
+                    es = new ExpressionSegment();
+                    
+                    es.parent = this;
+                    es.ci = ci;
+                    es.position = position;
+                    es.varSym = varSym;
+
+                    parts[1].parent = es;
+                    parts[2].parent = es;
+
+                    es.parts.Add(parts[2]);
+                    es.parts.Add(parts[3]);
+
+                    es.partType |= PartType.Executive;
+                    parts.RemoveRange(2, 2);
+                    parts.Insert(2, es);
+
+                }
+
             }
             else if (opcount > 1)
             {
-
                 for (i = 0; i < c; i++)
                 {
                     if (parts.Count((p) => p.partType == PartType.Operator) < 2) break;
@@ -1402,17 +1752,21 @@ namespace DataTools.Extras.Expressions
                                 if (parts[j].IsUnitaryOperator)
                                 {
                                     var oj = j;
-                                    while (parts[j].IsUnitaryOperator && j < d - 2)
+                                    while (parts[j].IsUnitaryOperator && j < d - 1)
                                     {
                                         j++;
                                     }
                                     j--;
                                     if (j == d - 1)
                                     {
-                                        ErrorText = "Unexpected identifier '" + cops[i] + "' in expression '" + ToString() + "'";
+                                        ErrorText = "Unexpected identifier '" + parts[j] + "' in expression '" + ToString() + "'";
                                         throw new SyntaxErrorException(errorText);
                                         //return;
-
+                                    }
+                                    else if ((parts[j + 1].partType & PartType.Composite) == 0)
+                                    {
+                                        ErrorText = "Unexpected identifier '" + parts[j + 1] + "' in expression '" + ToString() + "'";
+                                        throw new SyntaxErrorException(errorText);
                                     }
 
                                     p1 = parts[j];
@@ -1422,7 +1776,7 @@ namespace DataTools.Extras.Expressions
 
                                     es.ci = ci;
                                     es.parent = this;
-                                    es.partType = PartType.Executive;
+                                    es.partType |= PartType.Executive;
                                     es.storageMode = storageMode;
                                     es.position = position;
 
@@ -1442,7 +1796,7 @@ namespace DataTools.Extras.Expressions
                                 { 
                                     if (j == 0 || j == d - 1)
                                     {
-                                        ErrorText = "Unexpected identifier '" + cops[i] + "' in expression '" + ToString() + "'";
+                                        ErrorText = "Unexpected identifier '" + parts[j] + "' in expression '" + ToString() + "'";
                                         throw new SyntaxErrorException(errorText);
                                         //return;
                                     }
@@ -1456,7 +1810,7 @@ namespace DataTools.Extras.Expressions
 
                                     es.ci = ci;
                                     es.parent = this;
-                                    es.partType = PartType.Executive;
+                                    es.partType |= PartType.Executive;
                                     es.storageMode = storageMode;
                                     es.position = position;
 
@@ -1483,7 +1837,7 @@ namespace DataTools.Extras.Expressions
                     if (partType == PartType.Composite)
                         partType |= PartType.Executive;
                     else
-                        partType = PartType.Executive;
+                        partType |= PartType.Executive;
                 }
             }
 
@@ -1491,32 +1845,8 @@ namespace DataTools.Extras.Expressions
             for (j = 0; j < d; j++)
             {
                 var part = parts[j];
-
-                if ((part.partType & PartType.Executive) == PartType.Executive)
-                {
-                    // do this weird little check where we ensure that the left side of a unitary operator is another operator
-                    if (part.parts.Count == 3 && part.parts[1].IsUnitaryOperator)
-                    {
-                        es = new ExpressionSegment("*", part, ci, storageMode, varSym);
-                        part.parts.Insert(1, es);
-                        es = new ExpressionSegment();
-
-                        part.parts[1].parent = es;
-                        part.parts[2].parent = es;
-
-                        es.parts.Add(part.parts[2]);
-                        es.parts.Add(part.parts[3]);
-                        es.partType = PartType.Executive;
-                        es.parent = this;
-                        es.ci = ci;
-                        es.varSym = varSym;
-                        es.position = position;
-
-                        part.parts.RemoveRange(2, 2);
-                        part.parts.Add(es);
-                    }
-                }
-                else if (part.parts.Count < 2)
+               
+                if (part.parts.Count < 2)
                 {
                     continue;
                 }
@@ -1528,7 +1858,7 @@ namespace DataTools.Extras.Expressions
                         if ((part.partType & PartType.Composite) == PartType.Composite)
                             part.partType |= PartType.Executive;
                         else
-                            part.partType = PartType.Executive;
+                            part.partType |= PartType.Executive;
 
                     }
                 }
