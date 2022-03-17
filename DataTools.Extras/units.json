@@ -14,16 +14,16 @@
   },
   {
     "measures": "Area",
-    "name": "MeterSquared",
-    "prefix": "msq",
-    "pluralName": "MetersSquared",
-    "isBase": true,
-    "modifies": "",
+    "name": "SquareMeters",
+    "prefix": "m^2",
+    "pluralName": "SquareMeters",
+    "isBase": false,
+    "modifies": "Meters",
     "multiplier": 0.0,
     "offset": 0.0,
     "offsetFirst": false,
-    "derived": false,
-    "equation": ""
+    "derived": true,
+    "equation": "m^2"
   },
   {
     "measures": "BinaryData",

@@ -53,7 +53,7 @@ namespace DataTools.Extras.Expressions
         Operator = 0x4,
 
         /// <summary>
-        /// Indicates the expression segment represents a sign value.
+        /// Indicates the expression segment represents an executive segment more complex than a literal that produces a result.
         /// </summary>
         Executive = 0x8,
 
@@ -168,7 +168,7 @@ namespace DataTools.Extras.Expressions
         private Position position = Position.Expression;
         private StorageMode storageMode = StorageMode.AsDouble;
 
-        private MetricUnit unit = null;
+        private Unit unit = null;
         private object value = null;
         private string varSym = "$";
         private string errorText = "";
@@ -184,12 +184,12 @@ namespace DataTools.Extras.Expressions
         static ExpressionSegment()
         {
             // Add some common mathematical constants.
-
             constants.Add("pi", Math.PI);
             constants.Add("phi", 1.618033988749894d);
             constants.Add("π", Math.PI);
             constants.Add("φ", 1.618033988749894d);
             constants.Add("rad", 180d / Math.PI);
+            constants.Add("E", 180d / Math.E);
 
         }
         #endregion
@@ -493,7 +493,7 @@ namespace DataTools.Extras.Expressions
                     }
                     else
                     {
-                        var idunit = MetricTool.IdentifyUnit(monoVal);
+                        var idunit = ConversionTool.IdentifyUnit(monoVal);
                         if (idunit != null)
                         {
                             partType = PartType.Unit;
@@ -697,9 +697,9 @@ namespace DataTools.Extras.Expressions
             }
         }
         /// <summary>
-        /// Gets the identified <see cref="MetricUnit"/> information (or null if not a unit)
+        /// Gets the identified <see cref="Conversion.Unit"/> information (or null if not a unit)
         /// </summary>
-        public MetricUnit Unit => unit;
+        public Unit Unit => unit;
 
         /// <summary>
         /// Gets or sets the literal value of this <see cref="ExpressionSegment"/>.

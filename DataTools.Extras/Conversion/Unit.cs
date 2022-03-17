@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 namespace DataTools.Extras.Conversion
 {
     
-    public class MetricUnit : ICloneable
+    public class Unit : ICloneable
     {
         #region Private Fields
 
@@ -57,7 +57,9 @@ namespace DataTools.Extras.Conversion
             }
         }
 
-        // ' Equation for derived bases.  $ is used to denote a variable.
+        /// <summary>
+        /// The equation for the unit.
+        /// </summary>
         [JsonProperty("equation")]
         public string Equation
         {
@@ -65,13 +67,16 @@ namespace DataTools.Extras.Conversion
             {
                 return equation;
             }
-
             set
             {
                 equation = value;
             }
         }
 
+
+        /// <summary>
+        /// Indicates this is the base unit.
+        /// </summary>
         [JsonProperty("isBase")]
         public bool IsBase
         {
@@ -79,15 +84,17 @@ namespace DataTools.Extras.Conversion
             {
                 return isBase;
             }
-
             set
             {
                 isBase = value;
             }
         }
 
+        /// <summary>
+        /// Indicates that the unit is an SI-defined (metric) unit.
+        /// </summary>
         [JsonProperty("isSI")]
-        public bool IsSI
+        public bool IsSIUnit
         {
             get => isSI;
             set
@@ -99,6 +106,9 @@ namespace DataTools.Extras.Conversion
             }
         }
 
+        /// <summary>
+        /// Measurement category
+        /// </summary>
         [JsonProperty("measures")]
         public string Measures
         {
@@ -111,6 +121,10 @@ namespace DataTools.Extras.Conversion
                 measures = (value);
             }
         }
+
+        /// <summary>
+        /// Base unit that this unit modifies
+        /// </summary>
         [JsonProperty("modifies")]
         public string Modifies
         {
@@ -125,6 +139,9 @@ namespace DataTools.Extras.Conversion
             }
         }
 
+        /// <summary>
+        /// Multiplier
+        /// </summary>
         [JsonProperty("multiplier")]
         public double Multiplier
         {
@@ -139,6 +156,9 @@ namespace DataTools.Extras.Conversion
             }
         }
 
+        /// <summary>
+        /// Name
+        /// </summary>
         [JsonProperty("name")]
         public string Name
         {
@@ -152,6 +172,10 @@ namespace DataTools.Extras.Conversion
                 name = (value);
             }
         }
+
+        /// <summary>
+        /// Offset
+        /// </summary>
         [JsonProperty("offset")]
         public double Offset
         {
@@ -166,6 +190,9 @@ namespace DataTools.Extras.Conversion
             }
         }
 
+        /// <summary>
+        /// Compute offset before multiplier
+        /// </summary>
         [JsonProperty("offsetFirst")]
         public bool OffsetFirst
         {
@@ -180,6 +207,9 @@ namespace DataTools.Extras.Conversion
             }
         }
 
+        /// <summary>
+        /// Plural name
+        /// </summary>
         [JsonProperty("pluralName")]
         public string PluralName
         {
@@ -194,6 +224,9 @@ namespace DataTools.Extras.Conversion
             }
         }
 
+        /// <summary>
+        /// Prefix (short name)
+        /// </summary>
         [JsonProperty("prefix")]
         public string Prefix
         {
@@ -219,7 +252,7 @@ namespace DataTools.Extras.Conversion
 
         public override bool Equals(object obj)
         {
-            if (obj is MetricUnit mu)
+            if (obj is Unit mu)
             {
                 return JsonConvert.SerializeObject(this) == JsonConvert.SerializeObject(mu);
             }
