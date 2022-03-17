@@ -319,7 +319,7 @@ namespace DataTools.Extras.Conversion
             if (unit.IsBase)
             {
                 baseValue = Round(value, roundingDigits);
-                baseUnit = (Unit)unit.Clone();
+                baseUnit = unit.Clone();
 
                 return true;
             }

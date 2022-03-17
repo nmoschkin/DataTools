@@ -1,12 +1,5 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using static System.Math;
-using System.Runtime.InteropServices;
-using DataTools.MathTools;
-using DataTools.Text;
+using System.Collections.Generic;
 using static DataTools.Text.TextTools;
 using Newtonsoft.Json;
 
@@ -36,6 +29,8 @@ namespace DataTools.Extras.Conversion
         private string pluralName = "";
 
         private string prefix = "";
+
+        private string shortestPrefix = "";
 
         private bool isSI = true;
 
@@ -238,14 +233,49 @@ namespace DataTools.Extras.Conversion
             set
             {
                 prefix = value;
+                if (value.Contains(","))
+                {
+                    var vs = new List<string>(value.Split(','));
+                    vs.Sort((a, b) =>
+                    {
+                        if (a.Length < b.Length)
+                        {
+                            return -1;
+                        }
+                        else if (b.Length < a.Length)
+                        {
+                            return 1;
+                        }
+                        else
+                        {
+                            return string.Compare(a, b);
+                        }
+                    });
+
+                    shortestPrefix = vs[0];
+                }
+                else
+                {
+                    shortestPrefix = value;
+                }
             }
+        }
+
+        public string ShortestPrefix
+        {
+            get => shortestPrefix;
         }
 
         #endregion Public Properties
 
         #region Public Methods
 
-        public object Clone()
+
+        public Unit Clone()
+        {
+            return (Unit)MemberwiseClone();  
+        }
+        object ICloneable.Clone()
         {
             return MemberwiseClone();
         }

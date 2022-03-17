@@ -586,6 +586,24 @@ namespace DataTools.Extras.Expressions
         }
 
         /// <summary>
+        /// Returns true if the equation contains units.
+        /// </summary>
+        public bool HasUnits
+        {
+            get
+            {
+                if ((partType & PartType.Unit) == PartType.Unit) return true;
+
+                foreach (var part in parts)
+                {
+                    if (part.HasUnits) return true;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Gets a value indicating that this expression is a composite expression.
         /// </summary>
         public bool IsComposite
@@ -908,19 +926,65 @@ namespace DataTools.Extras.Expressions
 
         }
 
+        public ExpressionSegment Clone() => Clone(false);
+
         /// <summary>
         /// Clones the current <see cref="ExpressionSegment"/> to a new expression.
         /// </summary>
+        /// <param name="baseUnits">Clone the equation, converting value-unit pairs to their base unit equivalents.</param>
         /// <returns>A new <see cref="ExpressionSegment"/>.</returns>
         /// <remarks>
         /// <see cref="Parent"/> is set to null for all new cloned segment roots.
         /// </remarks>
-        public ExpressionSegment Clone()
+        public ExpressionSegment Clone(bool baseUnits)
         {
             var itemNew = (ExpressionSegment)MemberwiseClone();
 
             itemNew.parts = new List<ExpressionSegment>();
             itemNew.parent = null;
+            
+            if (baseUnits && ((partType & PartType.ValueUnitPair) == PartType.ValueUnitPair) && parts.Count == 2)
+            {
+                var vpart = parts[0];
+                var upart = parts[1];
+
+                if (baseUnits && upart.unit != null && !upart.unit.IsBase && ((vpart.value ?? 0d) is double || (vpart.value ?? 0m) is decimal))
+                {
+                    var newvpart = vpart.Clone();
+                    var newupart = upart.Clone();
+
+                    newvpart.parent = itemNew;
+                    newupart.parent = itemNew;
+
+                    if ((vpart.value ?? 0d) is double dv &&
+                        ConversionTool.GetBaseValue(dv, upart.unit, out double? bv, out Unit bu))
+                    {
+                        if ((newvpart.partType & PartType.Variable) == 0)
+                            newvpart.Value = ((bv == 0d) ? null : bv) ?? dv;
+                        newupart.unit = bu ?? upart.unit.Clone();
+                        newupart.monoVal = newupart.unit.ShortestPrefix;
+                    }
+                    else if ((vpart.value ?? 0m) is decimal dev &&
+                        ConversionTool.GetBaseValue(dev, upart.unit, out decimal? bev, out Unit beu))
+                    {
+                        if ((newvpart.partType & PartType.Variable) == 0)
+                            newvpart.Value = ((bev == 0m) ? null : bev) ?? dev;
+                        newupart.unit = beu ?? upart.unit.Clone();
+                        newupart.monoVal = newupart.unit.ShortestPrefix;
+                    }
+
+                    itemNew.parts = new List<ExpressionSegment>();
+                    
+                    itemNew.parts.Add(newvpart);
+                    itemNew.parts.Add(newupart);
+
+                    return itemNew;
+                }
+            }
+            if (unit != null)
+            {
+                itemNew.unit = unit.Clone();
+            }
 
             if (value != null)
             {
@@ -932,7 +996,8 @@ namespace DataTools.Extras.Expressions
 
             foreach (var item in parts)
             {
-                var addItem = item.Clone();
+                var addItem = item.Clone(baseUnits);
+
                 addItem.parent = itemNew;
                 itemNew.parts.Add(addItem);
             }
@@ -1340,6 +1405,15 @@ namespace DataTools.Extras.Expressions
 
             return execVal;
         }
+
+        //public ExpressionSegment Solve()
+        //{
+        //    if (partType != PartType.Equation || parts.Count != 3) return null;
+
+        //    var lval = parts[0].Execute();
+        //    var rval = parts[0].Execute();
+
+        //}
 
 
         public override int GetHashCode()
