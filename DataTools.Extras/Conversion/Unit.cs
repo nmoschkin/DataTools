@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using static DataTools.Text.TextTools;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace DataTools.Extras.Conversion
 {
@@ -10,8 +11,19 @@ namespace DataTools.Extras.Conversion
     {
         #region Private Fields
 
+        public static JsonSerializerSettings JsonSettings { get; set; } = new JsonSerializerSettings()
+        {
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
+            NullValueHandling = NullValueHandling.Ignore,
+            MissingMemberHandling = MissingMemberHandling.Ignore
+        };
+
         private bool derived = false;
+
+        private bool displayDefaultLong = false;
+
         private string equation = "";
+
         private bool isBase = false;
 
         private string measures = "";
@@ -36,6 +48,14 @@ namespace DataTools.Extras.Conversion
 
         #endregion Private Fields
 
+        #region Internal Constructors 
+
+        protected internal Unit()
+        {
+        }
+
+        #endregion
+
         #region Public Properties
 
         [JsonProperty("derived")]
@@ -45,11 +65,21 @@ namespace DataTools.Extras.Conversion
             {
                 return derived;
             }
-
-            set
+            protected internal set
             {
                 derived = value;
             }
+        }
+
+
+        /// <summary>
+        /// Displays the long form as the default string form.
+        /// </summary>
+        [JsonProperty("displayDefaultLong")]
+        public bool DisplayDefaultLong
+        {
+            get { return displayDefaultLong; }
+            protected internal set { displayDefaultLong = value; }
         }
 
         /// <summary>
@@ -62,7 +92,7 @@ namespace DataTools.Extras.Conversion
             {
                 return equation;
             }
-            set
+            protected internal set
             {
                 equation = value;
             }
@@ -79,7 +109,7 @@ namespace DataTools.Extras.Conversion
             {
                 return isBase;
             }
-            set
+            protected internal set
             {
                 isBase = value;
             }
@@ -92,7 +122,7 @@ namespace DataTools.Extras.Conversion
         public bool IsSIUnit
         {
             get => isSI;
-            set
+            protected internal set
             {
                 if (isSI != value)
                 {
@@ -111,7 +141,7 @@ namespace DataTools.Extras.Conversion
             {
                 return measures;
             }
-            set
+            protected internal set
             {
                 measures = (value);
             }
@@ -127,8 +157,7 @@ namespace DataTools.Extras.Conversion
             {
                 return modifies;
             }
-
-            set
+            protected internal set
             {
                 modifies = (value);
             }
@@ -144,8 +173,7 @@ namespace DataTools.Extras.Conversion
             {
                 return multiplier;
             }
-
-            set
+            protected internal set
             {
                 multiplier = value;
             }
@@ -161,8 +189,7 @@ namespace DataTools.Extras.Conversion
             {
                 return name;
             }
-
-            set
+            protected internal set
             {
                 name = (value);
             }
@@ -178,8 +205,7 @@ namespace DataTools.Extras.Conversion
             {
                 return offset;
             }
-
-            set
+            protected internal set
             {
                 offset = value;
             }
@@ -195,8 +221,7 @@ namespace DataTools.Extras.Conversion
             {
                 return offsetFirst;
             }
-
-            set
+            protected internal set
             {
                 offsetFirst = value;
             }
@@ -212,8 +237,7 @@ namespace DataTools.Extras.Conversion
             {
                 return pluralName;
             }
-
-            set
+            protected internal set
             {
                 pluralName = (value);
             }
@@ -229,30 +253,29 @@ namespace DataTools.Extras.Conversion
             {
                 return prefix;
             }
-
-            set
+            protected internal set
             {
                 prefix = value;
+                
                 if (value.Contains(","))
                 {
-                    var vs = new List<string>(value.Split(','));
-                    vs.Sort((a, b) =>
-                    {
-                        if (a.Length < b.Length)
-                        {
-                            return -1;
-                        }
-                        else if (b.Length < a.Length)
-                        {
-                            return 1;
-                        }
-                        else
-                        {
-                            return string.Compare(a, b);
-                        }
-                    });
+                    var vs = value.Split(',');
 
-                    shortestPrefix = vs[0];
+                    int c = vs[0].Length;                    
+                    int x = 0;
+                    
+                    for (int i = 1; i < vs.Length; i++)
+                    {
+                        int y = vs[i].Length;
+
+                        if (y < c)
+                        {
+                            c = y;
+                            x = i;
+                        }
+                    }
+
+                    shortestPrefix = vs[x];
                 }
                 else
                 {
@@ -270,6 +293,11 @@ namespace DataTools.Extras.Conversion
 
         #region Public Methods
 
+        public static Unit FromJson(string json)
+        {            
+            var unit = JsonConvert.DeserializeObject<Unit>(json, JsonSettings);
+            return unit;
+        }
 
         public Unit Clone()
         {
@@ -284,7 +312,7 @@ namespace DataTools.Extras.Conversion
         {
             if (obj is Unit mu)
             {
-                return JsonConvert.SerializeObject(this) == JsonConvert.SerializeObject(mu);
+                return JsonConvert.SerializeObject(this, JsonSettings) == JsonConvert.SerializeObject(mu, JsonSettings);
             }
             else
             {
@@ -294,12 +322,12 @@ namespace DataTools.Extras.Conversion
 
         public override int GetHashCode()
         {
-            return JsonConvert.SerializeObject(this).GetHashCode();
+            return JsonConvert.SerializeObject(this, JsonSettings).GetHashCode();
         }
 
         public override string ToString()
         {
-            return (string.IsNullOrEmpty(PluralName) ? Name : PluralName) + " (" + Separate(Measures) + ")";
+            return JsonConvert.SerializeObject(this, JsonSettings);
         }
 
         #endregion Public Methods

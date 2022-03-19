@@ -18,7 +18,7 @@ namespace DataTools.Extras.Conversion
     /// General, all-purpose unit conversion class.
     /// </summary>
     /// <remarks></remarks>
-    public class ConversionTool
+    public static class ConversionTool
     {
 
         #region Public Fields
@@ -35,8 +35,6 @@ namespace DataTools.Extras.Conversion
 
         private static UnitCollection units; 
 
-        private UnitCollection localUnits;
-
         #endregion Private Fields
 
         #region Public Constructors
@@ -44,12 +42,7 @@ namespace DataTools.Extras.Conversion
         static ConversionTool()
         {
             units = new UnitCollection();
-        }
 
-        public ConversionTool(bool initLocalUnits = false)
-        {
-            if (initLocalUnits)
-                localUnits = GetUnits();
         }
 
         #endregion Public Constructors
@@ -78,19 +71,6 @@ namespace DataTools.Extras.Conversion
             }
         }
 
-        [Browsable(true)]
-        public UnitCollection LocalUnits
-        {
-            get
-            {
-                return localUnits ?? units;
-            }
-            set
-            {
-                localUnits = value;
-            }
-        }
-
         #endregion Public Properties
 
         #region Public Methods
@@ -99,24 +79,57 @@ namespace DataTools.Extras.Conversion
         {
             units.Add(unit);
         }
-
-        public static Unit CreateUnit(string measures = "", string name = "", string pluralName = "", string prefix = "", string modifies = "", double multiplier = 0.0d, double offset = 0.0d, bool offsetFirst = false, bool isBase = false)
+        
+        /// <summary>
+        /// Create a new custom unit, and add it to the global units cache.
+        /// </summary>
+        /// <param name="measures">The category of measurement.</param>
+        /// <param name="name">The long-form name of the unit.</param>
+        /// <param name="prefix">The short-form name/unit specifier.</param>
+        /// <param name="isBase">Unit represents the base of its class.</param>
+        /// <param name="isSIUnit">Is an SI / metric unit.</param>
+        /// <param name="pluralName">Plural long-form name of the unit.</param>
+        /// <param name="modifies">Long-form name of the unit that this unit modifies.</param>
+        /// <param name="multiplier">The conversion multiplier.</param>
+        /// <param name="offset">The conversion offset.</param>
+        /// <param name="offsetFirst">Calculate offset, first.</param>
+        /// <param name="equation">Equation</param>
+        /// <param name="displayDefaultLong">Use the long-form display form by default.</param>
+        /// <param name="addToCache">Add the newly created unit to the global unit cache.</param>
+        /// <returns></returns>
+        public static Unit CreateUnit(
+            string measures,
+            string name,
+            string prefix,
+            bool isBase,
+            bool isSIUnit = false,
+            string pluralName = "", 
+            string modifies = "", 
+            double multiplier = 0.0d, 
+            double offset = 0.0d, 
+            bool offsetFirst = false, 
+            string equation = "",
+            bool displayDefaultLong = false,
+            bool addToCache = true)
         {
-            var b = new Unit();
+            var unit = new Unit
+            {
+                DisplayDefaultLong = displayDefaultLong,
+                Equation = equation,
+                IsBase = isBase,
+                IsSIUnit = isSIUnit,
+                Measures = measures,
+                Modifies = modifies,
+                Multiplier = multiplier,
+                Name = name,
+                Offset = offset,
+                OffsetFirst = offsetFirst,
+                PluralName = pluralName,
+                Prefix = prefix
+            };
 
-            b.Measures = measures;
-            b.IsBase = isBase;
-            b.Name = name;
-            b.PluralName = pluralName;
-            b.Prefix = prefix;
-            b.Modifies = modifies;
-            b.Multiplier = multiplier;
-            b.Offset = offset;
-            b.OffsetFirst = offsetFirst;
-
-            units.Add(b);
-
-            return b;
+            if (addToCache) units.Add(unit);
+            return unit;
         }
 
         [Description("Get the base unit for a specific category.")]
@@ -156,18 +169,7 @@ namespace DataTools.Extras.Conversion
         [Description("Get all base units for all categories.")]
         public static UnitCollection GetBaseUnits()
         {
-            var c = new UnitCollection(false);
-
-            foreach (Unit u in units)
-            {
-                if (u.IsBase == true)
-                    c.Add((Unit)u.Clone());
-                else
-                    // base units come first in a unit collection.
-                    break;
-            }
-
-            return c;
+            return new UnitCollection(((IList<Unit>)Units).Where((u) => u.IsBase).ToArray());
         }
 
         public static double GetMultiplier(string prefix)
@@ -176,7 +178,6 @@ namespace DataTools.Extras.Conversion
             int c;
 
             c = Prefixes.Length;
-
 
             if (prefix.Length <= 2)
             {
@@ -205,14 +206,14 @@ namespace DataTools.Extras.Conversion
 
         public static Unit GetUnitByName(string name)
         {
-            var res = Units.Where((e) => e.Name.ToLower() == name.ToLower()).FirstOrDefault();
+            var res = ((IList<Unit>)Units).Where((e) => e.Name.ToLower() == name.ToLower()).FirstOrDefault();
             return res;
         }
 
         [Description("Get all unit names for a category.")]
         public static string[] GetUnitNames(string category, bool excludeBase = false)
         {
-            var uret = units.Where((u) => u.Measures.ToLower() == category.ToLower()).Select(u => u.Name).ToArray();
+            var uret = ((IList<Unit>)Units).Where((u) => u.Measures.ToLower() == category.ToLower()).Select(u => u.Name).ToArray();
             Array.Sort(uret);
             return uret;
         }
@@ -232,12 +233,12 @@ namespace DataTools.Extras.Conversion
         {
             if (string.IsNullOrEmpty(category))
             {
-                return Units.ToArray();
+                return ((IList<Unit>)Units).ToArray();
             } 
             else
             {
                 category = TitleCase(category);
-                return Units.Where((u) => u.Measures == category)?.ToArray() ?? new Unit[0];
+                return ((IList<Unit>)Units).Where((u) => u.Measures == category)?.ToArray() ?? new Unit[0];
             }
         }
 
@@ -261,52 +262,104 @@ namespace DataTools.Extras.Conversion
 
         public static Unit IdentifyUnit(string text)
         {
-            foreach (var unit in units)
-            {
-                if (text == unit.Prefix) return unit;
-            }
+            Unit nu;
+            string lstra = text.ToLower(), lstrb, spre = "";
 
-            foreach (var p in ShortPrefixes)
+            int i, c = ShortPrefixes.Length;
+            bool found = false;
+            bool lfound = true;
+            string[] ups;
+
+            for (i = -1; i < c; i++)
             {
+                string p;
+                string lp;
+
+                if (i == -1)
+                {
+                    p = lp = "";
+                }
+                else
+                {
+                    p = ShortPrefixes[i];
+                    lp = Prefixes[i].ToLower();
+                }
+
                 foreach (var unit in units)
                 {
-                    var ups = unit.Prefix.Split(',');
+                    ups = unit.Prefix.Split(',');
 
                     foreach (var up in ups)
                     {
-                        if (text == p + up)
+                        spre = p + up;
+                        if (text == spre)
                         {
-                            var nu = (Unit)unit.Clone();
-                            var i = ((IList<string>)ShortPrefixes).IndexOf(p);
-                            var m = Multipliers[i];
+                            found = true;
+                            lfound = false;
 
-                            nu.Modifies = unit.Name;
-                            nu.Name = TitleCase(Prefixes[i] + nu.Name.ToLower());
+                            break;
+                        }
+                    }
 
-                            if (!string.IsNullOrEmpty(nu.PluralName))
-                                nu.PluralName = TitleCase(Prefixes[i] + nu.PluralName.ToLower());
+                    if (!found) 
+                    {
+                        lstrb = lp + unit.PluralName.ToLower();
 
-                            nu.IsBase = false;
-
-                            if (nu.Multiplier != 0)
+                        if (lstrb == lstra)
+                        {
+                            found = true;
+                        }
+                        else
+                        {
+                            lstrb = lp + unit.Name.ToLower();
+                            if (lstra == lstrb)
                             {
-                                nu.Multiplier *= m;
+                                found = true;
                             }
-                            else
-                            {
-                                nu.Multiplier = m;
-                            }
+                        }
+                    }
 
-                            nu.Prefix = text;
+                    if (found)
+                    {
+                        if (lfound)
+                        {
+                            spre = p + ups[0];
+                        }
 
+                        nu = unit.Clone();
+
+                        if (i == -1)
+                        {
                             return nu;
                         }
 
-                    }
+                        var m = Multipliers[i];
 
+                        nu.Modifies = unit.Name;
+                        nu.Name = TitleCase(Prefixes[i] + nu.Name.ToLower());
+                        nu.DisplayDefaultLong = lfound;
+
+                        if (!string.IsNullOrEmpty(nu.PluralName))
+                            nu.PluralName = TitleCase(Prefixes[i] + nu.PluralName.ToLower());
+
+                        nu.IsBase = false;
+
+                        if (nu.Multiplier != 0)
+                        {
+                            nu.Multiplier *= m;
+                        }
+                        else
+                        {
+                            nu.Multiplier = m;
+                        }
+
+                        nu.Prefix = spre;
+
+                        return nu;
+                    }
                 }
             }
-
+            
             return null;
         }
 
@@ -324,7 +377,7 @@ namespace DataTools.Extras.Conversion
                 return true;
             }
 
-            var bUnit = Units.Where((e) => e.Name == unit.Modifies).FirstOrDefault();
+            var bUnit = ((IList<Unit>)Units).Where((e) => e.Name == unit.Modifies).FirstOrDefault();
             double bv = value;
 
             if (bUnit == null) return false;
@@ -358,7 +411,7 @@ namespace DataTools.Extras.Conversion
                 return true;
             }
 
-            var bUnit = Units.Where((e) => e.Name == unit.Modifies).FirstOrDefault();
+            var bUnit = ((IList<Unit>)Units).Where((e) => e.Name == unit.Modifies).FirstOrDefault();
             decimal bv = value;
 
             if (bUnit == null) return false;
@@ -394,7 +447,7 @@ namespace DataTools.Extras.Conversion
 
             while (true)
             {                
-                var bUnit = Units.Where((e) => e.Name == sMod).FirstOrDefault();
+                var bUnit = ((IList<Unit>)Units).Where((e) => e.Name == sMod).FirstOrDefault();
                 if (bUnit == null) break;
 
                 unitChain.Add(bUnit);
@@ -439,7 +492,7 @@ namespace DataTools.Extras.Conversion
 
             while (true)
             {
-                var bUnit = Units.Where((e) => e.Name == sMod).FirstOrDefault();
+                var bUnit = ((IList<Unit>)Units).Where((e) => e.Name == sMod).FirstOrDefault();
                 if (bUnit == null) break;
 
                 unitChain.Add(bUnit);

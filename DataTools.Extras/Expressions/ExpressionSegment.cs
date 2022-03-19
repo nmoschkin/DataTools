@@ -16,6 +16,7 @@ using System.Xml.XPath;
 
 using static DataTools.Text.TextTools;
 using static DataTools.MathTools.MathLib;
+using DataTools.Text;
 
 namespace DataTools.Extras.Expressions
 {
@@ -147,11 +148,10 @@ namespace DataTools.Extras.Expressions
     {
         #region Public Fields
 
-        public static readonly string[] Operations = new[] { "round", "floor", "ceil", "min", "max", "sum", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "atan2", "^", "exp", "abs", "sqrt", "root", "*", "/", @"\", "mod", "%", "+", "-" };
         public static readonly string[] OperationOrders = new[] { "round,floor,ceil,sum,max,min,log,log10,sin,cos,tan,sinh,cosh,tanh,asin,acos,atan,atan2,abs", "^,exp,sqrt,root", "mod,%", "*,/,\\", "+,-" };
-        public static readonly string[] UnitaryOperations = new[] { "round", "max", "min", "floor", "ceil", "sum", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "atan2", "abs", "sqrt", "root" };
+        public static readonly string[] Operations = new[] { "round", "floor", "ceil", "min", "max", "sum", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "atan2", "^", "exp", "abs", "sqrt", "root", "*", "/", @"\", "mod", "%", "+", "-" };
         public static readonly string[] ProductOperations = new[] { "^", "exp", "*", "/", @"\", "mod", "%", "+", "-" };
-
+        public static readonly string[] UnitaryOperations = new[] { "round", "max", "min", "floor", "ceil", "sum", "log", "log10", "sin", "cos", "tan", "sinh", "cosh", "tanh", "asin", "acos", "atan", "atan2", "abs", "sqrt", "root" };
         #endregion Public Fields
 
         #region Private Fields
@@ -159,6 +159,7 @@ namespace DataTools.Extras.Expressions
         private static Dictionary<string, object> constants = new Dictionary<string, object>();
 
         private CultureInfo ci = CultureInfo.CurrentCulture;
+        private string errorText = "";
         private string monoVal = null;
         private ExpressionSegment parent = null;
 
@@ -169,13 +170,10 @@ namespace DataTools.Extras.Expressions
         private StorageMode storageMode = StorageMode.AsDouble;
 
         private Unit unit = null;
+        private Unit unitsrc = null;
         private object value = null;
-        private string varSym = "$";
-        private string errorText = "";
-
         private Dictionary<string, object> variables;
-
-
+        private string varSym = "$";
         #endregion Private Fields
 
         #region Static Constructor
@@ -473,7 +471,7 @@ namespace DataTools.Extras.Expressions
                     }
                 }
 
-                if (monoVal != null)
+                if (monoVal != null && partType != PartType.Literal)
                 {
                     if (monoVal == "=")
                     {
@@ -493,6 +491,11 @@ namespace DataTools.Extras.Expressions
                     }
                     else
                     {
+                        if (monoVal.StartsWith("["))
+                        {
+                            monoVal = TextBetween(monoVal, "[", "]");
+                        }
+
                         var idunit = ConversionTool.IdentifyUnit(monoVal);
                         if (idunit != null)
                         {
@@ -519,40 +522,6 @@ namespace DataTools.Extras.Expressions
         #endregion Private Constructors
 
         #region Public Properties
-
-        /// <summary>
-        /// Gets or sets variables dynamically.
-        /// </summary>
-        /// <param name="key">The variable key name.</param>
-        /// <returns></returns>
-        public object this[string key]
-        {
-            get
-            {
-                if (Variables != null && Variables.TryGetValue(key, out var value))
-                {
-                    return value;
-                }
-
-                return null;
-            }
-            set
-            {
-                if (Variables == null)
-                {
-                    Variables = new Dictionary<string, object>();
-                }
-
-                if (Variables.ContainsKey(key))
-                {
-                    Variables[key] = value;
-                }
-                else
-                {
-                    Variables.Add(key, value);
-                }
-            }
-        }
 
         /// <summary>
         /// Gets or sets a list of global constants that are used throughout the system.
@@ -614,19 +583,11 @@ namespace DataTools.Extras.Expressions
             }
         }
 
-        public bool IsProductOperator
+        public bool IsEquation
         {
             get
             {
-                return partType == PartType.Operator && ((IList<string>)ProductOperations).Contains(monoVal);
-            }
-        }
-
-        public bool IsUnitaryOperator
-        {
-            get
-            {
-                return partType == PartType.Operator && ((IList<string>)UnitaryOperations).Contains(monoVal);
+                return partType == PartType.Equation;
             }
         }
 
@@ -646,6 +607,14 @@ namespace DataTools.Extras.Expressions
             }
         }
 
+        public bool IsProductOperator
+        {
+            get
+            {
+                return partType == PartType.Operator && ((IList<string>)ProductOperations).Contains(monoVal);
+            }
+        }
+
         /// <summary>
         /// Gets a value indicating that the expression is solvable.
         /// </summary>
@@ -661,6 +630,14 @@ namespace DataTools.Extras.Expressions
                 {
                     return false;
                 }
+            }
+        }
+
+        public bool IsUnitaryOperator
+        {
+            get
+            {
+                return partType == PartType.Operator && ((IList<string>)UnitaryOperations).Contains(monoVal);
             }
         }
 
@@ -714,6 +691,7 @@ namespace DataTools.Extras.Expressions
                 Value = Value;
             }
         }
+
         /// <summary>
         /// Gets the identified <see cref="Conversion.Unit"/> information (or null if not a unit)
         /// </summary>
@@ -880,51 +858,42 @@ namespace DataTools.Extras.Expressions
             }
         }
 
+        /// <summary>
+        /// Gets or sets variables dynamically.
+        /// </summary>
+        /// <param name="key">The variable key name.</param>
+        /// <returns></returns>
+        public object this[string key]
+        {
+            get
+            {
+                if (Variables != null && Variables.TryGetValue(key, out var value))
+                {
+                    return value;
+                }
+
+                return null;
+            }
+            set
+            {
+                if (Variables == null)
+                {
+                    Variables = new Dictionary<string, object>();
+                }
+
+                if (Variables.ContainsKey(key))
+                {
+                    Variables[key] = value;
+                }
+                else
+                {
+                    Variables.Add(key, value);
+                }
+            }
+        }
         #endregion Public Properties
 
         #region Public Methods
-
-        /// <summary>
-        /// Check that the unit form is compatible with the unit form of the specified object.
-        /// </summary>
-        /// <param name="other">The object to compare.</param>
-        /// <returns>True if the unit forms are compatible.</returns>
-        public bool CheckUnitsMatch(ExpressionSegment other)
-        {
-            var lh = this;
-            var rh = other;
-
-            if (lh.parts.Count > 0)
-            {
-                var ucmp1 = lh.parts.Where((p) => (p.PartType & PartType.Unit) == PartType.Unit).ToList();
-                var ucmp2 = lh.parts.Where((p) => (p.PartType & PartType.Unit) == PartType.Unit).ToList();
-
-                if (ucmp1.Count != ucmp2.Count) return false;
-
-                int c = ucmp1.Count;
-                for (int i = 0; i < c; i++)
-                {
-                    if (ucmp1[i].partType != ucmp2[i].partType) return false;
-
-                    if ((ucmp1[i].partType & PartType.Composite) == PartType.Composite)
-                    {
-                        if (!ucmp1[i].CheckUnitsMatch(ucmp1[i])) return false;
-                    }
-                }
-
-
-                return true;
-            }
-            else if ((lh.PartType & PartType.Unit) == PartType.Unit)
-            {
-                return lh.Unit.Measures == rh.Unit.Measures;
-            }
-            else
-            {
-                return false;
-            }
-
-        }
 
         public ExpressionSegment Clone() => Clone(false);
 
@@ -942,19 +911,21 @@ namespace DataTools.Extras.Expressions
 
             itemNew.parts = new List<ExpressionSegment>();
             itemNew.parent = null;
-            
+
             if (baseUnits && ((partType & PartType.ValueUnitPair) == PartType.ValueUnitPair) && parts.Count == 2)
             {
                 var vpart = parts[0];
                 var upart = parts[1];
+                upart.unitsrc = upart.unit;
 
-                if (baseUnits && upart.unit != null && !upart.unit.IsBase && ((vpart.value ?? 0d) is double || (vpart.value ?? 0m) is decimal))
+                if (baseUnits && upart.unit != null && !upart.unit.IsBase)
                 {
                     var newvpart = vpart.Clone();
                     var newupart = upart.Clone();
 
                     newvpart.parent = itemNew;
                     newupart.parent = itemNew;
+                    newupart.unitsrc = upart.unit.Clone();
 
                     if ((vpart.value ?? 0d) is double dv &&
                         ConversionTool.GetBaseValue(dv, upart.unit, out double? bv, out Unit bu))
@@ -974,7 +945,7 @@ namespace DataTools.Extras.Expressions
                     }
 
                     itemNew.parts = new List<ExpressionSegment>();
-                    
+
                     itemNew.parts.Add(newvpart);
                     itemNew.parts.Add(newupart);
 
@@ -1044,7 +1015,26 @@ namespace DataTools.Extras.Expressions
             }
         }
 
-        public double? Execute()
+        public double? Execute(out ExpressionSegment simplified, bool inverse = false)
+        {
+            ExpressionSegment es = Clone(true);
+           
+            double? execVal = es.Execute(inverse);
+            if (execVal == null)
+            {
+                simplified = null;
+                return execVal;
+            }
+
+            simplified = es;
+            bool ff = false;
+
+            WalkAndSimplify(es, execVal, ref ff);
+            return execVal;
+        }
+
+
+        public double? Execute(bool inverse = false)
         {
             double? execVal = null;
             double pValA, pValB;
@@ -1056,6 +1046,10 @@ namespace DataTools.Extras.Expressions
                 if ((partType & PartType.Literal) == PartType.Literal)
                 {
                     return ValueToDouble();
+                }
+                else if ((partType & PartType.ValueUnitPair) == PartType.ValueUnitPair)
+                {
+                    return parts[0].ValueToDouble();
                 }
                 else if ((partType & PartType.Variable) == PartType.Variable)
                 {
@@ -1098,7 +1092,7 @@ namespace DataTools.Extras.Expressions
                     pars = new List<double>();
                     foreach (var examine in parts[1].parts)
                     {
-                        pars.Add(examine.Execute() ?? 0);
+                        pars.Add(examine.Execute(inverse) ?? 0);
                     }
                 }
                 else
@@ -1136,7 +1130,7 @@ namespace DataTools.Extras.Expressions
 
 
                     case "sum":
-                        
+
                         if (pars != null)
                         {
                             execVal = Sum(pars.ToArray());
@@ -1277,11 +1271,11 @@ namespace DataTools.Extras.Expressions
 
                         if (pars != null && pars.Count == 2)
                         {
-                            if (pars[1] == 2)
+                            if (inverse)
                             {
-                                execVal = Math.Sqrt(pars[0]);
+                                execVal = Math.Pow(pars[0], pars[1]);
                             }
-                            else 
+                            else
                             {
                                 execVal = Math.Pow(pars[0], 1 / pars[1]);
                             }
@@ -1300,7 +1294,7 @@ namespace DataTools.Extras.Expressions
 
                 if ((parts[0].partType & PartType.Executive) == PartType.Executive)
                 {
-                    execVal = parts[0].Execute();
+                    execVal = parts[0].Execute(inverse);
                 }
                 else if (parts[0].partType == PartType.ValueUnitPair)
                 {
@@ -1334,7 +1328,7 @@ namespace DataTools.Extras.Expressions
 
                 if ((parts[2].partType & PartType.Executive) == PartType.Executive)
                 {
-                    execVal = parts[2].Execute();
+                    execVal = parts[2].Execute(inverse);
                 }
                 else if (parts[2].partType == PartType.ValueUnitPair)
                 {
@@ -1370,20 +1364,47 @@ namespace DataTools.Extras.Expressions
                 {
                     case "exp":
                     case "^":
-
-                        execVal = Math.Pow(pValA, pValB);
+                        if (inverse)
+                        {
+                            execVal = Math.Pow(pValA, 1 / pValB);
+                        }
+                        else
+                        {
+                            execVal = Math.Pow(pValA, pValB);
+                        }
                         break;
 
                     case "*":
-                        execVal = pValA * pValB;
+                        if (inverse)
+                        {
+                            execVal = pValA / pValB;
+                        }
+                        else
+                        {
+                            execVal = pValA * pValB;
+                        }
                         break;
 
                     case "/":
-                        execVal = pValA / pValB;
+                        if (inverse)
+                        {
+                            execVal = pValA * pValB;
+                        }
+                        else
+                        {
+                            execVal = pValA / pValB;
+                        }
                         break;
 
                     case "\\":
-                        execVal = ((int)pValA) / ((int)pValB);
+                        if (inverse)
+                        {
+                            execVal = pValA * pValB;
+                        }
+                        else
+                        {
+                            execVal = ((int)pValA) / ((int)pValB);
+                        }
                         break;
 
                     case "%":
@@ -1406,27 +1427,18 @@ namespace DataTools.Extras.Expressions
             return execVal;
         }
 
-        //public ExpressionSegment Solve()
-        //{
-        //    if (partType != PartType.Equation || parts.Count != 3) return null;
-
-        //    var lval = parts[0].Execute();
-        //    var rval = parts[0].Execute();
-
-        //}
-
-
         public override int GetHashCode()
         {
             return ToString().GetHashCode();
         }
 
+        //}
         /// <summary>
-        /// Gets the expression root for the specified side.
+        /// Returns a new <see cref="ExpressionSegment"/> that represents the expression root for the specified side.
         /// </summary>
         /// <param name="side">The side of the expression.</param>
         /// <returns>An <see cref="ExpressionSegment"/> root.</returns>
-        public ExpressionSegment GetSide(Position side)
+        public ExpressionSegment ExtractSide(Position side)
         {
             if (side == Position.Expression) return Clone();
 
@@ -1449,19 +1461,9 @@ namespace DataTools.Extras.Expressions
         }
 
         /// <summary>
-        /// Check whether this root has left-hand and right-hand sides and the units match.
+        /// Returns all value/unit pairs in this expression.
         /// </summary>
         /// <returns></returns>
-        public bool HasMatchingUnits()
-        {
-            if (partType != PartType.Equation) return false;
-
-            var lh = GetSide(Position.LeftHand);
-            var rh = GetSide(Position.RightHand);
-
-            return lh.CheckUnitsMatch(rh);
-        }
-
         public List<(ExpressionSegment, ExpressionSegment)> GetValueUnitPairs()
         {
             if (parent == null && !IsSolvable) return null;
@@ -1480,7 +1482,7 @@ namespace DataTools.Extras.Expressions
                 {
                     if (parts[i].partType == PartType.Unit)
                     {
-                        result.Add((parts[i - 1], parts[i]));   
+                        result.Add((parts[i - 1], parts[i]));
                     }
                 }
             }
@@ -1488,6 +1490,60 @@ namespace DataTools.Extras.Expressions
             return result;
         }
 
+        /// <summary>
+        /// Check whether this root has left-hand and right-hand sides and the units match.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasMatchingUnits()
+        {
+            if (partType != PartType.Equation) return false;
+
+            var lh = ExtractSide(Position.LeftHand);
+            var rh = ExtractSide(Position.RightHand);
+
+            return lh.CheckUnitsMatch(rh);
+        }
+
+
+        public ExpressionSegment Solve(bool resultOnly = false)
+        {
+            if (!IsEquation || !IsSolvable) return null;
+
+            var mcopy = Clone();
+
+            mcopy.parts[2].FindOrReplaceFirstVariable(null, out ExpressionSegment context);
+
+            var lhs = parts[0].Clone(true);
+            var lhv = lhs.Execute();
+
+            var rhs = parts[2].Clone(true);
+
+            rhs.FindOrReplaceFirstVariable(lhv, out _);
+            var rhv = rhs.Execute(true);
+
+            if (context != null && context.parent != null && ((context.parent.partType & PartType.ValueUnitPair) == PartType.ValueUnitPair))
+            {
+                var unit = context.parent.parts[1].unit;
+
+                ConversionTool.GetDerivedValue((double)rhv, unit, out double? converted);
+
+                context.partType = PartType.Literal;
+                context.Value = converted; 
+            }
+
+            if (resultOnly)
+            {
+                return mcopy.parts[2];
+            }
+            else
+            {
+                return mcopy;
+            }
+        }
+
+        //public ExpressionSegment Solve()
+        //{
+        //    if (partType != PartType.Equation || parts.Count != 3) return null;
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -1509,7 +1565,7 @@ namespace DataTools.Extras.Expressions
                 }
                 foreach (var item in parts)
                 {
-                    
+
                     if (hasp)
                     {
                         if (sb.Length > 0) sb.Append(", ");
@@ -1588,6 +1644,22 @@ namespace DataTools.Extras.Expressions
             }
             else
             {
+                if (partType == PartType.ValueUnitPair && parts.Count == 2)
+                {
+                    if (parts[0].partType == PartType.Literal)
+                    {
+                        return parts[0].ValueToDouble();
+                    }
+                    else if(parts[0].partType == PartType.Variable)
+                    {
+                        if (Variables.ContainsKey(parts[0].monoVal))
+                        {
+                            return (double?)Variables[parts[0].monoVal];
+                        }
+                    }
+                }
+
+
                 return null;
             }
         }
@@ -1601,9 +1673,76 @@ namespace DataTools.Extras.Expressions
             return monoVal ?? value?.ToString();
         }
 
+   
         #endregion Public Methods
 
         #region Private Methods
+
+        /// <summary>
+        /// Check if the expression is solvable.
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckSolvable()
+        {
+            var i = parts.Count((e) => e.partType == PartType.Assignment || e.partType == PartType.Equality);
+            if (i == 1 && parts[0].PartType != PartType.Assignment && parts[0].PartType != PartType.Equality)
+            {
+                return HasMatchingUnits();
+            }
+            else if ((partType & PartType.Executive) == PartType.Executive)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        /// <summary>
+        /// Check that the unit form is compatible with the unit form of the specified object.
+        /// </summary>
+        /// <param name="other">The object to compare.</param>
+        /// <returns>True if the unit forms are compatible.</returns>
+        private bool CheckUnitsMatch(ExpressionSegment other)
+        {
+            var lh = this;
+            var rh = other;
+
+            if (lh.parts.Count > 0)
+            {
+                var ucmp1 = lh.parts;
+                var ucmp2 = rh.parts;
+
+                if (ucmp1.Count != ucmp2.Count) return false;
+
+                int c = ucmp1.Count;
+
+                for (int i = 0; i < c; i++)
+                {                    
+                    if (ucmp1[i].partType == PartType.Unit)
+                    {
+                        if (ucmp1[i].unit?.Measures != ucmp2[i].unit?.Measures) return false;
+                    }
+
+                    if ((ucmp1[i].partType & PartType.Composite) == PartType.Composite)
+                    {
+                        if (!ucmp1[i].CheckUnitsMatch(ucmp2[i])) return false;
+                    }
+                }
+
+                return true;
+            }
+            else if ((lh.PartType & PartType.Unit) == PartType.Unit)
+            {
+                return lh.Unit.Measures == rh.Unit.Measures;
+            }
+            else
+            {
+                return true;
+            }
+
+        }
 
         /// <summary>
         /// Check the integrity of the expression, formalize the structure, and determine if it is solvable.
@@ -1612,6 +1751,7 @@ namespace DataTools.Extras.Expressions
         {
             var mode = 0;
             bool ef;
+            List<int> newIdx = new List<int>();
 
             if (partType == PartType.Composite && parts.Count >= 3)
             {
@@ -1662,6 +1802,7 @@ namespace DataTools.Extras.Expressions
                     if (parts[j].partType == PartType.Equality || parts[j].partType == PartType.Assignment)
                     {
                         eqs++;
+                        mode = 0;
                     }
 
                     for (i = j; i < c; i++)
@@ -1713,6 +1854,8 @@ namespace DataTools.Extras.Expressions
                         parts.RemoveRange(startIdx.Value + 1, stopIdx.Value - startIdx.Value);
                         parts[startIdx.Value] = es;
 
+                        newIdx.Add(startIdx.Value);
+
                         j = startIdx.Value + 1;
                         c = parts.Count;
 
@@ -1761,50 +1904,23 @@ namespace DataTools.Extras.Expressions
                 }
             }
 
-            if (parts.Count > 1) MakeUnitValuePairs();
-            GroupByOrderOps();
-        }
-
-        private void MakeUnitValuePairs()
-        {
-            int i, c = parts.Count;
-
-            for (i = 0; i < c; i++)
+            if (parts.Count > 1) MakeValueUnitPairs();
+        
+            else if (parts.Count == 1)
             {
-                if (parts[i].parts.Count > 1)
-                {
-                    parts[i].MakeUnitValuePairs();
-                }
-
-                if (i < (c - 1))
-                {
-                    if ((parts[i + 1].partType == PartType.Unit) && (parts[i].partType == PartType.Composite || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
-                    {
-                        // Make a pair
-                        var es = new ExpressionSegment();
-
-                        es.parent = this;
-                        es.partType = PartType.ValueUnitPair;
-
-                        var epart = parts[i];
-                        var upart = parts[i + 1];
-
-                        parts.RemoveRange(i, 2);
-
-                        epart.parent = es;
-                        upart.parent = es;
-
-                        es.parts.Add(epart);
-                        es.parts.Add(upart);
-
-                        parts.Insert(i, es);
-                        c -= 1;
-                    }
-
-                    
-                }
+                parts[0].MakeValueUnitPairs();
+                parts[0].GroupByOrderOps();
             }
 
+            GroupByOrderOps();
+
+            if (newIdx.Count != 0)
+            {
+                foreach (var nx in newIdx)
+                {
+                    parts[nx].GroupByOrderOps();
+                }
+            }
         }
 
         private void GroupByOrderOps()
@@ -1847,7 +1963,7 @@ namespace DataTools.Extras.Expressions
                     parts.Insert(1, es);
 
                     es = new ExpressionSegment();
-                    
+
                     es.parent = this;
                     es.ci = ci;
                     es.position = position;
@@ -1921,13 +2037,13 @@ namespace DataTools.Extras.Expressions
                                     es.parts.Add(p2);
 
                                     parts.RemoveRange(j, 2);
-                                    parts.Insert(j, es);                                        
+                                    parts.Insert(j, es);
 
                                     if (j >= d - 2) break;
 
                                 }
-                                else 
-                                { 
+                                else
+                                {
                                     if (j == 0 || j == d - 1)
                                     {
                                         ErrorText = "Unexpected identifier '" + parts[j] + "' in expression '" + ToString() + "'";
@@ -1979,7 +2095,7 @@ namespace DataTools.Extras.Expressions
             for (j = 0; j < d; j++)
             {
                 var part = parts[j];
-               
+
                 if (part.parts.Count < 2)
                 {
                     continue;
@@ -2000,27 +2116,99 @@ namespace DataTools.Extras.Expressions
             }
         }
 
-        /// <summary>
-        /// Check if the expression is solvable.
-        /// </summary>
-        /// <returns></returns>
-        private bool CheckSolvable()
+        private void MakeValueUnitPairs()
         {
-            var i = parts.Count((e) => e.partType == PartType.Assignment || e.partType == PartType.Equality);
-            if (i == 1 && parts[0].PartType != PartType.Assignment && parts[0].PartType != PartType.Equality)
+            int i, c = parts.Count;
+
+            for (i = 0; i < c; i++)
             {
-                return HasMatchingUnits();
+                if (parts[i].parts.Count > 1)
+                {
+                    parts[i].MakeValueUnitPairs();
+                }
+
+                if (i < (c - 1))
+                {
+                    if ((parts[i + 1].partType == PartType.Unit) && (parts[i].partType == PartType.Composite || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
+                    {
+                        // Make a pair
+                        var es = new ExpressionSegment();
+
+                        es.parent = this;
+                        es.partType = PartType.ValueUnitPair;
+
+                        var epart = parts[i];
+                        var upart = parts[i + 1];
+
+                        parts.RemoveRange(i, 2);
+
+                        epart.parent = es;
+                        upart.parent = es;
+
+                        es.parts.Add(epart);
+                        es.parts.Add(upart);
+
+                        parts.Insert(i, es);
+                        c -= 1;
+                    }
+
+                    
+                }
             }
-            else if ((partType & PartType.Executive) == PartType.Executive)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+
         }
 
+        private bool FindOrReplaceFirstVariable(double? value, out ExpressionSegment context)
+        {
+            if (partType == PartType.Variable)
+            {
+                if (value != null)
+                {
+                    partType = PartType.Literal;
+                    this.Value = value;
+                }
+
+                context = this;
+                return true;
+            }
+            else if (parts.Count > 0) 
+            {
+                foreach (var part in parts)
+                {
+                    if (part.FindOrReplaceFirstVariable(value, out context))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            context = null;
+            return false;
+        }
+
+        private void WalkAndSimplify(ExpressionSegment es, double? value, ref bool firstFound)
+        {
+            if (es.partType == PartType.Literal)
+            {
+                if (!firstFound)
+                {
+                    firstFound = true;
+                    es.Value = value;
+                }
+                else
+                {
+                    es.Value = 1d;
+                }
+            }
+
+            if (es.IsComposite)
+            {
+                foreach (var part in es.parts)
+                {
+                    WalkAndSimplify(part, value, ref firstFound);
+                }
+            }
+        }
         #endregion Private Methods
 
         #region Operators

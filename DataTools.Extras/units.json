@@ -80,7 +80,7 @@
   {
     "measures": "Mass",
     "name": "Gram",
-    "prefix": "#,##0.####",
+    "prefix": "g",
     "pluralName": "Grams",
     "isBase": true,
     "modifies": "",
@@ -140,7 +140,7 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": "",
+    "equation": "m^2",
     "isSI": false
   },
   {
@@ -154,7 +154,7 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": "",
+    "equation": "m^2",
     "isSI": false
   },
   {
@@ -168,7 +168,7 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": "",
+    "equation": "m^2",
     "isSI": false
   },
   {
@@ -182,7 +182,7 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": "",
+    "equation": "m^2",
     "isSI": false
   },
   {
@@ -196,7 +196,7 @@
     "offset": 0.0,
     "offsetFirst": false,
     "derived": false,
-    "equation": "",
+    "equation": "m^2",
     "isSI": false
   },
   {
@@ -366,7 +366,7 @@
   {
     "measures": "Mass",
     "name": "Pound",
-    "prefix": "lb",
+    "prefix": "lb,lbs",
     "pluralName": "Pounds",
     "isBase": false,
     "modifies": "Gram",

@@ -14,17 +14,67 @@ using DataTools.Text;
 
 namespace DataTools.Extras.Conversion
 {
-    public class UnitCollection : Collection<Unit>
+    public class UnitCollection : Collection<Unit>, IReadOnlyDictionary<string, Unit>
     {
         #region Protected Fields
 
         public static readonly Unit[] MasterUnits;
-        public static readonly string[] DefaultCategoryList;
-
 
         protected bool autoSort = true;
         protected object lockObj = new object();
-        protected ConversionTool parent;
+
+        protected Dictionary<string, Unit> shortMap = new Dictionary<string, Unit>();
+        protected Dictionary<string, Unit> longMap = new Dictionary<string, Unit>();
+
+        public IEnumerable<string> Keys 
+        {
+            get
+            {
+                lock (lockObj)
+                {
+                    var l = new List<string>();
+
+                    l.AddRange(shortMap.Keys);
+                    l.AddRange(longMap.Keys);
+
+                    return l;
+                }
+            }
+        }
+        public IEnumerable<Unit> Values
+        {
+            get
+            {
+                lock (lockObj)
+                {
+                    var l = new List<Unit>();
+
+                    l.AddRange(shortMap.Values);
+                    l.AddRange(longMap.Values);
+
+                    return l;
+                }
+            }
+        }
+
+        public Unit this[string key]
+        {
+            get
+            {
+                if (shortMap.TryGetValue(key, out Unit value))
+                {
+                    return value;
+                }
+                else if (longMap.TryGetValue(key, out value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
 
         #endregion Protected Fields
 
@@ -33,7 +83,6 @@ namespace DataTools.Extras.Conversion
         static UnitCollection()
         {
             MasterUnits = JsonConvert.DeserializeObject<Unit[]>(Encoding.UTF8.GetString(AppResources.units));
-            DefaultCategoryList = MasterUnits.Select((u) => u.Measures).Distinct().ToArray();
         }
 
         /// <summary>
@@ -48,7 +97,6 @@ namespace DataTools.Extras.Conversion
                 foreach (var unit in initValues) Add(unit);
                 autoSort = true;
                 Sort();
-
             }
         }
 
@@ -71,6 +119,7 @@ namespace DataTools.Extras.Conversion
                 {
                     autoSort = false;
                     foreach (var unit in MasterUnits) Add(unit);
+
                     autoSort = true;
                     Sort();
                 }
@@ -101,25 +150,6 @@ namespace DataTools.Extras.Conversion
 
         #endregion Public Constructors
 
-        #region Internal Constructors
-
-        /// <summary>
-        /// Initialize with the specified conversion tool parent.
-        /// </summary>
-        /// <param name="parent"></param>
-        internal UnitCollection(ConversionTool parent) : this()
-        {
-            this.parent = parent;
-        }
-
-        #endregion Internal Constructors
-
-        #region Public Properties
-
-        public ConversionTool Parent => parent;
-
-        #endregion Public Properties
-
         #region Public Methods
 
         public void AddRange(IEnumerable<Unit> items)
@@ -131,6 +161,18 @@ namespace DataTools.Extras.Conversion
                 autoSort = true;
                 Sort();
             }
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return (shortMap.ContainsKey(key) || longMap.ContainsKey(key));
+        }
+
+        public bool TryGetValue(string key, out Unit value)
+        {
+            if (shortMap.TryGetValue(key, out value)) return true;
+            if (longMap.TryGetValue(key, out value)) return true;
+            return false;
         }
 
         public void InitializeSIDerivedUnits(params string[] categories)
@@ -147,7 +189,7 @@ namespace DataTools.Extras.Conversion
                     wcat = base.Items.Select((u) => u.Measures).Distinct().ToArray();
                 }
 
-                Unit[] wunits = Items.Where((u) => u.IsSIUnit && wcat.Contains(u.Measures) && u.IsBase).ToArray();
+                Unit[] wunits = Items.Where((u) => u.IsSIUnit && wcat.Contains(u.Measures) && !u.Derived && string.IsNullOrEmpty(u.Equation)).ToArray();
                 List<Unit> addUnits = new List<Unit>();
 
                 foreach (var p in ShortPrefixes)
@@ -155,7 +197,7 @@ namespace DataTools.Extras.Conversion
                     foreach (var unit in wunits)
                     {
                         var ups = unit.Prefix.Split(',');
-
+                        
                         foreach (var up in ups)
                         {
                             var text = p + up;
@@ -163,9 +205,9 @@ namespace DataTools.Extras.Conversion
                             var i = ((IList<string>)ShortPrefixes).IndexOf(p);
                             var m = Multipliers[i];
 
-                            if (unit.Measures != "BinaryData" && Prefixes[i].EndsWith("bi")) continue;
+                            if (Prefixes[i].EndsWith("bi") && unit.Measures != "BinaryData") continue;
 
-                            var nu = (Unit)unit.Clone();
+                            var nu = unit.Clone();
 
                             nu.Modifies = unit.Name;
                             nu.Name = TextTools.TitleCase(Prefixes[i] + nu.Name.ToLower());
@@ -195,6 +237,7 @@ namespace DataTools.Extras.Conversion
             }
 
         }
+
 
         public void Sort()
         {
@@ -233,8 +276,116 @@ namespace DataTools.Extras.Conversion
             lock(lockObj)
             {
                 base.InsertItem(index, item);
+
+                var sp = item.Prefix.Split(',');
+
+                foreach(var s in sp)
+                {
+                    try
+                    {
+                        shortMap.Add(s, item);
+                    }
+                    catch (Exception ex)
+                    {
+                        var z = ex.Message;
+                    }
+                }
+
+                try
+                {
+                    longMap.Add(item.Name, item);
+                }
+                catch (Exception mex)
+                {
+                    var zy = mex.Message;
+                }
+
+
+                if (item.PluralName != null)
+                {
+                    try
+                    {
+                        longMap.Add(item.PluralName, item);
+                    }
+                    catch (Exception ex)
+                    {
+                        var z = ex.Message;
+                    }
+                }
+
                 if (autoSort) Sort();
             }
+        }
+
+        protected override void RemoveItem(int index)
+        {
+            lock(lockObj)
+            {
+                var item = this[index];
+                var sp = item.Prefix.Split(',');
+
+                foreach (var s in sp)
+                {
+                    if (shortMap.ContainsKey(s))
+                    {
+                        shortMap.Remove(s);
+                    }
+                }
+
+                if (longMap.ContainsKey(item.Name)) longMap.Add(item.Name, item);
+                if (item.PluralName != null)
+                {
+                    if (longMap.ContainsKey(item.PluralName)) longMap.Add(item.PluralName, item);
+                }
+
+                base.RemoveItem(index);
+            }
+
+        }
+
+        protected override void SetItem(int index, Unit newItem)
+        {
+            lock (lockObj)
+            {
+                var item = this[index];
+                var sp = item.Prefix.Split(',');
+
+                foreach (var s in sp)
+                {
+                    if (shortMap.ContainsKey(s))
+                    {
+                        shortMap.Remove(s);
+                    }
+                }
+
+                if (longMap.ContainsKey(item.Name)) longMap.Add(item.Name, item);
+                if (item.PluralName != null)
+                {
+                    if (longMap.ContainsKey(item.PluralName)) longMap.Add(item.PluralName, item);
+                }
+
+                base.SetItem(index, newItem);
+
+                sp = item.Prefix.Split(',');
+
+                foreach (var s in sp)
+                {
+                    shortMap.Add(s, item);
+                }
+
+                longMap.Add(item.Name, item);
+                if (item.PluralName != null)
+                {
+                    longMap.Add(item.PluralName, item);
+                }
+
+                Sort();
+            }
+        }
+
+        IEnumerator<KeyValuePair<string, Unit>> IEnumerable<KeyValuePair<string, Unit>>.GetEnumerator()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion Protected Methods

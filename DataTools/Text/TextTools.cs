@@ -598,7 +598,7 @@ namespace DataTools.Text
 
             string s = null;
 
-            if (startIndex != -1)
+            if (startIndex == -1)
             {
                 i = subject.IndexOf(startString);
             }
