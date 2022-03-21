@@ -371,7 +371,11 @@ namespace DataTools.Extras.Conversion
 
             if (unit.IsBase)
             {
-                baseValue = Round(value, roundingDigits);
+                if (roundingDigits > 0)
+                    baseValue = Round(value, roundingDigits);
+                else
+                    baseValue = value;
+
                 baseUnit = unit.Clone();
 
                 return true;
@@ -405,7 +409,11 @@ namespace DataTools.Extras.Conversion
 
             if (unit.IsBase)
             {
-                baseValue = Round(value, roundingDigits);
+                if (roundingDigits > 0)
+                    baseValue = Round(value, roundingDigits);
+                else
+                    baseValue = value;
+
                 baseUnit = (Unit)unit.Clone();
 
                 return true;
@@ -472,8 +480,11 @@ namespace DataTools.Extras.Conversion
                     if (unit.Multiplier != 0) nv /= unit.Multiplier;
                 }
             }
+            if (roundingDigits > 0)
+                value = Round(nv, roundingDigits);
+            else
+                value = nv;
 
-            value = Round(nv, roundingDigits);
             return true;
         }
 
@@ -518,7 +529,11 @@ namespace DataTools.Extras.Conversion
                 }
             }
 
-            value = Round(nv, roundingDigits);
+            if (roundingDigits > 0)
+                value = Round(nv, roundingDigits);
+            else
+                value = nv;
+
             return true;
         }
 
