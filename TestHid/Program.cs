@@ -38,13 +38,20 @@ namespace TestHid
 
             Console.Clear();
             Console.CursorVisible = false;
-            Console.WindowHeight = 60;
+            Console.WindowHeight = 100;
 
             Task.Delay(1000).Wait();
 
             bool printed = false;
 
-            while(true)
+
+            //PrintValCaps(batt2, batt2.FeatureValueCaps);
+            //PrintValCaps(batt2, batt2.InputValueCaps);
+            //PrintValCaps(batt2, batt2.OutputValueCaps);
+
+            //Environment.Exit(0);
+
+            while (true)
             {
                 Console.CursorLeft = 0;
                 Console.CursorTop = 0;
@@ -62,7 +69,7 @@ namespace TestHid
 
                         if (item.UsageName.Contains("Time"))
                         {
-                            Console.WriteLine($"    {TextTools.Separate(item.UsageName)}: {new TimeSpan(0, 0, item.Value)}                           ");
+                            Console.WriteLine($"    {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {new TimeSpan(0, 0, item.Value)}                           ");
                         }
                         else
                         {
@@ -73,7 +80,7 @@ namespace TestHid
                                 vv /= 10;
                             }
 
-                            Console.WriteLine($"    {TextTools.Separate(item.UsageName)}: {vv}                                                  ");
+                            Console.WriteLine($"    {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {vv}                                                  ");
                         }
                     }
 
@@ -100,7 +107,7 @@ namespace TestHid
 
                             if (item.UsageName.Contains("Time"))
                             {
-                                Console.WriteLine($"    {TextTools.Separate(item.UsageName)}: {new TimeSpan(0, 0, item.Value)}                           ");
+                                Console.WriteLine($"    {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {new TimeSpan(0, 0, item.Value)}                           ");
                             }
                             else
                             {
@@ -111,7 +118,7 @@ namespace TestHid
                                     vv /= 10;
                                 }
 
-                                Console.WriteLine($"    {TextTools.Separate(item.UsageName)}: {vv}                                                  ");
+                                Console.WriteLine($"    {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {vv}                                                  ");
                             }
                         }
 
@@ -119,6 +126,7 @@ namespace TestHid
                     }
 
                     Console.WriteLine("                                                                      ");
+
 
                     printed = true;
                 }
@@ -158,12 +166,12 @@ namespace TestHid
 
                     if (usage != null)
                     {
-                        Console.WriteLine($"Found Power Device Usage {usage}, Value: {ires}");
+                        Console.WriteLine($"\r\nFound Power Device Usage {usage} ({usage.UsageId:x2})\r\nPage {feature.UsagePage}, Value: {ires}");
 
                         var lusage = psys.Where((x) => x.UsageId == feature.LinkUsage && x.UsageName != "Reserved").FirstOrDefault();
                         if (lusage != null)
                         {
-                            Console.WriteLine($"    Linked Usage: {lusage}");
+                            Console.WriteLine($"    Linked Usage: {lusage}  ({lusage.UsageId:x2})");
                         }
                     }
                     else
