@@ -41,8 +41,8 @@ namespace TestExtras
             //var dstr = "tanh(v)";
 
             //var dstr = "max(v, 44 * 0.32, 95 / 5)";
-            //var dstr = "abs((19 + 2)^u / 6 * 5 / (4 sqrt (sqrt (v * 5))) + (4 - 6 * 10))";
-            var dstr = "0x4A4e33 = {x:#,##0}";
+            var dstr = "abs((19 + 2)^u / 6 * 5 / (4 sqrt (sqrt (v * 5))) + (4 - 6 * 10))";
+            //var dstr = "0x4A4e33 = {x:#,##0}";
             // var dstr = "45 mi/h = $x km/h";
             ConversionTool.RoundingDigits = 4;
             //var dstr = "1 hr + 2 days = $x [min]";
@@ -66,6 +66,8 @@ namespace TestExtras
             Console.WriteLine($"Parsed Expression: {res}");
             Console.WriteLine($"Is Solvable:       {b}");
             Console.WriteLine($"Unit Value Pairs:  {pairs?.Count ?? 0}");
+            Console.WriteLine();
+            Console.WriteLine("Variables:\r\n" + JsonConvert.SerializeObject(res.Variables, jcfg));
             Console.WriteLine();
 
             var t1 = DateTime.Now;
