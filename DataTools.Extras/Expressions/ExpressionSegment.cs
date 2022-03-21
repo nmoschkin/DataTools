@@ -587,7 +587,7 @@ namespace DataTools.Extras.Expressions
         {
             get
             {
-                return partType == PartType.Equation;
+                return partType == PartType.Equation && parts.Count == 3 && (parts[1].partType == PartType.Assignment || parts[1].partType == PartType.Equality);
             }
         }
 
@@ -625,6 +625,14 @@ namespace DataTools.Extras.Expressions
                 if (parts.Count >= 2)
                 {
                     return CheckSolvable();
+                }
+                else if (partType == PartType.Literal && value != null)
+                {
+                    return true;
+                }
+                else if (partType == PartType.Variable && monoVal != null)
+                {
+                    return Variables.ContainsKey(monoVal) && Variables[monoVal] != null;
                 }
                 else
                 {
@@ -682,13 +690,13 @@ namespace DataTools.Extras.Expressions
                 if (value == (Parent?.StorageMode ?? storageMode)) return;
 
                 storageMode = value;
-
-                if (parent != null)
+                
+                foreach (var item in parts)
                 {
-                    parent.StorageMode = value;
+                    item.StorageMode = storageMode; 
                 }
 
-                Value = Value;
+                if (this.partType == PartType.Literal && this.value != null) Value = Value;
             }
         }
 
@@ -1015,11 +1023,35 @@ namespace DataTools.Extras.Expressions
             }
         }
 
-        public double? Execute(out ExpressionSegment simplified, bool inverse = false)
+        public object Execute(out ExpressionSegment simplified, bool inverse = false)
+        {
+            if (StorageMode == StorageMode.AsDecimal)
+            {
+                return ExecuteDecimal(out simplified, inverse);
+            }
+            else
+            {
+                return ExecuteDouble(out simplified, inverse);  
+            }
+        }
+
+        public object Execute(bool inverse = false)
+        {
+            if (StorageMode == StorageMode.AsDecimal)
+            {
+                return ExecuteDecimal(inverse);
+            }
+            else
+            {
+                return ExecuteDouble(inverse);
+            }
+        }
+
+        public double? ExecuteDouble(out ExpressionSegment simplified, bool inverse = false)
         {
             ExpressionSegment es = Clone(true);
            
-            double? execVal = es.Execute(inverse);
+            double? execVal = es.ExecuteDouble(inverse);
             if (execVal == null)
             {
                 simplified = null;
@@ -1033,8 +1065,7 @@ namespace DataTools.Extras.Expressions
             return execVal;
         }
 
-
-        public double? Execute(bool inverse = false)
+        public double? ExecuteDouble(bool inverse = false)
         {
             double? execVal = null;
             double pValA, pValB;
@@ -1069,7 +1100,7 @@ namespace DataTools.Extras.Expressions
             {
                 if ((parts[1].partType & PartType.Executive) == PartType.Executive)
                 {
-                    execVal = parts[1].Execute();
+                    execVal = parts[1].ExecuteDouble();
                 }
                 else if (parts[1].partType == PartType.ValueUnitPair)
                 {
@@ -1092,7 +1123,7 @@ namespace DataTools.Extras.Expressions
                     pars = new List<double>();
                     foreach (var examine in parts[1].parts)
                     {
-                        pars.Add(examine.Execute(inverse) ?? 0);
+                        pars.Add(examine.ExecuteDouble(inverse) ?? 0);
                     }
                 }
                 else
@@ -1277,7 +1308,7 @@ namespace DataTools.Extras.Expressions
                             }
                             else
                             {
-                                execVal = Math.Pow(pars[0], 1 / pars[1]);
+                                execVal = Math.Pow(pars[0], 1d / pars[1]);
                             }
                         }
                         else
@@ -1294,7 +1325,7 @@ namespace DataTools.Extras.Expressions
 
                 if ((parts[0].partType & PartType.Executive) == PartType.Executive)
                 {
-                    execVal = parts[0].Execute(inverse);
+                    execVal = parts[0].ExecuteDouble(inverse);
                 }
                 else if (parts[0].partType == PartType.ValueUnitPair)
                 {
@@ -1328,7 +1359,7 @@ namespace DataTools.Extras.Expressions
 
                 if ((parts[2].partType & PartType.Executive) == PartType.Executive)
                 {
-                    execVal = parts[2].Execute(inverse);
+                    execVal = parts[2].ExecuteDouble(inverse);
                 }
                 else if (parts[2].partType == PartType.ValueUnitPair)
                 {
@@ -1366,7 +1397,7 @@ namespace DataTools.Extras.Expressions
                     case "^":
                         if (inverse)
                         {
-                            execVal = Math.Pow(pValA, 1 / pValB);
+                            execVal = Math.Pow(pValA, 1d / pValB);
                         }
                         else
                         {
@@ -1426,6 +1457,419 @@ namespace DataTools.Extras.Expressions
 
             return execVal;
         }
+
+        public decimal? ExecuteDecimal(out ExpressionSegment simplified, bool inverse = false)
+        {
+            ExpressionSegment es = Clone(true);
+
+            decimal? execVal = es.ExecuteDecimal(inverse);
+            if (execVal == null)
+            {
+                simplified = null;
+                return execVal;
+            }
+
+            simplified = es;
+            bool ff = false;
+
+            WalkAndSimplify(es, execVal, ref ff);
+            return execVal;
+        }
+
+        public decimal? ExecuteDecimal(bool inverse = false)
+        {
+            decimal? execVal = null;
+            decimal pValA, pValB;
+
+            List<decimal> pars = null;
+
+            if ((partType & PartType.Executive) != PartType.Executive)
+            {
+                if ((partType & PartType.Literal) == PartType.Literal)
+                {
+                    return ValueToDecimal();
+                }
+                else if ((partType & PartType.ValueUnitPair) == PartType.ValueUnitPair)
+                {
+                    return parts[0].ValueToDecimal();
+                }
+                else if ((partType & PartType.Variable) == PartType.Variable)
+                {
+                    if (Variables.TryGetValue(monoVal, out object v))
+                    {
+                        if (v != null && decimal.TryParse(v.ToString(), out decimal dd))
+                        {
+                            return dd;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            if (parts.Count == 2)
+            {
+                if ((parts[1].partType & PartType.Executive) == PartType.Executive)
+                {
+                    execVal = parts[1].ExecuteDecimal();
+                }
+                else if (parts[1].partType == PartType.ValueUnitPair)
+                {
+                    execVal = parts[1].parts.FirstOrDefault()?.ValueToDecimal();
+                }
+                else if ((parts[1].partType & PartType.Literal) == PartType.Literal)
+                {
+                    execVal = parts[1].ValueToDecimal();
+                }
+                else if ((parts[1].partType & PartType.Variable) == PartType.Variable)
+                {
+                    var obj = this[parts[1].monoVal];
+                    if (obj != null && decimal.TryParse(obj.ToString(), out decimal dd))
+                    {
+                        execVal = dd;
+                    }
+                }
+                else if ((parts[1].partType & PartType.Parameter) == PartType.Parameter)
+                {
+                    pars = new List<decimal>();
+                    foreach (var examine in parts[1].parts)
+                    {
+                        pars.Add(examine.ExecuteDecimal(inverse) ?? 0);
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+
+                if (execVal == null && pars == null)
+                {
+                    return null;
+                }
+                else if (execVal != null)
+                {
+                    pValA = (decimal)execVal;
+                }
+                else
+                {
+                    pValA = 0m;
+                }
+
+                switch (parts[0].monoVal)
+                {
+                    case "round":
+
+                        if (pars != null && pars.Count == 2)
+                        {
+                            execVal = Math.Round(pars[0], (int)pars[1]);
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
+                        break;
+
+
+                    case "sum":
+
+                        if (pars != null)
+                        {
+                            execVal = Sum(pars.ToArray());
+                        }
+                        else if (execVal != null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
+                        break;
+
+                    case "min":
+
+                        if (pars != null)
+                        {
+                            execVal = Min(pars.ToArray());
+                        }
+                        else if (execVal != null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
+                        break;
+
+                    case "max":
+
+                        if (pars != null)
+                        {
+                            execVal = Max(pars.ToArray());
+                        }
+                        else if (execVal != null)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
+                        break;
+
+
+                    case "floor":
+                        execVal = Math.Floor(pValA);
+                        break;
+
+                    case "ceil":
+                        execVal = Math.Ceiling(pValA);
+                        break;
+
+                    case "abs":
+
+                        execVal = Math.Abs(pValA);
+                        break;
+
+                    case "sqrt":
+
+                        execVal = (decimal)Math.Sqrt((double)pValA);
+                        break;
+
+                    case "log":
+
+                        execVal = (decimal)Math.Log((double)pValA);
+                        break;
+
+                    case "log10":
+
+                        execVal = (decimal)Math.Log10((double)pValA);
+                        break;
+
+                    case "sin":
+
+                        execVal = (decimal)Math.Sin((double)pValA);
+                        break;
+
+                    case "cos":
+
+                        execVal = (decimal)Math.Cos((double)pValA);
+                        break;
+
+                    case "tan":
+
+                        execVal = (decimal)Math.Tan((double)pValA);
+                        break;
+
+                    case "sinh":
+
+                        execVal = (decimal)Math.Sinh((double)pValA);
+                        break;
+
+                    case "cosh":
+
+                        execVal = (decimal)Math.Cosh((double)pValA);
+                        break;
+
+                    case "tanh":
+
+                        execVal = (decimal)Math.Tanh((double)pValA);
+                        break;
+
+                    case "asin":
+
+                        execVal = (decimal)Math.Asin((double)pValA);
+                        break;
+
+                    case "acos":
+
+                        execVal = (decimal)Math.Acos((double)pValA);
+                        break;
+
+                    case "atan":
+
+                        execVal = (decimal)Math.Atan((double)pValA);
+                        break;
+
+                    case "atan2":
+
+                        if (pars != null && pars.Count == 2)
+                        {
+                            execVal = (decimal)Math.Atan2((double)pars[0], (double)pars[1]);
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
+                        break;
+
+                    case "root":
+
+                        if (pars != null && pars.Count == 2)
+                        {
+                            if (inverse)
+                            {
+                                execVal = (decimal)Math.Pow((double)pars[0], (double)pars[1]);
+                            }
+                            else
+                            {
+                                execVal = (decimal)Math.Pow((double)pars[0], 1d / (double)pars[1]);
+                            }
+                        }
+                        else
+                        {
+                            throw new SyntaxErrorException($"Cannot parse parameters for unitary operator {parts[0].monoVal}");
+                        }
+
+                        break;
+
+                }
+            }
+            else if (parts.Count == 3)
+            {
+
+                if ((parts[0].partType & PartType.Executive) == PartType.Executive)
+                {
+                    execVal = parts[0].ExecuteDecimal(inverse);
+                }
+                else if (parts[0].partType == PartType.ValueUnitPair)
+                {
+                    execVal = parts[0].parts.FirstOrDefault()?.ValueToDecimal();
+                }
+                else if (parts[0].partType == PartType.Literal)
+                {
+                    execVal = parts[0].ValueToDecimal();
+                }
+                else if ((parts[0].partType & PartType.Variable) == PartType.Variable)
+                {
+                    var obj = this[parts[0].monoVal];
+                    if (obj != null && decimal.TryParse(obj.ToString(), out decimal dd))
+                    {
+                        execVal = dd;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+
+                if (execVal == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    pValA = (decimal)execVal;
+                }
+
+                if ((parts[2].partType & PartType.Executive) == PartType.Executive)
+                {
+                    execVal = parts[2].ExecuteDecimal(inverse);
+                }
+                else if (parts[2].partType == PartType.ValueUnitPair)
+                {
+                    execVal = parts[2].parts.FirstOrDefault()?.ValueToDecimal();
+                }
+                else if (parts[2].partType == PartType.Literal)
+                {
+                    execVal = parts[2].ValueToDecimal();
+                }
+                else if ((parts[2].partType & PartType.Variable) == PartType.Variable)
+                {
+                    var obj = this[parts[2].monoVal];
+                    if (obj != null && decimal.TryParse(obj.ToString(), out decimal dd))
+                    {
+                        execVal = dd;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+
+                if (execVal == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    pValB = (decimal)execVal;
+                }
+
+                switch (parts[1].monoVal)
+                {
+                    case "exp":
+                    case "^":
+                        if (inverse)
+                        {
+                            execVal = (decimal)Math.Pow((double)pValA, 1d / (double)pValB);
+                        }
+                        else
+                        {
+                            execVal = (decimal)Math.Pow((double)pValA, (double)pValB);
+                        }
+                        break;
+
+                    case "*":
+                        if (inverse)
+                        {
+                            execVal = pValA / pValB;
+                        }
+                        else
+                        {
+                            execVal = pValA * pValB;
+                        }
+                        break;
+
+                    case "/":
+                        if (inverse)
+                        {
+                            execVal = pValA * pValB;
+                        }
+                        else
+                        {
+                            execVal = pValA / pValB;
+                        }
+                        break;
+
+                    case "\\":
+                        if (inverse)
+                        {
+                            execVal = pValA * pValB;
+                        }
+                        else
+                        {
+                            execVal = ((int)pValA) / ((int)pValB);
+                        }
+                        break;
+
+                    case "%":
+                    case "mod":
+                        execVal = pValA % pValB;
+                        break;
+
+                    case "+":
+                        execVal = pValA + pValB;
+                        break;
+
+                    case "-":
+                        execVal = pValA - pValB;
+                        break;
+
+                }
+
+            }
+
+            return execVal;
+        }
+
+
 
         public override int GetHashCode()
         {
@@ -1514,21 +1958,32 @@ namespace DataTools.Extras.Expressions
             mcopy.parts[2].FindOrReplaceFirstVariable(null, out ExpressionSegment context);
 
             var lhs = parts[0].Clone(true);
+
             var lhv = lhs.Execute();
 
             var rhs = parts[2].Clone(true);
 
             rhs.FindOrReplaceFirstVariable(lhv, out _);
+
             var rhv = rhs.Execute(true);
 
             if (context != null && context.parent != null && ((context.parent.partType & PartType.ValueUnitPair) == PartType.ValueUnitPair))
             {
                 var unit = context.parent.parts[1].unit;
 
-                ConversionTool.GetDerivedValue((double)rhv, unit, out double? converted);
+                if (rhv is decimal de)
+                {
+                    ConversionTool.GetDerivedValue((decimal)rhv, unit, out decimal? dconverted);
+                    context.Value = dconverted;
+                }
+                else if (rhv is double)
+                {
+                    ConversionTool.GetDerivedValue((double)rhv, unit, out double? converted);
+                    context.Value = converted;
+                }
+
 
                 context.partType = PartType.Literal;
-                context.Value = converted; 
             }
 
             if (resultOnly)
@@ -1684,13 +2139,19 @@ namespace DataTools.Extras.Expressions
         /// <returns></returns>
         private bool CheckSolvable()
         {
-            var i = parts.Count((e) => e.partType == PartType.Assignment || e.partType == PartType.Equality);
-            if (i == 1 && parts[0].PartType != PartType.Assignment && parts[0].PartType != PartType.Equality)
+            if (IsEquation)
             {
                 return HasMatchingUnits();
             }
             else if ((partType & PartType.Executive) == PartType.Executive)
             {
+                var vars = FindAllVariables();
+
+                foreach (var item in vars)
+                {
+                    if (!Variables.ContainsKey(item.monoVal) || Variables[item.monoVal] == null) return false;
+                }
+
                 return true;
             }
             else
@@ -1709,38 +2170,53 @@ namespace DataTools.Extras.Expressions
             var lh = this;
             var rh = other;
 
-            if (lh.parts.Count > 0)
+            var dhl = lh.DistinctUnitMeasuresInOrder();
+            var rhl = rh.DistinctUnitMeasuresInOrder();
+
+            if (dhl.Count == rhl.Count)
             {
-                var ucmp1 = lh.parts;
-                var ucmp2 = rh.parts;
-
-                if (ucmp1.Count != ucmp2.Count) return false;
-
-                int c = ucmp1.Count;
-
-                for (int i = 0; i < c; i++)
-                {                    
-                    if (ucmp1[i].partType == PartType.Unit)
-                    {
-                        if (ucmp1[i].unit?.Measures != ucmp2[i].unit?.Measures) return false;
-                    }
-
-                    if ((ucmp1[i].partType & PartType.Composite) == PartType.Composite)
-                    {
-                        if (!ucmp1[i].CheckUnitsMatch(ucmp2[i])) return false;
-                    }
+                for (int i = 0; i < dhl.Count; i++)
+                {
+                    if (dhl[i] != rhl[i]) return false;
                 }
 
                 return true;
             }
-            else if ((lh.PartType & PartType.Unit) == PartType.Unit)
-            {
-                return lh.Unit.Measures == rh.Unit.Measures;
-            }
-            else
-            {
-                return true;
-            }
+
+            return false;
+
+            //if (lh.parts.Count > 0)
+            //{
+            //    var ucmp1 = lh.parts;
+            //    var ucmp2 = rh.parts;
+
+            //    if (ucmp1.Count != ucmp2.Count) return false;
+
+            //    int c = ucmp1.Count;
+
+            //    for (int i = 0; i < c; i++)
+            //    {                    
+            //        if (ucmp1[i].partType == PartType.Unit)
+            //        {
+            //            if (ucmp1[i].unit?.Measures != ucmp2[i].unit?.Measures) return false;
+            //        }
+
+            //        if ((ucmp1[i].partType & PartType.Composite) == PartType.Composite)
+            //        {
+            //            if (!ucmp1[i].CheckUnitsMatch(ucmp2[i])) return false;
+            //        }
+            //    }
+
+            //    return true;
+            //}
+            //else if ((lh.PartType & PartType.Unit) == PartType.Unit)
+            //{
+            //    return lh.Unit.Measures == rh.Unit.Measures;
+            //}
+            //else
+            //{
+            //    return true;
+            //}
 
         }
 
@@ -1921,6 +2397,32 @@ namespace DataTools.Extras.Expressions
                     parts[nx].GroupByOrderOps();
                 }
             }
+        }
+        private List<string> DistinctUnitMeasuresInOrder()
+        {
+            List<string> result = new List<string>();
+
+            if (unit != null)
+            {
+                result.Add(unit.Measures);
+            }
+
+            if (parts.Count > 0)
+            {
+                foreach(var item in parts)
+                {
+                    result.AddRange(item.DistinctUnitMeasuresInOrder());
+                }
+            }
+
+            for (int i = result.Count - 2; i >= 0; i--)
+            {
+                if (result[i] == result[i + 1])
+                {
+                    result.RemoveAt(i);
+                }
+            }
+            return result;
         }
 
         private void GroupByOrderOps()
@@ -2134,6 +2636,7 @@ namespace DataTools.Extras.Expressions
                         // Make a pair
                         var es = new ExpressionSegment();
 
+                        es.position = parts[i].Position;
                         es.parent = this;
                         es.partType = PartType.ValueUnitPair;
 
@@ -2158,7 +2661,24 @@ namespace DataTools.Extras.Expressions
 
         }
 
-        private bool FindOrReplaceFirstVariable(double? value, out ExpressionSegment context)
+        private List<ExpressionSegment> FindAllVariables()
+        {
+            var result = new List<ExpressionSegment>();
+
+            if (partType == PartType.Variable)
+            {
+                result.Add(this);
+            }
+
+            foreach (var item in parts)
+            {
+                result.AddRange(item.FindAllVariables());
+            }
+
+            return result;
+        }
+
+        private bool FindOrReplaceFirstVariable(object value, out ExpressionSegment context)
         {
             if (partType == PartType.Variable)
             {
@@ -2209,6 +2729,31 @@ namespace DataTools.Extras.Expressions
                 }
             }
         }
+
+        private void WalkAndSimplify(ExpressionSegment es, decimal? value, ref bool firstFound)
+        {
+            if (es.partType == PartType.Literal)
+            {
+                if (!firstFound)
+                {
+                    firstFound = true;
+                    es.Value = value;
+                }
+                else
+                {
+                    es.Value = 1d;
+                }
+            }
+
+            if (es.IsComposite)
+            {
+                foreach (var part in es.parts)
+                {
+                    WalkAndSimplify(part, value, ref firstFound);
+                }
+            }
+        }
+
         #endregion Private Methods
 
         #region Operators
