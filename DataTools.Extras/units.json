@@ -490,7 +490,7 @@
   {
     "measures": "Time",
     "name": "Hour",
-    "prefix": "h",
+    "prefix": "h,hr,hrs",
     "pluralName": "Hours",
     "isBase": false,
     "modifies": "Second",
