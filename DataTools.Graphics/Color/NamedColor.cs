@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace DataTools.Graphics
     public class NamedColor
     {
         private static NamedColor[] catalog;
+        private static NamedColor[] webCatalog;
 
         private UniColor color;
 
@@ -35,19 +37,19 @@ namespace DataTools.Graphics
             return r;
         }
 
-        public static NamedColor FindColor(UniColor value, bool closest = false)
+        public static NamedColor FindColor(UniColor value, bool closest = false, bool useWebCatalog = true)
         {
             var r = FindColor(value, out _);
 
             if (r == null && closest)
             {
-                r = GetClosestColor(value);
+                r = GetClosestColor(value, useWebCatalog: useWebCatalog);
             }
 
             return r;
         }
 
-        public static NamedColor GetClosestColor(UniColor value, double maxDeviation = 0.013d, bool ignoreValue = true, bool ignoreSaturation = false, bool ignoreHue = false)
+        public static NamedColor GetClosestColor(UniColor value, double maxDeviation = 0.013d, bool ignoreValue = true, bool ignoreSaturation = false, bool ignoreHue = false, bool useWebCatalog = false)
         {
             var hsv1 = ColorMath.ColorToHSV(value);
 
@@ -62,7 +64,9 @@ namespace DataTools.Graphics
 
             var mxd = Math.Abs(maxDeviation);
 
-            foreach (var vl in catalog)
+            var workcat = useWebCatalog ? webCatalog : catalog;
+
+            foreach (var vl in workcat)
             {
                 match = true;
 
@@ -101,10 +105,22 @@ namespace DataTools.Graphics
 
             return closest;
         }
-        public static List<NamedColor> SearchAll(string search)
+        public static List<NamedColor> SearchAll(string search, bool includeWebCat = true)
         {
             List<NamedColor> output = new List<NamedColor>();
             search = TextTools.NoSpace(search.ToLower());
+
+            if (includeWebCat)
+            {
+                foreach (var nc in webCatalog)
+                {
+                    var idx = nc.nidxstr + nc.eidxstr;
+                    if (idx.Contains(search))
+                    {
+                        output.Add(nc);
+                    }
+                }
+            }
 
             foreach (var nc in catalog)
             {
@@ -118,10 +134,33 @@ namespace DataTools.Graphics
             return output;
         }
 
-        public static List<NamedColor> SearchByName(string search, bool anywhere = false)
+        public static List<NamedColor> SearchByName(string search, bool anywhere = false, bool includeWebCat = true)
         {
             List<NamedColor> output = new List<NamedColor>();
             search = TextTools.NoSpace(search.ToLower());
+
+            if (includeWebCat)
+            {
+                foreach (var nc in webCatalog)
+                {
+
+                    if (anywhere)
+                    {
+                        if (nc.nidxstr.Contains(search))
+                        {
+                            if (!output.Contains(nc)) output.Add(nc);
+                        }
+                    }
+                    else
+                    {
+                        if (nc.nidxstr.StartsWith(search))
+                        {
+                            if (!output.Contains(nc)) output.Add(nc);
+                        }
+                    }
+                }
+            }
+
 
             foreach (var nc in catalog)
             {
@@ -145,10 +184,33 @@ namespace DataTools.Graphics
             return output;
         }
 
-        public static List<NamedColor> SearchByExtra(string search, bool anywhere = false)
+        public static List<NamedColor> SearchByExtra(string search, bool anywhere = false, bool includeWebCat = true)
         {
             List<NamedColor> output = new List<NamedColor>();
             search = search.ToLower();
+
+            if (includeWebCat)
+            {
+                foreach (var nc in webCatalog)
+                {
+                    if (string.IsNullOrEmpty(nc.ExtraInfo)) continue;
+
+                    if (anywhere)
+                    {
+                        if (nc.eidxstr.Contains(search))
+                        {
+                            if (!output.Contains(nc)) output.Add(nc);
+                        }
+                    }
+                    else
+                    {
+                        if (nc.eidxstr.StartsWith(search))
+                        {
+                            if (!output.Contains(nc)) output.Add(nc);
+                        }
+                    }
+                }
+            }
 
             foreach (var nc in catalog)
             {
@@ -173,6 +235,9 @@ namespace DataTools.Graphics
             return output;
         }
 
+        /// <summary>
+        /// Gets the extensive catalog.
+        /// </summary>
         public static IReadOnlyList<NamedColor> Catalog
         {
             get
@@ -181,17 +246,30 @@ namespace DataTools.Graphics
             }
         }
 
-        static NamedColor()
+        /// <summary>
+        /// Gets the Web Color extended catalog.
+        /// </summary>
+        public static IReadOnlyList<NamedColor> WebCatalog
         {
-            if (catalog == null) LoadColors();
+            get
+            {
+                return webCatalog;
+            }
         }
 
-        public static void LoadColors()
+        static NamedColor()
         {
-            if (catalog != null) return;
+            if (catalog == null) catalog = LoadColors(AppResources.ColorList, true);
+            if (webCatalog == null) webCatalog = LoadColors(AppResources.WebPalette, false);
+
+        }
+
+        public static NamedColor[] LoadColors(string resource, bool sort)
+        {
+            NamedColor[] newcat;
 
             var cl = new List<NamedColor>();
-            var craw = AppResources.ColorList.Replace("\r\n", "\n").Split("\n");
+            var craw = resource.Replace("\r\n", "\n").Split("\n");
 
             foreach (var cen in craw)
             {
@@ -220,8 +298,14 @@ namespace DataTools.Graphics
                 if (test == null) cl.Add(cc);
             }
 
-            catalog = cl.ToArray();
-            Sort(ref catalog, (a, b) => a.Color.CompareTo(b.Color));
+            newcat = cl.ToArray();
+
+            if (sort)
+            {
+                Sort(ref newcat, (a, b) => a.Color.CompareTo(b.Color));
+            }
+
+            return newcat;
         }
 
         public UniColor Color

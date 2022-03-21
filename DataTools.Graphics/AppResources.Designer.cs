@@ -19,7 +19,7 @@ namespace DataTools.Graphics {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class AppResources {
@@ -91,6 +91,49 @@ namespace DataTools.Graphics {
         internal static string ColorList {
             get {
                 return ResourceManager.GetString("ColorList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FFFFFF|White
+        ///C0C0C0|Silver
+        ///808080|Gray
+        ///000000|Black
+        ///FF0000|Red
+        ///800000|Maroon
+        ///FFFF00|Yellow
+        ///808000|Olive
+        ///00FF00|Lime
+        ///008000|Green
+        ///00FFFF|Aqua
+        ///008080|Teal
+        ///0000FF|Blue
+        ///000080|Navy
+        ///FF00FF|Fuchsia
+        ///800080|Purple
+        ///C71585|MediumVioletRed
+        ///FF1493|DeepPink
+        ///DB7093|PaleVioletRed
+        ///FF69B4|HotPink
+        ///FFB6C1|LightPink
+        ///FFC0CB|Pink
+        ///8B0000|DarkRed
+        ///FF0000|Red
+        ///B22222|Firebrick
+        ///DC143C|Crimson
+        ///CD5C5C|IndianRed
+        ///F08080|LightCoral
+        ///FA8072|Salmon
+        ///E9967A|DarkSalmon
+        ///FFA07A|LightSalmon
+        ///FF4500|OrangeRed
+        ///FF6347|Tomato
+        ///FF8C00|DarkOrange
+        ///FF7F50|Co [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WebPalette {
+            get {
+                return ResourceManager.GetString("WebPalette", resourceCulture);
             }
         }
     }

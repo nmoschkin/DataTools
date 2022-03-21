@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 
 namespace DataTools.ColorControls
 {
+
     /// <summary>
     /// Interaction logic for NamedColorPicker.xaml
     /// </summary>
@@ -27,6 +28,25 @@ namespace DataTools.ColorControls
 
         internal protected NamedColorViewModel vm;
 
+        public CatalogOptions CatalogType
+        {
+            get { return (CatalogOptions)GetValue(CatalogTypeProperty); }
+            set { SetValue(CatalogTypeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CatalogType.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CatalogTypeProperty =
+            DependencyProperty.Register("CatalogType", typeof(CatalogOptions), typeof(NamedColorPicker), new PropertyMetadata(CatalogOptions.Extended, OnCatalogTypeChanged));
+
+
+        private static void OnCatalogTypeChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+
+            if (sender is NamedColorPicker ncp && e.NewValue is CatalogOptions co)
+            {
+                ncp.vm.ChangeCatalog(co);
+            }
+        }
 
         new public NamedColorViewModel SelectedItem
         {
