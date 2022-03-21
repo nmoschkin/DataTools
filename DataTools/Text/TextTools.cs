@@ -2108,12 +2108,14 @@ namespace DataTools.Text
             char[] ch = value.ToCharArray();
             List<char> seps = new List<char>(sepByChars);
 
+            value = value.Trim();
+
             int i;
             int c = ch.Length;
 
-            bool lsep = false;
-            bool lcap = false;
-            bool lchar = false;
+            bool lastWasSeperator = false;
+            bool lastWasCapital = false;
+            bool lastWasChar = false;
 
             StringBuilder sb = new StringBuilder(c * 2);
             
@@ -2121,9 +2123,9 @@ namespace DataTools.Text
             {
                 if (sepBy && seps.Contains(ch[i]))
                 {
-                    if (!lsep && lchar)
+                    if (!lastWasSeperator && lastWasChar)
                     {
-                        lsep = true;
+                        lastWasSeperator = true;
                         sb.Append(sepChar);
                     }
                     
@@ -2131,37 +2133,41 @@ namespace DataTools.Text
                 }
                 else if (ch[i] == sepChar)
                 {
-                    if (!lsep && lchar)
+                    if (!lastWasSeperator && lastWasChar)
                     {
-                        lsep = true;
+                        lastWasSeperator = true;
                         sb.Append(sepChar);
                     }
                     
                     continue;
                 }
 
-                if ((lsep || i == 0) && capitalize)
+                if ((lastWasSeperator || i == 0) && capitalize)
                 {
+                    lastWasCapital = true;
                     sb.Append(char.ToUpper(ch[i]));
-                    lcap = true;
                 }
                 else
                 {
-                    if (sepCamel && char.IsUpper(ch[i]) && !lsep)
+                    if (sepCamel && char.IsUpper(ch[i]) && !lastWasSeperator)
                     {
-                        if (!lcap) sb.Append(sepChar);
-                        lcap = true;
+                        if (!lastWasCapital) sb.Append(sepChar);
+                        else if (i < c - 1 && char.IsLower(ch[i + 1]))
+                        {
+                            sb.Append(sepChar);
+                        }
+                        lastWasCapital = true;
                     }
                     else
                     {
-                        lcap = false;
+                        lastWasCapital = false;
                     }
 
                     sb.Append(ch[i]);
                 }
 
-                lsep = false;
-                lchar = true;
+                lastWasSeperator = false;
+                lastWasChar = true;
             }
 
             return sb.ToString();
