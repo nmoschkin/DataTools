@@ -62,7 +62,7 @@ namespace DataTools.Win32.Usb
         /// <returns></returns>
         public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? RefreshDynamicValues()
         {
-            return GetFeatureValues(HidUsageType.CP | HidUsageType.CL, HidUsageType.DV);
+            return GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.DV);
         }
 
         /// <summary>
@@ -81,11 +81,11 @@ namespace DataTools.Win32.Usb
 
             foreach(var kvp in PowerCollections)
             {
-                if ((collectionType & kvp.Key.UsageType) == kvp.Key.UsageType && kvp.Key.ReportType == HidReportType.Feature)
+                if ((collectionType & kvp.Key.UsageType) != 0)
                 {
                     foreach (var item in kvp.Value)
                     {
-                        if ((usageType & item.UsageType) == item.UsageType)
+                        if ((usageType & item.UsageType) != 0)
                         {
                             int res = 0;
                             var b = HidGetFeature(item.ReportID, out res);
