@@ -291,7 +291,11 @@ namespace DataTools.Extras.Expressions
                     {
                         var seg = new ExpressionSegment();
                         
-                        seg.partType = PartType.Parameter | PartType.Parenthesis;
+                        if (parts.Count > 0 && parts[parts.Count - 1].IsUnitaryOperator)
+                            seg.partType = PartType.Parameter | PartType.Parenthesis;
+                        else
+                            seg.partType = PartType.Parenthesis;
+
                         seg.parent = this;
                         seg.ci = ci;
                         seg.varSym = varSym;
@@ -935,7 +939,42 @@ namespace DataTools.Extras.Expressions
                     newupart.parent = itemNew;
                     newupart.unitsrc = upart.unit.Clone();
 
-                    if ((vpart.value ?? 0d) is double dv &&
+                    double? dvv = null;
+                    decimal? devv = null;
+
+                    if (vpart.IsSolvable)
+                    {
+                        if (vpart.StorageMode == StorageMode.AsDecimal)
+                        {
+                            devv = vpart.ExecuteDecimal();
+                            if ((devv ?? 0m) is decimal desolved)
+                            {
+                                newvpart = new ExpressionSegment(desolved.ToString());
+                                newvpart.storageMode = StorageMode.AsDecimal;
+                                newvpart.parent = itemNew;
+                            }
+                        }
+                        else
+                        {
+                            dvv = vpart.ExecuteDouble();
+                            if ((dvv ?? 0d) is double dsolved)
+                            {
+                                newvpart = new ExpressionSegment(dsolved.ToString());
+                                newvpart.storageMode = StorageMode.AsDouble;
+                                newvpart.parent = itemNew;
+                            }
+                        }
+                    }
+                    else if (vpart.value is double vpv)
+                    {
+                        dvv = vpv;
+                    }
+                    else if (vpart.value is decimal evpv)
+                    {
+                        devv = evpv;
+                    }
+
+                    if ((dvv ?? 0d) is double dv &&
                         ConversionTool.GetBaseValue(dv, upart.unit, out double? bv, out Unit bu))
                     {
                         if ((newvpart.partType & PartType.Variable) == 0)
@@ -943,7 +982,7 @@ namespace DataTools.Extras.Expressions
                         newupart.unit = bu ?? upart.unit.Clone();
                         newupart.monoVal = newupart.unit.ShortestPrefix;
                     }
-                    else if ((vpart.value ?? 0m) is decimal dev &&
+                    else if ((devv ?? 0m) is decimal dev &&
                         ConversionTool.GetBaseValue(dev, upart.unit, out decimal? bev, out Unit beu))
                     {
                         if ((newvpart.partType & PartType.Variable) == 0)
@@ -2256,7 +2295,7 @@ namespace DataTools.Extras.Expressions
                         }
                         else
                         {
-                            if (parts[i - 1].partType != PartType.Composite && parts[i - 1].partType != PartType.Literal && parts[i - 1].partType != PartType.Variable)
+                            if (parts[i - 1].partType != PartType.Composite && parts[i - 1].partType != PartType.Literal && parts[i - 1].partType != PartType.Variable && ((parts[i - 1].partType & PartType.Composite) != PartType.Composite))
                             {
                                 di = true;
                             }
@@ -2283,7 +2322,7 @@ namespace DataTools.Extras.Expressions
 
                     for (i = j; i < c; i++)
                     {
-                        if (mode == 0 && (parts[i].partType == PartType.Composite || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
+                        if (mode == 0 && (((parts[i].partType & PartType.Composite) == PartType.Composite) || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
                         {
                             if (startIdx == null) startIdx = i;
                             mode = 1;
@@ -2296,7 +2335,7 @@ namespace DataTools.Extras.Expressions
                         {
                             mode = 3;
                         }
-                        else if (mode == 3 && (parts[i].partType == PartType.Composite || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
+                        else if (mode == 3 && (((parts[i].partType & PartType.Composite) == PartType.Composite) || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
                         {
                             mode = 4;
                         }
@@ -2631,7 +2670,9 @@ namespace DataTools.Extras.Expressions
 
                 if (i < (c - 1))
                 {
-                    if ((parts[i + 1].partType == PartType.Unit) && (parts[i].partType == PartType.Composite || parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable))
+                    if ((parts[i + 1].partType == PartType.Unit) && 
+                        (((parts[i].partType & PartType.Executive) == PartType.Executive) || 
+                        parts[i].partType == PartType.Literal || parts[i].partType == PartType.Variable || parts[i].partType == PartType.Parenthesis))
                     {
                         // Make a pair
                         var es = new ExpressionSegment();
