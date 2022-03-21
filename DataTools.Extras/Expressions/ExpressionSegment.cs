@@ -100,6 +100,7 @@ namespace DataTools.Extras.Expressions
         /// Indicates that the expression has exactly one left-hand part and exactly one right-hand part.
         /// </summary>
         Equation = 0x45
+
     }
 
     /// <summary>
@@ -161,6 +162,7 @@ namespace DataTools.Extras.Expressions
         private CultureInfo ci = CultureInfo.CurrentCulture;
         private string errorText = "";
         private string monoVal = null;
+        private string strFmt = null;
         private ExpressionSegment parent = null;
 
         private List<ExpressionSegment> parts = new List<ExpressionSegment>();
@@ -247,13 +249,14 @@ namespace DataTools.Extras.Expressions
             this.parent = parent;
 
             bool hasp = false;
+            string hasf;
 
             value = SpaceOperators(OneSpace(value));
 
             int? b, e;
             int i, c = value.Length;
 
-            char sc1 = '(', sc2 = ')';
+            char sc1 = '(', sc2 = ')', sc3 = '{', sc4 = '}';
             var sb = new StringBuilder();
 
             for (i = 0; i < c;)
@@ -324,6 +327,50 @@ namespace DataTools.Extras.Expressions
                         throw new SyntaxErrorException(ErrorText);
                     }
                 }
+                else if (value[i] == sc3)
+                {
+                    if (sb.Length > 0)
+                    {
+                        parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym));
+                        sb.Clear();
+                    }
+
+                    var val = TextBetween(value, i, sc3, sc4, out b, out e);
+
+                    var tseg = val.Split(':');
+
+                    var seg = new ExpressionSegment(tseg[0], this, ci, mode, varSym);
+
+                    if (tseg.Length > 1)
+                    {
+                        seg.strFmt = tseg[1];
+                    }
+
+                    // seg.partType = seg.partType | PartType.Parenthesis;
+
+                    var tp = parts.LastOrDefault();
+
+                    if (tp != null)
+                    {
+                        if (tp.IsUnitaryOperator)
+                        {
+                            seg.partType = seg.partType | PartType.Parameter;
+                        }
+                    }
+
+                    parts.Add(seg);
+
+                    if (b is int && e is int n)
+                    {
+                        i = n + 1;
+                        continue;
+                    }
+                    else
+                    {
+                        ErrorText = $"Open braces missing closing braces at position {i} of string '{value}'";
+                        throw new SyntaxErrorException(ErrorText);
+                    }
+                }
                 else if (value[i] == ',')
                 {
                     if (sb.Length > 0)
@@ -345,59 +392,10 @@ namespace DataTools.Extras.Expressions
                 }
                 else
                 {
-                    if (double.TryParse(sb.ToString(), NumberStyles.Any, ci, out double doubleTest))
+                    if (NumberCheck(sb, aheadChar: value[i], addToThis: true))
                     {
-                        if (sb.ToString() + value[i] != "0x" && !double.TryParse(sb.ToString() + value[i], NumberStyles.Any, ci, out _))
-                        {
-                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym)
-                            {
-                                partType = PartType.Literal,
-                                Value = doubleTest,
-                                monoVal = sb.ToString()
-                            });
-                            sb.Clear();
-                        }
+                        sb.Clear();
                     }
-                    else if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "0x" && long.TryParse(sb.ToString().Substring(2), NumberStyles.AllowHexSpecifier, ci, out long longTest))
-                    {
-                        if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "0x" && !long.TryParse(sb.ToString().Substring(2) + value[i], NumberStyles.AllowHexSpecifier, ci, out _))
-                        {
-                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym)
-                            {
-                                partType = PartType.Literal,
-                                Value = longTest,
-                                monoVal = sb.ToString()
-                            });
-                            sb.Clear();
-                        }
-                    }
-                    else if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "&H" && long.TryParse(sb.ToString().Substring(2), NumberStyles.AllowHexSpecifier, ci, out longTest))
-                    {
-                        if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "&H" && !long.TryParse(sb.ToString().Substring(2) + value[i], NumberStyles.AllowHexSpecifier, ci, out _))
-                        {
-                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym)
-                            {
-                                partType = PartType.Literal,
-                                Value = longTest,
-                                monoVal = sb.ToString()
-                            });
-                            sb.Clear();
-                        }
-                    }
-                    else if (sb.Length > 1 && sb.ToString().Substring(0, 1) == "#" && long.TryParse(sb.ToString().Substring(1), NumberStyles.AllowHexSpecifier, ci, out longTest))
-                    {
-                        if (sb.Length > 1 && sb.ToString().Substring(0, 1) == "#" && !long.TryParse(sb.ToString().Substring(1) + value[i], NumberStyles.AllowHexSpecifier, ci, out _))
-                        {
-                            parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym)
-                            {
-                                partType = PartType.Literal,
-                                Value = longTest,
-                                monoVal = sb.ToString()
-                            });
-                            sb.Clear();
-                        }
-                    }
-
                     sb.Append(value[i]);
                 }
 
@@ -408,59 +406,17 @@ namespace DataTools.Extras.Expressions
             {
                 if (parts.Count == 0)
                 {
-
-                    if (double.TryParse(sb.ToString(), NumberStyles.Any, ci, out double doubleTest))
+                    if (!NumberCheck(sb, this))
                     {
-                        partType = PartType.Literal;
-                        Value = doubleTest;
+                        monoVal = sb.ToString();
                     }
-                    else if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "0x" && long.TryParse(sb.ToString().Substring(2), NumberStyles.AllowHexSpecifier, ci, out long longTest))
-                    {
-                        partType = PartType.Literal;
-                        Value = longTest;
-                    }
-                    else if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "&H" && long.TryParse(sb.ToString().Substring(2), NumberStyles.AllowHexSpecifier, ci, out longTest))
-                    {
-                        partType = PartType.Literal;
-                        Value = longTest;
-                    }
-                    else if (sb.Length > 1 && sb.ToString().Substring(0, 1) == "#" && long.TryParse(sb.ToString().Substring(1), NumberStyles.AllowHexSpecifier, ci, out longTest))
-                    {
-                        partType = PartType.Literal;
-                        Value = longTest;
-                    }
-
-                    monoVal = sb.ToString();
 
                 }
                 else
                 {
                     var newPart = new ExpressionSegment(sb.ToString(), this, ci, mode, varSym);
 
-                    if (double.TryParse(sb.ToString(), NumberStyles.Any, ci, out double doubleTest))
-                    {
-                        newPart.partType = PartType.Literal;
-                        newPart.Value = doubleTest;
-                        newPart.monoVal = sb.ToString();
-                    }
-                    else if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "0x" && long.TryParse(sb.ToString().Substring(2), NumberStyles.AllowHexSpecifier, ci, out long longTest))
-                    {
-                        newPart.partType = PartType.Literal;
-                        newPart.Value = longTest;
-                        newPart.monoVal = sb.ToString();
-                    }
-                    else if (sb.Length > 2 && sb.ToString().Substring(0, 2) == "&H" && long.TryParse(sb.ToString().Substring(2), NumberStyles.AllowHexSpecifier, ci, out longTest))
-                    {
-                        newPart.partType = PartType.Literal;
-                        newPart.Value = longTest;
-                        newPart.monoVal = sb.ToString();
-                    }
-                    else if (sb.Length > 1 && sb.ToString().Substring(0, 1) == "#" && long.TryParse(sb.ToString().Substring(1), NumberStyles.AllowHexSpecifier, ci, out longTest))
-                    {
-                        newPart.partType = PartType.Literal;
-                        newPart.Value = longTest;
-                        newPart.monoVal = sb.ToString();
-                    }
+                    NumberCheck(sb, newPart);
 
                     if (hasp)
                     {
@@ -469,10 +425,6 @@ namespace DataTools.Extras.Expressions
 
                     parts.Add(newPart);
 
-                    if (parent == null)
-                    {
-                        partType = PartType.Composite;
-                    }
                 }
 
                 if (monoVal != null && partType != PartType.Literal)
@@ -517,10 +469,105 @@ namespace DataTools.Extras.Expressions
 
             if (parent == null)
             {
+
+                if (parts.Count > 0)
+                {
+                    partType = PartType.Composite;
+                }
                 variables = new Dictionary<string, object>();
             }
 
             FormalizeStructure();
+        }
+
+        private bool NumberCheck(StringBuilder sb, ExpressionSegment newPart = null, char? aheadChar = null, bool addToThis = false)
+        {
+            bool pass = false;
+            object value = null;
+
+            if (double.TryParse(sb.ToString(), NumberStyles.Any, ci, out double doubleTest))
+            {
+                
+                if (aheadChar != null)
+                {
+                    if (sb.ToString() + (aheadChar?.ToString() ?? "") != "0x" && !double.TryParse(sb.ToString() + (aheadChar?.ToString() ?? ""), NumberStyles.Any, ci, out _))
+                    {
+                        value = doubleTest;
+                        pass = true;
+                    }
+                }
+                else
+                {
+                    value = doubleTest;
+                    pass = true;
+                }
+            }
+            else
+            {
+                string pretest;
+                string numtest1 = null, numtest2 = null;
+
+
+                if (sb.Length > 2)
+                {
+                    pretest = sb.ToString().Substring(0, 2);
+                    if (pretest.ToLower() == "0x" || pretest.ToUpper() == "&H")
+                    {
+                        numtest1 = sb.ToString().Substring(2);
+                    }
+                }
+                else if (sb.Length > 1)
+                {
+                    pretest = sb.ToString().Substring(0, 1);
+                    if (pretest == "#")
+                    {
+                        numtest1 = sb.ToString().Substring(1);
+                    }
+                }
+
+                if (numtest1 != null)
+                {
+                    if (aheadChar != null)
+                    {
+                        numtest2 = numtest1 + aheadChar;
+
+                    }
+
+                    if (long.TryParse(numtest1, NumberStyles.AllowHexSpecifier, ci, out long longTest))
+                    {
+                        if (numtest2 != null)
+                        {
+                            if (!long.TryParse(numtest2, NumberStyles.AllowHexSpecifier, ci, out _))
+                            {
+                                value = longTest;
+                                pass = true;
+                            }
+                        }
+                        else
+                        {
+                            value = longTest;
+                            pass = true;
+                        }
+                    }
+
+                }
+
+
+            }
+
+            if (pass)
+            {
+                newPart = newPart ?? new ExpressionSegment(sb.ToString(), this, ci, storageMode, varSym);
+
+                newPart.partType = PartType.Literal;
+                newPart.Value = value;
+                newPart.monoVal = sb.ToString();
+
+                if (addToThis) parts.Add(newPart);
+
+            }
+
+            return pass;
         }
 
         #endregion Private Constructors
@@ -702,6 +749,15 @@ namespace DataTools.Extras.Expressions
 
                 if (this.partType == PartType.Literal && this.value != null) Value = Value;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the string format.
+        /// </summary>
+        public string StringFormat
+        {
+            get => strFmt;
+            set => strFmt = value;  
         }
 
         /// <summary>
@@ -921,6 +977,15 @@ namespace DataTools.Extras.Expressions
         {
             var itemNew = (ExpressionSegment)MemberwiseClone();
 
+            if (variables != null)
+            {
+                itemNew.variables = new Dictionary<string, object>();
+                foreach (var kvo in variables)
+                {
+                    itemNew.variables.Add(kvo.Key, kvo.Value);
+                }
+            }
+
             itemNew.parts = new List<ExpressionSegment>();
             itemNew.parent = null;
 
@@ -1111,7 +1176,7 @@ namespace DataTools.Extras.Expressions
 
             List<double> pars = null;
 
-            if ((partType & PartType.Executive) != PartType.Executive)
+            if ((partType & PartType.Executive) != PartType.Executive || (partType & PartType.Literal) == PartType.Literal)
             {
                 if ((partType & PartType.Literal) == PartType.Literal)
                 {
@@ -1123,7 +1188,7 @@ namespace DataTools.Extras.Expressions
                 }
                 else if ((partType & PartType.Variable) == PartType.Variable)
                 {
-                    if (Variables.TryGetValue(monoVal, out object v))
+                    if (Variables != null && Variables.TryGetValue(monoVal, out object v))
                     {
                         if (v != null && double.TryParse(v.ToString(), out double dd))
                         {
@@ -2021,10 +2086,13 @@ namespace DataTools.Extras.Expressions
                     context.Value = converted;
                 }
 
-
                 context.partType = PartType.Literal;
             }
-
+            else if (context != null)
+            {
+                context.Value = rhv;
+                context.partType = PartType.Literal;
+            }
             if (resultOnly)
             {
                 return mcopy.parts[2];
@@ -2044,7 +2112,27 @@ namespace DataTools.Extras.Expressions
 
             if (!IsComposite)
             {
-                sb.Append(monoVal);
+                if (!string.IsNullOrEmpty(strFmt) && value is IFormattable sfmt)
+                {
+                    if (strFmt[0].ToString().ToLower() == "x")
+                    {
+                        long ival = long.Parse(value.ToString());
+                        sb.Append("0x" + ival.ToString(strFmt, ci));
+                    }
+                    else
+                    {
+                        sb.Append(sfmt.ToString(strFmt, ci));
+                    }
+
+                }
+                else
+                {
+                    sb.Append(monoVal);
+                    if (!string.IsNullOrEmpty(strFmt))
+                    {
+                        sb.Append(":" + strFmt);
+                    }
+                }
             }
             else
             {
@@ -2401,10 +2489,14 @@ namespace DataTools.Extras.Expressions
                             if (ef)
                             {
                                 parts[i].position = Position.RightHand;
+                                if (parts[i].IsSolvable)
+                                    parts[i].partType |= PartType.Executive;
                             }
                             else
                             {
                                 parts[i].position = Position.LeftHand;
+                                if (parts[i].IsSolvable)
+                                    parts[i].partType |= PartType.Executive;
                             }
                         }
                     }

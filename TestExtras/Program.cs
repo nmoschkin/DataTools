@@ -35,14 +35,14 @@ namespace TestExtras
             //    MetricTool.GetDerivedValue((double)baseValue, u2, out double? cTemp);
             //}
 
-            var dstr = "(4593.33 * cos(5)) km/s = $x mi/h";
+            //var dstr = "(10^2) mi / [min] = $x mi/h";
             //var dstr = "floor(29.9)";
             //var dstr = "ceil(19.3)";
             //var dstr = "tanh(v)";
 
             //var dstr = "max(v, 44 * 0.32, 95 / 5)";
             //var dstr = "abs((19 + 2)^u / 6 * 5 / (4 sqrt (sqrt (v * 5))) + (4 - 6 * 10))";
-
+            var dstr = "0x4A4e33 = {x:#,##0}";
             // var dstr = "45 mi/h = $x km/h";
             ConversionTool.RoundingDigits = 4;
             //var dstr = "1 hr + 2 days = $x [min]";
@@ -52,7 +52,7 @@ namespace TestExtras
 
             Console.WriteLine($"Input Expression:  {dstr}");
            
-            var res = new ExpressionSegment(dstr);
+            var res = new ExpressionSegment(dstr, "");
             res.StorageMode = StorageMode.AsDouble;
 
             var v = 119.74d;
@@ -93,7 +93,7 @@ namespace TestExtras
             PrintExpression(res);
 
 
-            if (res.HasUnits && res.IsEquation)
+            if (res.HasUnits)
             {
                 Console.WriteLine();
                 Console.WriteLine("Base Unit Object Graph:");
@@ -101,11 +101,16 @@ namespace TestExtras
 
                 PrintExpression(res.Clone(true));
 
+            }
+
+            if (res.IsEquation)
+            {
                 Console.WriteLine();
                 Console.WriteLine("Solved Object Graph:");
                 Console.WriteLine();
 
                 PrintExpression(res.Solve());
+
             }
 
         }
