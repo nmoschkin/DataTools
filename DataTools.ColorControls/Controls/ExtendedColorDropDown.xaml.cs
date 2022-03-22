@@ -27,6 +27,27 @@ namespace DataTools.ColorControls
             InitializeComponent();
         }
 
+
+        public CatalogOptions CatalogType
+        {
+            get { return (CatalogOptions)GetValue(CatalogTypeProperty); }
+            set { SetValue(CatalogTypeProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CatalogType.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CatalogTypeProperty =
+            DependencyProperty.Register("CatalogType", typeof(CatalogOptions), typeof(NamedColorPicker), new PropertyMetadata(CatalogOptions.Extended, OnCatalogTypeChanged));
+
+
+        private static void OnCatalogTypeChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+
+            if (sender is ExtendedColorDropDown exd && e.NewValue is CatalogOptions co)
+            {
+                exd.Ncp.vm.ChangeCatalog(co);
+            }
+        }
+
         private void BtnMore_Click(object sender, RoutedEventArgs e)
         {
 

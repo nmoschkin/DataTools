@@ -84,7 +84,7 @@ namespace DataTools.ColorControls
         {
             InitializeComponent();
 
-            vm = new NamedColorViewModel();
+            vm = new NamedColorViewModel(CatalogType);
             base.ItemsSource = vm.AllNamedColors;
 
             DependencyPropertyDescriptor pdItemsSource = DependencyPropertyDescriptor.FromProperty(ComboBox.SelectedItemProperty, typeof(NamedColorPicker));
