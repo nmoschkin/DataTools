@@ -17,6 +17,7 @@ using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
 
 namespace DataTools.Text
 {
@@ -587,110 +588,259 @@ namespace DataTools.Text
         /// <param name="subject">The text to process.</param>
         /// <param name="startString">The starting string to scan.</param>
         /// <param name="stopString">The ending string to scan.</param>
-        /// <param name="startIndex">The index at which to start scanning.</param>
         /// <returns>The first occurrence of text between two seperator strings.</returns>
-        /// <remarks></remarks>
-        public static string TextBetween(string subject, string startString, string stopString, ref int startIndex)
+        /// <remarks>This version does not check for quoted text.</remarks>
+        public static string TextBetween(string subject, string startString, string stopString)
         {
+            return TextBetween(subject, 0, startString, stopString, out _, out _);
+        }
 
-            int i = 0;
-            int j = 0;
+        /// <summary>
+        /// Test to see if successive characters constitute a string we are looking for.
+        /// </summary>
+        /// <param name="goalStr">The string we are searching for.</param>
+        /// <param name="currChar">The next character to test.</param>
+        /// <param name="currStr">The current string that has been assembled so far.</param>
+        /// <param name="currPos">The current position in the string that we have assembled so far.</param>
+        /// <returns>An integer value indicating the state of the search:<br />
+        /// <br />0 - The string is not matched, and the string cannot be built from the combination of characters that have been passed. 
+        /// <br />1 - The string is matched, but not yet complete.
+        /// <br />2 - The string is completely matched.
+        /// </returns>
+        /// <remarks>
+        /// If the <paramref name="currChar"/>, <paramref name="currStr"/>, or <paramref name="currPos"/> values seem unrelated to <paramref name="goalStr"/>,
+        /// an <see cref="ArgumentOutOfRangeException"/> will be thrown.
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">currPos cannot be greater than or equal to the length of goalStr.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">currPos cannot be greater than the length of currStr.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">currStr does not represent a portion of goalStr.</exception>
+        public static int RunBy(string goalStr, char currChar, ref string currStr, ref int currPos)
+        {
+            if (currPos >= goalStr.Length) throw new ArgumentOutOfRangeException("currPos cannot be greater than or equal to the length of goalStr.");
 
-            string s = null;
-
-            if (startIndex == -1)
+            if (string.IsNullOrEmpty(currStr))
             {
-                i = subject.IndexOf(startString);
+                currStr = "";
+                currPos = 0;
+            }
+
+            if (currPos > currStr.Length || currPos < 0) throw new ArgumentOutOfRangeException("currPos cannot be greater than the length of currStr.");
+
+            if (currStr.Length > 0 && !goalStr.StartsWith(currStr))
+            {
+                throw new ArgumentOutOfRangeException("currStr does not represent a portion of goalStr.");
+            }
+
+            if (currChar != goalStr[currPos])
+            {
+                currStr = null;
+                currPos = 0;
+
+                return 0;
             }
             else
             {
-                i = subject.IndexOf(startString, startIndex);
+                currPos++;
+                currStr += currChar;
+
+                if (currPos == goalStr.Length)
+                {
+                    currPos = 0;
+                    currStr = "";
+
+                    return 2;
+                }
+                else
+                {
+                    return 1;
+                }
             }
-
-            if (i == -1)
-                return null;
-
-            j = subject.IndexOf(stopString, i + startString.Length + 1);
-
-            i = i + startString.Length;
-
-            if ((j - i) < 1)
-                return "";
-            s = subject.Substring(i, (j - i));
-
-            if ((startIndex != -1))
-            {
-                startIndex = j + stopString.Length;
-            }
-
-            return s;
-
 
         }
 
         /// <summary>
-        /// Finds and returns the first occurrence of text between startString and stopString
+        /// Finds the text between two strings.
         /// </summary>
-        /// <param name="subject">The text to process.</param>
-        /// <param name="startString">The starting string to scan.</param>
-        /// <param name="stopString">The ending string to scan.</param>
-        /// <returns>The first occurrence of text between two seperator strings.</returns>
-        /// <remarks></remarks>
-        public static string TextBetween(string subject, string startString, string stopString)
+        /// <param name="value">The string to search.</param>
+        /// <param name="startPos">The position of the string to start at.</param>
+        /// <param name="start">The start string.</param>
+        /// <param name="stop">The stop character.</param>
+        /// <param name="idxStart">The returned start index of the text between (excluding the start character.)</param>
+        /// <param name="idxStop">The returned stop index of the text between (excluding the stop character.)</param>
+        /// <param name="withDelimiters">Include the <paramref name="start"/> and <paramref name="stop"/> delimiters.</param>
+        /// <param name="escChar">The escape character to use for inside quoted strings (default is '\').</param>
+        /// <param name="throwException">True to throw a <see cref="SyntaxErrorException"/> if the block cannot be completed.</param>
+        /// <returns>The matched string optionally including the <paramref name="start"/> and <paramref name="stop"/> delimiter strings.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If the index is less than 2 positions before the last position in the string.</exception>
+        /// <exception cref="SyntaxErrorException">If the block is not terminated.</exception>
+        public static string TextBetween(string value, int startPos, string start, string stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false)
         {
-            int i = -1;
-            return TextBetween(subject, startString, stopString, ref i);
+            idxStart = null;
+            idxStop = null;
+
+            var chars = value.ToCharArray();
+            bool inSpan = false;
+
+            int rb1Pos = 0;
+            string rb1Str = "";
+            int rb2Pos = 0;
+            string rb2Str = "";
+
+            int s1test, s2test;
+
+            int level = 0;
+            StringBuilder sb = new StringBuilder();
+            sb.Capacity = value.Length;
+
+            if (startPos < 0 || startPos >= value.Length - ((start.Length + stop.Length) + 1)) throw new ArgumentOutOfRangeException(nameof(startPos));
+
+            for (int i = startPos; i < chars.Length; i++)
+            {
+                char c = chars[i];
+                if (c == '"' || c == '\'')
+                {
+                    var qs = QuoteFromHere(value, i, out int? qstart, out int? qstop, quoteChar: c, escChar: escChar, withQuotes: true, throwException: throwException);
+
+                    if (!string.IsNullOrEmpty(qs))
+                    {
+                        sb.Append(qs);  
+                    }
+                    if (qstart != null && qstop != null)
+                    {
+                        i = qstop.Value;
+                        continue;
+                    }
+                    else if (qstart != null && qstop == null)
+                    {
+                        break;
+                    }
+                }
+                else 
+                {
+                    s1test = RunBy(start, c, ref rb1Str, ref rb1Pos);
+
+                    if (s1test == 2)
+                    {
+                        if (!inSpan)
+                        {
+                            sb.Append(start);
+                        }
+                        else
+                        {
+                            sb.Append(c);
+                        }
+
+                        if (level == 0)
+                        {
+                            idxStart = i - (start.Length - 1);
+                            inSpan = true;
+                        }
+
+                        level++;
+                        continue;
+                    }
+                    else 
+                    {
+                        s2test = RunBy(stop, c, ref rb2Str, ref rb2Pos);
+
+                        if (s2test == 2)
+                        {
+                            level--;
+                            if (level == 0)
+                            {
+
+                                idxStop = i;
+                                //if (withDelimiters)
+                                //{
+                                //    idxStop = i;
+                                //}
+                                //else
+                                //{
+                                //    idxStop = i - stop.Length;
+                                //}
+
+                                sb.Append(c);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (inSpan)
+                {
+                    sb.Append(c);
+                }
+            }
+
+            if (level != 0 && throwException)
+            {
+                throw new SyntaxErrorException($"Block at position {idxStart} does not have an ending character '{stop}'.");
+            }
+
+            if (level == 0 && !withDelimiters)
+            {
+                var strTemp = sb.ToString().Substring(start.Length, sb.Length - (stop.Length + start.Length));
+                return strTemp;
+            }
+
+            return sb.ToString();
         }
 
 
-        public static string TextBetween(string value, int startPos, char start, char stop, out int? idxStart, out int? idxStop)
+        /// <summary>
+        /// Finds the text between two characters.
+        /// </summary>
+        /// <param name="value">The string to search.</param>
+        /// <param name="startPos">The position of the string to start at.</param>
+        /// <param name="start">The start character.</param>
+        /// <param name="stop">The stop character.</param>
+        /// <param name="idxStart">The returned start index of the text between (excluding the start character.)</param>
+        /// <param name="idxStop">The returned stop index of the text between (excluding the stop character.)</param>
+        /// <param name="withDelimiters">Include the <paramref name="start"/> and <paramref name="stop"/> delimiters.</param>
+        /// <param name="escChar">The escape character to use for inside quoted strings (default is '\').</param>
+        /// <param name="throwException">True to throw a <see cref="SyntaxErrorException"/> if the block cannot be completed.</param>
+        /// <returns>The matched string optionally including the <paramref name="start"/> and <paramref name="stop"/> delimiter characters.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If the index is less than 2 positions before the last position in the string.</exception>
+        /// <exception cref="SyntaxErrorException">If the block is not terminated.</exception>
+        public static string TextBetween(string value, int startPos, char start, char stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false)
         {
             idxStart = null;
             idxStop = null;
 
             var chars = value.ToCharArray();
 
-            bool inQuote = false;
-            bool inQuote2 = false;
             bool inSpan = false;
 
             int level = 0;
             StringBuilder sb = new StringBuilder();
-            
+            sb.Capacity = value.Length;
+
             if (startPos < 0 || startPos >= value.Length - 2) throw new ArgumentOutOfRangeException(nameof(startPos));
 
             for (int i = startPos; i < chars.Length; i++)
             {
                 char c = chars[i];
-                if (c == '"')
+
+                if (c == '"' || c == '\'')
                 {
-                    inQuote = true;
-                }
-                else if (inQuote)
-                {
-                    if (c == '"')
+                    var qs = QuoteFromHere(value, i, out int? qstart, out int? qstop, quoteChar: c, escChar: escChar, withQuotes: true, throwException: throwException);
+
+                    if (!string.IsNullOrEmpty(qs))
                     {
-                        if (chars[i - 1] != '\\')
-                        {
-                            inQuote = false;
-                        }
+                        sb.Append(qs);
+                    }
+
+                    if (qstart != null && qstop != null)
+                    {
+                        i = qstop.Value;
+                        continue;
+                    }
+                    else if (qstart != null && qstop == null)
+                    {
+                        break;
                     }
                 }
-                else if (c == '\'')
-                {
-                    inQuote2 = true;
-                }
-                else if (inQuote2)
-                {
-                    if (c == '\'')
-                    {
-                        if (chars[i - 1] != '\\')
-                        {
-                            inQuote2 = false;
-                        }
-                    }
-                }
-                else if (!inQuote && !inQuote2)
+                else 
                 {
                     if (c == start)
                     {
@@ -721,68 +871,120 @@ namespace DataTools.Text
                 }
             }
 
+            if (level != 0 && throwException)
+            {
+                throw new SyntaxErrorException($"Block at position {idxStart} does not have an ending character '{stop}'.");
+            }
+
+            if (withDelimiters)
+            {
+                sb.Insert(0, start);
+                sb.Append(stop);
+            }
+
             return sb.ToString();
         }
 
         /// <summary>
-        /// Function to retrieve a quote from a string of data. 
-        /// The quote character must be: exactly one before, exactly at, or anywhere after the location specified by 'index'.  
-        /// Text outside of the first quoted string is discarded.
+        /// Function to retrieve a quote from a string of data.
         /// </summary>
-        /// <param name="s">The string to scan.</param>
+        /// <param name="value">The string to scan.</param>
         /// <param name="index">The position to begin scanning.</param>
-        /// <param name="qc">The quote character to use.</param>
-        /// <param name="ec">The escape character to use.</param>
-        /// <param name="wc">Return the string in quotes.</param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public static string QuoteFromHere(string s, int index, char qc = '\"', char ec = '\\', bool wc = false)
+        /// <param name="startPos">
+        /// The returned start position of the quoted string.<br/><br />
+        /// if <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately after the quote character.
+        /// </param>
+        /// <param name="endPos">
+        /// The returned end position of the quoted string.<br/><br />
+        /// If <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately before the quote character. 
+        /// </param>
+        /// <param name="quoteChar">The quote character to use.</param>
+        /// <param name="escChar">The escape character to use.</param>
+        /// <param name="withQuotes">Return the string in quotes.</param>
+        /// <param name="throwException">True to throw a <see cref="SyntaxErrorException"/> if an unterminated quoted string is found.</param>
+        /// <returns>The requested string, or an empty string if no string is found.</returns>
+        /// <remarks>
+        /// The quote character must be: exactly one before, exactly at, or anywhere after the location specified by 'index'.<br /><br />
+        /// Any text outside of the first discovered quoted string is discarded.<br /><br />
+        /// If <paramref name="withQuotes"/> is true, then the escape characters are returned, verbatim. Otherwise, they are discarded.
+        /// </remarks>
+        /// <exception cref="SyntaxErrorException">If <paramref name="throwException"/> is true, then this error is thrown if the quoted string is unterminated.</exception>
+        /// 
+        public static string QuoteFromHere(string value, int index, out int? startPos, out int? endPos, char quoteChar = '\"', char escChar = '\\', bool withQuotes = false, bool throwException = false)
         {
-            char[] buffIn = s.ToCharArray();
+            char[] buffIn = value.ToCharArray();
 
             int i, c = buffIn.Length;
             bool inq = false;
-
+            
             StringBuilder sb = new StringBuilder();
+            sb.Capacity = value.Length;
+
+            startPos = endPos = null;
 
             for (i = ((index > 0) ? (index - 1) : 0); i < c; i++)
             {
                 if (!inq)
                 {
-                    if (buffIn[i] == qc)
+                    if (buffIn[i] == quoteChar)
                     {
                         inq = true;
-                        if (wc) sb.Append(qc);
+                        if (withQuotes)
+                        {
+                            startPos = i;
+                            sb.Append(quoteChar);
+                        }
+                        else
+                        {
+                            startPos = i + 1;
+                        }
                     }
                 }
                 else
                 {
                     if (i < c - 1)
                     {
-                        if ((buffIn[i] == ec) && (buffIn[i + 1] == qc))
+                        if ((buffIn[i] == escChar) && (buffIn[i + 1] == quoteChar))
                         {
-                            sb.Append(qc);
-                            i++;
+                            if (withQuotes) sb.Append(escChar);
+                            sb.Append(quoteChar);
 
+                            i++;
                             continue;
                         }
-                        else if ((buffIn[i] == ec) && (buffIn[i + 1] == ec))
+                        else if ((buffIn[i] == escChar) && (buffIn[i + 1] == escChar))
                         {
-                            sb.Append(ec);
-                            i++;
+                            if (withQuotes) sb.Append(escChar);
+                            sb.Append(escChar);
 
+                            i++;
                             continue;
                         }
                     }
 
-                    if (buffIn[i] == qc)
+                    if (buffIn[i] == quoteChar)
                     {
-                        if (wc) sb.Append(qc);
+                        if (withQuotes)
+                        {
+                            endPos = i;
+                            sb.Append(quoteChar);
+                        }
+                        else
+                        {
+                            endPos = i - 1;
+                        }
+
                         break;
                     }
+
                     sb.Append(buffIn[i]);
                 }
 
+            }
+
+            if (throwException && startPos != null && endPos == null)
+            {
+                throw new SyntaxErrorException($"Quoted string at position {startPos} does not have an ending quote.");
             }
 
             return sb.ToString();
@@ -1543,6 +1745,7 @@ namespace DataTools.Text
             string s = null;
             char ch = '\0';
             bool inq = false;
+            bool inqs = false;
 
             char[] sp = null;
 
@@ -1578,11 +1781,17 @@ namespace DataTools.Text
             {
                 if ((sp[i] == '\"'))
                 {
-                    inq = !inq;
+                    if (!(i > 0 && inq && sp[i - 1] == '\\'))
+                        inq = !inq;
+                }
+                else if ((sp[i] == '\''))
+                {
+                    if (!(i > 0 && inq && sp[i - 1] == '\\'))
+                        inqs = !inqs;
                 }
 
 
-                if (!inq && Operators.IndexOf(sp[i]) != -1)
+                if (!inq && !inqs && Operators.IndexOf(sp[i]) != -1)
                 {
 
                     if ((i > 0) && (Operators.IndexOf(sp[i - 1]) != -1) && (NoStickyChars.IndexOf(sp[i]) == -1) && (NoStickyChars.IndexOf(sp[i - 1]) == -1))

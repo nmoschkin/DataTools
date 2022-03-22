@@ -99,7 +99,11 @@ namespace DataTools.Extras.Expressions
         /// <summary>
         /// Indicates that the expression has exactly one left-hand part and exactly one right-hand part.
         /// </summary>
-        Equation = 0x45
+        Equation = 0x45,
+
+        BlockLevelEntity = 0x1000,
+
+        String = 0x4000
 
     }
 
@@ -249,6 +253,10 @@ namespace DataTools.Extras.Expressions
             this.parent = parent;
 
             bool hasp = false;
+            bool inble = false;
+            bool inquot = false;
+            bool insquot = false;
+
             string hasf;
 
             value = SpaceOperators(OneSpace(value));
@@ -261,7 +269,108 @@ namespace DataTools.Extras.Expressions
 
             for (i = 0; i < c;)
             {
-                if (value[i] == sc1)
+                if (inquot)
+                {
+                    if (value[i] == '"')
+                    {
+                        if (!(i > 0 && value[i - 1] == '\\'))
+                        {
+                            inquot = false;
+                        }
+                    }
+
+                    sb.Append(value[i]);
+
+                    if (!inquot)
+                    {
+                        if (i == c - 1 && parts.Count == 0)
+                        {
+                            partType = PartType.String;
+                            this.value = monoVal = sb.ToString();
+
+                            sb.Clear();
+
+                            break;
+                        }
+                        else
+                        {
+                            var es = new ExpressionSegment();
+
+                            es.parent = this;
+                            es.ci = ci;
+                            es.varSym = varSym;
+                            es.partType = PartType.String;
+                            es.value = es.monoVal = sb.ToString();
+
+                            sb.Clear();
+
+                            parts.Add(es);
+                        }
+                    }
+                }
+                else if (value[i] == '"')
+                {
+
+                    if (sb.Length > 0)
+                    {
+                        parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym));
+                        sb.Clear();
+                    }
+
+                    inquot = true;
+                    sb.Append(value[i]);
+
+                }
+                else if (insquot)
+                {
+                    if (value[i] == '\'')
+                    {
+                        if (!(i > 0 && value[i - 1] == '\\'))
+                        {
+                            insquot = false;
+                        }
+                    }
+
+                    sb.Append(value[i]);
+
+                    if (!insquot)
+                    {
+                        
+                        if (i == c - 1 && parts.Count == 0)
+                        {
+                            partType = PartType.String;
+                            this.value = monoVal = sb.ToString();
+                            sb.Clear();
+
+                            break;
+                        }
+                        else
+                        {
+                            var es = new ExpressionSegment();
+
+                            es.parent = this;
+                            es.ci = ci;
+                            es.varSym = varSym;
+                            es.partType = PartType.String;
+                            es.value = es.monoVal = sb.ToString();
+                            parts.Add(es);
+                        }
+                    }
+                }
+                else if (value[i] == '\'')
+                {
+
+                    if (sb.Length > 0)
+                    {
+                        parts.Add(new ExpressionSegment(sb.ToString(), this, ci, mode, varSym));
+                        sb.Clear();
+                    }
+
+                    insquot = true;
+                    sb.Append(value[i]);
+
+                }
+                else if (value[i] == sc1)
                 {
                     if (sb.Length > 0)
                     {
@@ -269,7 +378,7 @@ namespace DataTools.Extras.Expressions
                         sb.Clear();
                     }
 
-                    var val = TextBetween(value, i, sc1, sc2, out b, out e);
+                    var val = TextBetween(value, i, sc1, sc2, out b, out e, throwException: true);
 
                     var tseg = Split(val, ",", true);
                     

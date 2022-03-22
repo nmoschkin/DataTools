@@ -27,6 +27,25 @@ namespace TestExtras
                 Formatting = Formatting.Indented
             };
 
+            var tss = "Hey roberts roberts gemini falcon \"Hot extra sauce\" derecho derecho agnes";
+
+            var tb = TextTools.TextBetween(tss, 0, "roberts", "derecho", out int? is1, out int? is2);
+
+
+
+            Console.WriteLine($"\"{tb}\"");
+
+            tss = "geez[[flankly schmidt]]";
+            tb = TextTools.TextBetween(tss, 0, "[[", "]]", out is1, out is2);
+
+            Console.WriteLine($"\"{tb}\"");
+            tb = TextTools.TextBetween(tss, 0, '[', ']', out is1, out is2);
+
+            Console.WriteLine($"\"{tb}\"");
+
+
+
+
 
             //MetricTool.GetBaseValue(39d, u1, out double? baseValue, out MetricUnit baseUnit);
             //if (baseValue != null) 
