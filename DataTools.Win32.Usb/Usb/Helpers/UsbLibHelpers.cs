@@ -272,6 +272,18 @@ namespace DataTools.Win32.Usb
                     if (test.Usage == 0) list.Add(item);
                 }
 
+                else if (item.LinkCollection == 0 && item.LinkUsage == 0)
+                {
+                    if (!result.TryGetValue((item.UsagePage, 0), out var list))
+                    {
+                        list = new List<HidPValueCaps>();
+                        result.Add((item.UsagePage, item.LinkUsage), list);
+                    }
+
+                    var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
+                    if (test.Usage == 0) list.Add(item);
+                }
+
             }
 
             return result;
