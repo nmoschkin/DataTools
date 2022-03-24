@@ -113,6 +113,52 @@ namespace DataTools.Win32.Usb
 
 
         /// <summary>
+        /// Looks up a specific HID Usage value by usageId and collectionId.
+        /// </summary>
+        /// <param name="usageId">The code to look up.</param>
+        /// <param name="collectionId">Specify a collectionId to ensure that the usage is a member of this collection.</param>
+        /// <param name="retrieveValue">True to call the device and populate the <see cref="HidPowerUsageInfo.Value"/> property with a real-time value.</param>
+        /// <returns>A HID Usage Page or null.</returns>
+        /// <remarks>
+        /// Several reported usages can have identical <paramref name="usageId"/>'s. Only the first found is returned if <paramref name="collectionId"/> is not specified.
+        /// </remarks>
+        public HidPowerUsageInfo? LookupValue(byte usageId, byte collectionId = 0, bool retrieveValue = false)
+        {
+            if (PowerCollections == null) return null;  
+
+            //var features = deviceInfo.GetFeatureValues(HidUsageType.CL | HidUsageType.CA | HidUsageType.CP, HidUsageType.DV | HidUsageType.SV);
+
+            foreach (var kvp in PowerCollections)
+            {
+                if (collectionId == 0 || kvp.Key.UsageId == collectionId)
+                {
+                    foreach (var item in kvp.Value)
+                    {
+                        if (item.UsageId == usageId)
+                        {
+                            var newitem = item;
+                            if (retrieveValue)
+                            {
+                                var b = HidGetFeature(item.ReportID, out int res);
+
+                                if (b)
+                                    newitem.Value = res;
+
+                            }
+
+                            return newitem;
+                        }
+                    }
+
+                }
+
+            }
+
+            return null;
+        }
+
+
+        /// <summary>
         /// Create a power device collection from the pre-populated linked list of collections and usages.
         /// </summary>
         /// <param name="data">The linked usage data.</param>
