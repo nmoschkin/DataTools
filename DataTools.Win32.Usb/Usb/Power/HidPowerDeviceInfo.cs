@@ -134,32 +134,41 @@ namespace DataTools.Win32.Usb
                             }
                             else if (item.ValueCaps is HidPValueCaps vc && vc.StringIndex != 0)
                             {
-                                var hhid = HidFeatures.OpenHid(this);
-                                var sb = new SafePtr();
-                                sb.Alloc(256);
-                                
-                                var b = UsbLibHelpers.HidD_GetIndexedString(hhid, vc.StringIndex, sb, (int)sb.Length);
-                                HidFeatures.CloseHid(hhid);
-
-                                if (b)
+                                using (var mm = new SafePtr(256))
                                 {
-
-                                    var strres = sb.ToString();
-                                    if (!string.IsNullOrEmpty(strres))
+                                    var hhid = HidFeatures.OpenHid(this);
+                                    if (hhid != IntPtr.Zero)
                                     {
-                                        item.Value = strres;
+                                        var b = UsbLibHelpers.HidD_GetIndexedString(hhid, vc.StringIndex, mm, (int)mm.Length);
+                                        HidFeatures.CloseHid(hhid);
 
-                                        if (!result.TryGetValue(kvp.Key, out List<HidPowerUsageInfo>? col))
+                                        if (b)
                                         {
-                                            col = new List<HidPowerUsageInfo>();
-                                            result.Add(kvp.Key, col);
+                                            var strres = mm.ToString();
+                                            if (!string.IsNullOrEmpty(strres))
+                                            {
+
+                                                if (item.UsageId == 0x89 && vc.UsagePage == HidUsagePage.PowerDevice2 && DeviceChemistry.FindByName(strres) is DeviceChemistry dchem)
+                                                {
+                                                    item.Value = dchem;
+                                                }
+                                                else
+                                                {
+                                                    item.Value = strres;
+                                                }
+
+                                                if (!result.TryGetValue(kvp.Key, out List<HidPowerUsageInfo>? col))
+                                                {
+                                                    col = new List<HidPowerUsageInfo>();
+                                                    result.Add(kvp.Key, col);
+                                                }
+
+                                                col.Add(item);
+                                            }
+
                                         }
-
-                                        col.Add(item);
                                     }
-
                                 }
-
                             }
                             else
                             {

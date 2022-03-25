@@ -108,7 +108,7 @@ namespace DataTools.Win32.Usb
 
         protected HidPowerDevicePageInfo() : base(0x84)
         {
-            Parse(0x01, "iName", "SV", "I,F", "R/W", "4.1.1");
+            Parse(0x01, "Name", "SV", "I,F", "R/W", "4.1.1");
             Parse(0x02, "PresentStatus", "CL", "N/A", "4.1.1");
             Parse(0x03, "ChangedStatus", "CL", "N/A", "4.1.1");
             Parse(0x04, "UPS", "CA", "N/A", "4.1.1");
@@ -189,9 +189,9 @@ namespace DataTools.Win32.Usb
             Parse(0x72, "AwaitingPower", "DF", "I,O,F", "R/W", "4.1.5");
             Parse(0x73, "CommunicationLost", "DF", "I,O,F", "R/W", "4.1.5");
             Parse("74-FC", "Reserved", "DF");
-            Parse(0xFD, "iManufacturer", "SV", "F", "R/O", "4.1.6");
-            Parse(0xFE, "iProduct", "SV", "F", "R/O", "4.1.6");
-            Parse(0xFF, "iserialNumber", "SV", "F", "R/O", "4.1.6");
+            Parse(0xFD, "Manufacturer", "SV", "F", "R/O", "4.1.6");
+            Parse(0xFE, "Product", "SV", "F", "R/O", "4.1.6");
+            Parse(0xFF, "SerialNumber", "SV", "F", "R/O", "4.1.6");
 
 
         }

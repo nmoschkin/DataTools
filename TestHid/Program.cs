@@ -119,7 +119,7 @@ namespace TestHid
                                 {
                                     Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.ButtonValue}                                                  ");
                                 }
-                                else if (item.Value is string s)
+                                else if (item.Value is string || item.Value is DeviceChemistry)
                                 {
                                     Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.Value}                                                  ");
                                 }
