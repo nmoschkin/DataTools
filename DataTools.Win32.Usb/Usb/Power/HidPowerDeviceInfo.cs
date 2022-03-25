@@ -174,9 +174,20 @@ namespace DataTools.Win32.Usb
                             {
                                 var b = HidGetFeature(item.ReportID, out int res);
 
-                                if (b)
+                                if (b && item.ValueCaps is HidPValueCaps vc2)
                                 {
-                                    item.Value = res;
+                                    if (item.UsageId == 0x5a && vc2.UsagePage == HidUsagePage.PowerDevice1)
+                                    {
+                                        item.Value = (AudibleAlarmControlState)res;
+                                    }
+                                    else if (item.UsageId == 0x58 && vc2.UsagePage == HidUsagePage.PowerDevice1)
+                                    {
+                                        item.Value = (HidPowerTestState)res;
+                                    }
+                                    else
+                                    {
+                                        item.Value = res;
+                                    }
 
                                     if (!result.TryGetValue(kvp.Key, out List<HidPowerUsageInfo>? col))
                                     {
