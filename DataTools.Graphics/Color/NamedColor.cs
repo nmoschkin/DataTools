@@ -277,7 +277,7 @@ namespace DataTools.Graphics
                 var et = cen.Split("|");
                 UniColor cr = uint.Parse("ff" + et[0], System.Globalization.NumberStyles.HexNumber);
 
-                string text = TextTools.TitleCase(et[1], false).Replace("'S", "'s");
+                string text = TextTools.PascalCase(et[1], false).Replace("'S", "'s");
                 string extra = null;
 
                 int x = text.IndexOf("(");

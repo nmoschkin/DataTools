@@ -2383,7 +2383,7 @@ namespace DataTools.Text
         }
 
         /// <summary>
-        /// Convert spaced or underscored lines to camel case. This function is an alias for TitleCase.
+        /// Convert spaced or underscored lines to camel case. This function is an alias for <see cref="PascalCase(string, bool)"/>.
         /// </summary>
         /// <param name="input"></param>
         /// <param name="stripSpaces">Specify whether or not to remove space characters.</param>
@@ -2391,17 +2391,18 @@ namespace DataTools.Text
         /// <remarks></remarks>
         public static string CamelCase(string input, bool stripSpaces = true)
         {
-            return TitleCase(input, stripSpaces);
+            return PascalCase(input, stripSpaces, true);
         }
 
         /// <summary>
-        /// Convert spaced or underscored lines to camel case.
+        /// Convert spaced or underscored lines to PascalCase or camelCase.
         /// </summary>
         /// <param name="input"></param>
         /// <param name="stripSpaces">Specify whether or not to remove space characters.</param>
+        /// <param name="camel">Convert to camelCase</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string TitleCase(string input, bool stripSpaces = true)
+        public static string PascalCase(string input, bool stripSpaces = true, bool camel = false)
         {
             int a = 0;
             int b = 0;
@@ -2458,6 +2459,11 @@ namespace DataTools.Text
                     }
 
                 }
+            }
+
+            if (camel)
+            {
+                varOut[0] = char.ToLower(varOut[0]);
             }
 
             if (stripSpaces)
