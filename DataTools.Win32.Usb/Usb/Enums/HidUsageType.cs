@@ -26,51 +26,137 @@ namespace DataTools.Win32
         Reserved = 0,
 
         /// <summary>
-        /// Application Collection
+        /// Linear Control
         /// </summary>
-        [Description("Application Collection")]
-        CA = 0x1,
+        [Description("Linear Control")]
+        LC = 0x1,
 
         /// <summary>
-        /// Logical Collection
+        /// On/Off Control
         /// </summary>
-        [Description("Logical Collection")]
-        CL = 0x2,
+        [Description("On/Off Control")]
+        OOC = 0x2,
 
         /// <summary>
-        /// Physical Collection
+        /// Momentary Control
         /// </summary>
-        [Description("Physical Collection")]
-        CP = 0x4,
+        [Description("Momentary Control")]
+        MC = 0x4,
 
         /// <summary>
-        /// Dynamic Flag
+        /// One Shot Control
         /// </summary>
-        [Description("Dynamic Flag")]
-        DF = 0x8,
+        [Description("One Shot Control")]
+        OSC = 0x8,
 
         /// <summary>
-        /// Dynamic Value
+        /// Re-trigger Control
         /// </summary>
-        [Description("Dynamic Value")]
-        DV = 0x10,
+        [Description("Re-trigger Control")]
+        RTC = 0x10,
 
         /// <summary>
-        /// Static Flag
+        /// Sel Selector Array Contained in a Named Array
         /// </summary>
-        [Description("Static Flag")]
-        SF = 0x20,
+        [Description("Sel Selector Array Contained in a Named Array")]
+        Sel = 0x20,
 
         /// <summary>
         /// Static Value
         /// </summary>
+        /// <remarks>
+        /// Constant, Variable, Absolute A read-only multiple-bit value.
+        /// </remarks>
         [Description("Static Value")]
         SV = 0x40,
 
         /// <summary>
+        /// Static Flag
+        /// </summary>
+        /// <remarks>
+        /// Constant, Variable, Absolute A read-only single-bit value.
+        /// </remarks>
+        [Description("Static Flag")]
+        SF = 0x80,
+
+        /// <summary>
+        /// Dynamic Value
+        /// </summary>
+        /// <remarks>
+        /// Data, Variable, Absolute A read/write multiple-bit value.
+        /// </remarks>
+        [Description("Dynamic Value")]
+        DV = 0x100,
+
+        /// <summary>
+        /// Dynamic Flag
+        /// </summary>
+        /// <remarks>
+        /// Data, Variable, Absolute A read/write single-bit value.
+        /// </remarks>
+        [Description("Dynamic Flag")]
+        DF = 0x200,
+
+        /// <summary>
+        /// Named Array
+        /// </summary>
+        /// <remarks>
+        /// Logical A collection that encompasses an array definition, naming the array set or the field created by the array.
+        /// </remarks>
+        [Description("Named Array")]
+        NAry = 0x400,
+
+        /// <summary>
+        /// Application Collection
+        /// </summary>
+        /// <remarks>
+        /// Application Applies a name to a top level collection which the operating system uses to identify a device and possibly remap to a legacy API.
+        /// </remarks>
+        [Description("Application Collection")]
+        CA = 0x800,
+
+        /// <summary>
+        /// Logical Collection
+        /// </summary>
+        /// <remarks>
+        /// Logical A logical collection of items.
+        /// </remarks>
+        [Description("Logical Collection")]
+        CL = 0x1000,
+
+        /// <summary>
+        /// Physical Collection
+        /// </summary>
+        /// <remarks>
+        /// Physical A physical collection of items.
+        /// </remarks>
+        [Description("Physical Collection")]
+        CP = 0x2000,
+
+        /// <summary>
+        /// Usage Switch
+        /// </summary>
+        /// <remarks>
+        /// Logical Modifies the purpose or function of the Usages (controls) that it contains.
+        /// </remarks>
+        [Description("Usage Switch")]
+        US = 0x4000,
+
+        /// <summary>
+        /// Usage Modifier
+        /// </summary>
+        /// <remarks>
+        /// Logical Modifies the purpose or function of the Usages (controls) that contains it.
+        /// </remarks>
+        [Description("Usage Modifier")]
+        UM = 0x8000,
+
+        
+        /// <summary>
         /// Item
         /// </summary>
         [Description("Item")]
-        Item = 0x80
+        Item = 0x10000
+
     }
 }
