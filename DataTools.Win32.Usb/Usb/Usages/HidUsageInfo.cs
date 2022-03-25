@@ -37,6 +37,12 @@ namespace DataTools.Win32.Usb
         /// </summary>
         public virtual HidUsageType UsageType { get; set; }
 
+
+        /// <summary>
+        /// Yes if this report is a button
+        /// </summary>
+        public virtual bool IsButton { get; set; }
+
         /// <summary>
         /// Usage Type Description
         /// </summary>
@@ -81,6 +87,48 @@ namespace DataTools.Win32.Usb
         /// </summary>
         public virtual byte ReportID { get; set; }
 
+
+        /// <summary>
+        /// The value
+        /// </summary>
+        public virtual object? Value { get; set; }
+
+        /// <summary>
+        /// Button Value
+        /// </summary>
+        public virtual bool ButtonValue
+        {
+            get => Value != null && Value is int i && i != 0;
+            set => Value = value ? 1 : 0;
+        }
+
+        public virtual HidPValueCaps? ValueCaps { get; set; }
+
+        public virtual HidPButtonCaps? ButtonCaps { get; set; }
+
+        /// <summary>
+        /// Print the current value.
+        /// </summary>
+        /// <returns></returns>
+        public virtual string PrintValue()
+        {
+            if (Value == null)
+            {
+                return "Not Set";
+            }
+            else if (Value is string s)
+            {
+                return s;
+            }
+            else if (IsButton)
+            {
+                return ButtonValue.ToString();
+            }
+            else
+            {
+                return Value?.ToString() ?? "";
+            }
+        }
 
         /// <summary>
         /// Report Type
@@ -136,13 +184,14 @@ namespace DataTools.Win32.Usb
             return MemberwiseClone();
         }
 
-        public virtual object Clone(HidReportType reportType)
+        public virtual object Clone(HidReportType reportType, bool isButton = false)
         {
             var ret = MemberwiseClone();
             HidUsageInfo? rpt = (HidUsageInfo)ret;
 
             if (rpt != null)
             {
+                rpt.IsButton = isButton;
                 rpt.ReportType = reportType;
             }
 

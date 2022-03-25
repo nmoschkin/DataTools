@@ -18,6 +18,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 
 using static DataTools.Win32.User32;
 
@@ -61,8 +62,27 @@ namespace DataTools.Win32.Usb
         internal static extern bool HidD_GetPhysicalDescriptor(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
         [DllImport("hid.dll")]
         internal static extern bool HidD_GetPreparsedData(IntPtr HidDeviceObject, ref IntPtr PreparsedData);
+
         [DllImport("hid.dll")]
         internal static extern bool HidD_FreePreparsedData(IntPtr PreparsedData);
+
+        [DllImport("hid.dll", CharSet = CharSet.Unicode)]
+        internal static extern bool HidD_GetIndexedString(
+          [In] IntPtr HidDeviceObject,
+          [In] int StringIndex,
+
+          StringBuilder Buffer,
+          [In] int BufferLength
+        );
+
+        [DllImport("hid.dll", CharSet = CharSet.Unicode)]
+        internal static extern bool HidD_GetIndexedString(
+          [In] IntPtr HidDeviceObject,
+          [In] int StringIndex,
+
+          IntPtr Buffer,
+          [In] int BufferLength
+        );
 
 
         [DllImport("hid.dll")]
@@ -100,6 +120,122 @@ namespace DataTools.Win32.Usb
           IntPtr PreparsedData
         );
 
+        [DllImport("hid.dll")]
+        internal static extern HidResult HidP_GetUsages(
+          HidReportType ReportType,
+          HidUsagePage UsagePage,
+          ushort LinkCollection,
+          IntPtr UsageList,
+          [In, Out] ref uint UsageLength,
+          IntPtr PreparsedData,
+          IntPtr Report,
+          uint ReportLength
+        );
+
+
+        public static (ushort, ushort)[] GetButtonStatesRaw(HidDeviceInfo device, HidReportType reportType, HidPButtonCaps buttonCaps)
+        {
+            return GetButtonStatesRaw(device, reportType, new[] { buttonCaps });
+        }
+
+        public static (ushort, ushort)[] GetButtonStatesRaw(HidDeviceInfo device, HidReportType reportType, IEnumerable<HidPButtonCaps> buttonCaps)
+        {
+            uint ulen;
+            var output = new List<(ushort, ushort)>();
+
+            IntPtr hhid;
+            IntPtr ppd = default;
+            
+            var caps = device.HidCaps;
+
+            hhid = HidFeatures.OpenHid(device);
+            HidD_GetPreparsedData(hhid, ref ppd);
+
+            using (var buffer = new SafePtr())
+            {
+                using (var rptbuff = new SafePtr())
+                {
+                    foreach (var btn in buttonCaps)
+                    {
+
+                        if (reportType == HidReportType.Feature)
+                        {
+                            buffer.Alloc(sizeof(ushort) * caps.NumberFeatureButtonCaps);
+                            rptbuff.Alloc(caps.FeatureReportByteLength + 1);
+
+                            rptbuff.ByteAt(0) = btn.ReportID;
+                            HidD_GetFeature(hhid, rptbuff, (int)rptbuff.Length);
+
+                            ulen = (uint)buffer.Length / sizeof(ushort);
+
+                            HidResult res = HidP_GetUsages(reportType, btn.UsagePage, btn.LinkCollection, buffer, ref ulen, ppd, rptbuff, (uint)rptbuff.Length - 1);
+
+                            if (res == HidResult.HIDP_STATUS_SUCCESS)
+                            {
+                                for (int i = 0; i < ulen; i++)
+                                {
+                                    ushort us = buffer.UShortAt(i);
+                                    output.Add((btn.LinkCollection, us));
+                                }
+                            }
+
+                        }
+                        else if (reportType == HidReportType.Input)
+                        {
+                            buffer.Alloc(sizeof(ushort) * caps.NumberInputButtonCaps);
+                            rptbuff.Alloc(caps.InputReportByteLength + 1);
+
+                            rptbuff.ByteAt(0) = btn.ReportID;
+                            HidD_GetFeature(hhid, rptbuff, (int)rptbuff.Length);
+
+                            ulen = (uint)buffer.Length / sizeof(ushort);
+
+                            var res = HidP_GetUsages(reportType, btn.UsagePage, btn.LinkCollection, buffer, ref ulen, ppd, rptbuff, (uint)rptbuff.Length - 1);
+                            if (res == HidResult.HIDP_STATUS_SUCCESS)
+                            {
+                                for (int i = 0; i < ulen; i++)
+                                {
+                                    ushort us = buffer.UShortAt(i);
+                                    output.Add((btn.LinkCollection, us));
+                                }
+                            }
+                        }
+
+                        else if (reportType == HidReportType.Output)
+                        {
+                            buffer.Alloc(sizeof(ushort) * caps.NumberOutputButtonCaps);
+                            rptbuff.Alloc(caps.OutputReportByteLength + 1);
+
+                            rptbuff.ByteAt(0) = btn.ReportID;
+                            HidD_GetFeature(hhid, rptbuff, (int)rptbuff.Length);
+
+                            ulen = (uint)buffer.Length / sizeof(ushort);
+
+                            var res = HidP_GetUsages(reportType, btn.UsagePage, btn.LinkCollection, buffer, ref ulen, ppd, rptbuff, (uint)rptbuff.Length - 1);
+
+                            if (res == HidResult.HIDP_STATUS_SUCCESS)
+                            {
+                                for (int i = 0; i < ulen; i++)
+                                {
+                                    ushort us = buffer.UShortAt(i);
+                                    output.Add((btn.LinkCollection, us));
+                                }
+                            }
+                        }
+
+                    }
+
+
+                }
+
+            }
+
+            HidD_FreePreparsedData(ppd);
+            HidFeatures.CloseHid(hhid);
+
+            return output.ToArray();
+
+        }
 
         /// <summary>
         /// Get the button caps for the specified report type.
@@ -182,31 +318,44 @@ namespace DataTools.Win32.Usb
                 IntPtr hHid = HidFeatures.OpenHid(device);
                 IntPtr ppd = default;
                 HidAttributes attr;
+
                 HidCaps caps;
 
                 HidD_GetPreparsedData(hHid, ref ppd);
-
                 HidD_GetAttributes(hHid, out attr);
 
                 HidP_GetCaps(ppd, out caps);
 
+                device.HidCaps = caps;
 
                 var featBtn = GetButtonCaps(HidReportType.Feature, ppd);
+                ExpandCaps(ref featBtn);
+                                
                 var fbmap = LinkButtonCollections(featBtn);
 
                 var featVal = GetValueCaps(HidReportType.Feature, ppd);
+                ExpandCaps(ref featVal);
+
                 var fvmap = LinkValueCollections(featVal);
 
                 var inBtn = GetButtonCaps(HidReportType.Input, ppd);
+                ExpandCaps(ref inBtn);
+
                 var ibmap = LinkButtonCollections(inBtn);
 
                 var inVal = GetValueCaps(HidReportType.Input, ppd);
+                ExpandCaps(ref inVal);
+
                 var ivmap = LinkValueCollections(inVal);
 
                 var outBtn = GetButtonCaps(HidReportType.Output, ppd);
+                ExpandCaps(ref outBtn);
+
                 var obmap = LinkButtonCollections(outBtn);
 
                 var outVal = GetValueCaps(HidReportType.Output, ppd);
+                ExpandCaps(ref outVal);
+
                 var ovmap = LinkValueCollections(outVal);
 
                 device.FeatureButtonCaps = featBtn;
@@ -237,6 +386,62 @@ namespace DataTools.Win32.Usb
             return true;
         }
 
+        private static void ExpandCaps(ref HidPValueCaps[]? data)
+        {
+            if (data == null) return;
+
+            var l = new List<HidPValueCaps>();
+
+            foreach (var item in data)
+            {
+                if (item.IsRange)
+                {
+                    for (ushort i = item.UsageMin; i <= item.UsageMax; i++)
+                    {
+                        var citem = item.Clone();
+                        citem.IsRange = false;
+                        citem.Usage = i;
+
+                        l.Add(citem);
+                    }
+                }
+                else
+                {
+                    l.Add(item);
+                }
+            }
+
+            data = l.ToArray();
+        }
+
+        private static void ExpandCaps(ref HidPButtonCaps[]? data)
+        {
+            if (data == null) return;
+
+            var l = new List<HidPButtonCaps>();
+
+            foreach (var item in data)
+            {
+                if (item.IsRange && item.UsageMin < item.UsageMax)
+                {
+                    for (ushort i = item.UsageMin; i <= item.UsageMax; i++)
+                    {
+                        var citem = item.Clone();
+                        citem.IsRange = false;
+                        citem.Usage = i;
+
+                        l.Add(citem);
+                    }
+                }
+                else
+                {
+                    l.Add(item);
+                }
+            }
+
+            data = l.ToArray();
+        }
+
         /// <summary>
         /// Link value capabilities by grouped collection or linked usage.
         /// </summary>
@@ -250,34 +455,34 @@ namespace DataTools.Win32.Usb
             {
                 if (item.LinkCollection != 0)
                 {
-                    if (!result.TryGetValue((item.UsagePage, item.LinkCollection), out var list))
+                    if (!result.TryGetValue((item.LinkUsagePage, item.LinkCollection), out var list))
                     {
                         list = new List<HidPValueCaps>();
-                        result.Add((item.UsagePage, item.LinkCollection), list);
+                        result.Add((item.LinkUsagePage, item.LinkCollection), list);
+                    }
+
+                    var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
+                    if (test.Usage == 0) list.Add(item);
+                }
+
+                if (item.LinkUsage != 0)
+                {
+                    if (!result.TryGetValue((item.LinkUsagePage, item.LinkUsage), out var list))
+                    {
+                        list = new List<HidPValueCaps>();
+                        result.Add((item.LinkUsagePage, item.LinkUsage), list);
                     }
 
                     var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
                     if (test.Usage == 0) list.Add(item);
                 }
                 
-                if (item.LinkUsage != 0)
-                {
-                    if (!result.TryGetValue((item.UsagePage, item.LinkUsage), out var list))
-                    {
-                        list = new List<HidPValueCaps>();
-                        result.Add((item.UsagePage, item.LinkUsage), list);
-                    }
-
-                    var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
-                    if (test.Usage == 0) list.Add(item);
-                }
-
-                else if (item.LinkCollection == 0 && item.LinkUsage == 0)
+                if (item.LinkUsage == 0 && item.LinkCollection == 0)
                 {
                     if (!result.TryGetValue((item.UsagePage, 0), out var list))
                     {
                         list = new List<HidPValueCaps>();
-                        result.Add((item.UsagePage, item.LinkUsage), list);
+                        result.Add((item.UsagePage, 0), list);
                     }
 
                     var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
@@ -300,8 +505,6 @@ namespace DataTools.Win32.Usb
 
             foreach (var item in btnCaps)
             {
-
-
                 if (item.LinkCollection != 0)
                 {
                     if (!result.TryGetValue((item.UsagePage, item.LinkCollection), out var list))
@@ -313,12 +516,25 @@ namespace DataTools.Win32.Usb
                     var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
                     if (test.Usage == 0) list.Add(item);
                 }
+
                 if (item.LinkUsage != 0)
                 {
-                    if (!result.TryGetValue((item.UsagePage, item.LinkUsage), out var list))
+                    if (!result.TryGetValue((item.LinkUsagePage, item.LinkUsage), out var list))
                     {
                         list = new List<HidPButtonCaps>();
-                        result.Add((item.UsagePage, item.LinkUsage), list);
+                        result.Add((item.LinkUsagePage, item.LinkUsage), list);
+                    }
+
+                    var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
+                    if (test.Usage == 0) list.Add(item);
+                }
+
+                if (item.LinkUsage == 0 && item.LinkCollection == 0)
+                {
+                    if (!result.TryGetValue((item.UsagePage, 0), out var list))
+                    {
+                        list = new List<HidPButtonCaps>();
+                        result.Add((item.UsagePage, 0), list);
                     }
 
                     var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();

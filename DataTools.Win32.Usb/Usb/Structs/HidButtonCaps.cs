@@ -48,7 +48,7 @@ namespace DataTools.Win32.Usb
 
 
     [StructLayout(LayoutKind.Explicit)]
-    public struct HidPButtonCaps
+    public struct HidPButtonCaps : ICaps
     {
         [FieldOffset(0)]
         public HidUsagePage UsagePage;
@@ -70,7 +70,7 @@ namespace DataTools.Win32.Usb
         public ushort LinkUsage;
 
         [FieldOffset(10)]
-        public ushort LinkUsagePage;
+        public HidUsagePage LinkUsagePage;
 
         [FieldOffset(12)]
         [MarshalAs(UnmanagedType.U1)]
@@ -95,9 +95,7 @@ namespace DataTools.Win32.Usb
         [FieldOffset(18)]
         public ushort Reserved2;
 
-        //[FieldOffset(20)]
-        //[MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U4, SizeConst = 9)]
-        //public uint[] Reserved;
+        // Is Not Range
 
         [FieldOffset(56)]
         public ushort Usage;
@@ -124,6 +122,8 @@ namespace DataTools.Win32.Usb
         public ushort Reserved5;
 
 
+        // Is Range
+
         [FieldOffset(56)]
         public ushort UsageMin;
 
@@ -147,6 +147,33 @@ namespace DataTools.Win32.Usb
 
         [FieldOffset(70)]
         public ushort DataIndexMax;
+
+        ushort ICaps.Usage => Usage;
+        ushort ICaps.LinkCollection => LinkCollection;
+        ushort ICaps.LinkUsage => LinkUsage;
+
+        HidUsagePage ICaps.UsagePage => UsagePage;
+
+        HidUsagePage ICaps.LinkUsagePage => LinkUsagePage;
+
+        bool ICaps.IsRange => IsRange;
+
+        ushort ICaps.UsageMin => UsageMin;
+        ushort ICaps.UsageMax => UsageMax;
+
+        byte ICaps.ReportID => ReportID;
+
+        bool ICaps.IsButton => true;
+
+        object ICloneable.Clone()
+        {
+            return this.MemberwiseClone();
+        }
+
+        public HidPButtonCaps Clone()
+        {
+            return (HidPButtonCaps)MemberwiseClone();
+        }
 
         public override string ToString()
         {

@@ -192,7 +192,7 @@ namespace DataTools.Win32.Usb
             Parse(0x86, "SerialNumber", "SV", "F", "R/O", "SBML", "4.2.6");
             Parse(0x87, "iManufacturerName", "SV", "F", "R/O", "SBML", "4.2.6");
             Parse(0x88, "iDevicename", "SV", "F", "R/O", "SBML", "4.2.6");
-            Parse(0x89, "iDeviceChemistery", "SV", "F", "R/O", "SBML", "4.2.6");
+            Parse(0x89, "iDeviceChemistry", "SV", "F", "R/O", "SBML", "4.2.6");
             Parse(0x8A, "ManufacturerData", "SV", "F", "R/O", "4.2.6");
             Parse(0x8B, "Rechargable", "SV", "F", "R/O", "SBML", "4.2.7");
             Parse(0x8C, "WarningCapacityLimit", "SV", "F", "R/O", "SBML", "4.2.7");

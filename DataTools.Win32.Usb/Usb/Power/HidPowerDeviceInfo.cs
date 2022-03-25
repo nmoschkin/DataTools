@@ -1,4 +1,7 @@
-﻿using System;
+﻿using DataTools.Win32.Memory;
+
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,6 +46,9 @@ namespace DataTools.Win32.Usb
             var cd = GetCollection(LinkedFeatureValues, HidReportType.Feature);
             cd = GetCollection(LinkedInputValues, HidReportType.Input, cd);
             cd = GetCollection(LinkedOutputValues, HidReportType.Output, cd);
+            cd = GetCollection(LinkedFeatureButtons, HidReportType.Feature, cd);
+            cd = GetCollection(LinkedInputButtons, HidReportType.Input, cd);
+            cd = GetCollection(LinkedOutputButtons, HidReportType.Output, cd);
 
             PowerCollections = cd;
         }
@@ -62,8 +68,24 @@ namespace DataTools.Win32.Usb
         /// <returns></returns>
         public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? RefreshDynamicValues()
         {
-            return GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.DV);
+            var retDict = GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.DV | HidUsageType.DF);
+
+            if (retDict != null)
+            {
+                var leftovers = GetFeatureValues(HidUsageType.Reserved, HidUsageType.DV);
+                if (leftovers != null)
+                {
+                    foreach (var kvp in leftovers)
+                    {
+                        retDict.Add(kvp.Key, kvp.Value);
+                    }
+                }
+            }
+
+            return retDict;
         }
+
+
 
         /// <summary>
         /// Retrieve values live from the device by collection and usage type.
@@ -74,24 +96,33 @@ namespace DataTools.Win32.Usb
         /// <remarks>
         /// The <paramref name="collectionType"/> and <paramref name="usageType"/> properties can be OR'd to retrieve more than one kind of value set.
         /// </remarks>
-        public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? GetFeatureValues(HidUsageType collectionType, HidUsageType usageType)
+        public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? GetFeatureValues(HidUsageType collectionType, HidUsageType usageType, bool includeUnlinked = false)
         {
             var result = new Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>();
             if (PowerCollections == null) return null;
 
             foreach(var kvp in PowerCollections)
             {
-                if ((collectionType & kvp.Key.UsageType) != 0)
+                if ((collectionType & kvp.Key.UsageType) != 0 || (kvp.Key.UsageType == HidUsageType.Reserved && (collectionType == HidUsageType.Reserved || includeUnlinked)))
                 {
                     foreach (var item in kvp.Value)
                     {
                         if ((usageType & item.UsageType) != 0)
-                        {
-                            int res = 0;
-                            var b = HidGetFeature(item.ReportID, out res);
-                            if (b)
+                        {                           
+
+                            if (item.IsButton && item.ButtonCaps != null)
                             {
-                                item.Value = res;
+                                var btncaps = UsbLibHelpers.GetButtonStatesRaw(this, item.ReportType, item.ButtonCaps.Value);
+                                item.ButtonValue = false;
+
+                                foreach (var pair in btncaps)
+                                {
+                                    if (/*pair.Item1 == kvp.Key.UsageId &&*/ pair.Item2 == item.UsageId)
+                                    {
+                                        item.ButtonValue = true;
+                                        break;
+                                    }
+                                }
 
                                 if (!result.TryGetValue(kvp.Key, out List<HidPowerUsageInfo>? col))
                                 {
@@ -101,12 +132,61 @@ namespace DataTools.Win32.Usb
 
                                 col.Add(item);
                             }
+                            else if (item.ValueCaps is HidPValueCaps vc && vc.StringIndex != 0)
+                            {
+                                var hhid = HidFeatures.OpenHid(this);
+                                var sb = new SafePtr();
+                                sb.Alloc(256);
+                                
+                                var b = UsbLibHelpers.HidD_GetIndexedString(hhid, vc.StringIndex, sb, (int)sb.Length);
+                                HidFeatures.CloseHid(hhid);
+
+                                if (b)
+                                {
+
+                                    var strres = sb.ToString();
+                                    if (!string.IsNullOrEmpty(strres))
+                                    {
+                                        item.Value = strres;
+
+                                        if (!result.TryGetValue(kvp.Key, out List<HidPowerUsageInfo>? col))
+                                        {
+                                            col = new List<HidPowerUsageInfo>();
+                                            result.Add(kvp.Key, col);
+                                        }
+
+                                        col.Add(item);
+                                    }
+
+                                }
+
+                            }
+                            else
+                            {
+                                var b = HidGetFeature(item.ReportID, out int res);
+
+                                if (b)
+                                {
+                                    item.Value = res;
+
+                                    if (!result.TryGetValue(kvp.Key, out List<HidPowerUsageInfo>? col))
+                                    {
+                                        col = new List<HidPowerUsageInfo>();
+                                        result.Add(kvp.Key, col);
+                                    }
+
+                                    col.Add(item);
+                                }
+
+                            }
+
 
                         }
                     }
 
                 }
             }
+
 
             return result;
         }
@@ -139,11 +219,28 @@ namespace DataTools.Win32.Usb
                             var newitem = item;
                             if (retrieveValue)
                             {
-                                var b = HidGetFeature(item.ReportID, out int res);
+                                if (item.IsButton && item.ButtonCaps != null)
+                                {
+                                    var btncaps = UsbLibHelpers.GetButtonStatesRaw(this, item.ReportType, item.ButtonCaps.Value);
 
-                                if (b)
-                                    newitem.Value = res;
+                                    newitem.ButtonValue = false;
 
+                                    foreach (var pair in btncaps)
+                                    {
+                                        if (/*pair.Item1 == kvp.Key.UsageId &&*/ pair.Item2 == item.UsageId)
+                                        {
+                                            newitem.ButtonValue = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    var b = HidGetFeature(item.ReportID, out int res);
+
+                                    if (b)
+                                        newitem.Value = res;
+                                }
                             }
 
                             return newitem;
@@ -176,51 +273,134 @@ namespace DataTools.Win32.Usb
             foreach (var kv in data)
             {
                 var page = kv.Key.Item1;
-                var valcap = kv.Key.Item2;
+                var collectionid = kv.Key.Item2;
                 var list = kv.Value;
-                
-                if (page == HidUsagePage.PowerDevice2)
+
+                HidUsageInfo? bitem;
+
+                if (page == HidUsagePage.PowerDevice1)
                 {
-                    var bitem = bref.Where((x) => x.UsageId == valcap && x.UsageName != "Reserved").FirstOrDefault();
-                    if (bitem == null) continue;
+                    bitem = HidPowerDevicePageInfo.Instance.Where((x) => x.UsageId == collectionid && x.UsageName != "Reserved").FirstOrDefault();
+                }
+                else
+                {
+                    bitem = HidBatteryDevicePageInfo.Instance.Where((x) => x.UsageId == collectionid && x.UsageName != "Reserved").FirstOrDefault();
+                }
 
-                    var l = new List<HidPowerUsageInfo>();
+                if (bitem == null) continue;
 
-                    foreach (var item in list)
+                List<HidPowerUsageInfo> l;
+
+                l = result.Where((scan) => scan.Key.UsageId == collectionid && scan.Key.ReportType == reportType).Select((scan2) => scan2.Value).FirstOrDefault() ?? new List<HidPowerUsageInfo>();
+                var newres = l.Count == 0;
+
+                foreach (var item in list)
+                {
+                    HidUsageInfo? bitem2;
+
+                    if (item.UsagePage == HidUsagePage.PowerDevice1)
                     {
-                        var bitem2 = bref.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
-                        if (bitem2 == null) continue;
+                        bitem2 = HidPowerDevicePageInfo.Instance.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
+                    }
+                    else
+                    {
+                        bitem2 = HidBatteryDevicePageInfo.Instance.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
+                    }
+
+                    if (bitem2 == null) continue;
+
+                    if (l.Count((scan3) => scan3.UsageId == bitem2.UsageId) == 0)
+                    {
                         var newItem = (HidPowerUsageInfo)bitem2.Clone(reportType);
+
                         newItem.ReportID = item.ReportID;
+                        newItem.ValueCaps = item;
+
+                        newItem.IsButton = false;
+
                         l.Add(newItem);
+
                     }
 
-                    result.Add((HidPowerUsageInfo)bitem.Clone(reportType), l);
                 }
-                else if (page == HidUsagePage.PowerDevice1)
-                {
-                    var pitem = pref.Where((x) => x.UsageId == valcap && x.UsageName != "Reserved").FirstOrDefault();
-                    if (pitem == null) continue;
 
-                    var l = new List<HidPowerUsageInfo>();
-
-                    foreach (var item in list)
-                    {
-                        var pitem2 = pref.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
-                        if (pitem2 == null) continue;
-
-                        var newItem = (HidPowerUsageInfo)pitem2.Clone(reportType);
-                        newItem.ReportID = item.ReportID;
-                        l.Add(newItem);
-                    }
-
-                    result.Add((HidPowerUsageInfo)pitem.Clone(reportType), l);
-                }
+                if (newres) result.Add((HidPowerUsageInfo)bitem.Clone(reportType), l);
             }
 
             return result;
         }
 
+
+
+        /// <summary>
+        /// Create a power device collection from the pre-populated linked list of collections and usages.
+        /// </summary>
+        /// <param name="data">The linked usage data.</param>
+        /// <param name="currDict">The dictionary to add to.</param>
+        /// <returns>
+        /// Either <paramref name="currDict"/> or a new dictionary.
+        /// </returns>
+        public Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> data, HidReportType reportType, Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? currDict = null)
+        {
+            var result = currDict ?? new Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>();
+
+            foreach (var kv in data)
+            {
+                var page = kv.Key.Item1;
+                var collectionid = kv.Key.Item2;
+                var list = kv.Value;
+
+                HidUsageInfo? bitem;
+
+                if (page == HidUsagePage.PowerDevice1)
+                {
+                    bitem = HidPowerDevicePageInfo.Instance.Where((x) => x.UsageId == collectionid && x.UsageName != "Reserved").FirstOrDefault();
+                }
+                else
+                {
+                    bitem = HidBatteryDevicePageInfo.Instance.Where((x) => x.UsageId == collectionid && x.UsageName != "Reserved").FirstOrDefault();
+                }
+
+                if (bitem == null) continue;
+
+                List<HidPowerUsageInfo> l;
+
+                l = result.Where((scan) => scan.Key.UsageId == collectionid && scan.Key.ReportType == reportType).Select((scan2) => scan2.Value).FirstOrDefault() ?? new List<HidPowerUsageInfo>();
+                var newres = l.Count == 0;
+
+                foreach (var item in list)
+                {
+                    HidUsageInfo? bitem2;
+
+                    if (item.UsagePage == HidUsagePage.PowerDevice1)
+                    {
+                        bitem2 = HidPowerDevicePageInfo.Instance.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
+                    }
+                    else
+                    {
+                        bitem2 = HidBatteryDevicePageInfo.Instance.Where((x) => x.UsageId == item.Usage).FirstOrDefault();
+                    }
+
+                    if (bitem2 == null) continue;
+
+                    if (l.Count((scan3) => scan3.UsageId == bitem2.UsageId) == 0)
+                    {
+                        var newItem = (HidPowerUsageInfo)bitem2.Clone(reportType);
+
+                        newItem.ReportID = item.ReportID;
+                        newItem.ButtonCaps = item;
+                        newItem.IsButton = true;
+                        l.Add(newItem);
+
+                    }
+
+                }
+
+                if (newres) result.Add((HidPowerUsageInfo)bitem.Clone(reportType, true), l);
+            }
+
+            return result;
+        }
 
     }
 }

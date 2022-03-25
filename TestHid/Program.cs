@@ -62,25 +62,36 @@ namespace TestHid
 
                 foreach (var val in vals)
                 {
-                    Console.WriteLine(TextTools.Separate(val.Key.UsageName) + $" ({val.Key.UsageId:X2})                           ");
+                    Console.WriteLine($"({val.Key.UsageType}) {TextTools.Separate(val.Key.UsageName)} ({val.Key.UsageId:X2}) {val.Key.ReportType}                         ");
 
                     foreach (var item in val.Value)
                     {
-
                         if (item.UsageName.Contains("Time"))
                         {
-                            Console.WriteLine($"    {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {new TimeSpan(0, 0, item.Value)}                           ");
+                            Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {new TimeSpan(0, 0, (int?)item.Value ?? 0)}                           ");
                         }
                         else
                         {
-                            double vv = item.Value;
-
-                            if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
+                            
+                            if (item.IsButton)
                             {
-                                vv /= 10;
+                                Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.ButtonValue}                                                  ");
                             }
+                            else if (item.Value is string s)
+                            {
+                                Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.Value}                                                  ");
+                            }
+                            else
+                            {
+                                double vv = (int?)item.Value ?? 0d;
 
-                            Console.WriteLine($"    {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {vv}                                                  ");
+                                if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
+                                {
+                                    vv /= 10;
+                                }
+
+                                Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {vv}                                                  ");
+                            }
                         }
                     }
 
@@ -89,36 +100,40 @@ namespace TestHid
 
                 if (!printed)
                 {
-
-                    Console.WriteLine("       ");
-                    Console.WriteLine($"Product:       {pstr}       ");
-                    Console.WriteLine($"Serial Number: {sstr}       ");
-                    Console.WriteLine($"Manufacturer:  {mstr2}       ");
-                    Console.WriteLine("       ");
-
-                    var svals = batt2.GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.SV | HidUsageType.SF);
+                    var svals = batt2.GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.SV | HidUsageType.SF, true);
 
                     foreach (var val in svals)
                     {
-                        Console.WriteLine(TextTools.Separate(val.Key.UsageName) + $" ({val.Key.UsageId:X2})                           ");
+                        Console.WriteLine($"({val.Key.UsageType}) {TextTools.Separate(val.Key.UsageName)} ({val.Key.UsageId:X2}) {val.Key.ReportType}                          ");
 
                         foreach (var item in val.Value)
                         {
 
                             if (item.UsageName.Contains("Time"))
                             {
-                                Console.WriteLine($"    {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {new TimeSpan(0, 0, item.Value)}                           ");
+                                Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {new TimeSpan(0, 0, (int?)item.Value ?? 0)}                           ");
                             }
                             else
                             {
-                                double vv = item.Value;
-
-                                if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
+                                if (item.IsButton)
                                 {
-                                    vv /= 10;
+                                    Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.ButtonValue}                                                  ");
                                 }
+                                else if (item.Value is string s)
+                                {
+                                    Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.Value}                                                  ");
+                                }
+                                else
+                                {
+                                    double vv = (int?)item.Value ?? 0d;
 
-                                Console.WriteLine($"    {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {vv}                                                  ");
+                                    if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
+                                    {
+                                        vv /= 10;
+                                    }
+
+                                    Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {vv}                                                  ");
+                                }
                             }
                         }
 
@@ -132,6 +147,7 @@ namespace TestHid
                 }
 
                 Task.Delay(500);
+                Environment.Exit(0);    
             }
 
         }

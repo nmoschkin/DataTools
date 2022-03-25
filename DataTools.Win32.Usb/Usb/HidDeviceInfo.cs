@@ -41,6 +41,8 @@ namespace DataTools.Win32.Usb
         protected HidPButtonCaps[]? inputBtnCaps;
         protected HidPButtonCaps[]? outputBtnCaps;
 
+        protected HidCaps? hidCaps;
+
         protected Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> featureValMap = new Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>();
         protected Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> inputValMap = new Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>();
         protected Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> outputValMap = new Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>();
@@ -564,6 +566,15 @@ namespace DataTools.Win32.Usb
             {
                 return hidPage;
             }
+        }
+
+        /// <summary>
+        /// Device HID Capabilities
+        /// </summary>
+        public HidCaps HidCaps
+        {
+            get => hidCaps ?? default;
+            internal set => hidCaps = value;
         }
 
         /// <summary>
