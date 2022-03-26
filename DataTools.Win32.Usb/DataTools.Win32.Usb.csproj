@@ -68,7 +68,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataTools.Extras\DataTools.Extras.csproj" />
     <ProjectReference Include="..\DataTools.Win32\DataTools.Win32.csproj" />
     <ProjectReference Include="..\DataTools\DataTools.csproj" />
   </ItemGroup>
