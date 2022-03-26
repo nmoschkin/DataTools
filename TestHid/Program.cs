@@ -1,6 +1,6 @@
 ﻿
 
-
+using DataTools.Console;
 using DataTools.Win32;
 using DataTools.Win32.Memory;
 using DataTools.Win32.Usb;
@@ -21,7 +21,6 @@ namespace TestHid
         [STAThread]
         public static void Main(string[] args)
         {
-            
 
             var hids = HidDeviceInfo.EnumerateHidDevices();
 
@@ -62,28 +61,28 @@ namespace TestHid
 
                 foreach (var val in vals)
                 {
-                    Console.WriteLine($"({val.Key.UsageType}) {TextTools.Separate(val.Key.UsageName)} ({val.Key.UsageId:X2}) {val.Key.ReportType}                         ");
+                    ColorConsole.WriteLine($"({{Yellow}}{val.Key.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.Key.UsageName)}{{Reset}} ({{DarkCyan}}{val.Key.UsageId:X2}{{Reset}}) {val.Key.ReportType}                         ");
 
                     foreach (var item in val.Value)
                     {
                         if (item.UsageName.Contains("Time"))
                         {
-                            Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {new TimeSpan(0, 0, (int?)item.Value ?? 0)}                           ");
+                            ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{Green}}{new TimeSpan(0, 0, (int?)item.Value ?? 0)}{{Reset}}                           ");
                         }
                         else
                         {
                             
                             if (item.IsButton)
                             {
-                                Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.ButtonValue}                                                  ");
+                                ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{{(item.ButtonValue ? "Green" : "Red")}}}{item.ButtonValue}{{Reset}}                                                  ");
                             }
                             else if (item.Value is string || item.Value is DeviceChemistry)
                             {
-                                Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.Value}                                                  ");
+                                ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{Yellow}}{item.Value}{{Reset}}                                                  ");
                             }
                             else if (item.Value is Enum)
                             {
-                                Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {TextTools.Separate(item.Value.ToString())}                                                  ");
+                                ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{Yellow}}{TextTools.Separate(item.Value.ToString())}{{Reset}}                                                  ");
                             }
                             else
                             {
@@ -94,7 +93,7 @@ namespace TestHid
                                     vv /= 10;
                                 }
 
-                                Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {vv}                                                  ");
+                                ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{Green}}{vv}{{Reset}}                                                  ");
                             }
                         }
                     }
@@ -108,28 +107,28 @@ namespace TestHid
 
                     foreach (var val in svals)
                     {
-                        Console.WriteLine($"({val.Key.UsageType}) {TextTools.Separate(val.Key.UsageName)} ({val.Key.UsageId:X2}) {val.Key.ReportType}                          ");
+                        ColorConsole.WriteLine($"({{Yellow}}{val.Key.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.Key.UsageName)}{{Reset}} ({{DarkCyan}}{val.Key.UsageId:X2}{{Reset}}) {val.Key.ReportType}                         ");
 
                         foreach (var item in val.Value)
                         {
-
                             if (item.UsageName.Contains("Time"))
                             {
-                                Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {new TimeSpan(0, 0, (int?)item.Value ?? 0)}                           ");
+                                ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{Green}}{new TimeSpan(0, 0, (int?)item.Value ?? 0)}{{Reset}}                           ");
                             }
                             else
                             {
+
                                 if (item.IsButton)
                                 {
-                                    Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.ButtonValue}                                                  ");
+                                    ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{{(item.ButtonValue ? "Green" : "Red")}}}{item.ButtonValue}{{Reset}}                                                  ");
                                 }
                                 else if (item.Value is string || item.Value is DeviceChemistry)
                                 {
-                                    Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {item.Value}                                                  ");
+                                    ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{Yellow}}{item.Value}{{Reset}}                                                  ");
                                 }
                                 else if (item.Value is Enum)
                                 {
-                                    Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {TextTools.Separate(item.Value.ToString())}                                                  ");
+                                    ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{Yellow}}{TextTools.Separate(item.Value.ToString())}{{Reset}}                                                  ");
                                 }
                                 else
                                 {
@@ -140,22 +139,20 @@ namespace TestHid
                                         vv /= 10;
                                     }
 
-                                    Console.WriteLine($"    ({item.UsageType}) {TextTools.Separate(item.UsageName)} ({item.UsageId:x2}): {vv}                                                  ");
+                                    ColorConsole.WriteLine($"    ({{Yellow}}{item.UsageType}{{Reset}}) {{White}}{TextTools.Separate(item.UsageName)}{{Reset}} ({{DarkCyan}}{item.UsageId:x2}{{Reset}}): {{Green}}{vv}{{Reset}}                                                  ");
                                 }
                             }
+
                         }
 
                         Console.WriteLine("                                                                      ");
                     }
 
                     Console.WriteLine("                                                                      ");
-
-
                     printed = true;
                 }
 
                 Task.Delay(500);
-                Environment.Exit(0);    
             }
 
         }
