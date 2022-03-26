@@ -25,6 +25,8 @@ namespace DataTools.Win32.Usb
     /// </summary>
     public class HidUsageInfo : ICloneable, IComparable<HidUsageInfo>
     {
+        protected string name = "";
+
         /// <summary>
         /// The Usage ID
         /// </summary>
@@ -34,8 +36,49 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// The Usage Name
         /// </summary>
-        [JsonProperty("usageName")]
-        public virtual string? UsageName { get; set; }
+        public virtual string? UsageName
+        {
+            get => name;
+            set
+            {
+                name = value ?? "";
+
+                UnitInfoCode puc = UnitInfoCode.None;
+
+                if (name.Contains("Current"))
+                {
+                    puc = UnitInfoCode.DCCurrent;
+                }
+                else if (name.Contains("Volt"))
+                {
+                    puc = UnitInfoCode.DCVoltage;
+                }
+                else if (name.Contains("Power"))
+                {
+                    puc = UnitInfoCode.ApparentPower;
+                }
+                else if (name.Contains("Time"))
+                {
+                    puc = UnitInfoCode.Time;
+                }
+                else if (name.Contains("Temperature"))
+                {
+                    puc = UnitInfoCode.Temperature;
+                }
+                else if (name.Contains("Freq"))
+                {
+                    puc = UnitInfoCode.Frequency;
+                }
+                else if (name.Contains("Capacity"))
+                {
+                    puc = UnitInfoCode.BatteryCapacity;
+                }
+
+
+                HidUnit = puc;
+            }
+        }
+
 
         /// <summary>
         /// The Usage Type
@@ -200,6 +243,11 @@ namespace DataTools.Win32.Usb
 
         }
 
+        /// <summary>
+        /// Returns the HID Power Unit For this usage.
+        /// </summary>
+        [JsonProperty("hidUnit")]
+        public UnitInfoCode HidUnit { get; set; }
         public virtual object Clone()
         {
             return MemberwiseClone();
