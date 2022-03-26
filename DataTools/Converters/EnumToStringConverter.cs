@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace DataTools.Extras.Converters
 {
-    public class EnumToStringConverter<T> : JsonConverter<T> where T : Enum
+    public class EnumToStringConverter<T> : JsonConverter<T> where T : struct, Enum
     {
         public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
@@ -54,10 +54,15 @@ namespace DataTools.Extras.Converters
         }
 
 
-        public static U GetEnumValue<U>(string obj) where U : Enum
+        public static U GetEnumValue<U>(string obj) where U : struct, Enum
         {
 
             var fis = typeof(U).GetFields(BindingFlags.Public | BindingFlags.Static);
+
+            if (Enum.TryParse<U>(obj, out var answer))
+            {
+                return answer;
+            }
 
             foreach (var fi in fis)
             {
