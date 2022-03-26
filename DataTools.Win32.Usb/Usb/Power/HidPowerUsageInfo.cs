@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -57,6 +59,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Returns the HID Power Unit For this usage.
         /// </summary>
+        [JsonProperty("powerUnit")]
         public PowerUnitCode PowerUnit { get; set; }
 
 

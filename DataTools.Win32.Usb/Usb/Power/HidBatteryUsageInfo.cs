@@ -1,5 +1,7 @@
 ﻿using DataTools.Win32.Usb.Usb.Power;
 
+using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Supports Smart Battery Level
         /// </summary>
+        [JsonProperty("smbl")]
         public bool SBML { get; internal protected set; }
 
 
