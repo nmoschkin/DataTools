@@ -10,6 +10,7 @@
 // Licensed Under the MIT License   
 // ************************************************* ''
 
+
 using DataTools.Text;
 
 using Newtonsoft.Json;
@@ -96,6 +97,9 @@ namespace DataTools.Win32.Usb
         /// </summary>
         [JsonProperty("reportID")]
         public virtual byte ReportID { get; set; }
+
+        [JsonProperty("reservedRanges")]
+        public virtual List<int[]>? ReservedRanges { get; set; }
 
         /// <summary>
         /// The value

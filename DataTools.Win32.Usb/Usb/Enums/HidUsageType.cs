@@ -10,13 +10,18 @@
 // Licensed Under the MIT License   
 // ************************************************* ''
 
+using DataTools.Extras.Converters;
+
+using Newtonsoft.Json;
+
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace DataTools.Win32
+namespace DataTools.Win32.Usb
 {
     [Flags]
+    [JsonConverter(typeof(EnumToStringConverter<HidUsageType>))]
     public enum HidUsageType
     {
         /// <summary>
