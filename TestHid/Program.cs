@@ -174,7 +174,7 @@ namespace TestHid
                 }
                 if (feature.UsagePage == (HidUsagePage)0x84 || feature.UsagePage == (HidUsagePage)0x85)
                 {
-                    HidPowerUsageInfo? usage;
+                    HidUsageInfo? usage;
                     
                     if (feature.UsagePage == HidUsagePage.PowerDevice1)
                     {
@@ -182,7 +182,7 @@ namespace TestHid
                     }
                     else
                     {
-                        usage = (HidPowerUsageInfo?)bsys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
+                        usage = (HidUsageInfo?)bsys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
                     }
 
                     int ires = 0;
@@ -225,15 +225,15 @@ namespace TestHid
                 if (feature.UsagePage == (HidUsagePage)0x84 || feature.UsagePage == (HidUsagePage)0x85)
                 {
 
-                    HidPowerUsageInfo? usage;
+                    HidUsageInfo? usage;
 
                     if (feature.UsagePage == HidUsagePage.PowerDevice1)
                     {
-                        usage = (HidPowerUsageInfo?)psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
+                        usage = (HidUsageInfo?)psys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
                     }
                     else
                     {
-                        usage = (HidPowerUsageInfo?)bsys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
+                        usage = (HidUsageInfo?)bsys.Where((x) => x.UsageId == feature.Usage).FirstOrDefault();
                     }
 
                     int ires = 0;

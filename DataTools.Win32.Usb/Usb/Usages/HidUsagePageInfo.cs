@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using DataTools.Win32.Usb.Keyboard;
+
+using Newtonsoft.Json;
 
 using System;
 using System.Collections;
@@ -16,6 +18,55 @@ namespace DataTools.Win32.Usb
 
         public int PageID { get; protected set; }
 
+        public static HidUsagePageInfo<HidUsageInfo> CreatePage(int pageId)
+        {
+            return new HidUsagePageInfo<HidUsageInfo>(pageId);
+        }
+
+        public static HidUsagePageInfo<TCreate> CreatePage<TCreate>(int pageId)
+            where TCreate : HidUsageInfo, new()
+        {
+            return CreatePage<HidUsagePageInfo<TCreate>, TCreate>(pageId);
+        }
+    
+        public static TPage CreatePage<TPage, TCreate>(int pageId)             
+            where TCreate : HidUsageInfo, new()
+            where TPage : HidUsagePageInfo<TCreate>
+        {
+            if (typeof(TCreate) == typeof(HidKeyboardUsageInfo))
+            {
+                if (HidKeyboardDevicePageInfo.Instance is TPage page)
+                {
+                    return page;
+                }
+            }
+            else if (typeof(TCreate) == typeof(HidPowerDevicePageInfo))
+            {
+                if (HidPowerDevicePageInfo.Instance is TPage page)
+                {
+                    return page;
+                }
+            }
+            else if (typeof(TCreate) == typeof(HidBatteryDevicePageInfo))
+            {
+                if (HidBatteryDevicePageInfo.Instance is TPage page)
+                {
+                    return page;
+                }
+            }
+            else
+            {
+                var result = new HidUsagePageInfo<TCreate>(pageId);
+                if (result is TPage p)
+                {
+                    return p;
+                }
+
+            }
+
+            return (TPage?)Activator.CreateInstance(typeof(TPage), new object[] { pageId }) ?? throw new BadImageFormatException();
+        }
+
         protected virtual void Parse(params object[] values) 
         { 
             string? json = null;
@@ -32,11 +83,18 @@ namespace DataTools.Win32.Usb
                 if (compdat != null)
                 {
                     var arch = new ZipArchive(new MemoryStream(compdat));
-                    var strm = arch.Entries[0].Open();
-                    byte[] buffer = new byte[strm.Length];
-                    strm.Read(buffer, 0, (int)strm.Length);
+                    var entry = arch.Entries[0];
+
+                    var strm = entry.Open();
+                    var mem = new MemoryStream();
+                    strm.CopyTo(mem);
+
+                    byte[] buffer = mem.ToArray();
+
                     json = Encoding.UTF8.GetString(buffer);
-                    strm.Dispose();
+
+                    mem.Close();
+                    strm.Close();                            
                     arch.Dispose();
                 }
             }

@@ -16,7 +16,7 @@ namespace DataTools.Win32.Usb
     /// <remarks>
     /// Extends <see cref="HidUsageInfo"/> to add the <see cref="SBML"/> (Smart Battery Level) attribute.
     /// </remarks>
-    public class HidBatteryUsageInfo : HidUsageInfo
+    public class HidBatteryUsageInfo : HidPowerUsageInfo
     {
 
         /// <summary>
