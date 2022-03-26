@@ -321,6 +321,8 @@ namespace DataTools.Win32.Usb
 
                 HidCaps caps;
 
+                if (hHid == (IntPtr)(-1)) return false;
+
                 HidD_GetPreparsedData(hHid, ref ppd);
                 HidD_GetAttributes(hHid, out attr);
 
