@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataTools.Win32.Usb.Globalization;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,12 +14,12 @@ namespace DataTools.Win32.Usb
     /// </summary>
     public struct DeviceChemistry
     {
-        public static DeviceChemistry PbAc = new DeviceChemistry("PbAc", "Lead Acid");
-        public static DeviceChemistry LION = new DeviceChemistry("LION", "Lithium Ion");
-        public static DeviceChemistry NiCd = new DeviceChemistry("NiCd", "Nickel Cadmium");
-        public static DeviceChemistry NiMH = new DeviceChemistry("NiMH", "Nickel Metal Hydride");
-        public static DeviceChemistry NiZn = new DeviceChemistry("NiZn", "Nickel Zinc");
-        public static DeviceChemistry RAM = new DeviceChemistry("RAM", "Rechargeable Alkaline-Manganese");
+        public static DeviceChemistry PbAc = new DeviceChemistry(nameof(AppResources.pbAc), AppResources.pbAc);
+        public static DeviceChemistry LION = new DeviceChemistry(nameof(AppResources.LION), AppResources.LION);
+        public static DeviceChemistry NiCd = new DeviceChemistry(nameof(AppResources.NiCd), AppResources.NiCd);
+        public static DeviceChemistry NiMH = new DeviceChemistry(nameof(AppResources.NiMH), AppResources.NiMH);
+        public static DeviceChemistry NiZn = new DeviceChemistry(nameof(AppResources.NiZn), AppResources.NiZn);
+        public static DeviceChemistry RAM = new DeviceChemistry(nameof(AppResources.RAM), AppResources.RAM);
 
         private string name;
         private string description;
