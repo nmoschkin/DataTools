@@ -27,8 +27,12 @@ namespace TestHid
 
             var battery = hids.Where((e) => e.DeviceClass == DeviceClassEnum.Battery).ToList().FirstOrDefault();
 
+            var mouse = hids[0];
 
-            var batt2 = HidPowerDeviceInfo.CreateFromHidDevice(battery);
+            mouse.PopulateDeviceCaps();
+            mouse.CreateUsageCollection();
+
+            var batt2 = mouse; // HidPowerDeviceInfo.CreateFromHidDevice(battery);
 
             var mstr = batt2.Manufacturer;
             var mstr2 = batt2.HidManufacturer;

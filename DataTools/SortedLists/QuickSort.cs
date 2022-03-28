@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataTools.Text;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -192,9 +194,9 @@ namespace DataTools.SortedLists
         /// <param name="values">The array of values to sort.</param>
         /// <param name="comparison">The comparison function to use.</param>
         /// <param name="didChange">True if the collection did change.</param>
-        public static void Sort<T>(IList<T> values, Comparison<T> comparison)
+        public static void Sort<T>(IList<T> values, Comparison<T> comparison, SortOrder sortOrder = SortOrder.Ascending)
         {
-            Sort(values, comparison, out _);
+            Sort(values, comparison, sortOrder, out _);
         }
 
 
@@ -205,7 +207,7 @@ namespace DataTools.SortedLists
         /// <param name="values">The array of values to sort.</param>
         /// <param name="comparison">The comparison function to use.</param>
         /// <param name="didChange">True if the collection did change.</param>
-        public static void Sort<T>(IList<T> values, Comparison<T> comparison, out bool didChange)
+        public static void Sort<T>(IList<T> values, Comparison<T> comparison, SortOrder sortOrder, out bool didChange)
         {
             if (values == null || values.Count == 0)
             {
@@ -216,30 +218,30 @@ namespace DataTools.SortedLists
             int lo = 0;
             int hi = values.Count - 1;
 
-            Sort<T>(values, comparison, lo, hi, out didChange);
+            Sort<T>(values, comparison, sortOrder, lo, hi, out didChange);
         }
 
-        private static void Sort<T>(IList<T> values, Comparison<T> comparison, int lo, int hi, out bool didChange)
+        private static void Sort<T>(IList<T> values, Comparison<T> comparison, SortOrder sortOrder, int lo, int hi, out bool didChange)
         {
             bool dcf = false;
             bool dc = false;
 
             if (lo < hi)
             {
-                int p = Partition(values, comparison, lo, hi, out dc);
+                int p = Partition(values, comparison, sortOrder, lo, hi, out dc);
                 dcf |= dc;
 
-                Sort(values, comparison, lo, p, out dc);
+                Sort(values, comparison, sortOrder, lo, p, out dc);
                 dcf |= dc;
 
-                Sort(values, comparison, p + 1, hi, out dc);
+                Sort(values, comparison, sortOrder, p + 1, hi, out dc);
                 dcf |= dc;
             }
 
             didChange = dcf;
         }
 
-        private static int Partition<T>(IList<T> values, Comparison<T> comparison, int lo, int hi, out bool didChange)
+        private static int Partition<T>(IList<T> values, Comparison<T> comparison, SortOrder sortOrder, int lo, int hi, out bool didChange)
         {
             var ppt = (hi + lo) / 2;
             var pivot = values[ppt];
@@ -249,30 +251,62 @@ namespace DataTools.SortedLists
 
             bool dc = false;
 
-            while (true)
+            if (sortOrder == SortOrder.Ascending)
             {
-                do
+                while (true)
                 {
-                    ++i;
-                } while (i <= hi && comparison(values[i], pivot) < 0);
-                do
-                {
-                    --j;
-                } while (j >= 0 && comparison(values[j], pivot) > 0);
-        
-                if (i >= j)
-                {
-                    didChange = dc;
-                    return j;
+                    do
+                    {
+                        ++i;
+                    } while (i <= hi && comparison(values[i], pivot) < 0);
+                    do
+                    {
+                        --j;
+                    } while (j >= 0 && comparison(values[j], pivot) > 0);
 
+                    if (i >= j)
+                    {
+                        didChange = dc;
+                        return j;
+
+                    }
+
+                    T sw = values[i];
+
+                    values[i] = values[j];
+                    values[j] = sw;
+
+                    dc = true;
+                }
+            }
+            else
+            {
+                while (true)
+                {
+                    do
+                    {
+                        ++i;
+                    } while (i <= hi && comparison(values[i], pivot) > 0);
+                    do
+                    {
+                        --j;
+                    } while (j >= 0 && comparison(values[j], pivot) < 0);
+
+                    if (i >= j)
+                    {
+                        didChange = dc;
+                        return j;
+
+                    }
+
+                    T sw = values[i];
+
+                    values[i] = values[j];
+                    values[j] = sw;
+
+                    dc = true;
                 }
 
-                T sw = values[i];
-
-                values[i] = values[j];
-                values[j] = sw;
-
-                dc = true;
             }
         }
 

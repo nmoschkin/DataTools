@@ -11,6 +11,9 @@ using System.IO;
 using System.Text.Json.Nodes;
 
 using static DataTools.MathTools.MathLib;
+using DataTools.Extras.AdvancedLists;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TestExtras
 {
@@ -19,6 +22,99 @@ namespace TestExtras
     public static class Program
     {
         public static void Main(string[] args)
+        {
+            TestBufferList(args);
+        }
+
+        public static void TestBufferList(string[] args)
+        {
+
+            var ltest = new SortedBufferedObjectCollection<string>(3, SortOrder.Ascending);
+
+            ltest.Add("Zanzabar");
+            ltest.Add("Banana");
+            ltest.Add("Echo");
+            ltest.Add("Serenity");
+            ltest.Add("Melding");
+            ltest.Add("Kangaroo");
+            ltest.Add("Lumber");
+            ltest.Add("Xylephone");
+            ltest.Add("Gerbil");
+
+            ltest.Remove("Kangaroo");
+
+            ltest.Add("Jargon");
+            ltest.Add("Julip");
+            ltest.Add("Jamborine");
+
+            ltest.Add("Kaelidescope");
+            ltest.Add("Hadrosaur");
+            ltest.Add("Item");
+
+            ltest.Add("Jambalaya");
+            ltest.Add("Zanzabar");
+            ltest.Add("Banana");
+            ltest.Add("Kangaroo");
+            ltest.Add("Lumber");
+            ltest.Add("Echo");
+            ltest.Add("Serenity");
+            ltest.Add("Melding");
+            ltest.Add("Xylephone");
+            ltest.Add("Gerbil");
+
+            ltest.Remove("Kangaroo");
+
+            ltest.Add("Kaelidescope");
+            ltest.Add("Jargon");
+            ltest.Add("Kangaroo");
+            ltest.Add("Lumber");
+            ltest.Add("Julip");
+            ltest.Add("Jamborine");
+
+            ltest.Add("Hadrosaur");
+            ltest.Add("Hadrosaur");
+            ltest.Add("Kangaroo");
+            ltest.Add("Lumber");
+            ltest.Add("Item");
+
+            ltest.Add("Jambalaya");
+
+            var lcomp = new List<string>();
+
+            foreach(var s in ltest)
+            {
+                lcomp.Add(s);
+            }
+
+            var carr = ltest.ToArray();
+
+
+            var itest = new SortedBufferedValueTypeCollection<int>(16, SortOrder.Descending);
+
+            var r = new Random();
+
+            var testcount = 12000;
+
+
+            for (int x = 0; x < testcount; x++)
+            {
+                itest.Add((int)(r.NextDouble() * testcount));
+                itest.Add((int)(r.NextDouble() * testcount));
+                itest.Add((int)(r.NextDouble() * testcount));
+                itest.Add((int)(r.NextDouble() * testcount));
+            }
+
+            var icomp = itest.ToArray();
+
+            for (int x = 1; x < icomp.Length; x++)
+            {
+                if (icomp[x - 1] < icomp[x]) throw new Exception();
+            }
+
+
+        }
+
+        public static void TestParsing(string[] args)
         {
 
             //var u1 = MetricTool.GetUnitByName("Fahrenheit");
