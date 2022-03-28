@@ -25,10 +25,10 @@ namespace DataTools.Win32.Usb
     /// An object that represents a Human Interface Device USB device on the system.
     /// </summary>
     /// <remarks></remarks>
-    public class HidDeviceInfo : DeviceInfo
+    public class HidDeviceInfo : DeviceInfo, IDisposable
     {
         protected Dictionary<HidUsageInfo, List<HidUsageInfo>>? usageCollections;
-               
+
 
         protected HidUsagePage hidPage;
 
@@ -55,6 +55,9 @@ namespace DataTools.Win32.Usb
         protected Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> inputBtnMap = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
         protected Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> outputBtnMap = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
 
+        protected IntPtr hHid = (IntPtr)(-1);
+        protected bool openWrite = false;
+        private bool disposedValue;
 
         /// <summary>
         /// Enumarate all HID class devices on the local machine.
@@ -76,14 +79,31 @@ namespace DataTools.Win32.Usb
 
             return result;
         }
-        
+
         /// <summary>
         /// Populate All Device Capabilities
         /// </summary>
+        /// <param name="createUsageCollection">True to compile the usage collection after retrieving the device capabilities.</param>
         /// <returns></returns>
-        public bool PopulateDeviceCaps()
+        public bool PopulateDeviceCaps(bool createUsageCollection = true)
         {
-            return UsbLibHelpers.PopulateDeviceCaps(this);
+            bool b;
+            if (IsHidOpen)
+            {
+                b = UsbLibHelpers.PopulateDeviceCaps(this, hHid);
+            }
+            else
+            {
+                b = UsbLibHelpers.PopulateDeviceCaps(this);
+            }
+
+            if (b && createUsageCollection)
+            {
+                CreateUsageCollection();
+            }
+
+            return b;
+
         }
 
         /// <summary>
@@ -101,6 +121,100 @@ namespace DataTools.Win32.Usb
             UsageCollections = cd;
         }
 
+        /// <summary>
+        /// Retrieves the raw handle to the currently open HID device.
+        /// </summary>
+        /// <returns></returns>
+        public IntPtr DangerousGetHidDeviceHandle()
+        {
+            return hHid;
+        }
+
+        /// <summary>
+        /// Gets a value that indicates if the HID device is open.
+        /// </summary>
+        public bool IsHidOpen
+        {
+            get
+            {
+                return !hHid.IsInvalidHandle();
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating that hid is opened with write access.
+        /// </summary>
+        public bool IsOpenWrite
+        {
+            get
+            {
+                return IsHidOpen && openWrite;
+            }
+        }
+
+        /// <summary>
+        /// Open or reopen the HID device for multiple reads and writes.
+        /// </summary>
+        /// <param name="write">True to request write access.</param>
+        /// <returns>True if the device was successfully opened.</returns>
+        /// <remarks>
+        /// Use <see cref="DangerousGetHidDeviceHandle"/> to retrieve the handle value.
+        /// </remarks>
+        public bool OpenHid(bool write = false)
+        {
+            if (IsHidOpen && !CloseHid()) return false;
+
+            hHid = HidFeatures.OpenHid(this, write);
+            var b = IsHidOpen;
+
+            if (b) this.openWrite = write;
+            return b;
+        }
+
+        /// <summary>
+        /// Close the HID device handle.
+        /// </summary>
+        /// <returns></returns>
+        public bool CloseHid()
+        {
+            if (!IsHidOpen) return false;
+
+            HidFeatures.CloseHid(hHid);
+
+            hHid = (IntPtr)(-1);
+            if (openWrite) openWrite = false;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Retrieve an indexed string resource from the HID device.
+        /// </summary>
+        /// <param name="index">The index of the string to retrieve.</param>
+        /// <param name="result">The result of the call.</param>
+        /// <returns>True if successful.</returns>
+        public bool HidGetString(int index, out string? result)
+        {
+            using (var mm = new SafePtr(256))
+            {
+                var hhid = IsHidOpen ? this.hHid : HidFeatures.OpenHid(this);
+                
+                if (hhid != IntPtr.Zero)
+                {
+                    var b = UsbLibHelpers.HidD_GetIndexedString(hhid, index, mm, (int)mm.Length);
+                    if (hhid != hHid) HidFeatures.CloseHid(hhid);
+
+                    if (b)
+                    {
+                        result = mm.ToString();
+                        return true;
+                    }
+                } 
+            }
+
+            result = null;
+            return false;
+        }
 
         /// <summary>
         /// Returns the raw byte data for a Hid feature code.
@@ -114,9 +228,9 @@ namespace DataTools.Win32.Usb
         {
             bool success = false;
 
-            var hfile = HidFeatures.OpenHid(this);
+            var hhid = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
-            if (hfile == IntPtr.Zero)
+            if (hhid == IntPtr.Zero)
             {
                 result = new byte[0];
                 return false;
@@ -127,7 +241,7 @@ namespace DataTools.Win32.Usb
                 mm.Alloc(expectedSize + 1);
                 mm.ByteAt(0L) = reportId;
 
-                if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, expectedSize))
+                if (!UsbLibHelpers.HidD_GetFeature(hhid, mm, expectedSize))
                 {
                     success = false;
                     result = new byte[0];
@@ -138,7 +252,7 @@ namespace DataTools.Win32.Usb
                     result = mm.ToByteArray(1L, expectedSize);
                 }
 
-                HidFeatures.CloseHid(hfile);
+                if (!IsHidOpen) HidFeatures.CloseHid(hhid);
             }
 
             return success;
@@ -157,16 +271,16 @@ namespace DataTools.Win32.Usb
             
             bool success;
 
-            var hfile = HidFeatures.OpenHid(this);
-            
-            if (hfile == IntPtr.Zero) return false;
+            var hhid = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
+
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
                 mm.Alloc(3L);
                 mm.ByteAt(0L) = reportId;
 
-                if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 3))
+                if (!UsbLibHelpers.HidD_GetFeature(hhid, mm, 3))
                 {
                     success = false;
                 }
@@ -177,7 +291,7 @@ namespace DataTools.Win32.Usb
                 }
             }
 
-            HidFeatures.CloseHid(hfile);
+            if (!IsHidOpen) HidFeatures.CloseHid(hhid);
             return success;
         }
 
@@ -193,17 +307,17 @@ namespace DataTools.Win32.Usb
             result = 0;
             
             bool success;
-            
-            var hfile = HidFeatures.OpenHid(this);
-            
-            if (hfile == IntPtr.Zero) return false;
+
+            var hhid = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
+
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
                 mm.Alloc(5L);
                 mm.ByteAt(0L) = reportId;
 
-                if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 5))
+                if (!UsbLibHelpers.HidD_GetFeature(hhid, mm, 5))
                 {
                     success = false;
                 }
@@ -214,7 +328,7 @@ namespace DataTools.Win32.Usb
                 }
             }
 
-            HidFeatures.CloseHid(hfile);
+            if (!IsHidOpen) HidFeatures.CloseHid(hhid);
 
             return success;
         }
@@ -231,16 +345,16 @@ namespace DataTools.Win32.Usb
             result = 0;
             bool success;
 
-            var hfile = HidFeatures.OpenHid(this);
+            var hhid = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
-            if (hfile == IntPtr.Zero) return false;
+            if (hhid == IntPtr.Zero) return false;
 
             using(var mm = new SafePtr())
             {
                 mm.Alloc(9L);
                 mm.ByteAt(0L) = reportId;
 
-                if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 9))
+                if (!UsbLibHelpers.HidD_GetFeature(hhid, mm, 9))
                 {
                     success = false;
                 }
@@ -251,7 +365,7 @@ namespace DataTools.Win32.Usb
                 }
             }
 
-            HidFeatures.CloseHid(hfile);
+            if (!IsHidOpen) HidFeatures.CloseHid(hhid);
 
             return success;
         }
@@ -267,9 +381,9 @@ namespace DataTools.Win32.Usb
         {
             bool success;
 
-            var hfile = HidFeatures.OpenHid(this);
+            var hhid = IsOpenWrite ? hHid : HidFeatures.OpenHid(this);
 
-            if (hfile == IntPtr.Zero) return false;
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
@@ -277,7 +391,7 @@ namespace DataTools.Win32.Usb
                 mm.FromByteArray(value, 1L);
                 mm.ByteAt(0L) = reportId;
 
-                if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, (int)mm.Length))
+                if (!UsbLibHelpers.HidD_SetFeature(hhid, mm, (int)mm.Length))
                 {
                     success = false;
                 }
@@ -287,7 +401,7 @@ namespace DataTools.Win32.Usb
                 }
             }
             
-            HidFeatures.CloseHid(hfile);
+            if (!IsOpenWrite) HidFeatures.CloseHid(hhid);
             return success;
         }
 
@@ -301,16 +415,17 @@ namespace DataTools.Win32.Usb
         public bool HidSetFeature(byte reportId, short value)
         {
             bool success;
-            var hfile = HidFeatures.OpenHid(this);
 
-            if (hfile == IntPtr.Zero) return false;
+            var hhid = IsOpenWrite ? hHid : HidFeatures.OpenHid(this);
+
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
                 mm.Alloc(3L);
                 mm.ByteAt(0L) = reportId;
                 mm.ShortAtAbsolute(1L) = value;
-                if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 3))
+                if (!UsbLibHelpers.HidD_SetFeature(hhid, mm, 3))
                 {
                     success = false;
                 }
@@ -319,7 +434,7 @@ namespace DataTools.Win32.Usb
                     success = true;
                 }
 
-                HidFeatures.CloseHid(hfile);
+                if (!IsOpenWrite) HidFeatures.CloseHid(hhid);
             }
 
             return success;
@@ -335,10 +450,10 @@ namespace DataTools.Win32.Usb
         public bool HidSetFeature(byte reportId, int value)
         {
             bool success;
-            
-            var hfile = HidFeatures.OpenHid(this);
 
-            if (hfile == IntPtr.Zero) return false;
+            var hhid = IsOpenWrite ? hHid : HidFeatures.OpenHid(this);
+
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
@@ -346,7 +461,7 @@ namespace DataTools.Win32.Usb
                 mm.ByteAt(0L) = reportId;
                 mm.IntAtAbsolute(1L) = value;
 
-                if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 5))
+                if (!UsbLibHelpers.HidD_SetFeature(hhid, mm, 5))
                 {
                     success = false;
                 }
@@ -355,7 +470,7 @@ namespace DataTools.Win32.Usb
                     success = true;
                 }
 
-                HidFeatures.CloseHid(hfile);
+                if (!IsOpenWrite) HidFeatures.CloseHid(hhid);
 
             }
 
@@ -372,17 +487,17 @@ namespace DataTools.Win32.Usb
         public bool HidSetFeature(byte reportId, long value)
         {
             bool success;
-            
-            var hfile = HidFeatures.OpenHid(this);
 
-            if (hfile == IntPtr.Zero) return false;
+            var hhid = IsOpenWrite ? hHid : HidFeatures.OpenHid(this);
+
+            if (hhid == IntPtr.Zero) return false;
             
             using (var mm = new SafePtr())
             {
                 mm.Alloc(9L);
                 mm.ByteAt(0L) = reportId;
                 mm.LongAtAbsolute(1L) = value;
-                if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 9))
+                if (!UsbLibHelpers.HidD_SetFeature(hhid, mm, 9))
                 {
                     success = false;
                 }
@@ -391,7 +506,7 @@ namespace DataTools.Win32.Usb
                     success = true;
                 }
 
-                HidFeatures.CloseHid(hfile);
+                if (!IsOpenWrite) HidFeatures.CloseHid(hhid);
             }
 
             return success;
@@ -413,7 +528,7 @@ namespace DataTools.Win32.Usb
 
                     using (var mm = new SafePtr())
                     {
-                        var dev = HidFeatures.OpenHid(this);
+                        var dev = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
                         mm.AllocZero(128L * sizeof(char));
 
@@ -421,7 +536,7 @@ namespace DataTools.Win32.Usb
 
                         hidManufacturer = mm.GetString(0L);
 
-                        HidFeatures.CloseHid(dev);
+                        if (!IsHidOpen) HidFeatures.CloseHid(dev);
                     }
 
                 }
@@ -449,7 +564,7 @@ namespace DataTools.Win32.Usb
                 {
                     using (var mm = new SafePtr())
                     {
-                        var dev = HidFeatures.OpenHid(this);
+                        var dev = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
                         mm.AllocZero(128L * sizeof(char));
 
@@ -457,7 +572,7 @@ namespace DataTools.Win32.Usb
 
                         serialNumber = (string)mm;
 
-                        HidFeatures.CloseHid(dev);
+                        if (!IsHidOpen) HidFeatures.CloseHid(dev);
                     }
                 }
 
@@ -484,14 +599,14 @@ namespace DataTools.Win32.Usb
                 {
                     using (var mm = new SafePtr())
                     {
-                        var dev = HidFeatures.OpenHid(this);
+                        var dev = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
                         mm.AllocZero(128L * sizeof(char));
                         var b = UsbLibHelpers.HidD_GetProductString(dev, mm, (int)mm.Length);
 
                         productString = (string)mm;
 
-                        HidFeatures.CloseHid(dev);
+                        if (!IsHidOpen) HidFeatures.CloseHid(dev);
                     }
                 }
 
@@ -540,7 +655,7 @@ namespace DataTools.Win32.Usb
                 {
                     using (var mm = new SafePtr())
                     {
-                        var dev = HidFeatures.OpenHid(this);
+                        var dev = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
                         mm.AllocZero(512L);
 
@@ -548,7 +663,7 @@ namespace DataTools.Win32.Usb
 
                         physicalDescriptor = (string)mm;
 
-                        HidFeatures.CloseHid(dev);
+                        if (!IsHidOpen) HidFeatures.CloseHid(dev);
                     }
                 }
 
@@ -788,7 +903,84 @@ namespace DataTools.Win32.Usb
             return retDict;
         }
 
+        /// <summary>
+        /// Reads the current value for a usage report.
+        /// </summary>
+        /// <param name="item">The <see cref="HidUsageInfo"/> object that contains information about the report to retrieve.</param>
+        /// <param name="populateItemValue">True to set the <see cref="HidUsageInfo.Value"/> property to the result of the operation.</param>
+        /// <returns>The result of the operator or null.</returns>
+        protected bool ReadUsageValue(HidUsageInfo item, bool populateItemValue, out object? res)
+        {
+            int olen;
+            bool b;
+            res = null;
 
+            if (hidCaps == null)
+            {
+                PopulateDeviceCaps();
+            }
+
+            if (hidCaps is HidCaps hc)
+            {
+                if (item.ReportType == HidReportType.Feature)
+                {
+                    olen = hc.FeatureReportByteLength;
+                }
+                else if (item.ReportType == HidReportType.Input)
+                {
+                    olen = hc.InputReportByteLength;
+                }
+                else if (item.ReportType == HidReportType.Output)
+                {
+                    olen = hc.OutputReportByteLength;
+                }
+                else
+                {
+                    olen = 4;
+                }
+
+                b = HidGetFeature(item.ReportID, out byte[] resb, olen);
+
+                if (b)
+                {
+                    switch (olen)
+                    {
+                        case 2:
+                        case 3:
+
+                            res = (int)BitConverter.ToInt16(resb, 0);
+                            break;
+
+
+                        case 8:
+                        case 9:
+
+                            long l = BitConverter.ToInt64(resb, 0);
+
+                            if ((l & 0x7fffffff) == l)
+                                res = (int)l;
+                            else
+                                res = l;
+                            break;
+
+
+                        case 4:
+                        case 5:
+                        default:
+                            res = BitConverter.ToInt32(resb, 0);
+                            break;
+
+                    }
+
+                    if (populateItemValue) item.Value = res;
+
+                    return true;
+                }
+
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// Retrieve values live from the device by collection and usage type.
@@ -803,6 +995,13 @@ namespace DataTools.Win32.Usb
         {
             var result = new Dictionary<HidUsageInfo, List<HidUsageInfo>>();
             if (UsageCollections == null) return null;
+            bool ch = false;
+
+            if (!IsHidOpen)
+            {
+                if (!OpenHid()) return null;
+                ch = true;
+            }
 
             foreach (var kvp in UsageCollections)
             {
@@ -836,102 +1035,33 @@ namespace DataTools.Win32.Usb
                             }
                             else if (item.ValueCaps is HidPValueCaps vc && vc.StringIndex != 0)
                             {
-                                using (var mm = new SafePtr(256))
+                                if (HidGetString(vc.StringIndex, out string? strres))
                                 {
-                                    var hhid = HidFeatures.OpenHid(this);
-                                    if (hhid != IntPtr.Zero)
+                                    if (!string.IsNullOrEmpty(strres))
                                     {
-                                        var b = UsbLibHelpers.HidD_GetIndexedString(hhid, vc.StringIndex, mm, (int)mm.Length);
-                                        HidFeatures.CloseHid(hhid);
 
-                                        if (b)
+                                        if (item.UsageId == 0x89 && vc.UsagePage == HidUsagePage.PowerDevice2 && DeviceChemistry.FindByName(strres) is DeviceChemistry dchem)
                                         {
-                                            var strres = mm.ToString();
-                                            if (!string.IsNullOrEmpty(strres))
-                                            {
-
-                                                if (item.UsageId == 0x89 && vc.UsagePage == HidUsagePage.PowerDevice2 && DeviceChemistry.FindByName(strres) is DeviceChemistry dchem)
-                                                {
-                                                    item.Value = dchem;
-                                                }
-                                                else
-                                                {
-                                                    item.Value = strres;
-                                                }
-
-                                                if (!result.TryGetValue(kvp.Key, out List<HidUsageInfo>? col))
-                                                {
-                                                    col = new List<HidUsageInfo>();
-                                                    result.Add(kvp.Key, col);
-                                                }
-
-                                                col.Add(item);
-                                            }
-
+                                            item.Value = dchem;
                                         }
+                                        else
+                                        {
+                                            item.Value = strres;
+                                        }
+
+                                        if (!result.TryGetValue(kvp.Key, out List<HidUsageInfo>? col))
+                                        {
+                                            col = new List<HidUsageInfo>();
+                                            result.Add(kvp.Key, col);
+                                        }
+
+                                        col.Add(item);
                                     }
                                 }
                             }
                             else
                             {
-                                bool b = false;
-                                int olen;
-                                object res = 0;
-
-                                if (hidCaps is HidCaps hc)
-                                {
-                                    if (item.ReportType == HidReportType.Feature)
-                                    {
-                                        olen = hc.FeatureReportByteLength;
-                                    }
-                                    else if (item.ReportType == HidReportType.Input)
-                                    {
-                                        olen = hc.InputReportByteLength;
-                                    }
-                                    else if (item.ReportType == HidReportType.Output) 
-                                    {
-                                        olen = hc.OutputReportByteLength;
-                                    }
-                                    else 
-                                    {
-                                        olen = 4;
-                                    }
-
-                                    b = HidGetFeature(item.ReportID, out byte[] resb, olen);
-
-                                    if (b)
-                                    {
-                                        switch (olen)
-                                        {
-                                            case 2:
-                                            case 3:
-                                                res = BitConverter.ToInt16(resb, 0);
-                                                break;
-
-
-                                            case 8:
-                                            case 9:
-                                                
-                                                long l = BitConverter.ToInt64(resb, 0);
-                                                if ((l & 0x7fffffff) == l)
-                                                    res = (int)l;
-                                                else
-                                                    res = l;
-                                                break;
-
-
-                                            case 4:
-                                            case 5:
-                                            default:
-                                                res = BitConverter.ToInt32(resb, 0);
-                                                break;
-
-                                        }
-                                    }
-
-                                }
-                                
-                                if (b && item.ValueCaps is HidPValueCaps vc2 && res != null)
+                                if (ReadUsageValue(item, false, out object? res) && item.ValueCaps is HidPValueCaps vc2 && res != null)
                                 {
                                     if (item.UsageId == 0x5a && vc2.UsagePage == HidUsagePage.PowerDevice1)
                                     {
@@ -957,13 +1087,13 @@ namespace DataTools.Win32.Usb
 
                             }
 
-
                         }
                     }
 
                 }
             }
 
+            if (ch) CloseHid();
 
             return result;
         }
@@ -994,6 +1124,7 @@ namespace DataTools.Win32.Usb
                         if (item.UsageId == usageId)
                         {
                             var newitem = item;
+
                             if (retrieveValue)
                             {
                                 if (item.IsButton && item.ButtonCaps != null)
@@ -1011,12 +1142,19 @@ namespace DataTools.Win32.Usb
                                         }
                                     }
                                 }
+                                else if (item.ValueCaps is HidPValueCaps vc && vc.StringIndex != 0)
+                                {
+                                    if (HidGetString(vc.StringIndex, out string? strres))
+                                    {
+                                        newitem.Value = strres;
+                                    }
+                                }
                                 else
                                 {
-                                    var b = HidGetFeature(item.ReportID, out int res);
-
-                                    if (b)
+                                    if (ReadUsageValue(item, false, out object? res))
+                                    {
                                         newitem.Value = res;
+                                    }
                                 }
                             }
 
@@ -1247,7 +1385,41 @@ namespace DataTools.Win32.Usb
                 return FriendlyName + ", " + Description + " (" + HidUsageDescription + ")";
             }
         }
+
+        #region Dispose Pattern
+        
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                }
+
+                if (IsHidOpen) CloseHid();
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        ~HidDeviceInfo()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: false);
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion
     }
 
-    
+
 }

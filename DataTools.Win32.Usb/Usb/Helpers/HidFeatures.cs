@@ -136,21 +136,32 @@ namespace DataTools.Win32.Usb
         /// Opens a HID device for access.
         /// </summary>
         /// <param name="device">The HidDeviceInfo object of the device.</param>
+        /// <param name="write">Attempt to open with write access.</param>
         /// <returns>A handle to the open device (close with CloseHid).</returns>
         /// <remarks></remarks>
-        public static IntPtr OpenHid(HidDeviceInfo device)
+        public static IntPtr OpenHid(HidDeviceInfo device, bool write = false)
         {
-            IntPtr OpenHidRet = default;
+            IntPtr hhid;
+           
             try
             {
-                OpenHidRet = IO.CreateFile(device.DevicePath, 0, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
+                if (write)
+                {
+                    hhid = IO.CreateFile(device.DevicePath, IO.FILE_WRITE_ACCESS, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
+                }
+                else
+                {
+                    hhid = IO.CreateFile(device.DevicePath, 0, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
+                }
+
+                if (hhid == (IntPtr)(-1)) return IntPtr.Zero;
             }
             catch
             {
                 return IntPtr.Zero;
             }
 
-            return OpenHidRet;
+            return hhid;
         }
 
         /// <summary>
