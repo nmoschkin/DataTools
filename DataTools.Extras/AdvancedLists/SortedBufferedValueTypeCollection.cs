@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Xml.Linq;
 
 namespace DataTools.Extras.AdvancedLists
 {
@@ -20,12 +21,12 @@ namespace DataTools.Extras.AdvancedLists
     /// <remarks>
     /// Items cannot be <see cref="null"/>.  Null is reserved for buffer space.
     /// </remarks>
-    public class SortedBufferedObjectCollection<T> : ICollection<T> where T : class
+    public class SortedBufferedCollection<T> : ICollection<T> 
     {
         protected static byte defaultSpace = 5;
 
         /// <summary>
-        /// Gets or sets the default buffering to utilize when creating new instances of <see cref="SortedBufferedObjectCollection{T}"/> when a space parameter is not explicitly provided.
+        /// Gets or sets the default buffering to utilize when creating new instances of <see cref="SortedBufferedCollection{T}"/> when a space parameter is not explicitly provided.
         /// </summary>
         /// <remarks>
         /// Value must be 1-255.
@@ -44,10 +45,12 @@ namespace DataTools.Extras.AdvancedLists
         protected SortOrder sortOrder;
         protected int count = 0;
         protected Comparison<T> comp;
+        protected IComparer<T> comparer;
         protected List<T> items;
         protected object syncRoot = new object();
         protected byte space = DefaultSpace;
         protected T[] arrspace;
+        protected TreeWalker<T> walker;
 
         /// <summary>
         /// Gets the sort order for the current instance.
@@ -67,26 +70,26 @@ namespace DataTools.Extras.AdvancedLists
         public bool IsReadOnly { get; } = false;
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(byte space, IComparer<T> comparer, SortOrder sortOrder) : base()
+        public SortedBufferedCollection(byte space, IComparer<T> comparer, SortOrder sortOrder) : base()
         {
             if (space < 1) throw new ArgumentOutOfRangeException(nameof(space));
             items = new List<T>();
-
+            
             this.space = space;
             arrspace = new T[space];
-
             this.sortOrder = sortOrder;
 
             if (comparer == null)
             {
                 typeof(T).GetInterfaceMap(typeof(IComparable<T>));
+
                 comp = new Comparison<T>((x, y) =>
                 {
                     if (x is IComparable<T> a && y is T b)
@@ -95,114 +98,129 @@ namespace DataTools.Extras.AdvancedLists
                     }
                     else
                     {
-                        throw new ArgumentException();
+                        throw new ArgumentNullException();
                     }
                 });
             }
             else
             {
-                comp = comparer.Compare;
+                this.comparer = comparer;
+            
+                comp = new Comparison<T>((x, y) =>
+                {
+                    if (x is object && y is object)
+                    {
+                        return this.comparer.Compare(x, y);
+                    }
+                    else
+                    {
+                        throw new ArgumentNullException();
+                    }
+                });
+
             }
+
+            walker = new TreeWalker<T>(items, comp, sortOrder);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection() : this(SortOrder.Ascending) { }
+        public SortedBufferedCollection() : this(SortOrder.Ascending) { }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(SortOrder sortOrder) : this(DefaultSpace, (IComparer<T>)null, sortOrder)
+        public SortedBufferedCollection(SortOrder sortOrder) : this(DefaultSpace, (IComparer<T>)null, sortOrder)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="comparer">The comparer class.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(IComparer<T> comparer) : this(DefaultSpace, comparer, SortOrder.Ascending)
+        public SortedBufferedCollection(IComparer<T> comparer) : this(DefaultSpace, comparer, SortOrder.Ascending)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(byte space) : this(space, (IComparer<T>)null, SortOrder.Ascending)
+        public SortedBufferedCollection(byte space) : this(space, (IComparer<T>)null, SortOrder.Ascending)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder) : this(DefaultSpace, comparer, sortOrder)
+        public SortedBufferedCollection(IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder) : this(DefaultSpace, comparer, sortOrder)
         {
             AddRange(initialItems);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(IEnumerable<T> initialItems, IComparer<T> comparer) : this(DefaultSpace, comparer, SortOrder.Ascending)
+        public SortedBufferedCollection(IEnumerable<T> initialItems, IComparer<T> comparer) : this(DefaultSpace, comparer, SortOrder.Ascending)
         {
             AddRange(initialItems);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(IEnumerable<T> initialItems, SortOrder sortOrder) : this(DefaultSpace, (IComparer<T>)null, sortOrder)
+        public SortedBufferedCollection(IEnumerable<T> initialItems, SortOrder sortOrder) : this(DefaultSpace, (IComparer<T>)null, sortOrder)
         {
             AddRange(initialItems);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(byte space, SortOrder sortOrder) : this(space, (IComparer<T>)null, sortOrder)
+        public SortedBufferedCollection(byte space, SortOrder sortOrder) : this(space, (IComparer<T>)null, sortOrder)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(byte space, IComparer<T> comparer) : this(space, comparer, SortOrder.Ascending)
+        public SortedBufferedCollection(byte space, IComparer<T> comparer) : this(space, comparer, SortOrder.Ascending)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
@@ -210,39 +228,39 @@ namespace DataTools.Extras.AdvancedLists
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(byte space, IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder) : this(space, comparer, sortOrder)
+        public SortedBufferedCollection(byte space, IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder) : this(space, comparer, sortOrder)
         {
             AddRange(initialItems);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(byte space, IEnumerable<T> initialItems, IComparer<T> comparer) : this(space, comparer, SortOrder.Ascending)
+        public SortedBufferedCollection(byte space, IEnumerable<T> initialItems, IComparer<T> comparer) : this(space, comparer, SortOrder.Ascending)
         {
             AddRange(initialItems);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedObjectCollection(byte space, IEnumerable<T> initialItems, SortOrder sortOrder) : this(space, (IComparer<T>)null, sortOrder)
+        public SortedBufferedCollection(byte space, IEnumerable<T> initialItems, SortOrder sortOrder) : this(space, (IComparer<T>)null, sortOrder)
         {
             AddRange(initialItems);
         }
 
         /// <summary>
-        /// Adds multiple items to the <see cref="SortedBufferedObjectCollection{T}"/> at once.
+        /// Adds multiple items to the <see cref="SortedBufferedCollection{T}"/> at once.
         /// </summary>
         /// <param name="newItems"></param>
         public void AddRange(IEnumerable<T> newItems)
@@ -260,7 +278,7 @@ namespace DataTools.Extras.AdvancedLists
                 int idx = GetInsertIndex(item);
 
                 if (idx >= count || idx < 0) throw new KeyNotFoundException();
-                if (items[idx] != item) throw new KeyNotFoundException();
+                if (!items[idx].Equals(item)) throw new KeyNotFoundException();
 
                 alteration(item);
 
@@ -347,137 +365,7 @@ namespace DataTools.Extras.AdvancedLists
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected int GetInsertIndex(T item1)
         {
-            T item2;
-
-            var count = items.Count;
-            if (count == 0) return 0;
-
-            int hi = count - 1;
-            int lo = 0;
-            int mid;
-            int xmid;
-            int r;
-
-            if (sortOrder == SortOrder.Ascending)
-            {
-                // ascending
-                while (true)
-                {
-                    if (hi < lo)
-                    {
-                        
-
-                        xmid = count - 1;
-                        hi = lo + (space - 1);
-                        if (xmid > hi) xmid = hi;
-
-                        while (lo < xmid)
-                        {
-                            if (items[lo] == null) break;
-                            else if (comp(item1, items[lo]) <= 0) break;
-                            lo++;
-                        }
-
-                        return lo;
-                    }
-
-                    mid = (hi + lo) / 2;
-
-                    for (int t = mid; t <= hi; t++)
-                    {
-                        if (items[t] != null)
-                        {
-                            mid = t;
-                            break;
-                        }
-                    }
-
-                    item2 = items[mid];
-                    if (item2 == null)
-                    {
-                        hi = mid - 1;
-                    }
-                    else
-                    {
-                        r = comp(item1, item2);
-
-                        if (r > 0)
-                        {
-                            lo = mid + 1;
-                        }
-                        else if (r < 0)
-                        {
-                            hi = mid - 1;
-                        }
-                        else
-                        {
-                            return mid;
-                        }
-
-                    }
-                }
-            }
-            else
-            {
-                while (true)
-                {
-                    if (hi < lo)
-                    {
-                        
-
-                        xmid = count - 1;
-                        hi = lo + (space - 1);
-                        if (xmid > hi) xmid = hi;
-
-                        while (lo < xmid)
-                        {
-                            if (items[lo] == null) break;
-                            else if (comp(item1, items[lo]) >= 0) break;
-                            lo++;
-                        }
-
-                        return lo;
-                    }
-
-                    mid = (hi + lo) / 2;
-
-                    for (int t = mid; t <= hi; t++)
-                    {
-                        if (items[t] != null)
-                        {
-                            mid = t;
-                            break;
-                        }
-                    }
-
-                    item2 = items[mid];
-
-                    if (item2 == null)
-                    {
-                        hi = mid - 1;
-                    }
-                    else
-                    {
-                        r = comp(item1, item2);
-
-                        if (r < 0)
-                        {
-                            lo = mid + 1;
-                        }
-                        else if (r > 0)
-                        {
-                            hi = mid - 1;
-                        }
-                        else
-                        {
-                            return mid;
-                        }
-
-                    }
-                }
-
-            }
-
+            return walker.Walk(item1);
         }
 
         public void Add(T item)
@@ -504,14 +392,14 @@ namespace DataTools.Extras.AdvancedLists
             {
                 foreach (var item in items)
                 {
-                    if (item is null) continue;
+                    if (!(item is object)) continue;
                     array[arrayIndex++] = item;
                 }
             }
         }
 
         /// <summary>
-        /// Copies <paramref name="count"/> elements of the <see cref="SortedBufferedObjectCollection{T}"/> to an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
+        /// Copies <paramref name="count"/> elements of the <see cref="SortedBufferedCollection{T}"/> to an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
         /// </summary>
         /// <param name="array"></param>
         /// <param name="arrayIndex"></param>
@@ -529,7 +417,7 @@ namespace DataTools.Extras.AdvancedLists
 
                 foreach (var item in items)
                 {
-                    if (item is null) continue;
+                    if (!(item is object)) continue;
 
                     array[arrayIndex++] = item;
                     c++;
@@ -540,7 +428,7 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// Create a new <see cref="Array"/> of the items in this <see cref="SortedBufferedObjectCollection{T}"/>.
+        /// Create a new <see cref="Array"/> of the items in this <see cref="SortedBufferedCollection{T}"/>.
         /// </summary>
         /// <returns>A new <see cref="Array"/> with all the actual items.</returns>
         public T[] ToArray()
@@ -588,10 +476,10 @@ namespace DataTools.Extras.AdvancedLists
         {
             lock (syncRoot)
             {
-                var idx = GetInsertIndex(item);
+                var idx = walker.Walk(item, TreeWalkMode.Locate);
                 if (idx >= count || idx < 0) return false;
 
-                if (items[idx] == item)
+                if (items[idx] is object && items[idx].Equals(item))
                 {
                     RemoveItem(idx);
                     return true;
@@ -611,18 +499,18 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// <see cref="SortedBufferedObjectCollection{T}"/> enumerator.
+        /// <see cref="SortedBufferedCollection{T}"/> enumerator.
         /// </summary>
         public class SortedBufferedObjectCollectionEnumerator : IEnumerator<T>
         {
 
-            SortedBufferedObjectCollection<T> collection;
+            SortedBufferedCollection<T> collection;
             T current = default;
 
             int idx = -1;
             int count = 0;
 
-            public SortedBufferedObjectCollectionEnumerator(SortedBufferedObjectCollection<T> collection)
+            public SortedBufferedObjectCollectionEnumerator(SortedBufferedCollection<T> collection)
             {
                 this.collection = collection;
                 count = collection.items.Count;
@@ -660,701 +548,206 @@ namespace DataTools.Extras.AdvancedLists
             }
         }
     }
-
-
-    /// <summary>
-    /// A sorted, spatially buffered collection.
-    /// </summary>
-    /// <typeparam name="T">The type of the collection (must be a class)</typeparam>
-    /// <remarks>
-    /// Items cannot be <see cref="null"/>.  Null is reserved for buffer space.
-    /// </remarks>
-    public class SortedBufferedValueTypeCollection<T> : ICollection<T> where T : struct
+    public enum TreeWalkMode
     {
-        protected static byte defaultSpace = 5;
+        Null,
+        Locate
+    }
 
-        /// <summary>
-        /// Gets or sets the default buffering to utilize when creating new instances of <see cref="SortedBufferedValueTypeCollection{T}"/> when a space parameter is not explicitly provided.
-        /// </summary>
-        /// <remarks>
-        /// Value must be 1-255.
-        /// </remarks>
-        /// <exception cref="ArgumentOutOfRangeException" />
-        public static byte DefaultSpace
-        {
-            get => defaultSpace;
-            set
-            {
-                if (value < 1) throw new ArgumentOutOfRangeException(nameof(value));
-                defaultSpace = value;
-            }
-        }
+    public class TreeWalker<T>
+    {
+        private IList<T> items;
+        private readonly SortOrder sortOrder;
 
-        protected IComparer<T> comparer;    
-        protected SortOrder sortOrder;
-        protected int count = 0;
-        protected Comparison<T?> comp;
-        protected List<T?> items;
-        protected object syncRoot = new object();
-        protected byte space = DefaultSpace;
-        protected T?[] arrspace;
+        protected Comparison<T> comp;
 
-        /// <summary>
-        /// Gets the sort order for the current instance.
-        /// </summary>
+        protected int lo;
+        protected int hi;
+        protected int mid;
+        protected int count;
+
+        private int m;
+
+        public IReadOnlyList<T> Items => (IReadOnlyList<T>)items;
+
         public SortOrder SortOrder => sortOrder;
 
-        /// <summary>
-        /// Gets the spatial buffering for the current instance.
-        /// </summary>
-        public int Space => space;
-
-        /// <summary>
-        /// Gets the total number of actual elements.
-        /// </summary>
-        public int Count => count;
-
-        public bool IsReadOnly { get; } = false;
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(byte space, IComparer<T> comparer, SortOrder sortOrder) : base()
+        public static TreeWalker<TComp> CreateFromIComparable<TComp>(IList<TComp> items, SortOrder sortOrder = SortOrder.Ascending) where TComp: IComparable<T>
         {
-            if (space < 1) throw new ArgumentOutOfRangeException(nameof(space));
-            items = new List<T?>();
+            var tw = new TreeWalker<TComp>(items);
 
-            this.space = space;
-            arrspace = new T?[space];
-
-            this.sortOrder = sortOrder;
-
-            if (comparer == null)
+            tw.comp = new Comparison<TComp>((x, y) =>
             {
-                typeof(T).GetInterfaceMap(typeof(IComparable<T>));
-
-                comp = new Comparison<T?>((x, y) =>
+                if (y is T b)
                 {
-                    if (x is IComparable<T> a && y is T b)
-                    {
-                        return a.CompareTo(b);
-                    }
-                    else
-                    {
-                        throw new ArgumentException();
-                    }
-                });
-            }
-            else
-            {
-                this.comparer = comparer;
-
-                comp = new Comparison<T?>((x, y) =>
-                {
-                    if (x is T a && y is T b)
-                    {
-                        return this.comparer.Compare(a, b);
-                    }
-                    else
-                    {
-                        throw new ArgumentException();
-                    }
-                });
-            }
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection() : this(SortOrder.Ascending) { }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(SortOrder sortOrder) : this(DefaultSpace, (IComparer<T>)null, sortOrder)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="comparer">The comparer class.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(IComparer<T> comparer) : this(DefaultSpace, comparer, SortOrder.Ascending)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(byte space) : this(space, (IComparer<T>)null, SortOrder.Ascending)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder) : this(DefaultSpace, comparer, sortOrder)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(IEnumerable<T> initialItems, IComparer<T> comparer) : this(DefaultSpace, comparer, SortOrder.Ascending)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(IEnumerable<T> initialItems, SortOrder sortOrder) : this(DefaultSpace, (IComparer<T>)null, sortOrder)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(byte space, SortOrder sortOrder) : this(space, (IComparer<T>)null, sortOrder)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(byte space, IComparer<T> comparer) : this(space, comparer, SortOrder.Ascending)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(byte space, IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder) : this(space, comparer, sortOrder)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(byte space, IEnumerable<T> initialItems, IComparer<T> comparer) : this(space, comparer, SortOrder.Ascending)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedValueTypeCollection(byte space, IEnumerable<T> initialItems, SortOrder sortOrder) : this(space, (IComparer<T>)null, sortOrder)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Adds multiple items to the <see cref="SortedBufferedValueTypeCollection{T}"/> at once.
-        /// </summary>
-        /// <param name="newItems"></param>
-        public void AddRange(IEnumerable<T> newItems)
-        {
-            foreach (var item in newItems)
-            {
-                Add(item);
-            }
-        }
-
-        public void AlterItem(T item, Action<T> alteration)
-        {
-            lock (syncRoot)
-            {
-                int idx = GetInsertIndex(item);
-
-                if (idx >= count || idx < 0) throw new KeyNotFoundException();
-                if (comp(items[idx] ?? throw new KeyNotFoundException(), item) != 0) throw new KeyNotFoundException();
-
-                alteration(item);
-
-
-            }
-        }
-
-        /// <summary>
-        /// Clear the collection.
-        /// </summary>
-        protected virtual void ClearItems()
-        {
-            lock (syncRoot)
-            {
-                items.Clear();
-                count = 0;
-            }
-        }
-        public int NullInserts { get; private set; } = 0;
-
-        public int NewInserts { get; private set; } = 0;
-
-        /// <summary>
-        /// Insert an item into the collection.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <exception cref="ArgumentNullException" />
-        protected virtual void InsertItem(T? item)
-        {
-            if (item == null) throw new ArgumentNullException(nameof(item));
-
-            lock (syncRoot)
-            {
-                var index = GetInsertIndex(item.Value);
-
-                if (index < items.Count && items[index] == null)
-                {
-                    items[index] = item;
-                    NullInserts++;
+                    return x.CompareTo(b);
                 }
                 else
                 {
-                    arrspace[space - 1] = item;
-                    items.InsertRange(index, arrspace);
-                    NewInserts++;
+                    throw new ArgumentNullException();
                 }
+            });
 
-                count++;
-            }
+            return tw;
         }
 
-        /// <summary>
-        /// Remove an item from the collection.
-        /// </summary>
-        /// <param name="index"></param>
-        protected virtual void RemoveItem(int index)
+        protected TreeWalker(IList<T> items, SortOrder sortOrder = SortOrder.Ascending)
         {
-            lock (syncRoot)
-            {
-                int cn = 0;
-                int c = items.Count;
-                int b = index;
-                int e = b + space;
-
-                items[index] = default;
-
-                for (int i = b; i < e; i++)
-                {
-                    if (items[index] == null)
-                    {
-                        cn++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                if (cn >= space) items.RemoveAt(index);
-                count--;
-            }
-        }
-        
-        /// <summary>
-        /// Get the appropriate insert index for the configured sort direction, based on price.
-        /// </summary>
-        /// <param name="item1">The order unit to test.</param>
-        /// <returns>The calculated insert index based on the sort direction.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected int GetInsertIndex(T item1)
-        {
-            T? item2;
-
-            var count = items.Count;
-            if (count == 0) return 0;
-
-            int hi = count - 1;
-            int lo = 0;
-            int mid;
-            int xmid;
-            int r;
-
+            this.sortOrder = sortOrder;
+            this.items = items;
             if (sortOrder == SortOrder.Ascending)
             {
-                // ascending
-                while (true)
-                {
-                    if (hi < lo)
-                    {
-                        return lo;
-                    }
-
-                    mid = (hi + lo) / 2;
-
-                    for (int t = mid; t <= hi; t++)
-                    {
-                        if (items[t] != null)
-                        {
-                            mid = t;
-                            break;
-                        }
-                    }
-
-                    item2 = items[mid];
-                    if (item2 == null)
-                    {
-                        hi = mid - 1;
-                    }
-                    else
-                    {
-                        r = comp(item1, item2);
-
-                        if (r > 0)
-                        {
-                            lo = mid + 1;
-                        }
-                        else if (r < 0)
-                        {
-                            hi = mid - 1;
-                        }
-                        else
-                        {
-                            return mid;
-                        }
-
-                    }
-                }
+                m = 1;
             }
             else
             {
-                while (true)
+                m = -1;
+            }
+
+            Reset();
+        }
+
+        public TreeWalker(IList<T> items, Comparison<T> comparerFunc, SortOrder sortOrder = SortOrder.Ascending) : this(items, sortOrder)
+        {
+            comp = comparerFunc;
+        }
+
+        public void Reset()
+        {
+            lo = 0;
+            hi = items.Count - 1;
+            mid = 0;
+        }
+                
+        public int Walk(T item1, TreeWalkMode locateOrNull = TreeWalkMode.Null)
+        {
+            Reset();
+            int x = InnerWalk(item1, locateOrNull);
+
+            if (locateOrNull == TreeWalkMode.Null && count > 0 && items[x] is object)
+            {
+                if (x > 0 && !(items[x - 1] is object))
                 {
-                    if (hi < lo)
+                    items[x - 1] = items[x];
+                    items[x] = default;
+                }
+                else if (x < count - 1 && !(items[x + 1] is object))
+                {
+                    items[x + 1] = items[x];
+                    items[x] = default;
+                }
+            }
+
+            return x;
+
+        }
+
+        protected virtual int InnerWalk(T item1, TreeWalkMode locateOrNull)
+        {
+            T item2;
+
+            int r;
+
+            if (hi < lo)
+            {
+                return lo;
+            }
+
+            mid = (hi + lo) / 2;
+
+            item2 = items[mid];
+
+            if (item2 == null)
+            {
+                int r1 = 2, r2 = 2;
+                int x1 = -1, x2 = -1;
+
+                if (mid <= hi)
+                {
+                    T item3 = default;
+                    x2 = mid + 1;
+                    while (!(item3 is object) && x2 <= hi)
                     {
-                        return lo;
-                        //return ClosestNull(item1, lo);
+                        item3 = items[x2];
+                        x2++;
                     }
 
-                    mid = (hi + lo) / 2;
-
-                    for (int t = mid; t <= hi; t++)
+                    if (item3 is object)
                     {
-                        if (items[t] != null)
-                        {
-                            mid = t;
-                            break;
-                        }
-                    }
-
-                    item2 = items[mid];
-
-                    if (item2 == null)
-                    {
-                        hi = mid - 1;
-                    }
-                    else
-                    {
-                        r = comp(item1, item2);
-
-                        if (r < 0)
+                        r2 = comp(item1, item3) * m;
+                        if (r2 > 0)
                         {
                             lo = mid + 1;
+                            return InnerWalk(item1, locateOrNull);
                         }
-                        else if (r > 0)
+                    }
+                }
+
+                if (mid >= lo)
+                {
+                    x1 = mid - 1;
+                    while (!(item2 is object) && x1 >= lo)
+                    {
+                        item2 = items[x1];
+                        x1--;
+                    }
+
+                    if (item2 is object)
+                    {
+                        r1 = comp(item1, item2) * m;
+                        if (r1 < 0)
                         {
                             hi = mid - 1;
+                            return InnerWalk(item1, locateOrNull);
                         }
-                        else
-                        {
-                            return mid;
-                        }
-
                     }
                 }
 
-            }
-
-        }
-        //private int ClosestNull(T value, int mid)
-        //{
-        //    int lo = 0;
-        //    int hi = count - 1;
-
-        //    if (sortOrder == SortOrder.Ascending)
-        //    {
-        //        for (int i = mid - 1; i >= lo; i--)
-        //        {
-        //            if (items[i] == null) return i;
-        //            else if (comp(items[i], value) < 0)
-        //            {
-        //                return i + 1;
-        //            }
-        //        }
-
-        //        for (int i = mid + 1; i <= hi; i++)
-        //        {
-        //            if (items[i] == null) return i;
-        //            else if (comp(items[i], value) > 0)
-        //            {
-        //                return i - 1;
-        //            }
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        for (int i = mid - 1; i >= lo; i--)
-        //        {
-        //            if (items[i] == null) return i;
-        //            else if (comp(items[i], value) > 0)
-        //            {
-        //                return i + 1;
-        //            }
-        //        }
-
-        //        for (int i = mid + 1; i <= hi; i++)
-        //        {
-        //            if (items[i] == null) return i;
-        //            else if (comp(items[i], value) < 0)
-        //            {
-        //                return i - 1;
-        //            }
-        //        }
-        //    }
-
-
-        //    return mid;
-        //}
-
-        public void Add(T item)
-        {
-            InsertItem(item);
-        }
-
-        public void Clear()
-        {
-            ClearItems();
-        }
-
-        public bool Contains(T item)
-        {
-            lock (syncRoot)
-            {
-                return items.Contains(item);
-            }
-        }
-
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            lock (syncRoot)
-            {
-                foreach (var item in items)
+                if (r2 != 2 && r1 != 2)
                 {
-                    if (item is T o) array[arrayIndex++] = o;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Copies <paramref name="count"/> elements of the <see cref="SortedBufferedValueTypeCollection{T}"/> to an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
-        /// </summary>
-        /// <param name="array"></param>
-        /// <param name="arrayIndex"></param>
-        /// <param name="count"></param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public void CopyTo(T[] array, int arrayIndex, int count)
-        {
-            lock (syncRoot)
-            {
-                if (count < DefaultSpace) throw new ArgumentOutOfRangeException(nameof(count));
-
-                int c = 0;
-
-                foreach (var item in items)
-                {
-                    if (item is T o)
+                    if (r1 == 0 && r2 == 0)
                     {
-                        array[arrayIndex++] = o;
-                        c++;
-
-                        if (c == count) return;
+                        return mid;
                     }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Create a new <see cref="Array"/> of the items in this <see cref="SortedBufferedValueTypeCollection{T}"/>.
-        /// </summary>
-        /// <returns>A new <see cref="Array"/> with all the actual items.</returns>
-        public T[] ToArray()
-        {
-            lock (syncRoot)
-            {
-                var l = new List<T>();
-
-                foreach (var item in items)
-                {
-                    if (item is T o)
+                    else if (r1 == 0)
                     {
-                        l.Add(o);
+                        return x1 + 1;
                     }
-                }
-
-                return l.ToArray();
-            }
-        }
-
-        public T[] ToArray(int elementCount)
-        {
-            lock (syncRoot)
-            {
-                var l = new List<T>();
-                int x = 0;
-
-                foreach (var item in items)
-                {
-                    if (item is T o)
+                    else if (r2 == 0)
                     {
-                        l.Add(o);
-
-                        x++;
-                        if (x == elementCount) break;
+                        return x2 - 1;
                     }
+                    else if (r1 > 0 && r2 < 0) return mid;
                 }
 
-                return l.ToArray();
-            }
-        }
-
-
-        public bool Remove(T item)
-        {
-            lock (syncRoot)
-            {
-                var idx = GetInsertIndex(item);
-                if (idx >= count || idx < 0) return false;
-
-                if (comp(items[idx], item) == 0)
+                if (item2 == null)
                 {
-                    RemoveItem(idx);
-                    return true;
+                    hi = mid - 1;
                 }
-                return false;
             }
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return new SortedBufferedValueTypeCollectionEnumerator(this);
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new SortedBufferedValueTypeCollectionEnumerator(this);
-        }
-
-        /// <summary>
-        /// <see cref="SortedBufferedValueTypeCollection{T}"/> enumerator.
-        /// </summary>
-        public class SortedBufferedValueTypeCollectionEnumerator : IEnumerator<T>
-        {
-
-            SortedBufferedValueTypeCollection<T> collection;
-            T current = default;
-
-            int idx = -1;
-            int count = 0;
-
-            public SortedBufferedValueTypeCollectionEnumerator(SortedBufferedValueTypeCollection<T> collection)
+            
+            if (item2 != null)
             {
-                this.collection = collection;
-                count = collection.items.Count;
-            }
+                r = comp(item1, item2) * m;
 
-            public T Current => current;
-            object IEnumerator.Current => current;
-
-            public void Dispose()
-            {
-                collection = null;
-                Reset();
-            }
-
-            public bool MoveNext()
-            {
-                idx++;
-                while (idx < count)
+                if (r > 0)
                 {
-                    if (collection.items[idx] is T o)
-                    {
-                        current = o;
-                        break;
-                    }
-                    idx++;
+                    lo = mid + 1;
                 }
-
-                return idx < count;
+                else if (r < 0)
+                {
+                    hi = mid - 1;
+                }
+                else
+                {
+                    return mid;
+                }
             }
 
-            public void Reset()
-            {
-                idx = -1;
-                current = default;
-            }
+            return InnerWalk(item1, locateOrNull);
         }
+
     }
-
-
 
 
 

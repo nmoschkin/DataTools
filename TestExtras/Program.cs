@@ -17,8 +17,6 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace TestExtras
 {
-
-
     public static class Program
     {
         public static void Main(string[] args)
@@ -29,7 +27,7 @@ namespace TestExtras
         public static void TestBufferList(string[] args)
         {
 
-            var ltest = new SortedBufferedObjectCollection<string>(3, SortOrder.Ascending);
+            var ltest = new SortedBufferedCollection<string>(3, SortOrder.Ascending);
 
             ltest.Add("Zanzabar");
             ltest.Add("Banana");
@@ -89,7 +87,7 @@ namespace TestExtras
             var carr = ltest.ToArray();
 
 
-            var itest = new SortedBufferedValueTypeCollection<int>(16, SortOrder.Descending);
+            var itest = new SortedBufferedCollection<int?>(2, new NullableValueTypeComparer<int>(), SortOrder.Ascending);
 
             var r = new Random();
 
@@ -98,17 +96,18 @@ namespace TestExtras
 
             for (int x = 0; x < testcount; x++)
             {
-                itest.Add((int)(r.NextDouble() * testcount));
-                itest.Add((int)(r.NextDouble() * testcount));
-                itest.Add((int)(r.NextDouble() * testcount));
-                itest.Add((int)(r.NextDouble() * testcount));
+
+                itest.Add(x);
+                itest.Add(testcount - x);
+                itest.Add((x + testcount) / 2);
+                itest.Add(x % testcount);
             }
 
             var icomp = itest.ToArray();
 
             for (int x = 1; x < icomp.Length; x++)
             {
-                if (icomp[x - 1] < icomp[x]) throw new Exception();
+                if (icomp[x - 1] > icomp[x]) throw new Exception();
             }
 
 
@@ -466,4 +465,22 @@ namespace TestExtras
 
         }
     }
+
+    public class NullableValueTypeComparer<T> : IComparer<T?> where T: struct, IComparable<T>
+    {
+        public int Compare(T? x, T? y)
+        {
+            if (x is int a && y is int b)
+            {
+                return a.CompareTo(b);
+            }
+            else
+            {
+                if (x is object && !(y is object)) return -1;
+                else if (y is object) return 1;
+                return 0;
+            }
+        }
+    }
+
 }
