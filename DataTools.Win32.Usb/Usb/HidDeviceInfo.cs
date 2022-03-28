@@ -901,20 +901,45 @@ namespace DataTools.Win32.Usb
 
                                     if (b)
                                     {
+                                        switch (olen)
+                                        {
+                                            case 2:
+                                            case 3:
+                                                res = BitConverter.ToInt16(resb, 0);
+                                                break;
 
+
+                                            case 8:
+                                            case 9:
+                                                
+                                                long l = BitConverter.ToInt64(resb, 0);
+                                                if ((l & 0x7fffffff) == l)
+                                                    res = (int)l;
+                                                else
+                                                    res = l;
+                                                break;
+
+
+                                            case 4:
+                                            case 5:
+                                            default:
+                                                res = BitConverter.ToInt32(resb, 0);
+                                                break;
+
+                                        }
                                     }
 
                                 }
                                 
-                                if (b && item.ValueCaps is HidPValueCaps vc2)
+                                if (b && item.ValueCaps is HidPValueCaps vc2 && res != null)
                                 {
                                     if (item.UsageId == 0x5a && vc2.UsagePage == HidUsagePage.PowerDevice1)
                                     {
-                                        item.Value = (AudibleAlarmControlState)res;
+                                        item.Value = (AudibleAlarmControlState)(int)res;
                                     }
                                     else if (item.UsageId == 0x58 && vc2.UsagePage == HidUsagePage.PowerDevice1)
                                     {
-                                        item.Value = (HidPowerTestState)res;
+                                        item.Value = (HidPowerTestState)(int)res;
                                     }
                                     else
                                     {
