@@ -11,6 +11,7 @@
 // ************************************************* ''
 
 using System;
+using System.ComponentModel;
 
 using DataTools.Text;
 using DataTools.Win32.Memory;
@@ -104,12 +105,12 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Returns the raw byte data for a Hid feature code.
         /// </summary>
-        /// <param name="featureCode">The Hid feature code to retrieve.</param>
+        /// <param name="reportId">The Hid report ID to retrieve.</param>
         /// <param name="result">Receives the result of the operation.</param>
         /// <param name="expectedSize">The expected size, in bytes, of the result.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool HidGetFeature(byte featureCode, out byte[] result, int expectedSize)
+        public bool HidGetFeature(byte reportId, out byte[] result, int expectedSize)
         {
             bool success = false;
 
@@ -124,7 +125,7 @@ namespace DataTools.Win32.Usb
             using (var mm = new SafePtr())
             {
                 mm.Alloc(expectedSize + 1);
-                mm.ByteAt(0L) = featureCode;
+                mm.ByteAt(0L) = reportId;
 
                 if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, expectedSize))
                 {
@@ -144,13 +145,13 @@ namespace DataTools.Win32.Usb
         }
 
         /// <summary>
-        /// Returns the short value of a Hid feature code.
+        /// Returns the short value of a Hid report ID.
         /// </summary>
-        /// <param name="featureCode">The Hid feature code to retrieve.</param>
+        /// <param name="reportId">The Hid report ID to retrieve.</param>
         /// <param name="result">Receives the result of the operation.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool HidGetFeature(byte featureCode, out short result)
+        public bool HidGetFeature(byte reportId, out short result)
         {
             result = 0;
             
@@ -163,7 +164,7 @@ namespace DataTools.Win32.Usb
             using (var mm = new SafePtr())
             {
                 mm.Alloc(3L);
-                mm.ByteAt(0L) = featureCode;
+                mm.ByteAt(0L) = reportId;
 
                 if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 3))
                 {
@@ -181,13 +182,13 @@ namespace DataTools.Win32.Usb
         }
 
         /// <summary>
-        /// Returns the integer value of a Hid feature code.
+        /// Returns the integer value of a Hid report ID.
         /// </summary>
-        /// <param name="featureCode">The Hid feature code to retrieve.</param>
+        /// <param name="reportId">The Hid report ID to retrieve.</param>
         /// <param name="result">Receives the result of the operation.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool HidGetFeature(byte featureCode, out int result)
+        public bool HidGetFeature(byte reportId, out int result)
         {
             result = 0;
             
@@ -200,7 +201,7 @@ namespace DataTools.Win32.Usb
             using (var mm = new SafePtr())
             {
                 mm.Alloc(5L);
-                mm.ByteAt(0L) = featureCode;
+                mm.ByteAt(0L) = reportId;
 
                 if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 5))
                 {
@@ -219,13 +220,13 @@ namespace DataTools.Win32.Usb
         }
 
         /// <summary>
-        /// Returns the long value of a Hid feature code.
+        /// Returns the long value of a Hid report ID.
         /// </summary>
-        /// <param name="featureCode">The Hid feature code to retrieve.</param>
+        /// <param name="reportId">The Hid report ID to retrieve.</param>
         /// <param name="result">Receives the result of the operation.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool HidGetFeature(byte featureCode, out long result)
+        public bool HidGetFeature(byte reportId, out long result)
         {
             result = 0;
             bool success;
@@ -237,7 +238,7 @@ namespace DataTools.Win32.Usb
             using(var mm = new SafePtr())
             {
                 mm.Alloc(9L);
-                mm.ByteAt(0L) = featureCode;
+                mm.ByteAt(0L) = reportId;
 
                 if (!UsbLibHelpers.HidD_GetFeature(hfile, mm, 9))
                 {
@@ -256,13 +257,13 @@ namespace DataTools.Win32.Usb
         }
 
         /// <summary>
-        /// Sets the raw byte value of a Hid feature code.
+        /// Sets the raw byte value of a Hid report ID.
         /// </summary>
-        /// <param name="featureCode">The Hid feature code to set.</param>
+        /// <param name="reportId">The Hid report ID to set.</param>
         /// <param name="value">The value to set.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool HidSetFeature(byte featureCode, byte[] value)
+        public bool HidSetFeature(byte reportId, byte[] value)
         {
             bool success;
 
@@ -274,7 +275,7 @@ namespace DataTools.Win32.Usb
             {
                 mm.Alloc(value.Length + 1);
                 mm.FromByteArray(value, 1L);
-                mm.ByteAt(0L) = featureCode;
+                mm.ByteAt(0L) = reportId;
 
                 if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, (int)mm.Length))
                 {
@@ -291,13 +292,13 @@ namespace DataTools.Win32.Usb
         }
 
         /// <summary>
-        /// Sets the short value of a Hid feature code.
+        /// Sets the short value of a Hid report ID.
         /// </summary>
-        /// <param name="featureCode">The Hid feature code to set.</param>
+        /// <param name="reportId">The Hid report ID to set.</param>
         /// <param name="value">The value to set.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool HidSetFeature(byte featureCode, short value)
+        public bool HidSetFeature(byte reportId, short value)
         {
             bool success;
             var hfile = HidFeatures.OpenHid(this);
@@ -307,7 +308,7 @@ namespace DataTools.Win32.Usb
             using (var mm = new SafePtr())
             {
                 mm.Alloc(3L);
-                mm.ByteAt(0L) = featureCode;
+                mm.ByteAt(0L) = reportId;
                 mm.ShortAtAbsolute(1L) = value;
                 if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 3))
                 {
@@ -325,13 +326,13 @@ namespace DataTools.Win32.Usb
         }
 
         /// <summary>
-        /// Sets the integer value of a Hid feature code.
+        /// Sets the integer value of a Hid report ID.
         /// </summary>
-        /// <param name="featureCode">The Hid feature code to set.</param>
+        /// <param name="reportId">The Hid report ID to set.</param>
         /// <param name="value">The value to set.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool HidSetFeature(byte featureCode, int value)
+        public bool HidSetFeature(byte reportId, int value)
         {
             bool success;
             
@@ -342,7 +343,7 @@ namespace DataTools.Win32.Usb
             using (var mm = new SafePtr())
             {
                 mm.Alloc(5L);
-                mm.ByteAt(0L) = featureCode;
+                mm.ByteAt(0L) = reportId;
                 mm.IntAtAbsolute(1L) = value;
 
                 if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 5))
@@ -362,13 +363,13 @@ namespace DataTools.Win32.Usb
         }
 
         /// <summary>
-        /// Sets the long value of a Hid feature code.
+        /// Sets the long value of a Hid report ID.
         /// </summary>
-        /// <param name="featureCode">The Hid feature code to set.</param>
+        /// <param name="reportId">The Hid report ID to set.</param>
         /// <param name="value">The value to set.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool HidSetFeature(byte featureCode, long value)
+        public bool HidSetFeature(byte reportId, long value)
         {
             bool success;
             
@@ -379,7 +380,7 @@ namespace DataTools.Win32.Usb
             using (var mm = new SafePtr())
             {
                 mm.Alloc(9L);
-                mm.ByteAt(0L) = featureCode;
+                mm.ByteAt(0L) = reportId;
                 mm.LongAtAbsolute(1L) = value;
                 if (!UsbLibHelpers.HidD_SetFeature(hfile, mm, 9))
                 {
@@ -809,9 +810,8 @@ namespace DataTools.Win32.Usb
                 {
                     foreach (var item in kvp.Value)
                     {
-                        if ((usageType & item.UsageType) != 0)
+                        if ((usageType & item.UsageType) != 0 || (item.IsButton && item.UsageType == 0))
                         {
-
                             if (item.IsButton && item.ButtonCaps != null)
                             {
                                 var btncaps = UsbLibHelpers.GetButtonStatesRaw(this, item.ReportType, item.ButtonCaps.Value);
@@ -874,8 +874,38 @@ namespace DataTools.Win32.Usb
                             }
                             else
                             {
-                                var b = HidGetFeature(item.ReportID, out int res);
+                                bool b = false;
+                                int olen;
+                                object res = 0;
 
+                                if (hidCaps is HidCaps hc)
+                                {
+                                    if (item.ReportType == HidReportType.Feature)
+                                    {
+                                        olen = hc.FeatureReportByteLength;
+                                    }
+                                    else if (item.ReportType == HidReportType.Input)
+                                    {
+                                        olen = hc.InputReportByteLength;
+                                    }
+                                    else if (item.ReportType == HidReportType.Output) 
+                                    {
+                                        olen = hc.OutputReportByteLength;
+                                    }
+                                    else 
+                                    {
+                                        olen = 4;
+                                    }
+
+                                    b = HidGetFeature(item.ReportID, out byte[] resb, olen);
+
+                                    if (b)
+                                    {
+
+                                    }
+
+                                }
+                                
                                 if (b && item.ValueCaps is HidPValueCaps vc2)
                                 {
                                     if (item.UsageId == 0x5a && vc2.UsagePage == HidUsagePage.PowerDevice1)

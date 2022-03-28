@@ -143,7 +143,7 @@ namespace DataTools.Win32.Usb
             IntPtr OpenHidRet = default;
             try
             {
-                OpenHidRet = IO.CreateFile(device.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
+                OpenHidRet = IO.CreateFile(device.DevicePath, 0, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
             }
             catch
             {
