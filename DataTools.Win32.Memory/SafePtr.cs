@@ -8,7 +8,7 @@ using System.Text;
 
 namespace DataTools.Win32.Memory
 {
-    public class SafePtr : SafeHandle
+    public class SafePtr : SafeHandle, ICloneable
     {
         private static IntPtr procHeap = Native.GetProcessHeap();
 
@@ -190,10 +190,29 @@ namespace DataTools.Win32.Memory
 
         public SafePtr(int size, MemoryType t) : this()
         {
-            if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
+            if (size < 0) throw new ArgumentOutOfRangeException(nameof(size));
 
             MemoryType = t;
-            TAlloc(size);
+            if (size > 0) TAlloc(size);
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
+        }
+
+        public SafePtr Clone(MemoryType? memoryType = null)
+        {
+            if (handle.IsInvalidHandle() || Length == 0) return new SafePtr(0, memoryType ?? MemoryType.HGlobal);
+
+            var newptr = new SafePtr(this.Length, memoryType ?? MemoryType);
+
+            unsafe
+            {
+                Buffer.MemoryCopy((void*)handle, (void*)newptr.handle, Length, Length);
+            }
+
+            return newptr;
         }
 
         public uint CalculateCrc32()
@@ -1794,12 +1813,29 @@ namespace DataTools.Win32.Memory
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            if (obj is SafePtr other)
+            {
+                return (Length == other.Length && CalculateCrc32() == other.CalculateCrc32());
+            }
+            else if (obj is MemPtr mm)
+            {
+                return (Length == mm.Length && CalculateCrc32() == mm.CalculateCrc32());
+            }
+            else if (obj is byte[] buffer)
+            {
+                return Crc32.Calculate(buffer) == CalculateCrc32();
+            }
+
+            return false;
         }
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            unsafe
+            {
+                if (handle.IsInvalidHandle()) return 0;
+                return (int)Crc32.Calculate((byte*)handle, Length);
+            }
         }
 
         public static explicit operator byte[](SafePtr val)

@@ -13,7 +13,7 @@ namespace DataTools.Win32.Memory
 {
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct MemPtr
+    public struct MemPtr : ICloneable
     {
         internal IntPtr handle;
 
@@ -21,6 +21,15 @@ namespace DataTools.Win32.Memory
 
         private static IntPtr procHeap = Native.GetProcessHeap();
 
+
+        /// <summary>
+        /// Gets the size of the allocated buffer in bytes.
+        /// </summary>
+        /// <remarks>
+        /// This method only works for memory blocks allocated on the process heap.<br /><br />
+        /// The structure contains only the memory pointer, and so is not aware of how it was allocated.<br /><br />
+        /// Consider using <see cref="SafePtr"/>.
+        /// </remarks>
         public long Size
         {
             get
@@ -38,6 +47,14 @@ namespace DataTools.Win32.Memory
             }
         }
 
+        /// <summary>
+        /// Gets or sets the size of the allocated buffer in bytes.
+        /// </summary>
+        /// <remarks>
+        /// This method only works for memory blocks allocated on the process heap.<br /><br />
+        /// The structure contains only the memory pointer, and so is not aware of how it was allocated.<br /><br />
+        /// Consider using <see cref="SafePtr"/>.
+        /// </remarks>
         public long Length
         {
             get => Size;
@@ -57,6 +74,9 @@ namespace DataTools.Win32.Memory
             }
         }
 
+        /// <summary>
+        /// Gets or sets the handle value
+        /// </summary>
         public IntPtr Handle
         {
             get
@@ -75,7 +95,7 @@ namespace DataTools.Win32.Memory
             }
         }
 
-        public MemPtr(long size = 1024)
+        public MemPtr(long size)
         {
             if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
             handle = (IntPtr)0;
@@ -672,6 +692,11 @@ namespace DataTools.Win32.Memory
                 Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)((long)handle + index), vl, vl);
                 gch.Free();
             }
+        }
+
+        object ICloneable.Clone()
+        {
+            return Clone();
         }
 
         public MemPtr Clone()
@@ -1693,12 +1718,29 @@ namespace DataTools.Win32.Memory
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            if (obj is SafePtr other)
+            {
+                return (Length == other.Length && CalculateCrc32() == other.CalculateCrc32());
+            }
+            else if (obj is MemPtr mm)
+            {
+                return (Length == mm.Length && CalculateCrc32() == mm.CalculateCrc32());
+            }
+            else if (obj is byte[] buffer)
+            {
+                return Crc32.Calculate(buffer) == CalculateCrc32();
+            }
+
+            return false;
         }
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            unsafe
+            {
+                if (handle.IsInvalidHandle()) return 0;
+                return (int)Crc32.Calculate((byte*)handle, Length);
+            }
         }
 
 
