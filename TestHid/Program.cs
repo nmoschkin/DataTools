@@ -87,7 +87,21 @@ namespace TestHid
                             }
                             else
                             {
-                                double vv = (int?)item.Value ?? 0d;
+
+                                double vv = 0d;
+
+                                if (item.Value is HidFeatureValue fv)
+                                {
+                                    vv = fv.Value;
+                                }
+                                else if (item.Value is int ival)
+                                {
+                                    vv = ival;
+                                }
+                                else if (item.Value is long lval)
+                                {
+                                    vv = lval;
+                                }
 
                                 if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
                                 {
@@ -133,7 +147,20 @@ namespace TestHid
                                 }
                                 else
                                 {
-                                    double vv = (int?)item.Value ?? 0d;
+                                    double vv = 0d;
+
+                                    if (item.Value is HidFeatureValue fv)
+                                    {
+                                        vv = fv.Value;
+                                    }
+                                    else if (item.Value is int ival)
+                                    {
+                                        vv = ival;
+                                    }
+                                    else if (item.Value is long lval)
+                                    {
+                                        vv = lval;
+                                    }
 
                                     if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
                                     {

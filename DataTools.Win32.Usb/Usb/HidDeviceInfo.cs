@@ -909,7 +909,7 @@ namespace DataTools.Win32.Usb
         /// <param name="item">The <see cref="HidUsageInfo"/> object that contains information about the report to retrieve.</param>
         /// <param name="populateItemValue">True to set the <see cref="HidUsageInfo.Value"/> property to the result of the operation.</param>
         /// <returns>The result of the operator or null.</returns>
-        protected bool ReadUsageValue(HidUsageInfo item, bool populateItemValue, out object? res)
+        protected bool ReadUsageValue(HidUsageInfo item, bool populateItemValue, out HidFeatureValue? res)
         {
             int olen;
             bool b;
@@ -920,58 +920,14 @@ namespace DataTools.Win32.Usb
                 PopulateDeviceCaps();
             }
 
-            if (hidCaps is HidCaps hc)
+            if (hidCaps is HidCaps && item.ValueCaps is HidPValueCaps vc)
             {
-                if (item.ReportType == HidReportType.Feature)
+                //b = HidGetFeature(item.ReportID, out byte[] resb, olen);
+
+                res = UsbLibHelpers.GetScaledValue(this, item.ReportType, vc);
+
+                if (res != null)
                 {
-                    olen = hc.FeatureReportByteLength;
-                }
-                else if (item.ReportType == HidReportType.Input)
-                {
-                    olen = hc.InputReportByteLength;
-                }
-                else if (item.ReportType == HidReportType.Output)
-                {
-                    olen = hc.OutputReportByteLength;
-                }
-                else
-                {
-                    olen = 4;
-                }
-
-                b = HidGetFeature(item.ReportID, out byte[] resb, olen);
-
-                if (b)
-                {
-                    switch (olen)
-                    {
-                        case 2:
-                        case 3:
-
-                            res = (int)BitConverter.ToInt16(resb, 0);
-                            break;
-
-
-                        case 8:
-                        case 9:
-
-                            long l = BitConverter.ToInt64(resb, 0);
-
-                            if ((l & 0x7fffffff) == l)
-                                res = (int)l;
-                            else
-                                res = l;
-                            break;
-
-
-                        case 4:
-                        case 5:
-                        default:
-                            res = BitConverter.ToInt32(resb, 0);
-                            break;
-
-                    }
-
                     if (populateItemValue) item.Value = res;
 
                     return true;
@@ -991,7 +947,7 @@ namespace DataTools.Win32.Usb
         /// <remarks>
         /// The <paramref name="collectionType"/> and <paramref name="usageType"/> properties can be OR'd to retrieve more than one kind of value set.
         /// </remarks>
-        public List<HidUsageCollection>? GetFeatureValues(HidUsageType collectionType, HidUsageType usageType, bool includeUnlinked = false)
+        public virtual List<HidUsageCollection>? GetFeatureValues(HidUsageType collectionType, HidUsageType usageType, bool includeUnlinked = false)
         {
             var result = new List<HidUsageCollection>();
             
@@ -1074,7 +1030,7 @@ namespace DataTools.Win32.Usb
                             }
                             else
                             {
-                                if (ReadUsageValue(item, false, out object? res) && item.ValueCaps is HidPValueCaps vc2 && res != null)
+                                if (ReadUsageValue(item, false, out HidFeatureValue? res) && item.ValueCaps is HidPValueCaps vc2 && res != null)
                                 {
                                     if (item.UsageId == 0x5a && vc2.UsagePage == HidUsagePage.PowerDevice1)
                                     {
@@ -1084,9 +1040,18 @@ namespace DataTools.Win32.Usb
                                     {
                                         item.Value = (HidPowerTestState)(int)res;
                                     }
+                                    else if (item.UsageId == 0x2c && vc2.UsagePage == HidUsagePage.PowerDevice2)
+                                    {
+                                        item.Value = (PowerCapacityMode)(int)res;
+                                    }
+                                    else if (item.UsageId == 0x8b && vc2.UsagePage == HidUsagePage.PowerDevice2)
+                                    {
+                                        item.IsButton = true;
+                                        item.ButtonValue = ((int)res) == 1;
+                                    }
                                     else
                                     {
-                                        item.Value = res;
+                                        item.Value = (int)res;
                                     }
 
                                     if (result.Where((t) => t.UsageId == usageCol.UsageId && t.ReportType == usageCol.ReportType).FirstOrDefault() is HidUsageCollection uc)
@@ -1127,7 +1092,7 @@ namespace DataTools.Win32.Usb
         /// <remarks>
         /// Several reported usages can have identical <paramref name="usageId"/>'s. Only the first found is returned if <paramref name="collectionId"/> is not specified.
         /// </remarks>
-        public HidUsageInfo? LookupValue(byte usageId, byte collectionId = 0, bool retrieveValue = false)
+        public virtual HidUsageInfo? LookupValue(byte usageId, byte collectionId = 0, bool retrieveValue = false)
         {
             if (UsageCollections == null) return null;
 
@@ -1164,14 +1129,14 @@ namespace DataTools.Win32.Usb
                                 {
                                     if (HidGetString(vc.StringIndex, out string? strres))
                                     {
-                                        newitem.Value = strres;
+                                        newitem.Value = strres ?? string.Empty;
                                     }
                                 }
                                 else
                                 {
-                                    if (ReadUsageValue(item, false, out object? res))
+                                    if (ReadUsageValue(item, false, out HidFeatureValue? res) && res != null)
                                     {
-                                        newitem.Value = res;
+                                        newitem.Value = (int)res;
                                     }
                                 }
                             }

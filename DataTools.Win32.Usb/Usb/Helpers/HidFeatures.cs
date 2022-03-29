@@ -23,91 +23,6 @@ namespace DataTools.Win32.Usb
 {
     public static class HidFeatures
     {
-        public class HIDFeatureResult
-        {
-            public MemPtr data { get; set; }
-            public int code { get; set; }
-
-            public float singleVal
-            {
-                get
-                {
-                    float singleValRet = default;
-                    if (code.ToString().ToLower().IndexOf("Percent") != -1)
-                    {
-                        MemPtr m2 = new MemPtr();
-                        m2.Handle = data.Handle + 1;
-                        singleValRet = m2.SingleAt(0L);
-                    }
-                    else
-                    {
-                        singleValRet = intVal;
-                    }
-
-                    return singleValRet;
-                }
-            }
-
-            public long longVal
-            {
-                get
-                {
-                    long longValRet = default;
-                    MemPtr m2 = new MemPtr();
-                    m2.Handle = data.Handle + 1;
-                    longValRet = m2.LongAt(0L);
-                    return longValRet;
-                }
-            }
-
-            public int intVal
-            {
-                get
-                {
-                    int intValRet = default;
-                    MemPtr m2 = new MemPtr();
-                    m2.Handle = data.Handle + 1;
-                    intValRet = m2.IntAt(0L);
-                    return intValRet;
-                }
-            }
-
-            public byte[] bytes
-            {
-                get
-                {
-                    return (byte[])data;
-                }
-            }
-
-            ~HIDFeatureResult()
-            {
-                data.Free();
-            }
-
-            public HIDFeatureResult(int i, MemPtr m)
-            {
-                code = i;
-                data = m.Clone();
-            }
-
-            public HIDFeatureResult()
-            {
-            }
-
-            public static implicit operator HIDFeatureResult(byte[] operand)
-            {
-                var q = new HIDFeatureResult();
-                q.data = (MemPtr)operand;
-                return q;
-            }
-
-            public override string ToString()
-            {
-                return code.ToString() + " (" + intVal + ")";
-            }
-        }
-
         /// <summary>
         /// Enumerates all HID devices in a specific HID class.
         /// </summary>
@@ -154,7 +69,7 @@ namespace DataTools.Win32.Usb
                     hhid = IO.CreateFile(device.DevicePath, 0, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
                 }
 
-                if (hhid == (IntPtr)(-1)) return IntPtr.Zero;
+                if (hhid.IsInvalidHandle()) return IntPtr.Zero;
             }
             catch
             {
@@ -171,7 +86,7 @@ namespace DataTools.Win32.Usb
         /// <remarks></remarks>
         public static void CloseHid(IntPtr handle)
         {
-            if (handle != (IntPtr)(-1) && handle != IntPtr.Zero)
+            if (!handle.IsInvalidHandle())
                 User32.CloseHandle(handle);
         }
 
@@ -183,16 +98,19 @@ namespace DataTools.Win32.Usb
         /// <param name="datalen"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static HIDFeatureResult GetHIDFeature(HidDeviceInfo device, int code, int datalen = 16)
+        public static HidFeatureValue? GetHIDFeature(HidDeviceInfo device, byte code, int datalen = 16)
         {
-            HIDFeatureResult GetHIDFeatureRet = default;
             IntPtr hFile;
+
             hFile = IO.CreateFile(device.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
             if (hFile == IntPtr.Zero)
                 return null;
-            GetHIDFeatureRet = GetHIDFeature(hFile, code, datalen);
+
+            var res = GetHIDFeature(hFile, code, datalen);
+
             User32.CloseHandle(hFile);
-            return GetHIDFeatureRet;
+
+            return res;
         }
 
         /// <summary>
@@ -203,35 +121,36 @@ namespace DataTools.Win32.Usb
         /// <param name="datalen"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static HIDFeatureResult GetHIDFeature(IntPtr device, int code, int datalen = 16)
+        public static HidFeatureValue? GetHIDFeature(IntPtr device, byte code, int datalen = 16)
         {
-            HIDFeatureResult GetHIDFeatureRet = default;
-            MemPtr mm = new MemPtr();
+            HidFeatureValue? result;
 
-            int i = code;
-
-            try
+            using (var mm = new SafePtr())
             {
-                mm.AllocZero(datalen);
-                mm.ByteAt(0L) = (byte)i;
-                if (UsbLibHelpers.HidD_GetFeature(device, mm.Handle, (int)mm.Length))
+                try
                 {
-                    GetHIDFeatureRet = new HIDFeatureResult(i, mm);
+                    mm.AllocZero(datalen);
+                    mm.ByteAt(0L) = code;
+                    if (UsbLibHelpers.HidD_GetFeature(device, mm, (int)mm.Length))
+                    {
+                        result = new HidFeatureValue(code, mm.LongAt(1));
+                    }
+                    else
+                    {
+                        result = null;
+                    }
+
+                    mm.Free();
                 }
-                else
+                catch
                 {
-                    GetHIDFeatureRet = null;
+                    mm.Free();
+                    return null;
                 }
 
-                mm.Free();
-            }
-            catch
-            {
-                mm.Free();
-                return null;
+                return result;
             }
 
-            return GetHIDFeatureRet;
         }
     }
 }

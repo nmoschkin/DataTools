@@ -12,11 +12,13 @@
 
 using DataTools.Win32.Memory;
 using DataTools.Win32.Usb;
+using DataTools.Win32.Usb.Usb.Helpers;
 
 using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -65,6 +67,7 @@ namespace DataTools.Win32.Usb
 
         [DllImport("hid.dll")]
         internal static extern bool HidD_FreePreparsedData(IntPtr PreparsedData);
+
 
         [DllImport("hid.dll", CharSet = CharSet.Unicode)]
         internal static extern bool HidD_GetIndexedString(
@@ -132,6 +135,18 @@ namespace DataTools.Win32.Usb
           uint ReportLength
         );
 
+        [DllImport("hid.dll")]
+        internal static extern HidResult HidP_GetScaledUsageValue(
+          HidReportType ReportType,
+          HidUsagePage UsagePage,
+          ushort LinkCollection,
+          ushort Usage,
+          [Out] out long UsageValue,
+          IntPtr PreparsedData,
+          IntPtr Report,
+          uint ReportLength
+        );
+
 
         public static (ushort, ushort)[] GetButtonStatesRaw(HidDeviceInfo device, HidReportType reportType, HidPButtonCaps buttonCaps)
         {
@@ -144,7 +159,7 @@ namespace DataTools.Win32.Usb
             var output = new List<(ushort, ushort)>();
 
             IntPtr hhid;
-            IntPtr ppd = default;
+            
 
             var caps = device.HidCaps;
             var ch = false;
@@ -162,19 +177,31 @@ namespace DataTools.Win32.Usb
                 return new (ushort, ushort)[0];
             }
 
-            HidD_GetPreparsedData(hhid, ref ppd);
-
-            using (var buffer = new SafePtr())
+            
+            using (var ppd = new PreparsedData(hhid))
             {
-                using (var rptbuff = new SafePtr())
+                using (var buffer = new SafePtr())
                 {
-                    foreach (var btn in buttonCaps)
+                    using (var rptbuff = new SafePtr())
                     {
-
-                        if (reportType == HidReportType.Feature)
+                        foreach (var btn in buttonCaps)
                         {
-                            buffer.Alloc(sizeof(ushort) * caps.NumberFeatureButtonCaps);
-                            rptbuff.Alloc(caps.FeatureReportByteLength + 1);
+
+                            if (reportType == HidReportType.Feature)
+                            {
+                                buffer.Alloc(sizeof(ushort) * caps.NumberFeatureButtonCaps);
+                                rptbuff.Alloc(caps.FeatureReportByteLength + 1);
+                            }
+                            else if (reportType == HidReportType.Input)
+                            {
+                                buffer.Alloc(sizeof(ushort) * caps.NumberInputButtonCaps);
+                                rptbuff.Alloc(caps.InputReportByteLength + 1);
+                            }
+                            else
+                            {
+                                buffer.Alloc(sizeof(ushort) * caps.NumberOutputButtonCaps);
+                                rptbuff.Alloc(caps.OutputReportByteLength + 1);
+                            }
 
                             rptbuff.ByteAt(0) = btn.ReportID;
                             HidD_GetFeature(hhid, rptbuff, (int)rptbuff.Length);
@@ -191,64 +218,84 @@ namespace DataTools.Win32.Usb
                                     output.Add((btn.LinkCollection, us));
                                 }
                             }
-
                         }
-                        else if (reportType == HidReportType.Input)
-                        {
-                            buffer.Alloc(sizeof(ushort) * caps.NumberInputButtonCaps);
-                            rptbuff.Alloc(caps.InputReportByteLength + 1);
-
-                            rptbuff.ByteAt(0) = btn.ReportID;
-                            HidD_GetFeature(hhid, rptbuff, (int)rptbuff.Length);
-
-                            ulen = (uint)buffer.Length / sizeof(ushort);
-
-                            var res = HidP_GetUsages(reportType, btn.UsagePage, btn.LinkCollection, buffer, ref ulen, ppd, rptbuff, (uint)rptbuff.Length - 1);
-                            if (res == HidResult.HIDP_STATUS_SUCCESS)
-                            {
-                                for (int i = 0; i < ulen; i++)
-                                {
-                                    ushort us = buffer.UShortAt(i);
-                                    output.Add((btn.LinkCollection, us));
-                                }
-                            }
-                        }
-
-                        else if (reportType == HidReportType.Output)
-                        {
-                            buffer.Alloc(sizeof(ushort) * caps.NumberOutputButtonCaps);
-                            rptbuff.Alloc(caps.OutputReportByteLength + 1);
-
-                            rptbuff.ByteAt(0) = btn.ReportID;
-                            HidD_GetFeature(hhid, rptbuff, (int)rptbuff.Length);
-
-                            ulen = (uint)buffer.Length / sizeof(ushort);
-
-                            var res = HidP_GetUsages(reportType, btn.UsagePage, btn.LinkCollection, buffer, ref ulen, ppd, rptbuff, (uint)rptbuff.Length - 1);
-
-                            if (res == HidResult.HIDP_STATUS_SUCCESS)
-                            {
-                                for (int i = 0; i < ulen; i++)
-                                {
-                                    ushort us = buffer.UShortAt(i);
-                                    output.Add((btn.LinkCollection, us));
-                                }
-                            }
-                        }
-
                     }
-
-
                 }
-
             }
-
-            HidD_FreePreparsedData(ppd);
 
             if (ch) device.CloseHid();
             return output.ToArray();
 
         }
+
+        public static HidFeatureValue? GetScaledValue(HidDeviceInfo device, HidReportType reportType, HidPValueCaps valueCaps)
+        {
+            var result = GetScaledValues(device, reportType, new[] { valueCaps });
+            if (result.Length == 0) return null;
+            return result[0].Item3;
+        }
+
+
+        public static (ushort, ushort, HidFeatureValue)[] GetScaledValues(HidDeviceInfo device, HidReportType reportType, IEnumerable<HidPValueCaps> valueCaps)
+        {
+            var output = new List<(ushort, ushort, HidFeatureValue)>();
+
+            IntPtr hhid;
+            
+            var caps = device.HidCaps;
+            var ch = false;
+
+            if (!device.IsHidOpen)
+            {
+                if (!device.OpenHid()) return new (ushort, ushort, HidFeatureValue)[0];
+                else ch = true;
+            }
+
+            hhid = device.DangerousGetHidDeviceHandle();
+
+            if (hhid.IsInvalidHandle())
+            {
+                return new (ushort, ushort, HidFeatureValue)[0];
+            }
+
+            using (var ppd = new PreparsedData(hhid))
+            {
+                using (var rptbuff = new SafePtr())
+                {
+                    foreach (var val in valueCaps)
+                    {
+                        if (reportType == HidReportType.Feature)
+                        {
+                            rptbuff.Alloc(caps.FeatureReportByteLength + 1);
+                        }
+                        else if (reportType == HidReportType.Input)
+                        {
+                            rptbuff.Alloc(caps.InputReportByteLength + 1);
+                        }
+                        else
+                        {
+                            rptbuff.Alloc(caps.OutputReportByteLength + 1);
+                        }
+
+                        rptbuff.ByteAt(0) = val.ReportID;
+                        HidD_GetFeature(hhid, rptbuff, (int)rptbuff.Length);
+
+                        long retVal;
+
+                        HidResult res = HidP_GetScaledUsageValue(reportType, val.UsagePage, val.LinkCollection, val.Usage, out retVal, ppd, rptbuff, (uint)rptbuff.Length - 1);
+
+                        if (res == HidResult.HIDP_STATUS_SUCCESS)
+                        {
+                            output.Add((val.LinkCollection, val.Usage, new HidFeatureValue(val.ReportID, retVal)));
+                        }
+                    }
+                }
+            }
+
+            if (ch) device.CloseHid();
+            return output.ToArray();
+        }
+
 
         /// <summary>
         /// Get the button caps for the specified report type.
@@ -256,7 +303,7 @@ namespace DataTools.Win32.Usb
         /// <param name="reportType">The <see cref="HidReportType"/>.</param>
         /// <param name="ppd">The pointer to preparsed data.</param>
         /// <returns>An array of <see cref="HidPButtonCaps"/> structures.</returns>
-        public static HidPButtonCaps[] GetButtonCaps(HidReportType reportType, IntPtr ppd)
+        public static HidPButtonCaps[] GetButtonCaps(HidReportType reportType, PreparsedData ppd)
         {
             ushort ncaps = 0;
 
@@ -269,7 +316,7 @@ namespace DataTools.Win32.Usb
 
             using (var mm = new SafePtr(ncaps * hz))
             {
-                HidP_GetButtonCaps(reportType, mm.DangerousGetHandle(), ref ncaps, ppd);
+                HidP_GetButtonCaps(reportType, mm, ref ncaps, ppd);
 
                 int j = 0;
                 for (int i = 0; i < mm.Length; i += hz)
@@ -290,7 +337,7 @@ namespace DataTools.Win32.Usb
         /// <param name="reportType">The <see cref="HidReportType"/>.</param>
         /// <param name="ppd">The pointer to preparsed data.</param>
         /// <returns>An array of <see cref="HidPValueCaps"/> structures.</returns>
-        public static HidPValueCaps[] GetValueCaps(HidReportType reportType, IntPtr ppd)
+        public static HidPValueCaps[] GetValueCaps(HidReportType reportType, PreparsedData ppd)
         {
             ushort ncaps = 0;
 
@@ -303,7 +350,7 @@ namespace DataTools.Win32.Usb
 
             using (var mm = new SafePtr(ncaps * hz))
             {
-                HidP_GetValueCaps(reportType, mm.DangerousGetHandle(), ref ncaps, ppd);
+                HidP_GetValueCaps(reportType, mm, ref ncaps, ppd);
 
                 int j = 0;
 
@@ -334,120 +381,120 @@ namespace DataTools.Win32.Usb
                 var hhid = hHid ?? HidFeatures.OpenHid(device);
                 if (hhid.IsInvalidHandle()) return false;
 
-                IntPtr ppd = default;
                 HidAttributes attr;
 
                 HidCaps caps;
 
                 if (hhid == (IntPtr)(-1)) return false;
 
-                HidD_GetPreparsedData(hhid, ref ppd);
-                HidD_GetAttributes(hhid, out attr);
-
-                HidP_GetCaps(ppd, out caps);
-
-                device.HidCaps = caps;
-
-                HidPButtonCaps[]? featBtn;
-                HidPButtonCaps[]? inBtn;
-                HidPButtonCaps[]? outBtn;
-
-                HidPValueCaps[]? featVal;
-                HidPValueCaps[]? inVal;
-                HidPValueCaps[]? outVal;
-
-                Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? fbmap = null;
-                Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? ibmap = null;
-                Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? obmap = null;
-
-                Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? fvmap = null;
-                Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? ivmap = null;
-                Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? ovmap = null;
-
-                featBtn = GetButtonCaps(HidReportType.Feature, ppd);
-                inBtn = GetButtonCaps(HidReportType.Input, ppd);
-                outBtn = GetButtonCaps(HidReportType.Output, ppd);
-
-                featVal = GetValueCaps(HidReportType.Feature, ppd);
-                inVal = GetValueCaps(HidReportType.Input, ppd);
-                outVal = GetValueCaps(HidReportType.Output, ppd);
-
-                if (featBtn != null)
+                using (var ppd = new PreparsedData(hhid))
                 {
-                    ExpandCaps(ref featBtn);
+
+
+                    HidD_GetAttributes(hhid, out attr);
+                    HidP_GetCaps(ppd, out caps);
+
+                    device.HidCaps = caps;
+
+                    HidPButtonCaps[]? featBtn;
+                    HidPButtonCaps[]? inBtn;
+                    HidPButtonCaps[]? outBtn;
+
+                    HidPValueCaps[]? featVal;
+                    HidPValueCaps[]? inVal;
+                    HidPValueCaps[]? outVal;
+
+                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? fbmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? ibmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? obmap = null;
+
+                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? fvmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? ivmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? ovmap = null;
+
+                    featBtn = GetButtonCaps(HidReportType.Feature, ppd);
+                    inBtn = GetButtonCaps(HidReportType.Input, ppd);
+                    outBtn = GetButtonCaps(HidReportType.Output, ppd);
+
+                    featVal = GetValueCaps(HidReportType.Feature, ppd);
+                    inVal = GetValueCaps(HidReportType.Input, ppd);
+                    outVal = GetValueCaps(HidReportType.Output, ppd);
+
                     if (featBtn != null)
                     {
-                        fbmap = LinkButtonCollections(featBtn);
-                        device.FeatureButtonCaps = featBtn;
-                        device.LinkedFeatureButtons = fbmap;
+                        ExpandCaps(ref featBtn);
+                        if (featBtn != null)
+                        {
+                            fbmap = LinkButtonCollections(featBtn);
+                            device.FeatureButtonCaps = featBtn;
+                            device.LinkedFeatureButtons = fbmap;
 
+                        }
                     }
-                }
 
-                if (inBtn != null)
-                {
-                    ExpandCaps(ref inBtn);
                     if (inBtn != null)
                     {
-                        ibmap = LinkButtonCollections(inBtn);
+                        ExpandCaps(ref inBtn);
+                        if (inBtn != null)
+                        {
+                            ibmap = LinkButtonCollections(inBtn);
 
-                        device.InputButtonCaps = inBtn;
-                        device.LinkedInputButtons = ibmap;
+                            device.InputButtonCaps = inBtn;
+                            device.LinkedInputButtons = ibmap;
+                        }
                     }
-                }
 
 
-                if (outBtn != null)
-                {
-                    ExpandCaps(ref outBtn);
                     if (outBtn != null)
                     {
-                        obmap = LinkButtonCollections(outBtn);
+                        ExpandCaps(ref outBtn);
+                        if (outBtn != null)
+                        {
+                            obmap = LinkButtonCollections(outBtn);
 
-                        device.OutputButtonCaps = outBtn;
-                        device.LinkedOutputButtons = obmap;
+                            device.OutputButtonCaps = outBtn;
+                            device.LinkedOutputButtons = obmap;
+                        }
                     }
-                }
 
-                if (featVal != null)
-                {
-                    ExpandCaps(ref featVal);
                     if (featVal != null)
                     {
-                        fvmap = LinkValueCollections(featVal);
+                        ExpandCaps(ref featVal);
+                        if (featVal != null)
+                        {
+                            fvmap = LinkValueCollections(featVal);
 
-                        device.FeatureValueCaps = featVal;
-                        device.LinkedFeatureValues = fvmap;
+                            device.FeatureValueCaps = featVal;
+                            device.LinkedFeatureValues = fvmap;
+                        }
                     }
-                }
 
-                if (inVal != null)
-                {
-                    ExpandCaps(ref inVal);
                     if (inVal != null)
                     {
-                        ivmap = LinkValueCollections(inVal);
+                        ExpandCaps(ref inVal);
+                        if (inVal != null)
+                        {
+                            ivmap = LinkValueCollections(inVal);
 
-                        device.InputValueCaps = inVal;
-                        device.LinkedInputValues = ivmap;
+                            device.InputValueCaps = inVal;
+                            device.LinkedInputValues = ivmap;
+                        }
                     }
-                }
 
-                if (outVal != null)
-                {
-                    ExpandCaps(ref outVal);
                     if (outVal != null)
                     {
-                        ovmap = LinkValueCollections(outVal);
+                        ExpandCaps(ref outVal);
+                        if (outVal != null)
+                        {
+                            ovmap = LinkValueCollections(outVal);
 
-                        device.OutputValueCaps = outVal;
-                        device.LinkedOutputValues = ovmap;
+                            device.OutputValueCaps = outVal;
+                            device.LinkedOutputValues = ovmap;
+                        }
                     }
                 }
 
-                HidD_FreePreparsedData(ppd);
-
-                if (hHid == null) CloseHandle(hhid);
+                if (hHid == null) HidFeatures.CloseHid(hhid);
 
             }
             catch

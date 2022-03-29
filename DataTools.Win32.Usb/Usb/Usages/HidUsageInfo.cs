@@ -151,13 +151,14 @@ namespace DataTools.Win32.Usb
         /// </summary>
         [JsonIgnore]
         public virtual object? Value { get; set; }
+
         /// <summary>
         /// Button Value
         /// </summary>
         [JsonIgnore]
         public virtual bool ButtonValue
         {
-            get => Value != null && Value is int i && i != 0;
+            get => Value != null && (int)Value is int i && i != 0;
             set => Value = value ? 1 : 0;
         }
 
@@ -189,6 +190,10 @@ namespace DataTools.Win32.Usb
                 else if (Value is string s)
                 {
                     return s;
+                }
+                else if (Value is HidFeatureValue fv)
+                {
+                    return fv.Value.ToString();
                 }
                 else if (IsButton)
                 {
