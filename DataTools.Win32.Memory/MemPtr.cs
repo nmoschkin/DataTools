@@ -543,17 +543,16 @@ namespace DataTools.Win32.Memory
 
             byte[] output = new byte[len];
 
-            GCHandle gch = GCHandle.Alloc(output, GCHandleType.Pinned);
-
             unsafe
             {
                 void* ptr1 = (void*)((long)handle + index);
-                void* ptr2 = (void*)gch.AddrOfPinnedObject();
+                fixed(void* ptr2 = output)
+                {
+                    Buffer.MemoryCopy(ptr1, ptr2, len, len);
+                }
 
-                Buffer.MemoryCopy(ptr1, ptr2, len, len);
             }
 
-            gch.Free();
             return output;
         }
 
@@ -581,17 +580,16 @@ namespace DataTools.Win32.Memory
 
             char[] output = new char[len / sizeof(char)];
 
-            GCHandle gch = GCHandle.Alloc(output, GCHandleType.Pinned);
-
             unsafe
             {
                 void* ptr1 = (void*)((long)handle + index);
-                void* ptr2 = (void*)gch.AddrOfPinnedObject();
+                fixed(void* ptr2 = output)
+                {
+                    Buffer.MemoryCopy(ptr1, ptr2, len, len);
+                }
 
-                Buffer.MemoryCopy(ptr1, ptr2, len, len);
             }
 
-            gch.Free();
             return output;
         }
 
@@ -648,9 +646,10 @@ namespace DataTools.Win32.Memory
             unsafe
             {
                 var vl = value.Length;
-                GCHandle gch = GCHandle.Alloc(value, GCHandleType.Pinned);
-                Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)((long)handle + index), vl, vl);
-                gch.Free();
+                fixed (byte* ptr = value)
+                {
+                    Buffer.MemoryCopy(ptr, (void*)((long)handle + index), vl, vl);
+                }
             }
         }
 
@@ -666,10 +665,11 @@ namespace DataTools.Win32.Memory
             }
             unsafe
             {
-                var vl = value.Length * 2;
-                GCHandle gch = GCHandle.Alloc(value, GCHandleType.Pinned);
-                Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)((long)handle + index), vl, vl);
-                gch.Free();
+                var vl = value.Length * sizeof(char);
+                fixed (void* ptr = value)
+                {
+                    Buffer.MemoryCopy(ptr, (void*)((long)handle + index), vl, vl);
+                }
             }
         }
 
@@ -811,36 +811,38 @@ namespace DataTools.Win32.Memory
             byte[] data = Encoding.UTF8.GetBytes(value);
             int slen = data.Length;
 
-            GCHandle gch = GCHandle.Alloc(data, GCHandleType.Pinned);
-
             byte* b1 = ptr;
-            byte* b2 = (byte*)gch.AddrOfPinnedObject();
 
-            for (int i = 0; i < slen; i++)
+            fixed(byte* ptr2 = data)
             {
-                *b1++ = *b2++;
+                byte* b2 = ptr2;
+                for (int i = 0; i < slen; i++)
+                {
+                    *b1++ = *b2++;
+                }
+
             }
 
             if (addNull) *b1++ = 0;
-            gch.Free();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe void internalSetString(char* ptr, string value, bool addNull)
         {
             int slen = value.Length;
-            GCHandle gch = GCHandle.Alloc(Encoding.Unicode.GetBytes(value), GCHandleType.Pinned);
+            var data = Encoding.Unicode.GetBytes(value);
 
             char* b1 = ptr;
-            char* b2 = (char*)gch.AddrOfPinnedObject();
-
-            for (int i = 0; i < slen; i++)
+            fixed(void*ptr2 = data)
             {
-                *b1++ = *b2++;
+                char* b2 = (char*)ptr2;
+                for (int i = 0; i < slen; i++)
+                {
+                    *b1++ = *b2++;
+                }
             }
 
             if (addNull) *b1++ = '\x0';
-            gch.Free();
         }
 
 
