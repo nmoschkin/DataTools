@@ -100,15 +100,17 @@ namespace DataTools.Win32.Usb
         /// <remarks></remarks>
         public static HidFeatureValue? GetHIDFeature(HidDeviceInfo device, byte code, int datalen = 16)
         {
-            IntPtr hFile;
+            var ch = false;
 
-            hFile = IO.CreateFile(device.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
-            if (hFile == IntPtr.Zero)
-                return null;
+            if (!device.IsHidOpen)
+            {
+                device.OpenHid();
+                ch = true;
+            }
 
-            var res = GetHIDFeature(hFile, code, datalen);
+            var res = GetHIDFeature(device.DangerousGetHidDeviceHandle(), code, datalen);
 
-            User32.CloseHandle(hFile);
+            if (ch) device.CloseHid();
 
             return res;
         }
@@ -116,12 +118,12 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Retrieves a feature from the device.
         /// </summary>
-        /// <param name="device"></param>
+        /// <param name="hhid"></param>
         /// <param name="code"></param>
         /// <param name="datalen"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static HidFeatureValue? GetHIDFeature(IntPtr device, byte code, int datalen = 16)
+        public static HidFeatureValue? GetHIDFeature(IntPtr hhid, byte code, int datalen = 16)
         {
             HidFeatureValue? result;
 
@@ -131,7 +133,7 @@ namespace DataTools.Win32.Usb
                 {
                     mm.AllocZero(datalen);
                     mm.ByteAt(0L) = code;
-                    if (UsbLibHelpers.HidD_GetFeature(device, mm, (int)mm.Length))
+                    if (UsbLibHelpers.HidD_GetFeature(hhid, mm, (int)mm.Length))
                     {
                         result = new HidFeatureValue(code, mm.LongAt(1));
                     }
