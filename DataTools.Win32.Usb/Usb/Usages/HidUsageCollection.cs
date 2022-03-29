@@ -37,6 +37,7 @@ namespace DataTools.Win32.Usb
 
         public void Add(HidUsageInfo item)
         {
+            item.Parent = this;
             ((ICollection<HidUsageInfo>)usages).Add(item);
         }
 
@@ -104,12 +105,16 @@ namespace DataTools.Win32.Usb
         /// </summary>
         /// <param name="preserveList">Preserve the contents of the source object list (the list itself will be a new instance of <see cref="List{T}"/>)</param>
         /// <returns></returns>
-        public override HidUsageCollection Clone(HidReportType reportType, bool preserveList = false)
+        public override HidUsageCollection Clone(HidReportType reportType, bool preserveList = false, HidUsageCollection? parent = null)
         {
             var b = (HidUsageCollection)MemberwiseClone();
+            
             b.usages = new List<HidUsageInfo>();
             b.ReportType = reportType;
+            b.Parent = parent;   
+
             if (preserveList) b.usages.AddRange(usages);
+            
             return b;
         }
 

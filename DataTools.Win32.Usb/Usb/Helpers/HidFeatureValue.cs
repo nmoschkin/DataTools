@@ -29,6 +29,25 @@ namespace DataTools.Win32.Usb
             *((long*)ptr) = Value;
         }
 
+        public void CopyTo(byte[] buffer)
+        {
+            unsafe
+            {
+                fixed (byte* ptr = buffer)
+                {
+                    CopyTo(ptr);
+                }
+            }
+        }
+
+        public void CopyTo(IntPtr buffer)
+        {
+            unsafe
+            {
+                CopyTo((void*)buffer);
+            }
+        }
+
         public HidFeatureValue(byte reportId, long value)
         {
             ReportID = reportId;
