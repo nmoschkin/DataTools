@@ -55,7 +55,7 @@ namespace DataTools.Win32.Usb
         protected Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> inputBtnMap = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
         protected Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> outputBtnMap = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
 
-        protected IntPtr hHid = (IntPtr)(-1);
+        protected internal IntPtr hHid = (IntPtr)(-1);
         protected bool openWrite = false;
         private bool disposedValue;
 

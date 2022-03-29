@@ -108,7 +108,7 @@ namespace DataTools.Win32.Usb
                 ch = true;
             }
 
-            var res = GetHIDFeature(device.DangerousGetHidDeviceHandle(), code, datalen);
+            var res = GetHIDFeature(device.hHid, code, datalen);
 
             if (ch) device.CloseHid();
 
