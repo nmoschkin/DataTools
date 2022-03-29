@@ -27,7 +27,7 @@ namespace DataTools.Win32.Usb
     /// <remarks></remarks>
     public class HidDeviceInfo : DeviceInfo, IDisposable
     {
-        protected Dictionary<HidUsageInfo, List<HidUsageInfo>>? usageCollections;
+        protected List<HidUsageCollection>? usageCollections;
 
 
         protected HidUsagePage hidPage;
@@ -829,7 +829,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Usage Collections for this <see cref="HidUsagePage"/>.
         /// </summary>
-        public Dictionary<HidUsageInfo, List<HidUsageInfo>>? UsageCollections
+        public List<HidUsageCollection>? UsageCollections
         {
             get => usageCollections;
             protected internal set => usageCollections = value;
@@ -884,23 +884,23 @@ namespace DataTools.Win32.Usb
         /// Retrieve dynamic values live from the device.
         /// </summary>
         /// <returns></returns>
-        public Dictionary<HidUsageInfo, List<HidUsageInfo>>? RefreshDynamicValues()
+        public List<HidUsageCollection>? RefreshDynamicValues()
         {
-            var retDict = GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.DV | HidUsageType.DF);
+            var retCols = GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.DV | HidUsageType.DF);
 
-            if (retDict != null)
+            if (retCols != null)
             {
                 var leftovers = GetFeatureValues(HidUsageType.Reserved, HidUsageType.DV);
                 if (leftovers != null)
                 {
-                    foreach (var kvp in leftovers)
+                    foreach (var loitem in leftovers)
                     {
-                        retDict.Add(kvp.Key, kvp.Value);
+                        retCols.Add(loitem);
                     }
                 }
             }
 
-            return retDict;
+            return retCols;
         }
 
         /// <summary>
@@ -991,10 +991,12 @@ namespace DataTools.Win32.Usb
         /// <remarks>
         /// The <paramref name="collectionType"/> and <paramref name="usageType"/> properties can be OR'd to retrieve more than one kind of value set.
         /// </remarks>
-        public Dictionary<HidUsageInfo, List<HidUsageInfo>>? GetFeatureValues(HidUsageType collectionType, HidUsageType usageType, bool includeUnlinked = false)
+        public List<HidUsageCollection>? GetFeatureValues(HidUsageType collectionType, HidUsageType usageType, bool includeUnlinked = false)
         {
-            var result = new Dictionary<HidUsageInfo, List<HidUsageInfo>>();
+            var result = new List<HidUsageCollection>();
+            
             if (UsageCollections == null) return null;
+            
             bool ch = false;
 
             if (!IsHidOpen)
@@ -1003,11 +1005,14 @@ namespace DataTools.Win32.Usb
                 ch = true;
             }
 
-            foreach (var kvp in UsageCollections)
+            foreach (var enumCol in UsageCollections)
             {
-                if ((collectionType & kvp.Key.UsageType) != 0 || (kvp.Key.UsageType == HidUsageType.Reserved && (collectionType == HidUsageType.Reserved || includeUnlinked)))
+
+                HidUsageCollection usageCol = enumCol;
+
+                if ((collectionType & usageCol.UsageType) != 0 || (usageCol.UsageType == HidUsageType.Reserved && (collectionType == HidUsageType.Reserved || includeUnlinked)))
                 {
-                    foreach (var item in kvp.Value)
+                    foreach (var item in usageCol)
                     {
                         if ((usageType & item.UsageType) != 0 || (item.IsButton && item.UsageType == 0))
                         {
@@ -1025,13 +1030,17 @@ namespace DataTools.Win32.Usb
                                     }
                                 }
 
-                                if (!result.TryGetValue(kvp.Key, out List<HidUsageInfo>? col))
+                                if (result.Where((t) => t.UsageId == usageCol.UsageId && t.ReportType == usageCol.ReportType).FirstOrDefault() is HidUsageCollection uc)
                                 {
-                                    col = new List<HidUsageInfo>();
-                                    result.Add(kvp.Key, col);
+                                    usageCol = uc;
+                                }
+                                else
+                                {
+                                    usageCol = usageCol.Clone(usageCol.ReportType);
+                                    result.Add(usageCol);
                                 }
 
-                                col.Add(item);
+                                usageCol.Add(item);
                             }
                             else if (item.ValueCaps is HidPValueCaps vc && vc.StringIndex != 0)
                             {
@@ -1049,13 +1058,17 @@ namespace DataTools.Win32.Usb
                                             item.Value = strres;
                                         }
 
-                                        if (!result.TryGetValue(kvp.Key, out List<HidUsageInfo>? col))
+                                        if (result.Where((t) => t.UsageId == usageCol.UsageId && t.ReportType == usageCol.ReportType).FirstOrDefault() is HidUsageCollection uc)
                                         {
-                                            col = new List<HidUsageInfo>();
-                                            result.Add(kvp.Key, col);
+                                            usageCol = uc;
+                                        }
+                                        else
+                                        {
+                                            usageCol = usageCol.Clone(usageCol.ReportType);
+                                            result.Add(usageCol);
                                         }
 
-                                        col.Add(item);
+                                        usageCol.Add(item);
                                     }
                                 }
                             }
@@ -1076,13 +1089,18 @@ namespace DataTools.Win32.Usb
                                         item.Value = res;
                                     }
 
-                                    if (!result.TryGetValue(kvp.Key, out List<HidUsageInfo>? col))
+                                    if (result.Where((t) => t.UsageId == usageCol.UsageId && t.ReportType == usageCol.ReportType).FirstOrDefault() is HidUsageCollection uc)
                                     {
-                                        col = new List<HidUsageInfo>();
-                                        result.Add(kvp.Key, col);
+                                        usageCol = uc;
+                                    }
+                                    else
+                                    {
+                                        usageCol = usageCol.Clone(usageCol.ReportType);
+                                        result.Add(usageCol);
                                     }
 
-                                    col.Add(item);
+                                    usageCol.Add(item);
+
                                 }
 
                             }
@@ -1115,11 +1133,11 @@ namespace DataTools.Win32.Usb
 
             //var features = deviceInfo.GetFeatureValues(HidUsageType.CL | HidUsageType.CA | HidUsageType.CP, HidUsageType.DV | HidUsageType.SV);
 
-            foreach (var kvp in UsageCollections)
+            foreach (var usageCol in UsageCollections)
             {
-                if (collectionId == 0 || kvp.Key.UsageId == collectionId)
+                if (collectionId == 0 || usageCol.UsageId == collectionId)
                 {
-                    foreach (var item in kvp.Value)
+                    foreach (var item in usageCol)
                     {
                         if (item.UsageId == usageId)
                         {
@@ -1171,16 +1189,16 @@ namespace DataTools.Win32.Usb
 
 
         /// <summary>
-        /// Create a power device collection from the pre-populated linked list of collections and usages.
+        /// Create a power device collection from the pre-populated list of collections and usages.
         /// </summary>
         /// <param name="data">The linked usage data.</param>
-        /// <param name="currDict">The dictionary to add to.</param>
+        /// <param name="currCol">The collection to add to.</param>
         /// <returns>
-        /// Either <paramref name="currDict"/> or a new dictionary.
+        /// Either <paramref name="currCol"/> or a new collection.
         /// </returns>
-        public Dictionary<HidUsageInfo, List<HidUsageInfo>> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> data, HidReportType reportType, Dictionary<HidUsageInfo, List<HidUsageInfo>>? currDict = null)
+        public List<HidUsageCollection> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> data, HidReportType reportType, List<HidUsageCollection>? currCol = null)
         {
-            var result = currDict ?? new Dictionary<HidUsageInfo, List<HidUsageInfo>>();
+            var result = currCol ?? new List<HidUsageCollection>();
 
             var bref = HidBatteryDevicePageInfo.Instance;
             var pref = HidPowerDevicePageInfo.Instance;
@@ -1212,9 +1230,9 @@ namespace DataTools.Win32.Usb
 
                 if (bitem == null) continue;
 
-                List<HidUsageInfo> l;
+                IList<HidUsageInfo> l;
 
-                l = result.Where((scan) => scan.Key.UsageId == collectionid && scan.Key.ReportType == reportType).Select((scan2) => scan2.Value).FirstOrDefault() ?? new List<HidUsageInfo>();
+                l = result.Where((scan) => scan.UsageId == collectionid && scan.ReportType == reportType).FirstOrDefault() ?? (IList<HidUsageInfo>)new List<HidUsageInfo>();
                 var newres = l.Count == 0;
 
                 foreach (var item in list)
@@ -1255,7 +1273,7 @@ namespace DataTools.Win32.Usb
 
                 }
 
-                if (newres) result.Add(bitem.Clone(reportType), l);
+                if (newres) result.Add(new HidUsageCollection(bitem, reportType, l));
             }
 
             return result;
@@ -1264,16 +1282,16 @@ namespace DataTools.Win32.Usb
 
 
         /// <summary>
-        /// Create a power device collection from the pre-populated linked list of collections and usages.
+        /// Create a power device collection from the pre-populated list of collections and usages.
         /// </summary>
         /// <param name="data">The linked usage data.</param>
-        /// <param name="currDict">The dictionary to add to.</param>
+        /// <param name="currCol">The collection to add to.</param>
         /// <returns>
-        /// Either <paramref name="currDict"/> or a new dictionary.
+        /// Either <paramref name="currCol"/> or a new collection.
         /// </returns>
-        public Dictionary<HidUsageInfo, List<HidUsageInfo>> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> data, HidReportType reportType, Dictionary<HidUsageInfo, List<HidUsageInfo>>? currDict = null)
+        public List<HidUsageCollection> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> data, HidReportType reportType, List<HidUsageCollection>? currCol = null)
         {
-            var result = currDict ?? new Dictionary<HidUsageInfo, List<HidUsageInfo>>();
+            var result = currCol ?? new List<HidUsageCollection>();
 
             foreach (var kv in data)
             {
@@ -1303,9 +1321,9 @@ namespace DataTools.Win32.Usb
 
                 if (bitem == null) continue;
 
-                List<HidUsageInfo> l;
+                IList<HidUsageInfo> l;
 
-                l = result.Where((scan) => scan.Key.UsageId == collectionid && scan.Key.ReportType == reportType).Select((scan2) => scan2.Value).FirstOrDefault() ?? new List<HidUsageInfo>();
+                l = result.Where((scan) => scan.UsageId == collectionid && scan.ReportType == reportType).FirstOrDefault() ?? (IList<HidUsageInfo>)new List<HidUsageInfo>();
                 var newres = l.Count == 0;
 
                 foreach (var item in list)
@@ -1344,7 +1362,7 @@ namespace DataTools.Win32.Usb
 
                 }
 
-                if (newres) result.Add(bitem.Clone(reportType, true), l);
+                if (newres) result.Add(new HidUsageCollection(bitem, reportType, l));
             }
 
             return result;

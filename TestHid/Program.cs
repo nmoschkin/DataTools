@@ -29,7 +29,8 @@ namespace TestHid
 
 
             var batt2 = HidPowerDeviceInfo.CreateFromHidDevice(battery);
-
+            batt2.OpenHid();
+            
             var mstr = batt2.Manufacturer;
             var mstr2 = batt2.HidManufacturer;
             var pstr = batt2.ProductString;
@@ -61,9 +62,9 @@ namespace TestHid
 
                 foreach (var val in vals)
                 {
-                    ColorConsole.WriteLine($"({{Yellow}}{val.Key.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.Key.UsageName)}{{Reset}} ({{DarkCyan}}{val.Key.UsageId:X2}{{Reset}}) {val.Key.ReportType}                         ");
+                    ColorConsole.WriteLine($"({{Yellow}}{val.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.UsageName)}{{Reset}} ({{DarkCyan}}{val.UsageId:X2}{{Reset}}) {val.ReportType}                         ");
 
-                    foreach (var item in val.Value)
+                    foreach (var item in val)
                     {
                         if (item.UsageName.Contains("Time"))
                         {
@@ -107,9 +108,9 @@ namespace TestHid
 
                     foreach (var val in svals)
                     {
-                        ColorConsole.WriteLine($"({{Yellow}}{val.Key.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.Key.UsageName)}{{Reset}} ({{DarkCyan}}{val.Key.UsageId:X2}{{Reset}}) {val.Key.ReportType}                         ");
+                        ColorConsole.WriteLine($"({{Yellow}}{val.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.UsageName)}{{Reset}} ({{DarkCyan}}{val.UsageId:X2}{{Reset}}) {val.ReportType}                         ");
 
-                        foreach (var item in val.Value)
+                        foreach (var item in val)
                         {
                             if (item.UsageName.Contains("Time"))
                             {
@@ -154,6 +155,9 @@ namespace TestHid
 
                 Task.Delay(500);
             }
+
+            batt2.CloseHid();
+
 
         }
 

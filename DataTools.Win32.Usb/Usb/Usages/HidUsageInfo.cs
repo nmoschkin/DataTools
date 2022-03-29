@@ -11,6 +11,7 @@
 // ************************************************* ''
 
 
+using DataTools.MathTools;
 using DataTools.Text;
 
 using Newtonsoft.Json;
@@ -36,6 +37,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// The Usage Name
         /// </summary>
+        [JsonProperty("usageName")]
         public virtual string? UsageName
         {
             get => name;
@@ -248,9 +250,18 @@ namespace DataTools.Win32.Usb
         /// </summary>
         [JsonProperty("hidUnit")]
         public UnitInfoCode HidUnit { get; set; }
-        public virtual object Clone()
+
+        object ICloneable.Clone()
         {
             return MemberwiseClone();
+        }
+
+        public T CloneInto<T>() where T: HidUsageInfo, new()
+        {
+            T ret = new T();
+
+            ObjectMerge.MergeObjects(this, ret);
+            return ret;
         }
 
         public virtual HidUsageInfo? Clone(HidReportType reportType, bool isButton = false)
