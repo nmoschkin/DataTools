@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -21,34 +22,14 @@ namespace DataTools.Extras.AdvancedLists
     /// <remarks>
     /// Items cannot be <see cref="null"/>.  Null is reserved for buffer space.
     /// </remarks>
-    public class SortedBufferedCollection<T> : ICollection<T> 
+    public class RedBlackTree<T> : ICollection<T> 
     {
-        protected static byte defaultSpace = 5;
-
-        /// <summary>
-        /// Gets or sets the default buffering to utilize when creating new instances of <see cref="SortedBufferedCollection{T}"/> when a space parameter is not explicitly provided.
-        /// </summary>
-        /// <remarks>
-        /// Value must be 1-255.
-        /// </remarks>
-        /// <exception cref="ArgumentOutOfRangeException" />
-        public static byte DefaultSpace
-        {
-            get => defaultSpace;
-            set
-            {
-                if (value < 1) throw new ArgumentOutOfRangeException(nameof(value));
-                defaultSpace = value;
-            }
-        }
-
         protected SortOrder sortOrder;
         protected int count = 0;
         protected Comparison<T> comp;
         protected IComparer<T> comparer;
         protected List<T> items;
         protected object syncRoot = new object();
-        protected byte space = DefaultSpace;
         protected T[] arrspace;
         protected TreeWalker<T> walker;
 
@@ -58,11 +39,6 @@ namespace DataTools.Extras.AdvancedLists
         public SortOrder SortOrder => sortOrder;
 
         /// <summary>
-        /// Gets the spatial buffering for the current instance.
-        /// </summary>
-        public int Space => space;
-
-        /// <summary>
         /// Gets the total number of actual elements.
         /// </summary>
         public int Count => count;
@@ -70,20 +46,18 @@ namespace DataTools.Extras.AdvancedLists
         public bool IsReadOnly { get; } = false;
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
         /// </summary>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(byte space, IComparer<T> comparer, SortOrder sortOrder) : base()
+        public RedBlackTree(IComparer<T> comparer, SortOrder sortOrder) : base()
         {
-            if (space < 1) throw new ArgumentOutOfRangeException(nameof(space));
             items = new List<T>();
             
-            this.space = space;
-            arrspace = new T[space];
+            arrspace = new T[2];
             this.sortOrder = sortOrder;
 
             if (comparer == null)
@@ -124,143 +98,82 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection() : this(SortOrder.Ascending) { }
+        public RedBlackTree() : this(SortOrder.Ascending) { }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
         /// </summary>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(SortOrder sortOrder) : this(DefaultSpace, (IComparer<T>)null, sortOrder)
+        public RedBlackTree(SortOrder sortOrder) : this((IComparer<T>)null, sortOrder)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
         /// </summary>
         /// <param name="comparer">The comparer class.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(IComparer<T> comparer) : this(DefaultSpace, comparer, SortOrder.Ascending)
+        public RedBlackTree(IComparer<T> comparer) : this(comparer, SortOrder.Ascending)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
         /// </summary>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(byte space) : this(space, (IComparer<T>)null, SortOrder.Ascending)
+        public RedBlackTree(byte space) : this((IComparer<T>)null, SortOrder.Ascending)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder) : this(DefaultSpace, comparer, sortOrder)
+        public RedBlackTree(IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder) : this(comparer, sortOrder)
         {
             AddRange(initialItems);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(IEnumerable<T> initialItems, IComparer<T> comparer) : this(DefaultSpace, comparer, SortOrder.Ascending)
+        public RedBlackTree(IEnumerable<T> initialItems, IComparer<T> comparer) : this(comparer, SortOrder.Ascending)
         {
             AddRange(initialItems);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(IEnumerable<T> initialItems, SortOrder sortOrder) : this(DefaultSpace, (IComparer<T>)null, sortOrder)
+        public RedBlackTree(IEnumerable<T> initialItems, SortOrder sortOrder) : this((IComparer<T>)null, sortOrder)
         {
             AddRange(initialItems);
         }
 
+      
         /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
-        /// </summary>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(byte space, SortOrder sortOrder) : this(space, (IComparer<T>)null, sortOrder)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
-        /// </summary>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(byte space, IComparer<T> comparer) : this(space, comparer, SortOrder.Ascending)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(byte space, IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder) : this(space, comparer, sortOrder)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(byte space, IEnumerable<T> initialItems, IComparer<T> comparer) : this(space, comparer, SortOrder.Ascending)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SortedBufferedCollection{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
-        /// <param name="sortOrder">The sort order.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public SortedBufferedCollection(byte space, IEnumerable<T> initialItems, SortOrder sortOrder) : this(space, (IComparer<T>)null, sortOrder)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Adds multiple items to the <see cref="SortedBufferedCollection{T}"/> at once.
+        /// Adds multiple items to the <see cref="RedBlackTree{T}"/> at once.
         /// </summary>
         /// <param name="newItems"></param>
         public void AddRange(IEnumerable<T> newItems)
@@ -317,7 +230,18 @@ namespace DataTools.Extras.AdvancedLists
                 }
                 else
                 {
-                    arrspace[space - 1] = item;
+                    if (index % 2 == 0)
+                    {
+                        arrspace[0] = item;
+                        arrspace[1] = default;
+
+                    }
+                    else
+                    {
+                        arrspace[0] = default;
+                        arrspace[1] = item;
+                    }
+
                     items.InsertRange(index, arrspace);
                 }
 
@@ -333,29 +257,11 @@ namespace DataTools.Extras.AdvancedLists
         {
             lock (syncRoot)
             {
-                int cn = 0;
-                int c = items.Count;
-                int b = index;
-                int e = b + space;
-
                 items[index] = default;
-
-                for (int i = b; i < e; i++)
-                {
-                    if (items[index] == null)
-                    {
-                        cn++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                if (cn >= space) items.RemoveAt(index);
-                count--;
+                walker.BalanceTree(index);
             }
         }
+
 
         /// <summary>
         /// Get the appropriate insert index for the configured sort direction, based on price.
@@ -399,7 +305,7 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// Copies <paramref name="count"/> elements of the <see cref="SortedBufferedCollection{T}"/> to an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
+        /// Copies <paramref name="count"/> elements of the <see cref="RedBlackTree{T}"/> to an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
         /// </summary>
         /// <param name="array"></param>
         /// <param name="arrayIndex"></param>
@@ -428,7 +334,7 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// Create a new <see cref="Array"/> of the items in this <see cref="SortedBufferedCollection{T}"/>.
+        /// Create a new <see cref="Array"/> of the items in this <see cref="RedBlackTree{T}"/>.
         /// </summary>
         /// <returns>A new <see cref="Array"/> with all the actual items.</returns>
         public T[] ToArray()
@@ -490,27 +396,27 @@ namespace DataTools.Extras.AdvancedLists
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new SortedBufferedObjectCollectionEnumerator(this);
+            return new RedBlackTreeEnumerator(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new SortedBufferedObjectCollectionEnumerator(this);
+            return new RedBlackTreeEnumerator(this);
         }
 
         /// <summary>
-        /// <see cref="SortedBufferedCollection{T}"/> enumerator.
+        /// <see cref="RedBlackTree{T}"/> enumerator.
         /// </summary>
-        public class SortedBufferedObjectCollectionEnumerator : IEnumerator<T>
+        public class RedBlackTreeEnumerator : IEnumerator<T>
         {
 
-            SortedBufferedCollection<T> collection;
+            RedBlackTree<T> collection;
             T current = default;
 
             int idx = -1;
             int count = 0;
 
-            public SortedBufferedObjectCollectionEnumerator(SortedBufferedCollection<T> collection)
+            public RedBlackTreeEnumerator(RedBlackTree<T> collection)
             {
                 this.collection = collection;
                 count = collection.items.Count;
@@ -556,7 +462,7 @@ namespace DataTools.Extras.AdvancedLists
 
     public class TreeWalker<T>
     {
-        private IList<T> items;
+        private List<T> items;
         private readonly SortOrder sortOrder;
 
         protected Comparison<T> comp;
@@ -572,7 +478,7 @@ namespace DataTools.Extras.AdvancedLists
 
         public SortOrder SortOrder => sortOrder;
 
-        public static TreeWalker<TComp> CreateFromIComparable<TComp>(IList<TComp> items, SortOrder sortOrder = SortOrder.Ascending) where TComp: IComparable<T>
+        public static TreeWalker<TComp> CreateFromIComparable<TComp>(List<TComp> items, SortOrder sortOrder = SortOrder.Ascending) where TComp: IComparable<T>
         {
             var tw = new TreeWalker<TComp>(items);
 
@@ -591,7 +497,7 @@ namespace DataTools.Extras.AdvancedLists
             return tw;
         }
 
-        protected TreeWalker(IList<T> items, SortOrder sortOrder = SortOrder.Ascending)
+        protected TreeWalker(List<T> items, SortOrder sortOrder = SortOrder.Ascending)
         {
             this.sortOrder = sortOrder;
             this.items = items;
@@ -607,7 +513,7 @@ namespace DataTools.Extras.AdvancedLists
             Reset();
         }
 
-        public TreeWalker(IList<T> items, Comparison<T> comparerFunc, SortOrder sortOrder = SortOrder.Ascending) : this(items, sortOrder)
+        public TreeWalker(List<T> items, Comparison<T> comparerFunc, SortOrder sortOrder = SortOrder.Ascending) : this(items, sortOrder)
         {
             comp = comparerFunc;
         }
@@ -623,21 +529,6 @@ namespace DataTools.Extras.AdvancedLists
         {
             Reset();
             int x = InnerWalk(item1, locateOrNull);
-
-            if (locateOrNull == TreeWalkMode.Null && count > 0 && items[x] is object)
-            {
-                if (x > 0 && !(items[x - 1] is object))
-                {
-                    items[x - 1] = items[x];
-                    items[x] = default;
-                }
-                else if (x < count - 1 && !(items[x + 1] is object))
-                {
-                    items[x + 1] = items[x];
-                    items[x] = default;
-                }
-            }
-
             return x;
 
         }
@@ -645,87 +536,55 @@ namespace DataTools.Extras.AdvancedLists
         protected virtual int InnerWalk(T item1, TreeWalkMode locateOrNull)
         {
             T item2;
-
             int r;
+
+            bool isred;
+            bool isnullred = false;
 
             if (hi < lo)
             {
+                if (locateOrNull == TreeWalkMode.Null && lo % 2 == 0)
+                {
+                    if (lo < count - 1 && !(items[lo + 1] is object))
+                    {
+                        r = comp(item1, items[lo]) * m;
+                        if (r >= 0) lo++;
+                    }
+                    
+                    else if (lo > 0 && !(items[lo - 1] is object))
+                    {
+                        if (lo < count)
+                        {
+                            r = comp(item1, items[lo]) * m;
+                            if (r <= 0) lo--;
+                        }
+                        else
+                        {
+                            lo--;
+                        }
+                    }
+                }
                 return lo;
             }
 
             mid = (hi + lo) / 2;
+            isred = (mid % 2) == 1;
 
             item2 = items[mid];
-
-            if (item2 == null)
+            
+            if (!(item2 is object))
             {
-                int r1 = 2, r2 = 2;
-                int x1 = -1, x2 = -1;
-
-                if (mid <= hi)
+                if (isred)
                 {
-                    T item3 = default;
-                    x2 = mid + 1;
-                    while (!(item3 is object) && x2 <= hi)
-                    {
-                        item3 = items[x2];
-                        x2++;
-                    }
-
-                    if (item3 is object)
-                    {
-                        r2 = comp(item1, item3) * m;
-                        if (r2 > 0)
-                        {
-                            lo = mid + 1;
-                            return InnerWalk(item1, locateOrNull);
-                        }
-                    }
+                    item2 = items[mid - 1];
+                    isnullred = true;
                 }
-
-                if (mid >= lo)
+                else
                 {
-                    x1 = mid - 1;
-                    while (!(item2 is object) && x1 >= lo)
-                    {
-                        item2 = items[x1];
-                        x1--;
-                    }
-
-                    if (item2 is object)
-                    {
-                        r1 = comp(item1, item2) * m;
-                        if (r1 < 0)
-                        {
-                            hi = mid - 1;
-                            return InnerWalk(item1, locateOrNull);
-                        }
-                    }
-                }
-
-                if (r2 != 2 && r1 != 2)
-                {
-                    if (r1 == 0 && r2 == 0)
-                    {
-                        return mid;
-                    }
-                    else if (r1 == 0)
-                    {
-                        return x1 + 1;
-                    }
-                    else if (r2 == 0)
-                    {
-                        return x2 - 1;
-                    }
-                    else if (r1 > 0 && r2 < 0) return mid;
-                }
-
-                if (item2 == null)
-                {
-                    hi = mid - 1;
+                    throw new TreeUnbalancedException("Black node is null!");
                 }
             }
-            
+
             if (item2 != null)
             {
                 r = comp(item1, item2) * m;
@@ -740,16 +599,64 @@ namespace DataTools.Extras.AdvancedLists
                 }
                 else
                 {
-                    return mid;
+                    lo = mid;
+                    hi = mid - 1;
                 }
             }
 
             return InnerWalk(item1, locateOrNull);
         }
 
+
+        public void BalanceTree(int startNode)
+        {
+            if (startNode == -1 || startNode >= count) return;
+            var isred = startNode % 2 == 1;
+
+            if (isred)
+            {
+                int i = startNode - 1;
+
+                if (!(items[startNode] is object) && !(items[i] is object))
+                {
+                    items.RemoveRange(i, 2);
+                }
+                else if (items[startNode] is object && !(items[i] is object))
+                {
+                    items[i] = items[startNode];
+                    items[startNode] = default;
+                }
+            }
+            else
+            {
+                int i = startNode + 1;
+
+                if (!(items[startNode] is object) && !(items[i] is object))
+                {
+                    items.RemoveRange(startNode, 2);
+                }
+                else if (!(items[startNode] is object) && (items[i] is object))
+                {
+                    items[startNode] = items[i];
+                    items[i] = default;
+                }
+
+            }
+        }
+
     }
 
+    public class TreeUnbalancedException : Exception
+    {
+        public TreeUnbalancedException() : base()
+        {
 
+        }
+        public TreeUnbalancedException(string message) : base(message)
+        {
+        }
+
+    }
 
 
 }

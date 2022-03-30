@@ -27,7 +27,7 @@ namespace TestExtras
         public static void TestBufferList(string[] args)
         {
 
-            var ltest = new SortedBufferedCollection<string>(3, SortOrder.Ascending);
+            var ltest = new RedBlackTree<string>(SortOrder.Ascending);
 
             ltest.Add("Zanzabar");
             ltest.Add("Banana");
@@ -87,20 +87,26 @@ namespace TestExtras
             var carr = ltest.ToArray();
 
 
-            var itest = new SortedBufferedCollection<int?>(2, new NullableValueTypeComparer<int>(), SortOrder.Ascending);
+            var itest = new RedBlackTree<int?>(new NullableValueTypeComparer<int>(), SortOrder.Ascending);
 
             var r = new Random();
 
-            var testcount = 12000;
+            var testcount = 120;
 
 
             for (int x = 0; x < testcount; x++)
             {
+                int z = x;
+                itest.Add(z);
 
-                itest.Add(x);
-                itest.Add(testcount - x);
-                itest.Add((x + testcount) / 2);
-                itest.Add(x % testcount);
+                z = testcount - x;
+                itest.Add(z);
+
+                z = (x + testcount) / 2;
+                itest.Add(z);
+
+                z = x % testcount;
+                itest.Add(z);
             }
 
             var icomp = itest.ToArray();
