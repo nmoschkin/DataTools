@@ -11,6 +11,15 @@ namespace DataTools.Win32.Memory
     public static class MemoryTools
     {
 
+        /// <summary>
+        /// Returns true if the handle is one of the invalid handle values (<see cref="IntPtr.Zero"/> or (<see cref="IntPtr"/>)(-1).)
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static bool IsInvalidHandle(this IntPtr value)
+        {
+            return (value == IntPtr.Zero || value == (IntPtr)(-1));
+        }
 
 
         /// <summary>

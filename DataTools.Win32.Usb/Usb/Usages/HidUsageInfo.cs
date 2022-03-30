@@ -11,6 +11,7 @@
 // ************************************************* ''
 
 
+using DataTools.MathTools;
 using DataTools.Text;
 
 using Newtonsoft.Json;
@@ -25,7 +26,37 @@ namespace DataTools.Win32.Usb
     /// </summary>
     public class HidUsageInfo : ICloneable, IComparable<HidUsageInfo>
     {
+        private WeakReference<HidUsageCollection?>? wfparent = null;
+
         protected string name = "";
+
+        public virtual HidUsageCollection? Parent
+        {
+            get
+            {
+                if (wfparent != null && wfparent.TryGetTarget(out HidUsageCollection? target) && target is HidUsageCollection)  
+                {
+                    return target;
+                }
+                else
+                {
+                    wfparent = null;                    
+                }
+
+                return null;
+            }
+            protected internal set
+            {
+                if (value == null)
+                {
+                    wfparent = null;
+                }
+                else
+                {
+                    wfparent = new WeakReference<HidUsageCollection?>(value);
+                }
+            }
+        }
 
         /// <summary>
         /// The Usage ID
@@ -36,6 +67,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// The Usage Name
         /// </summary>
+        [JsonProperty("usageName")]
         public virtual string? UsageName
         {
             get => name;
@@ -149,13 +181,14 @@ namespace DataTools.Win32.Usb
         /// </summary>
         [JsonIgnore]
         public virtual object? Value { get; set; }
+
         /// <summary>
         /// Button Value
         /// </summary>
         [JsonIgnore]
         public virtual bool ButtonValue
         {
-            get => Value != null && Value is int i && i != 0;
+            get => Value != null && (int)Value is int i && i != 0;
             set => Value = value ? 1 : 0;
         }
 
@@ -187,6 +220,10 @@ namespace DataTools.Win32.Usb
                 else if (Value is string s)
                 {
                     return s;
+                }
+                else if (Value is HidFeatureValue fv)
+                {
+                    return fv.Value.ToString();
                 }
                 else if (IsButton)
                 {
@@ -248,20 +285,39 @@ namespace DataTools.Win32.Usb
         /// </summary>
         [JsonProperty("hidUnit")]
         public UnitInfoCode HidUnit { get; set; }
-        public virtual object Clone()
+
+        object ICloneable.Clone()
         {
             return MemberwiseClone();
         }
 
-        public virtual HidUsageInfo? Clone(HidReportType reportType, bool isButton = false)
+        public HidUsageInfo()
+        {
+        }
+
+        public HidUsageInfo(HidUsageCollection parent)
+        {
+            Parent = parent;
+        }
+
+        public T CloneInto<T>() where T: HidUsageInfo, new()
+        {
+            T ret = new T();
+
+            ObjectMerge.MergeObjects(this, ret);
+            return ret;
+        }
+
+        public virtual HidUsageInfo? Clone(HidReportType reportType, bool isButton = false, HidUsageCollection? parent = null)
         {
             var ret = MemberwiseClone();
             HidUsageInfo? rpt = (HidUsageInfo)ret;
-
+            
             if (rpt != null)
             {
                 rpt.IsButton = isButton;
                 rpt.ReportType = reportType;
+                rpt.Parent = parent;
             }
 
             return rpt;

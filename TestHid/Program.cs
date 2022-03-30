@@ -27,13 +27,10 @@ namespace TestHid
 
             var battery = hids.Where((e) => e.DeviceClass == DeviceClassEnum.Battery).ToList().FirstOrDefault();
 
-            var mouse = hids[0];
 
-            mouse.PopulateDeviceCaps();
-            mouse.CreateUsageCollection();
-
-            var batt2 = mouse; // HidPowerDeviceInfo.CreateFromHidDevice(battery);
-
+            var batt2 = HidPowerDeviceInfo.CreateFromHidDevice(battery);
+            batt2.OpenHid();
+            
             var mstr = batt2.Manufacturer;
             var mstr2 = batt2.HidManufacturer;
             var pstr = batt2.ProductString;
@@ -65,9 +62,9 @@ namespace TestHid
 
                 foreach (var val in vals)
                 {
-                    ColorConsole.WriteLine($"({{Yellow}}{val.Key.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.Key.UsageName)}{{Reset}} ({{DarkCyan}}{val.Key.UsageId:X2}{{Reset}}) {val.Key.ReportType}                         ");
+                    ColorConsole.WriteLine($"({{Yellow}}{val.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.UsageName)}{{Reset}} ({{DarkCyan}}{val.UsageId:X2}{{Reset}}) {val.ReportType}                         ");
 
-                    foreach (var item in val.Value)
+                    foreach (var item in val)
                     {
                         if (item.UsageName.Contains("Time"))
                         {
@@ -90,7 +87,21 @@ namespace TestHid
                             }
                             else
                             {
-                                double vv = (int?)item.Value ?? 0d;
+
+                                double vv = 0d;
+
+                                if (item.Value is HidFeatureValue fv)
+                                {
+                                    vv = fv.Value;
+                                }
+                                else if (item.Value is int ival)
+                                {
+                                    vv = ival;
+                                }
+                                else if (item.Value is long lval)
+                                {
+                                    vv = lval;
+                                }
 
                                 if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
                                 {
@@ -111,9 +122,9 @@ namespace TestHid
 
                     foreach (var val in svals)
                     {
-                        ColorConsole.WriteLine($"({{Yellow}}{val.Key.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.Key.UsageName)}{{Reset}} ({{DarkCyan}}{val.Key.UsageId:X2}{{Reset}}) {val.Key.ReportType}                         ");
+                        ColorConsole.WriteLine($"({{Yellow}}{val.UsageType}{{Reset}}) {{White}}{TextTools.Separate(val.UsageName)}{{Reset}} ({{DarkCyan}}{val.UsageId:X2}{{Reset}}) {val.ReportType}                         ");
 
-                        foreach (var item in val.Value)
+                        foreach (var item in val)
                         {
                             if (item.UsageName.Contains("Time"))
                             {
@@ -136,7 +147,20 @@ namespace TestHid
                                 }
                                 else
                                 {
-                                    double vv = (int?)item.Value ?? 0d;
+                                    double vv = 0d;
+
+                                    if (item.Value is HidFeatureValue fv)
+                                    {
+                                        vv = fv.Value;
+                                    }
+                                    else if (item.Value is int ival)
+                                    {
+                                        vv = ival;
+                                    }
+                                    else if (item.Value is long lval)
+                                    {
+                                        vv = lval;
+                                    }
 
                                     if (item.UsageName == "Voltage" || item.UsageName.Contains("Current") || item.UsageName.Contains("Frequency"))
                                     {
@@ -158,6 +182,9 @@ namespace TestHid
 
                 Task.Delay(500);
             }
+
+            batt2.CloseHid();
+
 
         }
 

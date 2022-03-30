@@ -1,5 +1,5 @@
 ﻿using DataTools.Win32.Usb.Keyboard;
-
+using static DataTools.Text.TextTools;
 using Newtonsoft.Json;
 
 using System;
@@ -111,6 +111,20 @@ namespace DataTools.Win32.Usb
             }
 
             return result ?? throw new AccessViolationException($"Cannot create instance of type ({typeof(TPage)})");
+        }
+
+        /// <summary>
+        /// Gets a usage by its usage name.
+        /// </summary>
+        /// <param name="name">The name to search for.</param>
+        /// <returns>A <see cref="HidUsageInfo"/> or null.</returns>
+        /// <remarks>
+        /// Name matching is done with casing neutral and spaces are discarded.
+        /// </remarks>
+        public HidUsageInfo? GetUsageByName(string name)
+        {
+            name = NoSpace(name).ToLower();
+            return this.Where((x) => NoSpace(x.UsageName).ToLower() == name).FirstOrDefault();
         }
 
         protected virtual void Parse(params object[] values) 
