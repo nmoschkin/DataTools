@@ -1113,7 +1113,14 @@ namespace DataTools.Win32.Usb
 
             if (populateItemValue)
             {
-                item.Value = result;
+                if (result is bool btn)
+                {
+                    item.ButtonValue = (bool)btn;
+                }
+                else
+                {
+                    item.Value = result;
+                }
             }
 
             return result;
