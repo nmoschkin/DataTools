@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
-namespace DataTools.Win32.Usb.Usb.Power
+namespace DataTools.Win32.Usb
 {
-    public enum PowerDeviceUsage : ushort
+    public enum HidPowerUsageCode : ushort
     {
         [Description("Undefined")]
         Undefined = 0x00,
@@ -246,7 +246,7 @@ namespace DataTools.Win32.Usb.Usb.Power
     }
 
 
-    public enum BatteryDeviceUsage : ushort
+    public enum HidBatteryUsageCode : ushort
     {
         [Description("Undefined")]
         Undefined = 0x00,

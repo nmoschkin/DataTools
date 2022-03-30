@@ -60,21 +60,49 @@ namespace DataTools.Win32.Usb
         private bool disposedValue;
 
         /// <summary>
+        /// Enumarate all HID class devices on the local machine with the specified HID page.
+        /// </summary>
+        /// <param name="page">The HID usage page to filter by.</param>
+        /// <param name="populateDevCaps"><see cref="true"/> to enumerate all device capabilities for each device.</param>
+        /// <returns></returns>
+        public static HidDeviceInfo[] EnumerateHidDevices(HidUsagePage page, bool populateDevCaps = false)
+        {
+            return EnumerateHidDevices(populateDevCaps, new[] { page });
+        }
+
+        /// <summary>
         /// Enumarate all HID class devices on the local machine.
         /// </summary>
         /// <param name="populateDevCaps"><see cref="true"/> to enumerate all device capabilities for each device.</param>
         /// <returns></returns>
-        public static HidDeviceInfo[] EnumerateHidDevices(bool populateDevCaps = false)
+        public static HidDeviceInfo[] EnumerateHidDevices(bool populateDevCaps = false, IList<HidUsagePage>? pages = null)
         {
             var result = DeviceEnum.EnumerateDevices<HidDeviceInfo>(DevProp.GUID_DEVINTERFACE_HID);
 
-            if (populateDevCaps)
+            int i, c = result.Length;
+            bool doPages = (pages != null) && (pages.Count > 0);
+
+            for (i = c - 1; i >= 0; i--)
             {
-                foreach (var device in result)
+                var device = result[i];
+
+                if (device != null)
                 {
-                    device.PopulateDeviceCaps();
-                    device.CreateUsageCollection();
+                    if (doPages && !pages.Contains(device.HidUsagePage))
+                    {
+                            ((IList<HidDeviceInfo>)result).RemoveAt(i);
+                    }
+                    if (populateDevCaps)
+                    {
+                        device.PopulateDeviceCaps();
+                        device.CreateUsageCollection();
+                    }
                 }
+                else
+                {
+                    ((IList<HidDeviceInfo>)result).RemoveAt(i);
+                }
+
             }
 
             return result;
@@ -972,20 +1000,10 @@ namespace DataTools.Win32.Usb
                     {
                         if ((usageType & item.UsageType) != 0 || (item.IsButton && item.UsageType == 0))
                         {
-                            if (item.IsButton && item.ButtonCaps != null)
+
+                            var testres = RetrieveValue(item, true);
+                            if (testres != null)
                             {
-                                var btncaps = UsbLibHelpers.GetButtonStatesRaw(this, item.ReportType, item.ButtonCaps.Value);
-                                item.ButtonValue = false;
-
-                                foreach (var pair in btncaps)
-                                {
-                                    if (/*pair.Item1 == kvp.Key.UsageId &&*/ pair.Item2 == item.UsageId)
-                                    {
-                                        item.ButtonValue = true;
-                                        break;
-                                    }
-                                }
-
                                 if (result.Where((t) => t.UsageId == usageCol.UsageId && t.ReportType == usageCol.ReportType).FirstOrDefault() is HidUsageCollection uc)
                                 {
                                     usageCol = uc;
@@ -997,77 +1015,6 @@ namespace DataTools.Win32.Usb
                                 }
 
                                 usageCol.Add(item);
-                            }
-                            else if (item.ValueCaps is HidPValueCaps vc && vc.StringIndex != 0)
-                            {
-                                if (HidGetString(vc.StringIndex, out string? strres))
-                                {
-                                    if (!string.IsNullOrEmpty(strres))
-                                    {
-
-                                        if (item.UsageId == 0x89 && vc.UsagePage == HidUsagePage.PowerDevice2 && DeviceChemistry.FindByName(strres) is DeviceChemistry dchem)
-                                        {
-                                            item.Value = dchem;
-                                        }
-                                        else
-                                        {
-                                            item.Value = strres;
-                                        }
-
-                                        if (result.Where((t) => t.UsageId == usageCol.UsageId && t.ReportType == usageCol.ReportType).FirstOrDefault() is HidUsageCollection uc)
-                                        {
-                                            usageCol = uc;
-                                        }
-                                        else
-                                        {
-                                            usageCol = usageCol.Clone(usageCol.ReportType);
-                                            result.Add(usageCol);
-                                        }
-
-                                        usageCol.Add(item);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                if (ReadUsageValue(item, false, out HidFeatureValue? res) && item.ValueCaps is HidPValueCaps vc2 && res != null)
-                                {
-                                    if (item.UsageId == 0x5a && vc2.UsagePage == HidUsagePage.PowerDevice1)
-                                    {
-                                        item.Value = (AudibleAlarmControlState)(int)res;
-                                    }
-                                    else if (item.UsageId == 0x58 && vc2.UsagePage == HidUsagePage.PowerDevice1)
-                                    {
-                                        item.Value = (HidPowerTestState)(int)res;
-                                    }
-                                    else if (item.UsageId == 0x2c && vc2.UsagePage == HidUsagePage.PowerDevice2)
-                                    {
-                                        item.Value = (PowerCapacityMode)(int)res;
-                                    }
-                                    else if (item.UsageId == 0x8b && vc2.UsagePage == HidUsagePage.PowerDevice2)
-                                    {
-                                        item.IsButton = true;
-                                        item.ButtonValue = ((int)res) == 1;
-                                    }
-                                    else
-                                    {
-                                        item.Value = (int)res;
-                                    }
-
-                                    if (result.Where((t) => t.UsageId == usageCol.UsageId && t.ReportType == usageCol.ReportType).FirstOrDefault() is HidUsageCollection uc)
-                                    {
-                                        usageCol = uc;
-                                    }
-                                    else
-                                    {
-                                        usageCol = usageCol.Clone(usageCol.ReportType);
-                                        result.Add(usageCol);
-                                    }
-
-                                    usageCol.Add(item);
-
-                                }
-
                             }
 
                         }
@@ -1087,12 +1034,12 @@ namespace DataTools.Win32.Usb
         /// </summary>
         /// <param name="usageId">The code to look up.</param>
         /// <param name="collectionId">Specify a collectionId to ensure that the usage is a member of this collection.</param>
-        /// <param name="retrieveValue">True to call the device and populate the <see cref="HidUsageInfo.Value"/> property with a real-time value.</param>
+        /// <param name="populateItemValue">True to call the device and populate the <see cref="HidUsageInfo.Value"/> property with a real-time value.</param>
         /// <returns>A HID Usage Page or null.</returns>
         /// <remarks>
         /// Several reported usages can have identical <paramref name="usageId"/>'s. Only the first found is returned if <paramref name="collectionId"/> is not specified.
         /// </remarks>
-        public virtual HidUsageInfo? LookupValue(byte usageId, byte collectionId = 0, bool retrieveValue = false)
+        public virtual HidUsageInfo? LookupValue(byte usageId, byte collectionId = 0, bool populateItemValue = false)
         {
             if (UsageCollections == null) return null;
 
@@ -1106,42 +1053,12 @@ namespace DataTools.Win32.Usb
                     {
                         if (item.UsageId == usageId)
                         {
-                            var newitem = item;
-
-                            if (retrieveValue)
+                            if (populateItemValue)
                             {
-                                if (item.IsButton && item.ButtonCaps != null)
-                                {
-                                    var btncaps = UsbLibHelpers.GetButtonStatesRaw(this, item.ReportType, item.ButtonCaps.Value);
-
-                                    newitem.ButtonValue = false;
-
-                                    foreach (var pair in btncaps)
-                                    {
-                                        if (/*pair.Item1 == kvp.Key.UsageId &&*/ pair.Item2 == item.UsageId)
-                                        {
-                                            newitem.ButtonValue = true;
-                                            break;
-                                        }
-                                    }
-                                }
-                                else if (item.ValueCaps is HidPValueCaps vc && vc.StringIndex != 0)
-                                {
-                                    if (HidGetString(vc.StringIndex, out string? strres))
-                                    {
-                                        newitem.Value = strres ?? string.Empty;
-                                    }
-                                }
-                                else
-                                {
-                                    if (ReadUsageValue(item, false, out HidFeatureValue? res) && res != null)
-                                    {
-                                        newitem.Value = (int)res;
-                                    }
-                                }
+                                RetrieveValue(item, true);
                             }
 
-                            return newitem;
+                            return item;
                         }
                     }
 
@@ -1150,6 +1067,56 @@ namespace DataTools.Win32.Usb
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Retrieve the current value for the specified <see cref="HidUsageInfo"/> item.
+        /// </summary>
+        /// <param name="item">The HID usage to retrieve.</param>
+        /// <param name="populateItemValue">True to populate the <see cref="HidUsageInfo.Value"/> property with the real-time value.</param>
+        /// <returns>
+        /// A <see cref="long"/> integer, a <see cref="bool"/> value, or a <see cref="string"/>, or null if not successful.
+        /// </returns>
+        public virtual object? RetrieveValue(HidUsageInfo item, bool populateItemValue = false)
+        {
+            object? result = null;
+
+            if (item.IsButton && item.ButtonCaps != null)
+            {
+                var btncaps = UsbLibHelpers.GetButtonStatesRaw(this, item.ReportType, item.ButtonCaps.Value);
+
+                result = false;
+
+                foreach (var pair in btncaps)
+                {
+                    if (pair.Item2 == item.UsageId)
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+            else if (item.ValueCaps is HidPValueCaps vc && vc.StringIndex != 0)
+            {
+                if (HidGetString(vc.StringIndex, out string? strres))
+                {
+                    result = strres ?? string.Empty;
+                }
+            }
+            else
+            {
+                if (ReadUsageValue(item, false, out HidFeatureValue? res) && res != null)
+                {
+                    result = (int)res;
+                }
+            }
+
+            if (populateItemValue)
+            {
+                item.Value = result;
+            }
+
+            return result;
         }
 
 

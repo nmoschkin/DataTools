@@ -159,7 +159,6 @@ namespace DataTools.Win32.Usb
             var output = new List<(ushort, ushort)>();
 
             IntPtr hhid;
-            
 
             var caps = device.HidCaps;
             var ch = false;
@@ -176,7 +175,6 @@ namespace DataTools.Win32.Usb
             {
                 return new (ushort, ushort)[0];
             }
-
             
             using (var ppd = new PreparsedData(hhid))
             {
