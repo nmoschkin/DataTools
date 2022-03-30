@@ -77,9 +77,9 @@ namespace DataTools.Win32.Usb
         /// <returns></returns>
         public static HidDeviceInfo[] EnumerateHidDevices(bool populateDevCaps = false, IList<HidUsagePage>? pages = null)
         {
-            var result = DeviceEnum.EnumerateDevices<HidDeviceInfo>(DevProp.GUID_DEVINTERFACE_HID);
+            var result = new List<HidDeviceInfo>(DeviceEnum.EnumerateDevices<HidDeviceInfo>(DevProp.GUID_DEVINTERFACE_HID));
 
-            int i, c = result.Length;
+            int i, c = result.Count;
             bool doPages = (pages != null) && (pages.Count > 0);
 
             for (i = c - 1; i >= 0; i--)
@@ -105,7 +105,7 @@ namespace DataTools.Win32.Usb
 
             }
 
-            return result;
+            return result.ToArray();
         }
 
         /// <summary>
