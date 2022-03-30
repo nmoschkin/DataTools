@@ -32,7 +32,7 @@ namespace DataTools.Win32
     /// A large cross-section of pInvoke-related items
     /// </summary>
     /// <remarks>This class is not well documented.</remarks>
-    public static class User32
+    internal static class User32
     {
 
         
