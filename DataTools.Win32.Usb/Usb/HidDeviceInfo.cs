@@ -1077,6 +1077,9 @@ namespace DataTools.Win32.Usb
         /// <returns>
         /// A <see cref="long"/> integer, a <see cref="bool"/> value, or a <see cref="string"/>, or null if not successful.
         /// </returns>
+        /// <remarks>
+        /// This method may return additional types of values if overridden in a derived class.
+        /// </remarks>
         public virtual object? RetrieveValue(HidUsageInfo item, bool populateItemValue = false)
         {
             object? result = null;
