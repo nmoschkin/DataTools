@@ -12,7 +12,7 @@ namespace DataTools.Win32.Usb
         [Description("Undefined")]
         Undefined = 0x00,
 
-        [Description("IName")]
+        [Description("Name")]
         iName = 0x01,
 
         [Description("Present Status")]
@@ -234,13 +234,13 @@ namespace DataTools.Win32.Usb
         [Description("Communication Lost")]
         CommunicationLost = 0x73,
 
-        [Description("IManufacturer")]
+        [Description("Manufacturer")]
         iManufacturer = 0xfd,
 
-        [Description("IProduct")]
+        [Description("Product ID")]
         iProduct = 0xfe,
 
-        [Description("Iserial Number")]
+        [Description("Serial Number")]
         iserialNumber = 0xff,
 
     }
@@ -263,34 +263,34 @@ namespace DataTools.Win32.Usb
         [Description("SMBCharger Mode")]
         SMBChargerMode = 0x04,
 
-        [Description("SMBCharger Status")]
+        [Description("SMB Charger Status")]
         SMBChargerStatus = 0x05,
 
-        [Description("SMBCharger Spec Info")]
+        [Description("SMB Charger Spec Info")]
         SMBChargerSpecInfo = 0x06,
 
-        [Description("SMBSelector State")]
+        [Description("SMB Selector State")]
         SMBSelectorState = 0x07,
 
-        [Description("SMBSelector Presets")]
+        [Description("SMB Selector Presets")]
         SMBSelectorPresets = 0x08,
 
-        [Description("SMBSelector Info")]
+        [Description("SMB Selector Info")]
         SMBSelectorInfo = 0x09,
 
-        [Description("Optional Mfg Function1")]
+        [Description("Optional Mfg Function 1")]
         OptionalMfgFunction1 = 0x10,
 
-        [Description("Optional Mfg Function2")]
+        [Description("Optional Mfg Function 2")]
         OptionalMfgFunction2 = 0x11,
 
-        [Description("Optional Mfg Function3")]
+        [Description("Optional Mfg Function 3")]
         OptionalMfgFunction3 = 0x12,
 
-        [Description("Optional Mfg Function4")]
+        [Description("Optional Mfg Function 4")]
         OptionalMfgFunction4 = 0x13,
 
-        [Description("Optional Mfg Function5")]
+        [Description("Optional Mfg Function 5")]
         OptionalMfgFunction5 = 0x14,
 
         [Description("Connection To SMBus")]
@@ -305,10 +305,10 @@ namespace DataTools.Win32.Usb
         [Description("Battery Insertion")]
         BatteryInsertion = 0x18,
 
-        [Description("Usenext")]
-        Usenext = 0x19,
+        [Description("Use Next")]
+        UseNext = 0x19,
 
-        [Description("OKTo Use")]
+        [Description("OK To Use")]
         OKToUse = 0x1a,
 
         [Description("Battery Supported")]
@@ -374,7 +374,7 @@ namespace DataTools.Win32.Usb
         [Description("At Rate OK")]
         AtRateOK = 0x49,
 
-        [Description("SMBError Code")]
+        [Description("SMB Error Code")]
         SMBErrorCode = 0x4a,
 
         [Description("Need Replacement")]
@@ -389,8 +389,8 @@ namespace DataTools.Win32.Usb
         [Description("Average Current")]
         AverageCurrent = 0x62,
 
-        [Description("Maxerror")]
-        Maxerror = 0x63,
+        [Description("Max Error")]
+        MaxError = 0x63,
 
         [Description("Relative State Of Charge")]
         RelativeStateOfCharge = 0x64,
@@ -437,13 +437,13 @@ namespace DataTools.Win32.Usb
         [Description("Serial Number")]
         SerialNumber = 0x86,
 
-        [Description("IManufacturer Name")]
+        [Description("Manufacturer Name")]
         iManufacturerName = 0x87,
 
-        [Description("IDevicename")]
-        iDevicename = 0x88,
+        [Description("Device Name")]
+        iDeviceName = 0x88,
 
-        [Description("IDevice Chemistery")]
+        [Description("Device Chemistery")]
         iDeviceChemistery = 0x89,
 
         [Description("Manufacturer Data")]
@@ -455,10 +455,10 @@ namespace DataTools.Win32.Usb
         [Description("Warning Capacity Limit")]
         WarningCapacityLimit = 0x8c,
 
-        [Description("Capacity Granularity1")]
+        [Description("Capacity Granularity 1")]
         CapacityGranularity1 = 0x8d,
 
-        [Description("Capacity Granularity2")]
+        [Description("Capacity Granularity 2")]
         CapacityGranularity2 = 0x8e,
 
         [Description("IOEMInformation")]
