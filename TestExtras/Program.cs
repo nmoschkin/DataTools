@@ -60,7 +60,7 @@ namespace TestExtras
             ltest.Add("Xylephone");
             ltest.Add("Gerbil");
 
-            ltest.Remove("Kangaroo");
+            ltest.AlterItem("Banana", (item) => "Tumble");
 
             ltest.Add("Kaelidescope");
             ltest.Add("Jargon");
@@ -91,7 +91,7 @@ namespace TestExtras
 
             var r = new Random();
 
-            var testcount = 120;
+            var testcount = 52000;
 
 
             for (int x = 0; x < testcount; x++)
