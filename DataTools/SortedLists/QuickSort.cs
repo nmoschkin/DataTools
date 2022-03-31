@@ -143,7 +143,7 @@ namespace DataTools.SortedLists
             Sort<T>(ref values, comparison, lo, hi);
         }
 
-        private static void Sort<T>(ref T[] values, Comparison<T> comparison, int lo, int hi)
+        public static void Sort<T>(ref T[] values, Comparison<T> comparison, int lo, int hi)
         {
             if (lo < hi)
             {
@@ -221,7 +221,7 @@ namespace DataTools.SortedLists
             Sort<T>(values, comparison, sortOrder, lo, hi, out didChange);
         }
 
-        private static void Sort<T>(IList<T> values, Comparison<T> comparison, SortOrder sortOrder, int lo, int hi, out bool didChange)
+        public static void Sort<T>(IList<T> values, Comparison<T> comparison, SortOrder sortOrder, int lo, int hi, out bool didChange)
         {
             bool dcf = false;
             bool dc = false;
