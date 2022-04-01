@@ -246,10 +246,12 @@ namespace DataTools.Extras.AdvancedLists
                 RemoveItem(idx);
 
                 var newitem = alteration(item);
-
                 InsertItem(newitem);
+                //int idx2 = Walk(newitem);
 
-                //int idx2 = walker.Walk(newitem);
+
+
+
 
                 //if (idx == idx2) return;
                 //if (idx2 >= count)
@@ -479,10 +481,24 @@ namespace DataTools.Extras.AdvancedLists
             lock (syncRoot)
             {
                 var index = Walk(item);
+                int rc = items.Count;
 
-                if (index < items.Count && items[index] == null)
+                if (index < rc && items[index] == null)
                 {
                     items[index] = item;
+                    if (metrics) softInserts++;
+                }
+                if (index > 0 && items[index - 1] == null)
+                {
+                    items[index - 1] = item;
+                    if (metrics) softInserts++;
+                }
+                else if (index < rc - 2 && items[index + 2] == null)
+                {
+                    items[index + 2] = items[index + 1];
+                    items[index + 1] = items[index];
+                    items[index] = item;
+
                     if (metrics) softInserts++;
                 }
                 else
@@ -517,13 +533,81 @@ namespace DataTools.Extras.AdvancedLists
             {
                 items[index] = default;
                 count--;
-                BalanceTree(index);
+
+                if (index % 2 == 0)
+                {
+                    if (items[index + 1] is object)
+                    {
+                        items[index] = items[index + 1];
+                        items[index + 1] = default;
+
+                        if (metrics) softRemoves++;
+                    }
+                    else if (index < items.Count - 3 && items[index + 2] is object && items[index + 3] is object) 
+                    {
+                        items[index] = items[index + 2];
+                        items[index + 2] = items[index + 3];
+                        items[index + 3] = default;  
+
+                        if (metrics) softRemoves++;
+                    }
+                    else
+                    {
+                        items.RemoveRange(index, 2);
+                        if (metrics) hardRemoves++;
+                    }
+                }
             }
         }
 
+        protected int TryGrandparentInsert(T item, int index) 
+        {
+            int end = index - 4;
+            if (end < 0) end = 0;
+
+            for (int i = index - 1; i >= end; i--)
+            {
+                if (!(items[i] is object))
+                {
+                    for (int j = i; j < index; j++)
+                    {
+                        items[j] = items[j + 1];
+                    }
+
+                    items[index] = item;
+                    return index;
+                }
+            }
+
+            return -1;
+        }
+
+        protected int TryDescendantInsert(T item, int index)
+        {
+
+            int count = items.Count;
+            int end = index + 4;
+            if (end > count - 1) end = count - 1;
+
+            for (int i = index + 1; i <= end; i++)
+            {
+                if (!(items[i] is object))
+                {
+                    for (int j = i; j > index; j--)
+                    {
+                        items[j] = items[j - 1];
+                    }
+
+                    items[index] = item;
+                    return index;
+                }
+            }
+
+            return -1;
+        }
 
 
-        protected int Walk(T item1, TreeWalkMode walkMode = TreeWalkMode.InsertIndex)
+        protected virtual int Walk(T item1, TreeWalkMode walkMode = TreeWalkMode.InsertIndex)
         {
             int count = items.Count;
             int lo = 0;

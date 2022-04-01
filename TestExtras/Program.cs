@@ -93,19 +93,20 @@ namespace TestExtras
 
             var testcount = 52000;
 
-
+            var rand = new Random();
+            
             for (int x = 0; x < testcount; x++)
             {
                 int z = x;
+                itest.Add(rand.Next(testcount));
+
+                z = rand.Next(testcount) - x;
                 itest.Add(z);
 
-                z = testcount - x;
+                z = (x + rand.Next(testcount)) / 2;
                 itest.Add(z);
 
-                z = (x + testcount) / 2;
-                itest.Add(z);
-
-                z = x % testcount;
+                z = x % rand.Next(testcount);
                 itest.Add(z);
             }
 
