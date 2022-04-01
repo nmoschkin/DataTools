@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTools.Win32.Usb
+namespace DataTools.Win32.Usb.Power
 {
     /// <summary>
     /// An object that represents a HID power device or battery on the local machine.
@@ -29,7 +29,7 @@ namespace DataTools.Win32.Usb
         public static HidPowerDeviceInfo CreateFromHidDevice(HidDeviceInfo device)
         {
             if (device.DeviceClass != DeviceClassEnum.Battery) throw new ArgumentException($"{nameof(device)} must have a device class of {DeviceClassEnum.Battery}");
-            
+
             var result = device.CopyTo<HidPowerDeviceInfo>();
 
             result.PopulateDeviceCaps();
@@ -61,7 +61,7 @@ namespace DataTools.Win32.Usb
                 }
                 else if (item.UsageId == (byte)HidBatteryUsageCode.Rechargable && vc2.UsagePage == HidUsagePage.PowerDevice2)
                 {
-                    res = ((int)res) == 1;
+                    res = (int)res == 1;
 
                     if (populateItemValue)
                     {

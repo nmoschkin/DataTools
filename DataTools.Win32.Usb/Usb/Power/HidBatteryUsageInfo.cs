@@ -1,5 +1,4 @@
-﻿using DataTools.Win32.Usb;
-
+﻿
 using Newtonsoft.Json;
 
 using System;
@@ -8,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTools.Win32.Usb
+namespace DataTools.Win32.Usb.Power
 {
     /// <summary>
     /// Describes a usage or capability within a HID Battery (0x85) Usage Page

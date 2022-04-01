@@ -1,11 +1,12 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Markup;
 
-namespace DataTools.Win32.Usb
+namespace DataTools.Win32.Usb.Power
 {
     public class HidPowerDevicePageInfo : HidUsagePageInfo<HidPowerUsageInfo>
     {

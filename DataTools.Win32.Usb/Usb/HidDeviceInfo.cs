@@ -16,6 +16,7 @@ using System.ComponentModel;
 using DataTools.Text;
 using DataTools.Win32.Memory;
 using DataTools.Win32.Usb.Keyboard;
+using DataTools.Win32.Usb.Power;
 
 namespace DataTools.Win32.Usb
 {

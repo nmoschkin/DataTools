@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿
+using Newtonsoft.Json;
 
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTools.Win32.Usb
+namespace DataTools.Win32.Usb.Power
 {
     public class HidPowerUsageInfo : HidUsageInfo
     {
@@ -17,8 +18,8 @@ namespace DataTools.Win32.Usb
         [JsonProperty("powerUnit")]
         public virtual UnitInfoCode PowerUnit
         {
-            get => base.HidUnit;
-            set => base.HidUnit = value;
+            get => HidUnit;
+            set => HidUnit = value;
         }
 
 

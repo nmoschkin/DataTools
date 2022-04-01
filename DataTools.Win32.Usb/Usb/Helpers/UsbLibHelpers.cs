@@ -12,7 +12,6 @@
 
 using DataTools.Win32.Memory;
 using DataTools.Win32.Usb;
-using DataTools.Win32.Usb.Usb.Helpers;
 
 using System;
 using System.ComponentModel;

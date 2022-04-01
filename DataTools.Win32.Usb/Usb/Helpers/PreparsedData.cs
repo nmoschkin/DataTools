@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTools.Win32.Usb.Usb.Helpers
+namespace DataTools.Win32.Usb
 {
     public class PreparsedData : SafeHandle
     {

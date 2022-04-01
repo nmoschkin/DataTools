@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DataTools.Win32.Usb.Globalization;
+using DataTools.Win32.Usb.Power;
 
 namespace DataTools.Win32.Usb
 {

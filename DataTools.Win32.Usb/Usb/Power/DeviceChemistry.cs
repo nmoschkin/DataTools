@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTools.Win32.Usb
+namespace DataTools.Win32.Usb.Power
 {
 
     /// <summary>
