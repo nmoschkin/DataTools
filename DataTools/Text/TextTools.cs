@@ -774,7 +774,7 @@ namespace DataTools.Text
 
             if (level != 0 && throwException)
             {
-                throw new SyntaxErrorException($"Block at position {idxStart} does not have an ending character '{stop}'.");
+                throw new SyntaxErrorException($"Block at position {idxStart} does not have an ending string '{stop}'.");
             }
 
             if (level == 0 && !withDelimiters)
