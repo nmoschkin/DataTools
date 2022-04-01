@@ -149,7 +149,7 @@ namespace DataTools.Extras.Expressions
     /// <summary>
     /// An object that represents a mathematical expression segment.
     /// </summary>
-    public sealed class ExpressionSegment : ICloneable
+    public class ExpressionSegment : ICloneable
     {
         #region Public Fields
 
@@ -176,10 +176,10 @@ namespace DataTools.Extras.Expressions
         private StorageMode storageMode = StorageMode.AsDouble;
 
         private Unit unit = null;
-        private Unit unitsrc = null;
         private object value = null;
         private Dictionary<string, object> variables;
         private string varSym = "$";
+
         #endregion Private Fields
 
         #region Static Constructor
@@ -241,11 +241,16 @@ namespace DataTools.Extras.Expressions
 
         #region Private Constructors
 
-        private ExpressionSegment()
+        protected ExpressionSegment()
         {
         }
+        
+        protected ExpressionSegment(string value, ExpressionSegment parent, CultureInfo ci, StorageMode mode, string varSym)
+        {
+            Initialize(value, parent, ci, mode, varSym);
+        }
 
-        private ExpressionSegment(string value, ExpressionSegment parent, CultureInfo ci, StorageMode mode, string varSym)
+        protected virtual void Initialize(string value, ExpressionSegment parent, CultureInfo ci, StorageMode mode, string varSym)
         {
             storageMode = mode;
             this.varSym = varSym;
@@ -1102,7 +1107,7 @@ namespace DataTools.Extras.Expressions
             {
                 var vpart = parts[0];
                 var upart = parts[1];
-                upart.unitsrc = upart.unit;
+                //upart.unitsrc = upart.unit;
 
                 if (baseUnits && upart.unit != null && !upart.unit.IsBase)
                 {
@@ -1111,7 +1116,7 @@ namespace DataTools.Extras.Expressions
 
                     newvpart.parent = itemNew;
                     newupart.parent = itemNew;
-                    newupart.unitsrc = upart.unit.Clone();
+                    //newupart.unitsrc = upart.unit.Clone();
 
                     double? dvv = null;
                     decimal? devv = null;
