@@ -35,7 +35,7 @@ namespace TestExtras
                 Formatting = Formatting.Indented
             };
 
-            var tss = "Hey roberts roberts gemini falcon \"Hot extra sauce\" derecho derecho agnes";
+            var tss = "Hey roberts roberts gemini falcon \"Hot extra derecho sauce\" derecho derecho agnes";
 
             var tb = TextTools.TextBetween(tss, 0, "roberts", "derecho", out int? is1, out int? is2);
 
