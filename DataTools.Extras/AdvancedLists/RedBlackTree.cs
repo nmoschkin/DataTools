@@ -848,73 +848,26 @@ namespace DataTools.Extras.AdvancedLists
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new RedBlackTreeEnumerator(this);
+            foreach(var item in items)
+            {
+                if (item is object) yield return item;
+            }
+
+            yield break;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new RedBlackTreeEnumerator(this);
+            foreach (var item in items)
+            {
+                if (item is object) yield return item;
+            }
+
+            yield break;
         }
 
-        /// <summary>
-        /// <see cref="RedBlackTree{T}"/> enumerator.
-        /// </summary>
-        public class RedBlackTreeEnumerator : IEnumerator<T>
-        {
-            RedBlackTree<T> collection;
-            T current = default;
-
-            int idx = -1;
-            int count = 0;
-            private object syncRoot;
-
-            public RedBlackTreeEnumerator(RedBlackTree<T> collection)
-            {
-                this.collection = collection;
-                count = collection.items.Count;
-                syncRoot = collection.syncRoot;
-            }
-
-            public T Current => current;
-            object IEnumerator.Current => current;
-
-            public void Dispose()
-            {
-                Reset();
-
-                collection = null;
-                syncRoot = null;
-            }
-
-            public bool MoveNext()
-            {
-                lock (syncRoot)
-                {
-                    idx++;
-                    while (idx < count)
-                    {
-                        current = collection.items[idx];
-                        if (current is object)
-                        {
-                            break;
-                        }
-                        idx++;
-                    }
-
-                    return idx < count;
-                }
-            }
-
-            public void Reset()
-            {
-                lock (syncRoot)
-                {
-                    idx = -1;
-                    current = default;
-                }
-            }
-        }
     }
+
     public enum TreeWalkMode
     {
         InsertIndex,
