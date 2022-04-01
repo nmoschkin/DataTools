@@ -37,6 +37,14 @@ namespace DataTools.Extras.AdvancedLists
     //    Descending,
     //}
 
+
+    public enum RebalanceResult
+    {
+        NotPerformed,
+        Unchanged,
+        Changed
+    }
+
     /// <summary>
     /// A sorted, spatially buffered collection.
     /// </summary>
@@ -233,7 +241,6 @@ namespace DataTools.Extras.AdvancedLists
                 Add(item);
             }
         }
-
         public bool Locate(T item)
         {
             int idx = Walk(item, TreeWalkMode.Locate);
@@ -440,7 +447,18 @@ namespace DataTools.Extras.AdvancedLists
         int hardRemoves = 0;
         int softRemoves = 0;
 
+        int sixteened = 0;
+
+        int changedRebalances = 0;
+
+        int unchangedRebalances = 0;
+
         bool metrics = true;
+
+        public int ChangedRebalances => changedRebalances;
+        public int UnchangedRebalances => unchangedRebalances;
+
+        public int SixteenOpt => sixteened;
 
         public int HardRemoves => hardRemoves;
 
@@ -476,6 +494,11 @@ namespace DataTools.Extras.AdvancedLists
 
                 hardRemoves = 0;
                 softRemoves = 0;
+
+                sixteened = 0;
+                changedRebalances = 0;
+                unchangedRebalances = 0;
+
             }
         }
 
@@ -553,11 +576,11 @@ namespace DataTools.Extras.AdvancedLists
 
                         if (metrics) softRemoves++;
                     }
-                    else if (index < items.Count - 3 && items[index + 2] is object && items[index + 3] is object) 
+                    else if (index < items.Count - 3 && items[index + 2] is object && items[index + 3] is object)
                     {
                         items[index] = items[index + 2];
                         items[index + 2] = items[index + 3];
-                        items[index + 3] = default;  
+                        items[index + 3] = default;
 
                         if (metrics) softRemoves++;
                     }
@@ -570,8 +593,150 @@ namespace DataTools.Extras.AdvancedLists
                 else
                 {
                     if (metrics) softRemoves++;
+
+                    if (Rebalance() == RebalanceResult.NotPerformed)
+                    {
+                        CheckThem(index);
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Attempt to Rebalance The Tree
+        /// </summary>
+        /// <param name="threshold">The ratio of the tree size over the logical count at which a rebalance should be performed. Default is 1.2 : 1</param>
+        /// <returns>A <see cref="RebalanceResult"/> of <see cref="RebalanceResult.NotPerformed"/>, <see cref="RebalanceResult.Unchanged"/>, or <see cref="RebalanceResult.Changed"/>.</returns>
+        public RebalanceResult Rebalance(float threshold = 1.2f)
+        {
+            if (count > 1024 && ((float)items.Count / count) >= threshold)
+            {
+                bool b = false;
+
+                for (int i = items.Count - 2; i >= 2; i -= 2)
+                {
+                    b = b | CheckThem(i, 4, true);
+                }
+
+                if (b)
+                {
+                    if (metrics) changedRebalances++;
+                    return RebalanceResult.Changed;
+                }
+                else
+                {
+                    if (metrics) unchangedRebalances++;
+                    return RebalanceResult.Unchanged;
+                }
+            }
+
+            return RebalanceResult.NotPerformed;
+        }
+
+        protected bool CheckThem(int index, int cadence = 16, bool rebalancing = false)
+        {
+            if (cadence == 16)
+            {
+                if ((index & 1) == 1) index--;
+
+                if (index + 8 > items.Count) return false;
+                if (index - 8 < 0) return false;
+
+                index -= 8;
+
+                if (
+                    items[index] is object && !(items[index + 1] is object)
+                    && items[index + 2] is object && !(items[index + 3] is object)
+                    && items[index + 4] is object && !(items[index + 5] is object)
+                    && items[index + 6] is object && !(items[index + 7] is object)
+                    && items[index + 8] is object && !(items[index + 9] is object)
+                    && items[index + 10] is object && !(items[index + 11] is object)
+                    && items[index + 12] is object && !(items[index + 13] is object)
+                    && items[index + 14] is object && !(items[index + 15] is object)
+                    )
+                {
+                    items[index + 1] = items[index + 2];
+                    items[index + 2] = items[index + 4];
+                    items[index + 3] = items[index + 6];
+                    items[index + 4] = items[index + 8];
+                    items[index + 5] = items[index + 10];
+                    items[index + 6] = items[index + 12];
+                    items[index + 7] = items[index + 14];
+
+                    items.RemoveRange(index + 8, 8);
+
+                    if (metrics && !rebalancing)
+                    {
+                        softRemoves--;
+                        sixteened++;
+                        hardRemoves++;
+                    }
+
+                    return true;
+                }
+            }
+            else if (cadence == 8)
+            {
+                if ((index & 1) == 1) index--;
+
+                if (index + 4 > items.Count) return false;
+                if (index - 4 < 0) return false;
+
+                index -= 4;
+
+                if (
+                    items[index] is object && !(items[index + 1] is object)
+                    && items[index + 2] is object && !(items[index + 3] is object)
+                    && items[index + 4] is object && !(items[index + 5] is object)
+                    && items[index + 6] is object && !(items[index + 7] is object)
+                    )
+                {
+                    items[index + 1] = items[index + 2];
+                    items[index + 2] = items[index + 4];
+                    items[index + 3] = items[index + 6];
+
+                    items.RemoveRange(index + 4, 4);
+
+                    if (metrics && !rebalancing)
+                    {
+                        softRemoves--;
+                        sixteened++;
+                        hardRemoves++;
+                    }
+
+                    return true;
+                }
+
+            }
+            else if (cadence == 4)
+            {
+                if ((index & 1) == 1) index--;
+
+                if (index + 2 > items.Count) return false;
+                if (index - 2 < 0) return false;
+
+                index -= 2;
+
+                if (
+                    items[index] is object && !(items[index + 1] is object)
+                    && items[index + 2] is object && !(items[index + 3] is object)
+                    )
+                {
+                    items[index + 1] = items[index + 2];
+                    items.RemoveRange(index + 2, 2);
+
+                    if (metrics && !rebalancing)
+                    {
+                        softRemoves--;
+                        sixteened++;
+                        hardRemoves++;
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         protected virtual int Walk(T item1, TreeWalkMode walkMode = TreeWalkMode.InsertIndex)
