@@ -11,7 +11,7 @@ using System.IO;
 using System.Text.Json.Nodes;
 
 using static DataTools.MathTools.MathLib;
-using DataTools.Extras.AdvancedLists;
+
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -22,76 +22,9 @@ namespace TestExtras
     {
         public static void Main(string[] args)
         {
-            TestBufferList(args);
+            TestParsing(args);
         }
 
-        public static void TestBufferList(string[] args)
-        {
-
-            var ltest = new RedBlackTree<string>(SortOrder.Ascending);
-            int strcount = 64;
-            var ch = 'A';
-
-            for (int i = 0; i < strcount; i++)
-            {
-                if (ch > 'Z') ch = 'A';
-                var s = ch;
-
-                ltest.Add(ch.ToString());
-                ltest.Add(ch.ToString());
-                ltest.Add(ch.ToString());
-                ltest.Add(ch.ToString());
-
-                ch++;
-            }
-
-            foreach (var item in ltest) 
-            {
-                if (!ltest.Locate(item)) throw new KeyNotFoundException();
-            }
-
-            var lcomp = new List<string>();
-
-            foreach(var s in ltest)
-            {
-                lcomp.Add(s);
-            }
-
-            var carr = ltest.ToArray();
-
-
-            var itest = new RedBlackTree<int?>(new NullableValueTypeComparer<int>(), SortOrder.Ascending);
-
-            var r = new Random();
-
-            var testcount = 52000;
-
-            var rand = new Random();
-            
-            for (int x = 0; x < testcount; x++)
-            {
-                int z = x;
-                itest.Add(rand.Next(testcount));
-
-                z = rand.Next(testcount) - x;
-                itest.Add(z);
-
-                z = (x + rand.Next(testcount)) / 2;
-                itest.Add(z);
-
-                z = x % rand.Next(1, testcount);
-                itest.Add(z);
-            }
-
-            var icomp = itest.ToArray();
-
-            for (int x = 1; x < icomp.Length; x++)
-            {
-                if (icomp[x - 1] > icomp[x]) throw new Exception();
-            }
-
-
-        }
 
         public static void TestParsing(string[] args)
         {
