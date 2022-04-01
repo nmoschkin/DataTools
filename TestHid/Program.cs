@@ -12,6 +12,7 @@ using static DataTools.Win32.IO;
 using static DataTools.Win32.User32;
 using DataTools.Text;
 using System.Text;
+using DataTools.Win32.Usb.Power;
 
 namespace TestHid
 {
