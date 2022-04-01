@@ -34,36 +34,34 @@ namespace DataTools.Extras.Expressions
             Name = name;
         }
 
-        public bool IsQuote(char ch)
-        {
-            return QuoteChar == ch;
-        }
+        //public bool IsQuote(char ch)
+        //{
+        //    return QuoteChar == ch;
+        //}
 
-        public bool IsQuote(string value, int index)
-        {
-            if (Prefix != null)
-            {
-                if ((value.Length - index) > Prefix.Length) return value.IndexOf(QuoteChar, index) == 0;
-                else return false;
-            }
-            else
-            {
-                return value[0] == QuoteChar;
-            }
+        //public bool IsQuote(string value, int index)
+        //{
+        //    if (Prefix != null)
+        //    {
+        //        if ((value.Length - index) > Prefix.Length) return value.IndexOf(QuoteChar, index) == 0;
+        //        else return false;
+        //    }
+        //    else
+        //    {
+        //        return value[0] == QuoteChar;
+        //    }
 
-        }
+        //}
 
-        public bool IsEscape(char ch)
-        {
-            return EscapeChar == ch;
-        }
+        //public bool IsEscape(char ch)
+        //{
+        //    return EscapeChar == ch;
+        //}
 
-        public string GetQuote(string value, int index, out int? startPos, out int? endPos, bool returnInQuotes = false)
-        {
-
-
-            return QuoteFromHere(value, index, out startPos, out endPos, QuoteChar, EscapeChar, returnInQuotes);
-        }
+        //public string GetQuote(string value, int index, out int? startPos, out int? endPos, bool returnInQuotes = false)
+        //{
+        //    return QuoteFromHere(value, index, out startPos, out endPos, QuoteChar, EscapeChar, returnInQuotes);
+        //}
 
 
 
@@ -71,15 +69,57 @@ namespace DataTools.Extras.Expressions
 
     public class ExpressionConfig
     {
+        private List<QuoteStringConfig> quotes = new List<QuoteStringConfig>();
 
-        private List<QuoteStringConfig> quotes = new List<QuoteStringConfig>(); 
+        private List<string> keywords = new List<string>();
 
+        private List<(string, string)> blockDelimiters = new List<(string, string)>();
+
+        public List<(string, string)> BlockDelimiters
+        {
+            get => blockDelimiters;
+            set
+            {
+                blockDelimiters = value;
+            }
+        }
 
         public List<QuoteStringConfig> Quotes
         {
-            get => Quotes;
+            get => quotes;
+            set
+            {
+                quotes = value;
+            }
         }
-        
+
+        public List<string> Keywords
+        {
+            get => keywords;
+            set
+            {
+                keywords = value;
+            }
+        }
+
+        public ExpressionConfig(IEnumerable<QuoteStringConfig> quotes, IEnumerable<(string, string)> blocks, IEnumerable<string> keywords)
+        {
+            this.quotes.AddRange(quotes);
+            this.keywords.AddRange(keywords);
+
+            blockDelimiters.AddRange(blocks);
+        }
+
+        public ExpressionConfig()
+        {
+            quotes.Add(QuoteStringConfig.SingleQuotes);
+            quotes.Add(QuoteStringConfig.DoubleQuotes);
+
+            blockDelimiters.Add(("{", "}"));
+
+            keywords.AddRange(new[] { "public", "private", "new", "lock", "try", "catch", "finally", "fixed", "unsafe", "using", "static", "internal", "extern", "protected", "abstract", "class", "interface", "struct", "record", "namespace", "sealed" });
+
+        }
 
     }
 }
