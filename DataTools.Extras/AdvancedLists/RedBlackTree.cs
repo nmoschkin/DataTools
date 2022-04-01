@@ -272,8 +272,8 @@ namespace DataTools.Extras.AdvancedLists
                 //    return;
                 //}
 
-                //bool black1 = idx % 2 == 0;
-                //bool black2 = idx2 % 2 == 0;
+                //bool black1 = (idx & 1) == 0;
+                //bool black2 = (idx2 & 1) == 0;
 
                 //if (black1 && items[idx + 1] is object)
                 //{
@@ -513,7 +513,7 @@ namespace DataTools.Extras.AdvancedLists
                 }
                 else
                 {
-                    if (index % 2 == 0)
+                    if ((index & 1) == 0)
                     {
                         arrspace[0] = item;
                         arrspace[1] = default;
@@ -544,7 +544,7 @@ namespace DataTools.Extras.AdvancedLists
                 items[index] = default;
                 count--;
 
-                if (index % 2 == 0)
+                if ((index & 1) == 0)
                 {
                     if (items[index + 1] is object)
                     {
@@ -588,7 +588,7 @@ namespace DataTools.Extras.AdvancedLists
             {
                 if (hi < lo)
                 {
-                    if (walkMode == TreeWalkMode.InsertIndex && lo % 2 == 0)
+                    if (walkMode == TreeWalkMode.InsertIndex && (lo & 1) == 0)
                     {
                         if (lo < count - 1 && !(items[lo + 1] is object))
                         {
@@ -615,7 +615,7 @@ namespace DataTools.Extras.AdvancedLists
 
                 mid = (hi + lo) / 2;
 
-                if ((mid % 2) == 1) mid--;
+                if (((mid & 1)) == 1) mid--;
 
                 item2 = items[mid];
                 item3 = items[mid + 1];

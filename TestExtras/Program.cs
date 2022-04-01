@@ -29,12 +29,20 @@ namespace TestExtras
         {
 
             var ltest = new RedBlackTree<string>(SortOrder.Ascending);
-
-            int strcount = 8000;
+            int strcount = 64;
+            var ch = 'A';
 
             for (int i = 0; i < strcount; i++)
             {
-                ltest.Add(RandomString());
+                if (ch > 'Z') ch = 'A';
+                var s = ch;
+
+                ltest.Add(ch.ToString());
+                ltest.Add(ch.ToString());
+                ltest.Add(ch.ToString());
+                ltest.Add(ch.ToString());
+
+                ch++;
             }
 
             foreach (var item in ltest) 
@@ -456,11 +464,14 @@ namespace TestExtras
                 if (p > 26)
                 {
                     p -= 26;
+                    p--;
+
                     ch = 'A';
                     ch += (char)p;
                 }
                 else
                 {
+                    p--;
                     ch = 'a';
                     ch += (char)p;
                 }
