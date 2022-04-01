@@ -257,13 +257,36 @@ namespace DataTools.Extras.AdvancedLists
             {
                 int idx = Walk(item, TreeWalkMode.Locate);
 
-                if (idx >= items.Count || idx < 0) throw new KeyNotFoundException();
-                if (!items[idx].Equals(item)) throw new KeyNotFoundException();
+                if (idx >= items.Count || idx < 0)
+                {
+                    string err = $"{idx} Out Of Bounds!";
 
+                    Console.WriteLine(err);
+
+                    throw new KeyNotFoundException(err);
+                }
+                if (!items[idx].Equals(item))
+                {
+                    int c = items.Count;
+                    string err = $"{idx} for {item} Is Incorrect!";
+
+                    Console.WriteLine(err);
+
+                    for (int i = 0; i < c; i++)
+                    {
+                        if (items[i] is object && items[i].Equals(item))
+                        {
+                            err += $"\r\n{i} is the correct index for {item}!";
+                            Console.WriteLine($"{i} is the correct index for {item}!");
+                            break;
+                        }
+                    }
+                }
+                
                 RemoveItem(idx);
-
                 var newitem = alteration(item);
                 InsertItem(newitem);
+
                 //int idx2 = Walk(newitem);
 
 
@@ -609,24 +632,27 @@ namespace DataTools.Extras.AdvancedLists
         /// <returns>A <see cref="RebalanceResult"/> of <see cref="RebalanceResult.NotPerformed"/>, <see cref="RebalanceResult.Unchanged"/>, or <see cref="RebalanceResult.Changed"/>.</returns>
         public RebalanceResult Rebalance(float threshold = 1.2f)
         {
-            if (count > 1024 && ((float)items.Count / count) >= threshold)
+            lock (syncRoot)
             {
-                bool b = false;
+                if (count > 1024 && ((float)items.Count / count) >= threshold)
+                {
+                    bool b = false;
 
-                for (int i = items.Count - 2; i >= 2; i -= 2)
-                {
-                    b = b | CheckThem(i, 4, true);
-                }
+                    for (int i = items.Count - 2; i >= 2; i -= 2)
+                    {
+                        b = b | CheckThem(i, 4, true);
+                    }
 
-                if (b)
-                {
-                    if (metrics) changedRebalances++;
-                    return RebalanceResult.Changed;
-                }
-                else
-                {
-                    if (metrics) unchangedRebalances++;
-                    return RebalanceResult.Unchanged;
+                    if (b)
+                    {
+                        if (metrics) changedRebalances++;
+                        return RebalanceResult.Changed;
+                    }
+                    else
+                    {
+                        if (metrics) unchangedRebalances++;
+                        return RebalanceResult.Unchanged;
+                    }
                 }
             }
 
@@ -635,105 +661,109 @@ namespace DataTools.Extras.AdvancedLists
 
         protected bool CheckThem(int index, int cadence = 16, bool rebalancing = false)
         {
-            if (cadence == 16)
+            lock (syncRoot)
             {
-                if ((index & 1) == 1) index--;
-
-                if (index + 8 > items.Count) return false;
-                if (index - 8 < 0) return false;
-
-                index -= 8;
-
-                if (
-                    items[index] is object && !(items[index + 1] is object)
-                    && items[index + 2] is object && !(items[index + 3] is object)
-                    && items[index + 4] is object && !(items[index + 5] is object)
-                    && items[index + 6] is object && !(items[index + 7] is object)
-                    && items[index + 8] is object && !(items[index + 9] is object)
-                    && items[index + 10] is object && !(items[index + 11] is object)
-                    && items[index + 12] is object && !(items[index + 13] is object)
-                    && items[index + 14] is object && !(items[index + 15] is object)
-                    )
+                if (cadence == 16)
                 {
-                    items[index + 1] = items[index + 2];
-                    items[index + 2] = items[index + 4];
-                    items[index + 3] = items[index + 6];
-                    items[index + 4] = items[index + 8];
-                    items[index + 5] = items[index + 10];
-                    items[index + 6] = items[index + 12];
-                    items[index + 7] = items[index + 14];
+                    if ((index & 1) == 1) index--;
 
-                    items.RemoveRange(index + 8, 8);
+                    if (index + 8 > items.Count) return false;
+                    if (index - 8 < 0) return false;
 
-                    if (metrics && !rebalancing)
+                    index -= 8;
+
+                    if (
+                        items[index] is object && !(items[index + 1] is object)
+                        && items[index + 2] is object && !(items[index + 3] is object)
+                        && items[index + 4] is object && !(items[index + 5] is object)
+                        && items[index + 6] is object && !(items[index + 7] is object)
+                        && items[index + 8] is object && !(items[index + 9] is object)
+                        && items[index + 10] is object && !(items[index + 11] is object)
+                        && items[index + 12] is object && !(items[index + 13] is object)
+                        && items[index + 14] is object && !(items[index + 15] is object)
+                        )
                     {
-                        softRemoves--;
-                        sixteened++;
-                        hardRemoves++;
+                        items[index + 1] = items[index + 2];
+                        items[index + 2] = items[index + 4];
+                        items[index + 3] = items[index + 6];
+                        items[index + 4] = items[index + 8];
+                        items[index + 5] = items[index + 10];
+                        items[index + 6] = items[index + 12];
+                        items[index + 7] = items[index + 14];
+
+                        items.RemoveRange(index + 8, 8);
+
+                        if (metrics && !rebalancing)
+                        {
+                            softRemoves--;
+                            sixteened++;
+                            hardRemoves++;
+                        }
+
+                        return true;
+                    }
+                }
+                else if (cadence == 8)
+                {
+                    if ((index & 1) == 1) index--;
+
+                    if (index + 4 > items.Count) return false;
+                    if (index - 4 < 0) return false;
+
+                    index -= 4;
+
+                    if (
+                        items[index] is object && !(items[index + 1] is object)
+                        && items[index + 2] is object && !(items[index + 3] is object)
+                        && items[index + 4] is object && !(items[index + 5] is object)
+                        && items[index + 6] is object && !(items[index + 7] is object)
+                        )
+                    {
+                        items[index + 1] = items[index + 2];
+                        items[index + 2] = items[index + 4];
+                        items[index + 3] = items[index + 6];
+
+                        items.RemoveRange(index + 4, 4);
+
+                        if (metrics && !rebalancing)
+                        {
+                            softRemoves--;
+                            sixteened++;
+                            hardRemoves++;
+                        }
+
+                        return true;
                     }
 
-                    return true;
                 }
-            }
-            else if (cadence == 8)
-            {
-                if ((index & 1) == 1) index--;
-
-                if (index + 4 > items.Count) return false;
-                if (index - 4 < 0) return false;
-
-                index -= 4;
-
-                if (
-                    items[index] is object && !(items[index + 1] is object)
-                    && items[index + 2] is object && !(items[index + 3] is object)
-                    && items[index + 4] is object && !(items[index + 5] is object)
-                    && items[index + 6] is object && !(items[index + 7] is object)
-                    )
+                else if (cadence == 4)
                 {
-                    items[index + 1] = items[index + 2];
-                    items[index + 2] = items[index + 4];
-                    items[index + 3] = items[index + 6];
+                    if ((index & 1) == 1) index--;
 
-                    items.RemoveRange(index + 4, 4);
+                    if (index + 2 > items.Count) return false;
+                    if (index - 2 < 0) return false;
 
-                    if (metrics && !rebalancing)
+                    index -= 2;
+
+                    if (
+                        items[index] is object && !(items[index + 1] is object)
+                        && items[index + 2] is object && !(items[index + 3] is object)
+                        )
                     {
-                        softRemoves--;
-                        sixteened++;
-                        hardRemoves++;
-                    }
+                        items[index + 1] = items[index + 2];
+                        items.RemoveRange(index + 2, 2);
 
-                    return true;
+                        if (metrics && !rebalancing)
+                        {
+                            softRemoves--;
+                            sixteened++;
+                            hardRemoves++;
+                        }
+
+                        return true;
+                    }
                 }
 
-            }
-            else if (cadence == 4)
-            {
-                if ((index & 1) == 1) index--;
-
-                if (index + 2 > items.Count) return false;
-                if (index - 2 < 0) return false;
-
-                index -= 2;
-
-                if (
-                    items[index] is object && !(items[index + 1] is object)
-                    && items[index + 2] is object && !(items[index + 3] is object)
-                    )
-                {
-                    items[index + 1] = items[index + 2];
-                    items.RemoveRange(index + 2, 2);
-
-                    if (metrics && !rebalancing)
-                    {
-                        softRemoves--;
-                        sixteened++;
-                        hardRemoves++;
-                    }
-
-                    return true;
-                }
             }
 
             return false;
