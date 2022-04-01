@@ -250,7 +250,7 @@ namespace DataTools.Extras.AdvancedLists
             {
                 int idx = Walk(item, TreeWalkMode.Locate);
 
-                if (idx >= count || idx < 0) throw new KeyNotFoundException();
+                if (idx >= items.Count || idx < 0) throw new KeyNotFoundException();
                 if (!items[idx].Equals(item)) throw new KeyNotFoundException();
 
                 RemoveItem(idx);
