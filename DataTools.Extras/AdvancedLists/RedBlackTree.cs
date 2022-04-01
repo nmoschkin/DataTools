@@ -234,6 +234,16 @@ namespace DataTools.Extras.AdvancedLists
             }
         }
 
+        public bool Locate(T item)
+        {
+            int idx = Walk(item, TreeWalkMode.Locate);
+
+            if (idx >= items.Count || idx < 0) return false;
+            if (!items[idx].Equals(item)) return false;
+
+            return true;
+        }
+
         public void AlterItem(T item, Func<T, T> alteration)
         {
             lock (syncRoot)
@@ -488,7 +498,7 @@ namespace DataTools.Extras.AdvancedLists
                     items[index] = item;
                     if (metrics) softInserts++;
                 }
-                if (index > 0 && items[index - 1] == null)
+                else if (index > 0 && items[index - 1] == null)
                 {
                     items[index - 1] = item;
                     if (metrics) softInserts++;
@@ -557,55 +567,12 @@ namespace DataTools.Extras.AdvancedLists
                         if (metrics) hardRemoves++;
                     }
                 }
-            }
-        }
-
-        protected int TryGrandparentInsert(T item, int index) 
-        {
-            int end = index - 4;
-            if (end < 0) end = 0;
-
-            for (int i = index - 1; i >= end; i--)
-            {
-                if (!(items[i] is object))
+                else
                 {
-                    for (int j = i; j < index; j++)
-                    {
-                        items[j] = items[j + 1];
-                    }
-
-                    items[index] = item;
-                    return index;
+                    if (metrics) softRemoves++;
                 }
             }
-
-            return -1;
         }
-
-        protected int TryDescendantInsert(T item, int index)
-        {
-
-            int count = items.Count;
-            int end = index + 4;
-            if (end > count - 1) end = count - 1;
-
-            for (int i = index + 1; i <= end; i++)
-            {
-                if (!(items[i] is object))
-                {
-                    for (int j = i; j > index; j--)
-                    {
-                        items[j] = items[j - 1];
-                    }
-
-                    items[index] = item;
-                    return index;
-                }
-            }
-
-            return -1;
-        }
-
 
         protected virtual int Walk(T item1, TreeWalkMode walkMode = TreeWalkMode.InsertIndex)
         {
@@ -680,48 +647,6 @@ namespace DataTools.Extras.AdvancedLists
                 }
             }
 
-        }
-
-        protected void BalanceTree(int startNode)
-        {
-            int count = items.Count;
-
-            if (startNode == -1 || startNode >= count) return;
-            var isred = startNode % 2 == 1;
-
-            if (isred)
-            {
-                int i = startNode - 1;
-
-                if (!(items[startNode] is object) && !(items[i] is object))
-                {
-                    items.RemoveRange(i, 2);
-                    if (metrics) hardRemoves++;
-                }
-                else if (items[startNode] is object && !(items[i] is object))
-                {
-                    items[i] = items[startNode];
-                    items[startNode] = default;
-                    if (metrics) softRemoves++;
-                }
-            }
-            else
-            {
-                int i = startNode + 1;
-
-                if (!(items[startNode] is object) && !(items[i] is object))
-                {
-                    items.RemoveRange(startNode, 2);
-                    if (metrics) hardRemoves++;
-                }
-                else if (!(items[startNode] is object) && (items[i] is object))
-                {
-                    items[startNode] = items[i];
-                    items[i] = default;
-                    if (metrics) softRemoves++;
-                }
-
-            }
         }
 
         #endregion

@@ -14,6 +14,7 @@ using static DataTools.MathTools.MathLib;
 using DataTools.Extras.AdvancedLists;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace TestExtras
 {
@@ -29,53 +30,17 @@ namespace TestExtras
 
             var ltest = new RedBlackTree<string>(SortOrder.Ascending);
 
-            ltest.Add("Zanzabar");
-            ltest.Add("Banana");
-            ltest.Add("Echo");
-            ltest.Add("Serenity");
-            ltest.Add("Melding");
-            ltest.Add("Kangaroo");
-            ltest.Add("Lumber");
-            ltest.Add("Xylephone");
-            ltest.Add("Gerbil");
+            int strcount = 8000;
 
-            ltest.Remove("Kangaroo");
+            for (int i = 0; i < strcount; i++)
+            {
+                ltest.Add(RandomString());
+            }
 
-            ltest.Add("Jargon");
-            ltest.Add("Julip");
-            ltest.Add("Jamborine");
-
-            ltest.Add("Kaelidescope");
-            ltest.Add("Hadrosaur");
-            ltest.Add("Item");
-
-            ltest.Add("Jambalaya");
-            ltest.Add("Zanzabar");
-            ltest.Add("Banana");
-            ltest.Add("Kangaroo");
-            ltest.Add("Lumber");
-            ltest.Add("Echo");
-            ltest.Add("Serenity");
-            ltest.Add("Melding");
-            ltest.Add("Xylephone");
-            ltest.Add("Gerbil");
-
-            ltest.AlterItem("Banana", (item) => "Tumble");
-
-            ltest.Add("Kaelidescope");
-            ltest.Add("Jargon");
-            ltest.Add("Kangaroo");
-            ltest.Add("Lumber");
-            ltest.Add("Julip");
-            ltest.Add("Jamborine");
-
-            ltest.Add("Hadrosaur");
-            ltest.Add("Hadrosaur");
-            ltest.Add("Kangaroo");
-            ltest.Add("Lumber");
-            ltest.Add("Item");
-
-            ltest.Add("Jambalaya");
+            foreach (var item in ltest) 
+            {
+                if (!ltest.Locate(item)) throw new KeyNotFoundException();
+            }
 
             var lcomp = new List<string>();
 
@@ -106,7 +71,7 @@ namespace TestExtras
                 z = (x + rand.Next(testcount)) / 2;
                 itest.Add(z);
 
-                z = x % rand.Next(testcount);
+                z = x % rand.Next(1, testcount);
                 itest.Add(z);
             }
 
@@ -469,6 +434,41 @@ namespace TestExtras
             }
 
             Console.CursorVisible = true;
+
+        }
+
+
+        public static string RandomString(int lenMin = 1, int lenMax = 10)
+        {
+            if (lenMin < 1 || lenMax < 1) throw new ArgumentOutOfRangeException();
+
+            var rnd = new Random();
+
+            char ch;
+            int p;
+            var strLen = rnd.Next(lenMin, lenMax);
+            
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < strLen; i++)
+            {
+                p = rnd.Next(1, 52);
+                if (p > 26)
+                {
+                    p -= 26;
+                    ch = 'A';
+                    ch += (char)p;
+                }
+                else
+                {
+                    ch = 'a';
+                    ch += (char)p;
+                }
+
+                sb.Append(ch);
+            }
+
+            return sb.ToString();
 
         }
     }
