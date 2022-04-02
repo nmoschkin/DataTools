@@ -75,6 +75,14 @@ namespace DataTools.Extras.Expressions
 
         private List<(string, string)> blockDelimiters = new List<(string, string)>();
 
+        private string expressionTerminator = string.Empty;
+
+        public string ExpressionEnd
+        {
+            get => expressionTerminator;
+            set => expressionTerminator = value;
+        }
+
         public List<(string, string)> BlockDelimiters
         {
             get => blockDelimiters;
@@ -102,11 +110,11 @@ namespace DataTools.Extras.Expressions
             }
         }
 
-        public ExpressionConfig(IEnumerable<QuoteStringConfig> quotes, IEnumerable<(string, string)> blocks, IEnumerable<string> keywords)
+        public ExpressionConfig(IEnumerable<QuoteStringConfig> quotes, IEnumerable<(string, string)> blocks, IEnumerable<string> keywords, string terminator)
         {
             this.quotes.AddRange(quotes);
             this.keywords.AddRange(keywords);
-
+            this.expressionTerminator = terminator;
             blockDelimiters.AddRange(blocks);
         }
 

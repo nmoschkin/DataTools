@@ -14,11 +14,15 @@ using DataTools.Text;
 
 namespace DataTools.Extras.Conversion
 {
+    /// <summary>
+    /// Contains a collection of units of measurement for various categories of measurement.
+    /// </summary>
     public class UnitCollection : Collection<Unit>, IReadOnlyDictionary<string, Unit>
     {
-        #region Protected Fields
 
         public static readonly Unit[] MasterUnits;
+        
+        #region Protected Fields
 
         protected bool autoSort = true;
         protected object lockObj = new object();

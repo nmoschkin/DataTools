@@ -23,8 +23,19 @@ namespace DataTools.Extras.Conversion
 
         #region Public Fields
 
+        /// <summary>
+        /// SI multipliers
+        /// </summary>
         public static readonly double[] Multipliers = new double[] { Pow(10d, 0d), Pow(10d, -1), Pow(10d, -2), Pow(10d, -3), Pow(10d, -6), Pow(10d, -9), Pow(10d, -12), Pow(10d, -15), Pow(10d, -18), Pow(10d, -21), Pow(10d, -24), Pow(10d, 1d), Pow(10d, 2d), Pow(10d, 3d), Pow(10d, 6d), Pow(10d, 9d), Pow(10d, 12d), Pow(10d, 15d), Pow(10d, 18d), Pow(10d, 21d), Pow(10d, 24d), Pow(2d, 10d), Pow(2d, 20d), Pow(2d, 30d), Pow(2d, 40d), Pow(2d, 50d), Pow(2d, 60d), Pow(2d, 70d), Pow(2d, 80d) };
+
+        /// <summary>
+        /// SI units
+        /// </summary>
         public static readonly string[] Prefixes = new string[] { "", "deci", "centi", "milli", "micro", "nano", "pico", "femto", "atto", "zepto", "yocto", "deca", "hecto", "kilo", "mega", "giga", "tera", "peta", "exa", "zetta", "yotta", "kibi", "mebi", "gibi", "tebi", "pebi", "exbi", "zebi", "yobi" };
+        
+        /// <summary>
+        /// SI abbreviated units
+        /// </summary>
         public static readonly string[] ShortPrefixes = new string[] { "", "d", "c", "m", "μ", "n", "p", "f", "a", "z", "y", "da", "h", "k", "M", "G", "T", "P", "E", "Z", "Y", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi", "Yi" };
 
         #endregion Public Fields
@@ -49,6 +60,10 @@ namespace DataTools.Extras.Conversion
 
         #region Public Properties
 
+
+        /// <summary>
+        /// Gets or sets the global value for the number of significant digits of a value to be used in performing conversions.
+        /// </summary>
         [Browsable(true)]
         public static int RoundingDigits
         {
@@ -62,6 +77,9 @@ namespace DataTools.Extras.Conversion
             }
         }
 
+        /// <summary>
+        /// Gets the global units collection.
+        /// </summary>
         [Browsable(true)]
         public static UnitCollection Units
         {
@@ -75,6 +93,10 @@ namespace DataTools.Extras.Conversion
 
         #region Public Methods
 
+        /// <summary>
+        /// Add a new unit of measurement to the global collection.
+        /// </summary>
+        /// <param name="unit">The unit to add.</param>
         public static void AddUnit(Unit unit)
         {
             units.Add(unit);
@@ -132,6 +154,11 @@ namespace DataTools.Extras.Conversion
             return unit;
         }
 
+        /// <summary>
+        /// Get the base unit for a specific category.
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
         [Description("Get the base unit for a specific category.")]
         public static Unit GetBaseUnit(string category)
         {
@@ -144,6 +171,10 @@ namespace DataTools.Extras.Conversion
             return null;
         }
 
+        /// <summary>
+        /// Get all base unit names.
+        /// </summary>
+        /// <returns></returns>
         [Description("Get all base unit names.")]
         public static string[] GetBaseUnitNames()
         {
@@ -166,12 +197,21 @@ namespace DataTools.Extras.Conversion
             return c;
         }
 
+        /// <summary>
+        /// Get all base units for all categories.
+        /// </summary>
+        /// <returns></returns>
         [Description("Get all base units for all categories.")]
         public static UnitCollection GetBaseUnits()
         {
             return new UnitCollection(((IList<Unit>)Units).Where((u) => u.IsBase).ToArray());
         }
 
+        /// <summary>
+        /// Gets the multiplier for the specified SI prefix.
+        /// </summary>
+        /// <param name="prefix">The short or long prefix to identify.</param>
+        /// <returns>The multiplier or 1 if no multiplier is found.</returns>
         public static double GetMultiplier(string prefix)
         {
             int i;
@@ -204,20 +244,37 @@ namespace DataTools.Extras.Conversion
             return 1d;
         }
 
+        /// <summary>
+        /// Get unit by name.
+        /// </summary>
+        /// <param name="name">The name of the unit.</param>
+        /// <returns></returns>
         public static Unit GetUnitByName(string name)
         {
             var res = ((IList<Unit>)Units).Where((e) => e.Name.ToLower() == name.ToLower()).FirstOrDefault();
             return res;
         }
 
+        /// <summary>
+        /// Get all unit names for a category.
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="excludeBase"></param>
+        /// <returns></returns>
         [Description("Get all unit names for a category.")]
-        public static string[] GetUnitNames(string category, bool excludeBase = false)
+        public static string[] GetUnitNames(string category)
         {
             var uret = ((IList<Unit>)Units).Where((u) => u.Measures.ToLower() == category.ToLower()).Select(u => u.Name).ToArray();
             Array.Sort(uret);
             return uret;
         }
 
+
+        /// <summary>
+        /// Get all units for a category.
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
         [Description("Get all units for a category.")]
         public static UnitCollection GetUnits(string category = "")
         {
@@ -242,6 +299,11 @@ namespace DataTools.Extras.Conversion
             }
         }
 
+        /// <summary>
+        /// Returns true if this category of measurement is present in the collection of available units.
+        /// </summary>
+        /// <param name="category">The category to check (case insensitive)</param>
+        /// <returns>True if the category is present.</returns>
         public static bool HasCategory(string category)
         {
             foreach (Unit u in units)
@@ -260,6 +322,11 @@ namespace DataTools.Extras.Conversion
             return false;
         }
 
+        /// <summary>
+        /// Identify the exact unit from the given text.
+        /// </summary>
+        /// <param name="text">The text that can be in short notation or long form expressing a unit or derived SI unit.</param>
+        /// <returns>A Unit or null.</returns>
         public static Unit IdentifyUnit(string text)
         {
             Unit nu;
@@ -363,7 +430,17 @@ namespace DataTools.Extras.Conversion
             return null;
         }
 
-
+        /// <summary>
+        /// Converts the given derived value into its base unit value.
+        /// </summary>
+        /// <param name="value">The value expressed in derived units.</param>
+        /// <param name="unit">The derived unit to convert from.</param>
+        /// <param name="baseValue">Returns the calculated base value.</param>
+        /// <param name="baseUnit">Returns the base unit.</param>
+        /// <returns>True if successful.</returns>
+        /// <remarks>
+        /// This is the conversion function from a unit value to the base value for that unit's category of measurement.
+        /// </remarks>
         public static bool GetBaseValue(double value, Unit unit, out double? baseValue, out Unit baseUnit)
         {
             baseValue = null;
@@ -402,6 +479,17 @@ namespace DataTools.Extras.Conversion
         }
 
 
+        /// <summary>
+        /// Converts the given derived value into its base unit value.
+        /// </summary>
+        /// <param name="value">The value expressed in derived units.</param>
+        /// <param name="unit">The derived unit to convert from.</param>
+        /// <param name="baseValue">Returns the calculated base value.</param>
+        /// <param name="baseUnit">Returns the base unit.</param>
+        /// <returns>True if successful.</returns>
+        /// <remarks>
+        /// This is the conversion function from a unit value to the base value for that unit's category of measurement.
+        /// </remarks>
         public static bool GetBaseValue(decimal value, Unit unit, out decimal? baseValue, out Unit baseUnit)
         {
             baseValue = null;
@@ -438,6 +526,17 @@ namespace DataTools.Extras.Conversion
             return GetBaseValue(bv, unit, out baseValue, out baseUnit);
         }
 
+
+        /// <summary>
+        /// Converts the given base value into its derived unit value.
+        /// </summary>
+        /// <param name="baseValue">The value expressed in base units.</param>
+        /// <param name="targetUnit">The target derived unit.</param>
+        /// <param name="value">Returns the calculated value.</param>
+        /// <returns>True if successful.</returns>
+        /// <remarks>
+        /// This is the conversion function to the unit value from the base value for that unit's category of measurement.
+        /// </remarks>
         public static bool GetDerivedValue(double baseValue, Unit targetUnit, out double? value)
         {
             value = null;
@@ -488,6 +587,16 @@ namespace DataTools.Extras.Conversion
             return true;
         }
 
+        /// <summary>
+        /// Converts the given base value into its derived unit value.
+        /// </summary>
+        /// <param name="baseValue">The value expressed in base units.</param>
+        /// <param name="targetUnit">The target derived unit.</param>
+        /// <param name="value">Returns the calculated value.</param>
+        /// <returns>True if successful.</returns>
+        /// <remarks>
+        /// This is the conversion function to the unit value from the base value for that unit's category of measurement.
+        /// </remarks>
         public static bool GetDerivedValue(decimal baseValue, Unit targetUnit, out decimal? value)
         {
             value = null;
@@ -535,13 +644,6 @@ namespace DataTools.Extras.Conversion
                 value = nv;
 
             return true;
-        }
-
-        public static void WordsTest(string Example)
-        {
-            string[] s;
-            s = Words(Example);
-            Console.WriteLine("There are " + s.Length + " words, starting with " + s[0]);
         }
 
      
