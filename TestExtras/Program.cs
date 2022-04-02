@@ -206,11 +206,11 @@ namespace TestExtras
             {
                 if (!string.IsNullOrEmpty(es.Unit.PluralName))
                 {
-                    Console.Write($" ({es.Unit.PluralName})");
+                    Console.Write($" ({TextTools.Separate(es.Unit.PluralName)})");
                 }
                 else
                 {
-                    Console.Write($" ({es.Unit.Name})");
+                    Console.Write($" ({TextTools.Separate(es.Unit.Name)})");
                 }
             }
             
