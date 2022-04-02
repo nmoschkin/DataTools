@@ -160,7 +160,7 @@
   {
     "measures": "Area",
     "name": "SquareFoot",
-    "prefix": "sqft,sft,ftsq",
+    "prefix": "sqft,sft,ftsq,ft^2",
     "pluralName": "SquareFeet",
     "isBase": false,
     "modifies": "MeterSquared",
