@@ -2250,7 +2250,8 @@ namespace DataTools.Extras.Expressions
             {
                 if (value != null)
                 {
-                    partType = PartType.Literal;
+                    partType = partType & ~PartType.Variable;
+                    partType |= PartType.Literal;
                     this.Value = value;
                 }
 
@@ -2987,10 +2988,7 @@ namespace DataTools.Extras.Expressions
 
             if (opcount == 1)
             {
-                if ((partType & PartType.Composite) == PartType.Composite)
-                    partType |= PartType.Executive;
-                else
-                    partType |= PartType.Executive;
+                partType |= PartType.Executive;
 
                 if (parts.Count == 2)
                 {
@@ -3188,6 +3186,7 @@ namespace DataTools.Extras.Expressions
                         es.position = parts[i].Position;
                         es.parent = this;
                         es.partType = PartType.ValueUnitPair;
+                        es.ci = ci;
 
                         var epart = parts[i];
                         var upart = parts[i + 1];
@@ -3196,6 +3195,11 @@ namespace DataTools.Extras.Expressions
 
                         epart.parent = es;
                         upart.parent = es;
+
+                        if ((epart.partType & PartType.Literal) == PartType.Literal)
+                        {
+                            epart.partType = PartType.Literal;
+                        }
 
                         es.parts.Add(epart);
                         es.parts.Add(upart);
