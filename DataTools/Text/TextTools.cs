@@ -916,7 +916,7 @@ namespace DataTools.Text
 
             int i, c = buffIn.Length;
             bool inq = false;
-            
+
             StringBuilder sb = new StringBuilder();
             sb.Capacity = value.Length;
 
@@ -943,7 +943,7 @@ namespace DataTools.Text
                 else
                 {
                     if (i < c - 1)
-                    {
+                    {                        
                         if ((buffIn[i] == escChar) && (buffIn[i + 1] == quoteChar))
                         {
                             if (withQuotes) sb.Append(escChar);
