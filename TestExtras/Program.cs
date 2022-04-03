@@ -22,33 +22,34 @@ namespace TestExtras
     {
         public static void Main(string[] args)
         {
-         //   TestBufferList(args);
+            TestBufferList(args);
             TestParsing(args);
         }
 
         public static void TestBufferList(string[] args)
         {
 
-            var ltest = new RedBlackTree<string>(SortOrder.Ascending);
+            var ltest = new RedBlackTree<string>();
             int strcount = 64;
             var ch = 'A';
 
             for (int i = 0; i < strcount; i++)
             {
-                if (ch > 'Z') ch = 'A';
+                if (ch > 'Z') break;
                 var s = ch;
 
-                ltest.Add(ch.ToString());
-                ltest.Add(ch.ToString());
-                ltest.Add(ch.ToString());
                 ltest.Add(ch.ToString());
 
                 ch++;
             }
 
+            var bb = ltest.Contains("Z");
+            ltest.Remove("Z");
+
+            ltest.Add("Z");
             foreach (var item in ltest) 
             {
-                if (!ltest.Locate(item)) throw new KeyNotFoundException();
+                if (!ltest.Contains(item)) throw new KeyNotFoundException();
             }
 
             var lcomp = new List<string>();
@@ -60,8 +61,7 @@ namespace TestExtras
 
             var carr = ltest.ToArray();
 
-
-            var itest = new RedBlackTree<int?>(new NullableValueTypeComparer<int>(), SortOrder.Ascending);
+            var itest = new RedBlackTree<int?>(new NullableValueTypeComparer<int>());
 
             var r = new Random();
 
