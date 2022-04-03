@@ -13,7 +13,6 @@ namespace DataTools.Graphics
         {
             UniColor clr = new UniColor();
             clr.SetValue(c.A, c.R, c.G, c.B);
-
             return clr;
         }
 
