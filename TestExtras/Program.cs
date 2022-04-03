@@ -29,7 +29,7 @@ namespace TestExtras
         public static void TestBufferList(string[] args)
         {
 
-            var ltest = new RedBlackTree<string>();
+            var ltest = new UpsideDownRedBlackTree<string>();
             int strcount = 64;
             var ch = 'A';
 
@@ -38,7 +38,10 @@ namespace TestExtras
                 if (ch > 'Z') break;
                 var s = ch;
 
+                ltest.Add(ch.ToString() + ch.ToString());
                 ltest.Add(ch.ToString());
+                ltest.Add(ch.ToString() + ch.ToString() + ch.ToString());
+                ltest.Add(ch.ToString() + ch.ToString() + ch.ToString() + ch.ToString());
 
                 ch++;
             }
@@ -61,7 +64,7 @@ namespace TestExtras
 
             var carr = ltest.ToArray();
 
-            var itest = new RedBlackTree<int?>(new NullableValueTypeComparer<int>());
+            var itest = new UpsideDownRedBlackTree<int?>(new NullableValueTypeComparer<int>(true));
 
             var r = new Random();
 
@@ -88,7 +91,7 @@ namespace TestExtras
 
             for (int x = 1; x < icomp.Length; x++)
             {
-                if (icomp[x - 1] > icomp[x]) throw new Exception();
+                if (icomp[x - 1] < icomp[x]) throw new Exception();
             }
 
 
@@ -514,16 +517,34 @@ namespace TestExtras
 
     public class NullableValueTypeComparer<T> : IComparer<T?> where T: struct, IComparable<T>
     {
+        bool desc = false;
+        public NullableValueTypeComparer(bool descending)
+        {
+            desc = descending;
+        }
+
+        public NullableValueTypeComparer()
+        {
+
+        }
+
         public int Compare(T? x, T? y)
         {
             if (x is int a && y is int b)
             {
-                return a.CompareTo(b);
+                if (desc)
+                {
+                    return -a.CompareTo(b);
+                }
+                else
+                {
+                    return a.CompareTo(b);
+                }
             }
             else
             {
-                if (x is object && !(y is object)) return -1;
-                else if (y is object) return 1;
+                if (x is object && !(y is object)) return 1;
+                else if (y is object) return -1;
                 return 0;
             }
         }
