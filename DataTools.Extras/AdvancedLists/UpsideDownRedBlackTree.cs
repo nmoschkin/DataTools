@@ -233,7 +233,13 @@ namespace DataTools.Extras.AdvancedLists
         /// </summary>
         public T First
         {
-            get => count == 0 ? default : items[0];
+            get
+            {
+                var ic = items.Count - 1;
+
+                if (ic == -1) return default;
+                return items[ic];
+            }
         }
 
         /// <summary>
@@ -243,17 +249,9 @@ namespace DataTools.Extras.AdvancedLists
         {
             get
             {
-                var ic = items.Count;
-
-                if (ic == 0) return default;
-                if (items[ic - 1] is object)
-                {
-                    return items[ic - 1];
-                }
-                else
-                {
-                    return items[ic - 2];
-                }
+                if (items.Count == 0) return default;
+                if ((items[0] is object)) return items[0];
+                else return items[1];
             }
         }
 
@@ -383,7 +381,7 @@ namespace DataTools.Extras.AdvancedLists
         {
             lock (syncRoot)
             {
-                foreach (var item in items)
+                foreach (var item in this)
                 {
                     if (!(item is object)) continue;
                     array[arrayIndex++] = item;
@@ -408,7 +406,7 @@ namespace DataTools.Extras.AdvancedLists
 
                 int c = 0;
 
-                foreach (var item in items)
+                foreach (var item in this)
                 {
                     if (!(item is object)) continue;
 
@@ -422,9 +420,10 @@ namespace DataTools.Extras.AdvancedLists
 
         public IEnumerator<T> GetEnumerator()
         {
-            foreach (var item in items)
+            int c = items.Count - 1;
+            for (int i = c; i >= 0; i--)
             {
-                if (item is object) yield return item;
+                if (items[i] is object) yield return items[i];
             }
 
             yield break;
@@ -864,13 +863,13 @@ namespace DataTools.Extras.AdvancedLists
                         {
                             if (!(items[lo - 1] is object))
                             {
-                                r = comp(item1, items[lo]);
+                                r = -comp(item1, items[lo]);
                                 if (r <= 0) lo--;
                             }
 
                             else if (lo < count - 1 && !(items[lo + 1] is object))
                             {
-                                r = comp(item1, items[lo]);
+                                r = -comp(item1, items[lo]);
                                 if (r >= 0) lo++;
                             }
                         }
@@ -902,7 +901,7 @@ namespace DataTools.Extras.AdvancedLists
                 item2 = items[mid];
                 item3 = items[mid + 1];
 
-                r = comp(item1, item3);
+                r = -comp(item1, item3);
 
                 if (r > 0)
                 {
@@ -912,7 +911,7 @@ namespace DataTools.Extras.AdvancedLists
                 {
                     if (item2 is object)
                     {
-                        r = comp(item1, item2);
+                        r = -comp(item1, item2);
 
                         if (r > 0)
                         {
