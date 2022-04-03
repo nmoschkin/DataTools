@@ -65,22 +65,6 @@ namespace DataTools.Extras.AdvancedLists
     }
 
     /// <summary>
-    /// The sorting direction of the tree.
-    /// </summary>
-    public enum SortOrder
-    {
-        /// <summary>
-        /// Ascending sort order.
-        /// </summary>
-        Ascending,
-
-        /// <summary>
-        /// Descending sort order.
-        /// </summary>
-        Descending,
-    }
-
-    /// <summary>
     /// The method to use to walk the tree.
     /// </summary>
     public enum TreeWalkMode
@@ -111,11 +95,11 @@ namespace DataTools.Extras.AdvancedLists
 
         #region Public Constructors
 
-        public KeyedRedBlackTree(SortOrder sortOrder) : base(sortOrder)
+        public KeyedRedBlackTree() : base()
         {
         }
 
-        public KeyedRedBlackTree(IComparer<TValue> comparer, SortOrder sortOrder) : base(comparer, sortOrder)
+        public KeyedRedBlackTree(IComparer<TValue> comparer) : base(comparer)
         {
         }
 
@@ -197,9 +181,7 @@ namespace DataTools.Extras.AdvancedLists
         protected RebalanceStrategy globalStrategy = RebalanceStrategy.Cadance4;
         protected List<T> items;
         protected RebalanceStrategy localStrategy = RebalanceStrategy.Cadence16;
-        protected int m;
         protected float rebalanceThreshold = 1.2f;
-        protected SortOrder sortOrder;
         protected object syncRoot = new object();
 
         #endregion Protected Fields
@@ -222,6 +204,8 @@ namespace DataTools.Extras.AdvancedLists
 
         int unchangedRebalances = 0;
 
+        float averageInsertIndex = 0f;
+
         #endregion Private Fields
 
         #region Public Constructors
@@ -234,7 +218,7 @@ namespace DataTools.Extras.AdvancedLists
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public RedBlackTree(IComparer<T> comparer, SortOrder sortOrder, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : base()
+        public RedBlackTree(IComparer<T> comparer, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : base()
         {
             rebalanceThreshold = threshold;
             globalStrategy = globStrategy;
@@ -243,15 +227,6 @@ namespace DataTools.Extras.AdvancedLists
             items = new List<T>();
 
             arrspace = new T[2];
-            this.sortOrder = sortOrder;
-            if (sortOrder == SortOrder.Ascending)
-            {
-                m = 1;
-            }
-            else
-            {
-                m = -1;
-            }
 
             if (comparer == null)
             {
@@ -272,19 +247,7 @@ namespace DataTools.Extras.AdvancedLists
             else
             {
                 this.comparer = comparer;
-
-                comp = new Comparison<T>((x, y) =>
-                {
-                    if (x is object && y is object)
-                    {
-                        return this.comparer.Compare(x, y);
-                    }
-                    else
-                    {
-                        throw new ArgumentNullException();
-                    }
-                });
-
+                comp = comparer.Compare;
             }
 
         }
@@ -292,27 +255,10 @@ namespace DataTools.Extras.AdvancedLists
         /// <summary>
         /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public RedBlackTree() : this(SortOrder.Ascending) { }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
-        /// </summary>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public RedBlackTree(SortOrder sortOrder, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this((IComparer<T>)null, sortOrder, threshold, globStrategy, locStrategy)
-        {
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
-        /// </summary>
-        /// <param name="comparer">The comparer class.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public RedBlackTree(IComparer<T> comparer, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this(comparer, SortOrder.Ascending, threshold, globStrategy, locStrategy)
+        public RedBlackTree(float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this((IComparer<T>)null, threshold, globStrategy, locStrategy)
         {
         }
 
@@ -324,19 +270,7 @@ namespace DataTools.Extras.AdvancedLists
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public RedBlackTree(IEnumerable<T> initialItems, IComparer<T> comparer, SortOrder sortOrder, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this(comparer, sortOrder, threshold, globStrategy, locStrategy)
-        {
-            AddRange(initialItems);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="RedBlackTree{T}"/>.
-        /// </summary>
-        /// <param name="initialItems">The initial items used to populate the collection.</param>
-        /// <param name="comparer">The comparer class.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        public RedBlackTree(IEnumerable<T> initialItems, IComparer<T> comparer, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this(comparer, SortOrder.Ascending, threshold, globStrategy, locStrategy)
+        public RedBlackTree(IEnumerable<T> initialItems, IComparer<T> comparer, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this(comparer, threshold, globStrategy, locStrategy)
         {
             AddRange(initialItems);
         }
@@ -348,7 +282,7 @@ namespace DataTools.Extras.AdvancedLists
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public RedBlackTree(IEnumerable<T> initialItems, SortOrder sortOrder, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this((IComparer<T>)null, sortOrder, threshold, globStrategy, locStrategy)
+        public RedBlackTree(IEnumerable<T> initialItems, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this((IComparer<T>)null, threshold, globStrategy, locStrategy)
         {
             AddRange(initialItems);
         }
@@ -378,6 +312,10 @@ namespace DataTools.Extras.AdvancedLists
             }
         }
 
+        /// <summary>
+        /// (Metrics) The average insert index.
+        /// </summary>
+        public float AverageInsertIndex => averageInsertIndex;
 
         /// <summary>
         /// (Metrics) Number of inserts performed by resizing the tree.
@@ -425,11 +363,6 @@ namespace DataTools.Extras.AdvancedLists
         /// </summary>
         public int TreeSize => items.Count;
 
-        /// <summary>
-        /// Gets the sort order for the current instance.
-        /// </summary>
-        public SortOrder SortOrder => sortOrder;
-
         public bool IsReadOnly { get; } = false;
 
         /// <summary>
@@ -447,14 +380,16 @@ namespace DataTools.Extras.AdvancedLists
         {
             get
             {
-                if (count == 0) return default;
-                if (items[count - 1] is object)
+                var ic = items.Count;
+
+                if (ic == 0) return default;
+                if (items[ic - 1] is object)
                 {
-                    return items[count - 1];
+                    return items[ic - 1];
                 }
                 else
                 {
-                    return items[count - 2];
+                    return items[ic - 2];
                 }
             }
         }
@@ -577,7 +512,7 @@ namespace DataTools.Extras.AdvancedLists
         {
             lock (syncRoot)
             {
-                return Locate(item);
+                return Walk(item, TreeWalkMode.Locate) != -1;
             }
         }
 
@@ -632,39 +567,17 @@ namespace DataTools.Extras.AdvancedLists
             yield break;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            foreach (var item in items)
-            {
-                if (item is object) yield return item;
-            }
-
-            yield break;
-        }
-
-        /// <summary>
-        /// Validate that an item exists in the collection.
-        /// </summary>
-        /// <param name="item">The item to locate.</param>
-        /// <returns>True if the item exists in the collection.</returns>
-        public virtual bool Locate(T item)
-        {
-            return Walk(item, TreeWalkMode.Locate) != -1;
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public bool Remove(T item)
         {
             lock (syncRoot)
             {
                 var idx = Walk(item, TreeWalkMode.Locate);
-                if (idx >= count || idx < 0) return false;
+                if (idx == -1) return false;
 
-                if (items[idx] is object && items[idx].Equals(item))
-                {
-                    RemoveItem(idx);
-                    return true;
-                }
-                return false;
+                RemoveItem(idx);
+                return true;
             }
         }
 
@@ -682,9 +595,11 @@ namespace DataTools.Extras.AdvancedLists
                 softRemoves = 0;
 
                 localRebalances = 0;
+
                 changedRebalances = 0;
                 unchangedRebalances = 0;
 
+                averageInsertIndex = 0f;
             }
         }
 
@@ -698,12 +613,9 @@ namespace DataTools.Extras.AdvancedLists
             {
                 var l = new List<T>();
 
-                foreach (var item in items)
+                foreach (var item in this)
                 {
-                    if (item is object)
-                    {
-                        l.Add(item);
-                    }
+                    l.Add(item);
                 }
 
                 return l.ToArray();
@@ -716,20 +628,19 @@ namespace DataTools.Extras.AdvancedLists
         /// <returns>A new <see cref="Array"/> with at most <paramref name="elementCount"/> items.</returns>
         public T[] ToArray(int elementCount)
         {
+            if (elementCount < 1) throw new ArgumentOutOfRangeException();
+
             lock (syncRoot)
             {
                 var l = new List<T>();
                 int x = 0;
 
-                foreach (var item in items)
+                foreach (var item in this)
                 {
-                    if (item != null)
-                    {
-                        l.Add(item);
+                    l.Add(item);
 
-                        x++;
-                        if (x == elementCount) break;
-                    }
+                    x++;
+                    if (x >= elementCount) break;
                 }
 
                 return l.ToArray();
@@ -876,6 +787,12 @@ namespace DataTools.Extras.AdvancedLists
                     if (metrics) hardInserts++;
                 }
 
+                if (metrics)
+                {
+                    var ins = softInserts + hardInserts;
+                    averageInsertIndex = ((averageInsertIndex * (ins - 1)) + index) / ins;
+                }
+
                 count++;
             }
         }
@@ -1008,6 +925,7 @@ namespace DataTools.Extras.AdvancedLists
             index = Walk(item, TreeWalkMode.Locate);
             return index != -1;
         }
+
         /// <summary>
         /// Remove an item from the collection.
         /// </summary>
@@ -1078,7 +996,7 @@ namespace DataTools.Extras.AdvancedLists
                     {
                         if (lo < count - 1 && !(items[lo + 1] is object))
                         {
-                            r = comp(item1, items[lo]) * m;
+                            r = comp(item1, items[lo]);
                             if (r >= 0) lo++;
                         }
 
@@ -1086,7 +1004,7 @@ namespace DataTools.Extras.AdvancedLists
                         {
                             if (lo < count)
                             {
-                                r = comp(item1, items[lo]) * m;
+                                r = comp(item1, items[lo]);
                                 if (r <= 0) lo--;
                             }
                             else
@@ -1112,13 +1030,13 @@ namespace DataTools.Extras.AdvancedLists
                 item2 = items[mid];
                 item3 = items[mid + 1];
 
-                r = comp(item1, item2) * m;
+                r = comp(item1, item2);
 
                 if (r > 0)
                 {
                     if (item3 is object)
                     {
-                        r = comp(item1, item3) * m;
+                        r = comp(item1, item3);
 
                         if (r <= 0)
                         {
@@ -1158,8 +1076,8 @@ namespace DataTools.Extras.AdvancedLists
 
         public TreeUnbalancedException() : base()
         {
-
         }
+
         public TreeUnbalancedException(string message) : base(message)
         {
         }

@@ -11,7 +11,7 @@ using System.IO;
 using System.Text.Json.Nodes;
 
 using static DataTools.MathTools.MathLib;
-
+using DataTools.Extras.AdvancedLists;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -22,9 +22,77 @@ namespace TestExtras
     {
         public static void Main(string[] args)
         {
+            TestBufferList(args);
             TestParsing(args);
         }
 
+        public static void TestBufferList(string[] args)
+        {
+
+            var ltest = new RedBlackTree<string>();
+            int strcount = 64;
+            var ch = 'A';
+
+            for (int i = 0; i < strcount; i++)
+            {
+                if (ch > 'Z') break;
+                var s = ch;
+
+                ltest.Add(ch.ToString());
+
+                ch++;
+            }
+
+            var bb = ltest.Contains("Z");
+            ltest.Remove("Z");
+
+            ltest.Add("Z");
+            foreach (var item in ltest) 
+            {
+                if (!ltest.Contains(item)) throw new KeyNotFoundException();
+            }
+
+            var lcomp = new List<string>();
+
+            foreach(var s in ltest)
+            {
+                lcomp.Add(s);
+            }
+
+            var carr = ltest.ToArray();
+
+            var itest = new RedBlackTree<int?>(new NullableValueTypeComparer<int>());
+
+            var r = new Random();
+
+            var testcount = 52000;
+
+            var rand = new Random();
+            
+            for (int x = 0; x < testcount; x++)
+            {
+                int z = x;
+                itest.Add(rand.Next(testcount));
+
+                z = rand.Next(testcount) - x;
+                itest.Add(z);
+
+                z = (x + rand.Next(testcount)) / 2;
+                itest.Add(z);
+
+                z = x % rand.Next(1, testcount);
+                itest.Add(z);
+            }
+
+            var icomp = itest.ToArray();
+
+            for (int x = 1; x < icomp.Length; x++)
+            {
+                if (icomp[x - 1] > icomp[x]) throw new Exception();
+            }
+
+
+        }
 
         public static void TestParsing(string[] args)
         {
@@ -35,7 +103,7 @@ namespace TestExtras
                 Formatting = Formatting.Indented
             };
 
-            var tss = "Hey roberts roberts gemini falcon \"Hot extra derecho sauce\" derecho derecho agnes";
+            var tss = "Hey roberts roberts gemini falcon \"Hot extra sauce\" derecho derecho agnes";
 
             var tb = TextTools.TextBetween(tss, 0, "roberts", "derecho", out int? is1, out int? is2);
 
@@ -68,77 +136,104 @@ namespace TestExtras
             //var dstr = "tanh(v)";
 
             //var dstr = "max(v, 44 * 0.32, 95 / 5)";
-            var dstr = "abs((19 + 2)^u / 6 * 5 / (4 sqrt (sqrt (v * 5))) + (4 - 6 * 10))";
+            
+            var dstr = "5 m^2 = x ft^2";
+
+            var dstr3 = "abs((19 + 2)^u / 6 * 5 / (4 sqrt (sqrt (v * 5))) + (4 - 6 * 10))";
             //var dstr = "0x4A4e33 = {x:#,##0}";
-            // var dstr = "45 mi/h = $x km/h";
-            ConversionTool.RoundingDigits = 4;
+            var dstr2 = "$x km/h = 45 mi/6 [min]";
+            ConversionTool.RoundingDigits = 2;
             //var dstr = "1 hr + 2 days = $x [min]";
 
             //var lstr = "4 sqrt (9)";
             //var ostr = "sqrt(300)";
 
-            Console.WriteLine($"Input Expression:  {dstr}");
-           
-            var res = new ExpressionSegment(dstr, "");
-            res.StorageMode = StorageMode.AsDouble;
-
-            var v = 119.74d;
-            var u = 2.234d;
-
-            res["v"] = v;
-            res["u"] = u;
-
-            var pairs = res.GetValueUnitPairs();
-            var b = res.IsSolvable;
-            Console.WriteLine($"Parsed Expression: {res}");
-            Console.WriteLine($"Is Solvable:       {b}");
-            Console.WriteLine($"Unit Value Pairs:  {pairs?.Count ?? 0}");
-            Console.WriteLine();
-            Console.WriteLine("Variables:\r\n" + JsonConvert.SerializeObject(res.Variables, jcfg));
-            Console.WriteLine();
-
-            var t1 = DateTime.Now;
-            var execRes = res.Execute();
-            var t2 = DateTime.Now;
-
-            var ts = t2 - t1;
-            Console.WriteLine($"Computed Result: {execRes}");
-            //Console.WriteLine($"{Math.Tanh(v)}");
-
-            t1 = DateTime.Now;
-            var expVal = Math.Abs(Math.Pow(19d + 2d, u) / 6d * 5d / (4d * (Math.Sqrt(Math.Sqrt(v * 5)))) + (4 - 6 * 10));
-            t2 = DateTime.Now;
-
-            var ts2 = t2 - t1;
-
-            Console.WriteLine($"Expected Result: {expVal}");
-            Console.WriteLine($"Parser Run Time: {ts}");
-            Console.WriteLine($"Normal Run Time: {ts2}");
-            Console.WriteLine();
-
-            Console.WriteLine("Object Graph:");
-            Console.WriteLine();
-
-            PrintExpression(res);
+            Console.WriteLine($"Input Expression:  {dstr3}");
 
 
-            if (res.HasUnits)
+            var zExp3 = new ExpressionSegment(dstr, "");
+            var zExp1 = new ExpressionSegment(dstr3, "");
+            var zExp2 = new ExpressionSegment(dstr2, "");
+
+            var expList = new List<ExpressionSegment>();
+
+            expList.Add(zExp3);
+            expList.Add(zExp1);
+            expList.Add(zExp2);
+
+            foreach (var res in expList)
             {
-                Console.WriteLine();
-                Console.WriteLine("Base Unit Object Graph:");
+
+
+
+
+                res.StorageMode = StorageMode.AsDouble;
+
+                var v = 119.74d;
+                var u = 2.234d;
+
+                res["v"] = v;
+                res["u"] = u;
+
+                var pairs = res.GetValueUnitPairs();
+                var b = res.IsSolvable;
+                Console.WriteLine($"\r\nExpression:");
+                Console.WriteLine($"-------------");
+                Console.WriteLine($"Parsed Expression: {res}");
+                Console.WriteLine($"Is Solvable:       {b}");
+                Console.WriteLine($"Unit Value Pairs:  {pairs?.Count ?? 0}");
+
+                if (!res.HasUnits)
+                {
+
+                    Console.WriteLine();
+                    Console.WriteLine("Variables:\r\n" + JsonConvert.SerializeObject(res.Variables, jcfg));
+                    Console.WriteLine();
+
+                    var t1 = DateTime.Now;
+                    var execRes = res.Execute();
+                    var t2 = DateTime.Now;
+
+                    var ts = t2 - t1;
+                    Console.WriteLine($"Computed Result: {execRes}");
+                    //Console.WriteLine($"{Math.Tanh(v)}");
+
+                    t1 = DateTime.Now;
+                    var expVal = Math.Abs(Math.Pow(19d + 2d, u) / 6d * 5d / (4d * (Math.Sqrt(Math.Sqrt(v * 5)))) + (4 - 6 * 10));
+                    t2 = DateTime.Now;
+
+                    var ts2 = t2 - t1;
+
+                    Console.WriteLine($"Expected Result: {expVal}");
+                    Console.WriteLine($"Parser Run Time: {ts}");
+                    Console.WriteLine($"Normal Run Time: {ts2}");
+                    Console.WriteLine();
+                }
+
+                Console.WriteLine("Object Graph:");
                 Console.WriteLine();
 
-                PrintExpression(res.Clone(true));
+                PrintExpression(res);
 
-            }
+                if (res.HasUnits)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Base Unit Object Graph:");
+                    Console.WriteLine();
 
-            if (res.IsEquation)
-            {
-                Console.WriteLine();
-                Console.WriteLine("Solved Object Graph:");
-                Console.WriteLine();
+                    PrintExpression(res.Clone(true));
 
-                PrintExpression(res.Solve());
+                }
+
+                if (res.IsEquation)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Solved Object Graph:");
+                    Console.WriteLine();
+
+                    PrintExpression(res.Solve());
+
+                }
 
             }
 
