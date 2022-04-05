@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace DataTools.Streams
 {
+
     public class SimpleLog : IDisposable
     {
+        private object _lock = new object();
 
         public virtual bool IsOpened { get; protected set; }
 
@@ -18,7 +20,7 @@ namespace DataTools.Streams
 
         public SimpleLog()
         {
-           
+
         }
         public SimpleLog(string fileName, bool open = true)
         {
@@ -59,43 +61,53 @@ namespace DataTools.Streams
 
         public virtual void OpenLog(string fileName = null)
         {
-            if (disposed) throw new ObjectDisposedException(nameof(SimpleLog));
-
-            if (fileName != null)
+            lock (_lock)
             {
-                Filename = fileName;
-            }
-            else if (Filename == null)
-            {
-                throw new ArgumentNullException(nameof(fileName), "Must specify filename if property is not set.");
-            }
+                if (disposed) throw new ObjectDisposedException(nameof(SimpleLog));
 
-            Stream = new FileStream(Filename, FileMode.Append, FileAccess.Write, FileShare.Read);
-            IsOpened = true;
+                if (fileName != null)
+                {
+                    Filename = fileName;
+                }
+                else if (Filename == null)
+                {
+                    throw new ArgumentNullException(nameof(fileName), "Must specify filename if property is not set.");
+                }
+
+                Stream = new FileStream(Filename, FileMode.Append, FileAccess.Write, FileShare.Read);
+                IsOpened = true;
+            }
         }
 
         public virtual void Close()
         {
-            if (disposed) throw new ObjectDisposedException(nameof(SimpleLog));
+            lock (_lock)
+            {
+                if (disposed) throw new ObjectDisposedException(nameof(SimpleLog));
 
-            Stream?.Close();
-            Stream = null;
-            IsOpened = false;
+                Stream?.Close();
+                Stream = null;
+                IsOpened = false;
+            }
         }
 
         public virtual void Log(string message)
         {
-            if (disposed) throw new ObjectDisposedException(nameof(SimpleLog));
-
-            try
+            lock (_lock)
             {
-                if (!IsOpened) return;
-                var data = Encoding.UTF8.GetBytes($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.FFFFFFF")}]: {message}\r\n");
-                Stream.Write(data, 0, data.Length);
-            }
-            catch
-            {
+                if (disposed) throw new ObjectDisposedException(nameof(SimpleLog));
 
+                try
+                {
+                    if (!IsOpened) return;
+                    var data = Encoding.UTF8.GetBytes($"[{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.FFFFFFF")}]: {message}\r\n");
+                    Stream.Write(data, 0, data.Length);
+                    Stream.Flush();
+                }
+                catch
+                {
+
+                }
             }
         }
 
