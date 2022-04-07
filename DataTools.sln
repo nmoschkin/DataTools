@@ -84,7 +84,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataTools.Extras", "DataToo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestExtras", "TestExtras\TestExtras.csproj", "{9ABD942B-559D-492E-A530-CA71A8E57A39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTools.Console", "DataTools.Console\DataTools.Console.csproj", "{5DF33CD5-4C83-4DD4-B114-646ACCA3708F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataTools.Console", "DataTools.Console\DataTools.Console.csproj", "{5DF33CD5-4C83-4DD4-B114-646ACCA3708F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
