@@ -81,11 +81,11 @@ namespace DataTools.Extras.AdvancedLists
     }
 
     /// <summary>
-    /// A version of <see cref="BufferedCollection{T}"/> with an additional cross-reference for keys.
+    /// A version of <see cref="RedBlackCollection{T}"/> with an additional cross-reference for keys.
     /// </summary>
     /// <typeparam name="TKey">The type of key.</typeparam>
     /// <typeparam name="TValue">The type of value.</typeparam>
-    public abstract class KeyedBufferedCollection<TKey, TValue> : BufferedCollection<TValue> // Do not implement: IReadOnlyDictionary<TKey, TValue>
+    public abstract class KeyedRedBlackCollection<TKey, TValue> : RedBlackCollection<TValue> // Do not implement: IReadOnlyDictionary<TKey, TValue>
     {
         #region Protected Fields
 
@@ -96,12 +96,12 @@ namespace DataTools.Extras.AdvancedLists
 
         #region Public Constructors
 
-        public KeyedBufferedCollection() : base()
+        public KeyedRedBlackCollection() : base()
         {
             items = base.Items as List<TValue>;
         }
 
-        public KeyedBufferedCollection(IComparer<TValue> comparer) : base(comparer)
+        public KeyedRedBlackCollection(IComparer<TValue> comparer) : base(comparer)
         {
             items = base.Items as List<TValue>;
         }
@@ -173,7 +173,7 @@ namespace DataTools.Extras.AdvancedLists
     /// <remarks>
     /// Items cannot be <see cref="null"/>.
     /// </remarks>
-    public class BufferedCollection<T> : ICollection<T>
+    public class RedBlackCollection<T> : ICollection<T>
     {
         #region Protected Fields
 
@@ -216,14 +216,14 @@ namespace DataTools.Extras.AdvancedLists
         #region Public Constructors
 
         /// <summary>
-        /// Creates a new instance of <see cref="BufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackCollection{T}"/>.
         /// </summary>
         /// <param name="space">The number of total new elements to insert for each single new element inserted.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public BufferedCollection(IComparer<T> comparer, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : base()
+        public RedBlackCollection(IComparer<T> comparer, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : base()
         {
             rebalanceThreshold = threshold;
             globalStrategy = globStrategy;
@@ -258,36 +258,36 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="BufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackCollection{T}"/>.
         /// </summary>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public BufferedCollection(float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this((IComparer<T>)null, threshold, globStrategy, locStrategy)
+        public RedBlackCollection(float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this((IComparer<T>)null, threshold, globStrategy, locStrategy)
         {
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="BufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackCollection{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="comparer">The comparer class.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public BufferedCollection(IEnumerable<T> initialItems, IComparer<T> comparer, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this(comparer, threshold, globStrategy, locStrategy)
+        public RedBlackCollection(IEnumerable<T> initialItems, IComparer<T> comparer, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this(comparer, threshold, globStrategy, locStrategy)
         {
             AddRange(initialItems);
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="BufferedCollection{T}"/>.
+        /// Creates a new instance of <see cref="RedBlackCollection{T}"/>.
         /// </summary>
         /// <param name="initialItems">The initial items used to populate the collection.</param>
         /// <param name="sortOrder">The sort order.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        public BufferedCollection(IEnumerable<T> initialItems, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this((IComparer<T>)null, threshold, globStrategy, locStrategy)
+        public RedBlackCollection(IEnumerable<T> initialItems, float threshold = 1.2f, RebalanceStrategy globStrategy = RebalanceStrategy.Cadance4, RebalanceStrategy locStrategy = RebalanceStrategy.Cadence16) : this((IComparer<T>)null, threshold, globStrategy, locStrategy)
         {
             AddRange(initialItems);
         }
@@ -468,7 +468,7 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// Adds multiple items to the <see cref="BufferedCollection{T}"/> at once.
+        /// Adds multiple items to the <see cref="RedBlackCollection{T}"/> at once.
         /// </summary>
         /// <param name="newItems"></param>
         public void AddRange(IEnumerable<T> newItems)
@@ -541,7 +541,7 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// Copies <paramref name="count"/> elements of the <see cref="BufferedCollection{T}"/> to an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
+        /// Copies <paramref name="count"/> elements of the <see cref="RedBlackCollection{T}"/> to an <see cref="Array"/>, starting at a particular <see cref="Array"/> index.
         /// </summary>
         /// <param name="array"></param>
         /// <param name="arrayIndex"></param>
@@ -616,7 +616,7 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// Return a new <see cref="Array"/> of the items in this <see cref="BufferedCollection{T}"/>.
+        /// Return a new <see cref="Array"/> of the items in this <see cref="RedBlackCollection{T}"/>.
         /// </summary>
         /// <returns>A new <see cref="Array"/>.</returns>
         public T[] ToArray()
@@ -635,7 +635,7 @@ namespace DataTools.Extras.AdvancedLists
         }
 
         /// <summary>
-        /// Return a new <see cref="Array"/> of at most <paramref name="elementCount"/> items in this <see cref="BufferedCollection{T}"/>.
+        /// Return a new <see cref="Array"/> of at most <paramref name="elementCount"/> items in this <see cref="RedBlackCollection{T}"/>.
         /// </summary>
         /// <returns>A new <see cref="Array"/> with at most <paramref name="elementCount"/> items.</returns>
         public T[] ToArray(int elementCount)
