@@ -15,15 +15,18 @@ using DataTools.Extras.AdvancedLists;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace TestExtras
 {
     public static class Program
     {
+        [STAThread]
         public static void Main(string[] args)
         {
-            TestBufferList(args);
-            TestParsing(args);
+            //TestBufferList(args);
+            // TestParsing(args);
+            TestCParse(args);
         }
 
         public static void TestBufferList(string[] args)
@@ -97,6 +100,287 @@ namespace TestExtras
 
         }
 
+        public class Snippet
+        {
+            public string Content { get; set; }
+
+            public int StartPos { get; set; }   
+
+            public int EndPos { get; set; }
+
+            public int StartLine { get; set; }
+
+            public int EndLine { get; set; }
+
+            public int StartColumn { get; set; }
+
+            public int EndColumn { get; set; }
+
+            public string Type { get; set; }
+
+            public string Name { get; set; }
+
+            public int Level { get; set; }
+
+            public List<Snippet> Children { get; set; }
+
+            public override string ToString()
+            {
+                return "(" + Type + ") " + (Name ?? Content ?? "");
+            }
+
+        }
+
+        public static List<Snippet> TestCParse(string[] args)
+        {
+
+            //var dlg = new OpenFileDialog()
+            //{
+            //    Filter = "C# Files (*.cs)|*.cs",
+            //    InitialDirectory = Environment.CurrentDirectory
+            //};
+
+            //if (dlg.ShowDialog() != DialogResult.OK)
+            //{
+            //    return;
+            //}
+
+            //var filename = dlg.FileName;
+
+            var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools\\Text\\BOM.cs";
+
+
+            var chars = File.ReadAllText(filename).ToCharArray();
+
+            int i, j, c = chars.Length;
+
+            List<Snippet> captured = new List<Snippet>();
+            Snippet currSnip = null;
+
+            var stack = new Stack<Snippet>();
+            var listStack = new Stack<List<Snippet>>();
+
+            StringBuilder sb;
+
+            int startPos = 0, endPos = 0;
+
+            int startLine = 0, endLine = 0;
+            int startCol = 0, endCol = 0;
+
+            int column = 0;
+            int currLine = 0;
+
+            int currLevel = 0;
+
+            Dictionary<string, Regex> patterns = new Dictionary<string, Regex>();
+
+            patterns.Add("using", new Regex(@"using (.+);"));
+            patterns.Add("namespace", new Regex(@"namespace (.+)"));
+            patterns.Add("class", new Regex(@".*class (\w+).*")); 
+            patterns.Add("interface", new Regex(@".*interface (\w+).*")); 
+            patterns.Add("struct", new Regex(@".*struct (\w+).*")); 
+            patterns.Add("enum", new Regex(@".*enum (\w+).*")); 
+            patterns.Add("record", new Regex(@".*record (\w+).*")); 
+            patterns.Add("delegate", new Regex(@".*delegate .+ (\w+).*;")); 
+            patterns.Add("event", new Regex(@".*event .+ (\w+).*;")); 
+            patterns.Add("method", new Regex(@".* (\w+).*\s*\(.*\)"));
+            patterns.Add("property", new Regex(@".+ (\w+)"));
+
+            for (i = 0; i < c; i++)
+            {
+                if (chars[i] == ';')
+                {
+                    var lookback = TextTools.OneSpace(new string(chars, startPos, i - startPos + 1).Replace("\r", "").Replace("\n", "").Trim());
+
+                    foreach (var kvp in patterns)
+                    {
+                        var result = kvp.Value.Match(lookback);
+
+                        if (result.Success)
+                        {
+                            currSnip = new Snippet();
+
+                            currSnip.StartPos = startPos;
+                            currSnip.StartLine = startLine;
+                            currSnip.EndPos = i;
+                            currSnip.EndLine = currLine;
+                            currSnip.Content = new string(chars, startPos, i - startPos + 1);
+                            currSnip.Type = kvp.Key;
+                            currSnip.Name = result.Groups[1].Value;
+                            captured.Add(currSnip);
+
+                            break;
+                        }
+                    }
+
+                    startPos = i + 1;
+                    startLine = currLine;
+                }
+                else if (chars[i] == '{')
+                {
+                    ++currLevel;
+
+                    var lookback = TextTools.OneSpace(new string(chars, startPos, i - startPos).Replace("\r", "").Replace("\n", "").Trim());
+
+                    foreach (var kvp in patterns)
+                    {
+                        var result = kvp.Value.Match(lookback);
+
+                        if (result.Success)
+                        {
+                            currSnip = new Snippet();
+
+                            currSnip.StartPos = startPos;
+                            currSnip.StartLine = startLine;
+                            currSnip.Type = kvp.Key;
+                            currSnip.Name = result.Groups[1].Value;
+
+                            captured.Add(currSnip);
+
+                            break;
+                        }
+                    }
+
+                    stack.Push(currSnip);
+                    listStack.Push(captured);
+
+                    captured = new List<Snippet>();
+
+                    startPos = i;
+                    startLine = currLine;
+                }
+                else if (chars[i] == '}')
+                {
+                    --currLevel;
+
+                    if (currSnip != null)
+                    {
+                        currSnip.EndPos = i;
+                        currSnip.EndLine = currLine;
+                        currSnip.Children = captured;
+                        currSnip.Content = new string(chars, currSnip.StartPos, currSnip.EndPos - currSnip.StartPos + 1);
+                    }
+
+                    currSnip = stack.Pop();
+
+                    if (currSnip != null)
+                    {
+                        currSnip.Children = captured;
+                        captured = listStack.Pop();
+                    }
+                    else
+                    {
+                        var cc = captured;
+                        captured = listStack.Pop();
+                        captured.AddRange(cc);
+                    }
+
+                    startPos = i + 1;
+                }
+                else if (chars[i] == '\n')
+                {
+                    currLine++;
+                    column = 0;
+                }
+                else if ((i < c - 1) && (chars[i] == '/' && chars[i + 1] == '/'))
+                {
+                    currSnip = new Snippet()
+                    {
+                        StartColumn = column,
+                        StartLine = currLine,
+                        StartPos = i,
+
+                    };
+
+                    sb = new StringBuilder();
+
+                    sb.Append(chars[i]);
+                    sb.Append(chars[i + 1]);
+                        
+                    column += 2;
+            
+                    for (j = i + 2; j < c; j++)
+                    {
+                        sb.Append(chars[j]);
+
+                        if (chars[j] == '\n')
+                        {
+                            currSnip.EndColumn = column;
+                            currSnip.EndLine = currLine;
+                            currSnip.EndPos = j - 1;
+                            currSnip.Content = sb.ToString();
+                            currSnip.Type = "linecomment";
+                                
+                            captured.Add(currSnip);
+
+                            currLine++;
+                            column = 0;
+                            startPos = j + 1;
+                            break;
+                        }
+
+                        column++;
+                    }
+
+                    if (j >= c) break;
+                    i = j;
+                }
+                else if ((i < c - 3) && (chars[i] == '/' && chars[i + 1] == '*'))
+                {
+                    currSnip = new Snippet()
+                    {
+                        StartColumn = column,
+                        StartLine = currLine,
+                        StartPos = i,
+
+                    };
+
+                    sb = new StringBuilder();
+
+                    sb.Append(chars[i]);
+                    sb.Append(chars[i + 1]);
+
+                    column += 2;
+
+                    for (j = i + 2; j < c; j++)
+                    {
+                        sb.Append(chars[j]);
+
+                        if (j < c - 1 && chars[j] == '*' && chars[j + 1] == '/')
+                        {
+                            sb.Append('/');
+                            currSnip.EndColumn = column + 1;
+                            currSnip.EndLine = currLine;
+                            currSnip.EndPos = j + 1;
+                            currSnip.Content = sb.ToString();
+                            currSnip.Type = "blockcomment";
+
+                            captured.Add(currSnip);
+
+                            column += 1;
+                            startPos = j + 2;
+
+                            break;
+                        }
+                        else if (chars[j] == '\n')
+                        {
+                            currLine++;
+                            column = 0;
+
+                            continue;
+                        }
+
+                        column++;
+                    }
+
+                    if (j >= c) break;
+                    i = j;
+                }
+            }
+
+            return captured;
+        }
+
         public static void TestParsing(string[] args)
         {
 
@@ -121,9 +405,6 @@ namespace TestExtras
             tb = TextTools.TextBetween(tss, 0, '[', ']', out is1, out is2);
 
             Console.WriteLine($"\"{tb}\"");
-
-
-
 
 
             //MetricTool.GetBaseValue(39d, u1, out double? baseValue, out MetricUnit baseUnit);

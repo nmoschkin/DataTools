@@ -673,7 +673,7 @@ namespace DataTools.Text
         /// <returns>The matched string optionally including the <paramref name="start"/> and <paramref name="stop"/> delimiter strings.</returns>
         /// <exception cref="ArgumentOutOfRangeException">If the index is less than 2 positions before the last position in the string.</exception>
         /// <exception cref="SyntaxErrorException">If the block is not terminated.</exception>
-        public static string TextBetween(string value, int startPos, string start, string stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false)
+        public static string TextBetween(string value, int startPos, string start, string stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false, bool noQuoteCheck = false)
         {
             idxStart = null;
             idxStop = null;
@@ -697,7 +697,7 @@ namespace DataTools.Text
             for (int i = startPos; i < chars.Length; i++)
             {
                 char c = chars[i];
-                if (c == '"' || c == '\'')
+                if (!noQuoteCheck && (c == '"' || c == '\''))
                 {
                     var qs = QuoteFromHere(value, i, out int? qstart, out int? qstop, quoteChar: c, escChar: escChar, withQuotes: true, throwException: throwException);
 
@@ -914,7 +914,7 @@ namespace DataTools.Text
         /// </remarks>
         /// <exception cref="SyntaxErrorException">If <paramref name="throwException"/> is true, then this error is thrown if the quoted string is unterminated.</exception>
         ///
-        public static string QuoteFromHere(char[] input, int index, ref int line, out int? startPos, out int? endPos, char interpolationChar, char literalChar, char interpolationBegin, char interpolationEnd, char quoteChar = '\"', char escChar = '\\', bool withQuotes = false, bool throwException = false)
+        public static string QuoteFromHere(char[] input, int index, ref int line, out int? startPos, out int? endPos, char interpolationChar = '$', char literalChar = '@', char interpolationBegin = '{', char interpolationEnd = '}', char quoteChar = '\"', char escChar = '\\', bool withQuotes = false, bool throwException = false)
         {
             int i = index, c = input.Length;
             var sb = new StringBuilder();
@@ -1114,82 +1114,8 @@ namespace DataTools.Text
         /// 
         public static string QuoteFromHere(string value, int index, out int? startPos, out int? endPos, char quoteChar = '\"', char escChar = '\\', bool withQuotes = false, bool throwException = false)
         {
-            char[] buffIn = value.ToCharArray();
-
-            int i, c = buffIn.Length;
-            bool inq = false;
-
-            StringBuilder sb = new StringBuilder();
-            sb.Capacity = value.Length;
-
-            startPos = endPos = null;
-
-            for (i = ((index > 0) ? (index - 1) : 0); i < c; i++)
-            {
-                if (!inq)
-                {
-                    if (buffIn[i] == quoteChar)
-                    {
-                        inq = true;
-                        if (withQuotes)
-                        {
-                            startPos = i;
-                            sb.Append(quoteChar);
-                        }
-                        else
-                        {
-                            startPos = i + 1;
-                        }
-                    }
-                }
-                else
-                {
-                    if (i < c - 1)
-                    {                        
-                        if ((buffIn[i] == escChar) && (buffIn[i + 1] == quoteChar))
-                        {
-                            if (withQuotes) sb.Append(escChar);
-                            sb.Append(quoteChar);
-
-                            i++;
-                            continue;
-                        }
-                        else if ((buffIn[i] == escChar) && (buffIn[i + 1] == escChar))
-                        {
-                            if (withQuotes) sb.Append(escChar);
-                            sb.Append(escChar);
-
-                            i++;
-                            continue;
-                        }
-                    }
-
-                    if (buffIn[i] == quoteChar)
-                    {
-                        if (withQuotes)
-                        {
-                            endPos = i;
-                            sb.Append(quoteChar);
-                        }
-                        else
-                        {
-                            endPos = i - 1;
-                        }
-
-                        break;
-                    }
-
-                    sb.Append(buffIn[i]);
-                }
-
-            }
-
-            if (throwException && startPos != null && endPos == null)
-            {
-                throw new SyntaxErrorException($"Quoted string at position {startPos} does not have an ending quote.");
-            }
-
-            return sb.ToString();
+            int l = 0;
+            return QuoteFromHere(value.ToCharArray(), index, ref l, out startPos, out endPos, '$', '@', '{', '}', quoteChar, escChar, withQuotes, throwException);
         }
 
         /// <summary>
