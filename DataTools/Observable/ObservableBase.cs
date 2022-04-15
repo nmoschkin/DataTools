@@ -20,7 +20,7 @@ namespace DataTools.Observable
         /// <summary>
         /// Gets or sets a value that indicates that the property change should be cancelled.
         /// </summary>
-        public bool Cancel { get; set; }
+        public bool Cancel { get; set; } = false;
 
         /// <summary>
         /// Gets or sets a value indicating that the event has been handled, and the remaining handlers should not be invoked.

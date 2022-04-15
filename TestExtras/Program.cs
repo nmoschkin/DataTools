@@ -16,6 +16,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Text.Json;
 
 namespace TestExtras
 {
@@ -147,7 +148,7 @@ namespace TestExtras
 
             //var filename = dlg.FileName;
 
-            var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools\\Text\\BOM.cs";
+            var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools\\Observable\\ObservableBase.cs";
 
 
             var chars = File.ReadAllText(filename).ToCharArray();
@@ -156,7 +157,7 @@ namespace TestExtras
 
             List<Snippet> captured = new List<Snippet>();
             Snippet currSnip = null;
-
+            var strack = new Stack<string>();
             var stack = new Stack<Snippet>();
             var listStack = new Stack<List<Snippet>>();
 
@@ -181,14 +182,19 @@ namespace TestExtras
             patterns.Add("struct", new Regex(@".*struct (\w+).*")); 
             patterns.Add("enum", new Regex(@".*enum (\w+).*")); 
             patterns.Add("record", new Regex(@".*record (\w+).*")); 
-            patterns.Add("delegate", new Regex(@".*delegate .+ (\w+).*;")); 
-            patterns.Add("event", new Regex(@".*event .+ (\w+).*;")); 
+            patterns.Add("delegate", new Regex(@".*delegate\s+.+\s+(\w+).*;")); 
+            patterns.Add("event", new Regex(@".*event\s+.+\s+(\w+).*;"));
+            patterns.Add("operator", new Regex(@".*operator\s+(\S+)\(.*\)"));
             patterns.Add("method", new Regex(@".* (\w+).*\s*\(.*\)"));
             patterns.Add("property", new Regex(@".+ (\w+)"));
+            Regex currCons = null;
+            Regex currDecons = null;
+            string currName = null;
+            string currPatt = null;
 
             for (i = 0; i < c; i++)
             {
-                if (chars[i] == ';')
+                if (chars[i] == ';' && currPatt != "property" && currPatt != "destructor" && currPatt != "constructor" && currPatt != "method")
                 {
                     var lookback = TextTools.OneSpace(new string(chars, startPos, i - startPos + 1).Replace("\r", "").Replace("\n", "").Trim());
 
@@ -219,62 +225,102 @@ namespace TestExtras
                 else if (chars[i] == '{')
                 {
                     ++currLevel;
+                    strack.Push(currPatt);
 
-                    var lookback = TextTools.OneSpace(new string(chars, startPos, i - startPos).Replace("\r", "").Replace("\n", "").Trim());
-
-                    foreach (var kvp in patterns)
+                    if (currPatt != "property" && currPatt != "destructor" && currPatt != "constructor" && currPatt != "method")
                     {
-                        var result = kvp.Value.Match(lookback);
+                        var lookback = TextTools.OneSpace(new string(chars, startPos, i - startPos).Replace("\r", "").Replace("\n", "").Trim());
+                        Match cons = currCons?.Match(lookback) ?? null;
 
-                        if (result.Success)
+                        if (cons != null && cons.Success)
                         {
                             currSnip = new Snippet();
 
                             currSnip.StartPos = startPos;
                             currSnip.StartLine = startLine;
-                            currSnip.Type = kvp.Key;
-                            currSnip.Name = result.Groups[1].Value;
-
+                            currSnip.Type = "constructor";
+                            currPatt = "constructor";
+                            currSnip.Name = currName;
                             captured.Add(currSnip);
-
-                            break;
                         }
+                        else
+                        {
+                            cons = currDecons?.Match(lookback) ?? null;
+
+                            if (cons != null && cons.Success)
+                            {
+                                currSnip = new Snippet();
+
+                                currSnip.StartPos = startPos;
+                                currSnip.StartLine = startLine;
+                                currSnip.Type = "destructor";
+                                currPatt = "destructor";
+                                currSnip.Name = currName;
+                                captured.Add(currSnip);
+                            }
+                            else
+                            {
+                                foreach (var kvp in patterns)
+                                {
+                                    var result = kvp.Value.Match(lookback);
+
+                                    if (result.Success)
+                                    {
+                                        currSnip = new Snippet();
+
+                                        currSnip.StartPos = startPos;
+                                        currSnip.StartLine = startLine;
+                                        currSnip.Type = kvp.Key;
+                                        currPatt = kvp.Key;
+                                        currSnip.Name = result.Groups[1].Value;
+
+                                        captured.Add(currSnip);
+
+                                        if (currPatt == "class" || currPatt == "struct" || currPatt == "record")
+                                        {
+                                            currName = currSnip.Name;
+
+                                            currCons = new Regex($"^.*{currSnip.Name}\\s*\\(.*\\).*$");
+                                            currDecons = new Regex($"^.*\\~{currSnip.Name}\\s*\\(\\)$");
+                                        }
+
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        stack.Push(currSnip);
+                        listStack.Push(captured);
+                        captured = new List<Snippet>();
+
+                        startPos = i;
+                        startLine = currLine;
                     }
-
-                    stack.Push(currSnip);
-                    listStack.Push(captured);
-
-                    captured = new List<Snippet>();
-
-                    startPos = i;
-                    startLine = currLine;
                 }
                 else if (chars[i] == '}')
                 {
                     --currLevel;
+                    currPatt = strack.Pop();
 
                     if (currSnip != null)
                     {
                         currSnip.EndPos = i;
                         currSnip.EndLine = currLine;
-                        currSnip.Children = captured;
                         currSnip.Content = new string(chars, currSnip.StartPos, currSnip.EndPos - currSnip.StartPos + 1);
                     }
 
-                    currSnip = stack.Pop();
-
-                    if (currSnip != null)
+                    if (currPatt != "property" && currPatt != "destructor" && currPatt != "constructor" && currPatt != "method")
                     {
-                        currSnip.Children = captured;
-                        captured = listStack.Pop();
-                    }
-                    else
-                    {
-                        var cc = captured;
-                        captured = listStack.Pop();
-                        captured.AddRange(cc);
-                    }
+                        currSnip = stack.Pop();
 
+                        if (currSnip != null)
+                        {
+                            currSnip.Children = captured;
+                            captured = listStack.Pop();
+                        }                      
+                    }
+                   
                     startPos = i + 1;
                 }
                 else if (chars[i] == '\n')
@@ -298,9 +344,13 @@ namespace TestExtras
                     sb.Append(chars[i + 1]);
                         
                     column += 2;
-            
+                    bool docs = false;
                     for (j = i + 2; j < c; j++)
                     {
+                        if (j == i + 2 && chars[j] == '/')
+                        {
+                            docs = true;
+                        }
                         sb.Append(chars[j]);
 
                         if (chars[j] == '\n')
@@ -309,7 +359,7 @@ namespace TestExtras
                             currSnip.EndLine = currLine;
                             currSnip.EndPos = j - 1;
                             currSnip.Content = sb.ToString();
-                            currSnip.Type = "linecomment";
+                            currSnip.Type = docs ? "xmldoc" : "linecomment";
                                 
                             captured.Add(currSnip);
 
