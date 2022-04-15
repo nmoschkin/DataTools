@@ -29,7 +29,7 @@ namespace DataTools.Desktop
         /// Defines the base for all custom messages in this module.
         /// </summary>
         /// <remarks></remarks>
-        public const int WM_MYBASE = User32.WM_USER + 0x100;
+        public const int WM_MYBASE = 0x400 + 0x100;
 
         /// <summary>
         /// Signals that a change has occurred within the context of a watched folder.
@@ -417,7 +417,7 @@ namespace DataTools.Desktop
             {
                 if (ptr == IntPtr.Zero || FilenameLength == 0)
                     return null;
-                return ptr.GetString(12L, FilenameLength);
+                return ptr.GetString(12L);
             }
         }
 
@@ -711,7 +711,23 @@ namespace DataTools.Desktop
         protected int _lastIndex = 0;
         protected IntPtr _owner;
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+        static extern bool CloseHandle(IntPtr hObject);
+
+        [DllImport("user32", EntryPoint = "PostMessageW", CharSet = CharSet.Unicode)]
+        static extern bool PostMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
         
+        [DllImport("kernel32", CharSet = CharSet.Unicode)]
+        static extern int GetLastError();
+
+        [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode)]
+        static extern IntPtr CreateFile([MarshalAs(UnmanagedType.LPWStr)] string lpFileName, int dwDesiredAccess, int dwShareMode, IntPtr lpSecurityAttributes, int dwCreationDisposition, int dwFlagsAndAttributes, IntPtr hTemplateFile);
+
+
+
+        const int WS_CHILDWINDOW = 0x40000000;
+
+
         /// <summary>
         /// The event that get fired when a change is detected in the monitored path.
         /// </summary>
@@ -927,7 +943,7 @@ namespace DataTools.Desktop
                 var cp = new CreateParams();
                 if (_owner != IntPtr.Zero)
                 {
-                    cp.Style = User32.WS_CHILDWINDOW;
+                    cp.Style = WS_CHILDWINDOW;
                     cp.Parent = _owner;
                 }
 
@@ -965,7 +981,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         protected void internalCloseFile()
         {
-            if (User32.CloseHandle(_hFile))
+            if (CloseHandle(_hFile))
             {
                 _hFile = IntPtr.Zero;
             }
@@ -993,7 +1009,7 @@ namespace DataTools.Desktop
             _thread = new System.Threading.Thread(() =>
             {
                 var notice = IntPtr.Zero;
-                User32.PostMessage(Handle, FileSystemMonitor.WM_SIGNAL_OPEN, IntPtr.Zero, IntPtr.Zero);
+                PostMessage(Handle, FileSystemMonitor.WM_SIGNAL_OPEN, IntPtr.Zero, IntPtr.Zero);
                 do
                 {
                     try
@@ -1007,7 +1023,7 @@ namespace DataTools.Desktop
 
                         if (!FileSystemMonitor.ReadDirectoryChangesW(_hFile, tbuff, bufflen, true, _Filter, ref blen, IntPtr.Zero, IntPtr.Zero))
                         {
-                            notice = (IntPtr)User32.GetLastError();
+                            notice = (IntPtr)GetLastError();
                             break;
                         }
                     }
@@ -1029,11 +1045,11 @@ namespace DataTools.Desktop
                     System.Threading.Monitor.Exit(_WaitList);
 
                     // post to the UI thread that there are items to dequeue and continue!
-                    User32.PostMessage(Handle, FileSystemMonitor.WM_SIGNAL, IntPtr.Zero, IntPtr.Zero);
+                    PostMessage(Handle, FileSystemMonitor.WM_SIGNAL, IntPtr.Zero, IntPtr.Zero);
                 }
                 while (true);
                 _thread = null;
-                User32.PostMessage(Handle, FileSystemMonitor.WM_SIGNAL_CLOSE, IntPtr.Zero, IntPtr.Zero);
+                PostMessage(Handle, FileSystemMonitor.WM_SIGNAL_CLOSE, IntPtr.Zero, IntPtr.Zero);
             });
 
             _thread.SetApartmentState(System.Threading.ApartmentState.STA);
@@ -1085,14 +1101,14 @@ namespace DataTools.Desktop
 
                                 // post a message to the queue cleaner.  if there are more files, it will send the pump back this way.
                                 _lastIndex = i + 1;
-                                User32.PostMessage(Handle, FileSystemMonitor.WM_SIGNAL_CLEAN, IntPtr.Zero, IntPtr.Zero);
+                                PostMessage(Handle, FileSystemMonitor.WM_SIGNAL_CLEAN, IntPtr.Zero, IntPtr.Zero);
                             }
 
                             System.Threading.Monitor.Exit(_WaitList);
                         }
                         // going too fast?  we'll get there, eventually.  At least we know they're queuing.
                         else if (_WaitList.Count > 0)
-                            User32.PostMessage(Handle, FileSystemMonitor.WM_SIGNAL, IntPtr.Zero, IntPtr.Zero);
+                            PostMessage(Handle, FileSystemMonitor.WM_SIGNAL, IntPtr.Zero, IntPtr.Zero);
                         break;
                     }
 
@@ -1121,12 +1137,12 @@ namespace DataTools.Desktop
 
                             // if we still have more signals in the queue, tell the message pump to keep on truckin'.
                             if (_WaitList.Count > 0)
-                                User32.PostMessage(Handle, FileSystemMonitor.WM_SIGNAL, IntPtr.Zero, IntPtr.Zero);
+                                PostMessage(Handle, FileSystemMonitor.WM_SIGNAL, IntPtr.Zero, IntPtr.Zero);
                         }
                         else
                         {
                             // oh snap!  can't lock it, let's send another clean message to make sure we do finally execute, eventually.
-                            User32.PostMessage(Handle, FileSystemMonitor.WM_SIGNAL_CLEAN, IntPtr.Zero, IntPtr.Zero);
+                            PostMessage(Handle, FileSystemMonitor.WM_SIGNAL_CLEAN, IntPtr.Zero, IntPtr.Zero);
                         }
 
                         break;

@@ -29,7 +29,7 @@ namespace TestExtras
         public static void TestBufferList(string[] args)
         {
 
-            var ltest = new UpsideDownRedBlackTree<string>();
+            var ltest = new RedBlackCollection<string>();
             int strcount = 64;
             var ch = 'A';
 
@@ -64,7 +64,7 @@ namespace TestExtras
 
             var carr = ltest.ToArray();
 
-            var itest = new UpsideDownRedBlackTree<int?>(new NullableValueTypeComparer<int>(true));
+            var itest = new RedBlackCollection<int?>(new NullableValueTypeComparer<int>(true));
 
             var r = new Random();
 

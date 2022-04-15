@@ -888,6 +888,208 @@ namespace DataTools.Text
         /// <summary>
         /// Function to retrieve a quote from a string of data.
         /// </summary>
+        /// <param name="input">The string characters to scan.</param>
+        /// <param name="index">The position to begin scanning.</param>
+        /// <param name="startPos">
+        /// The returned start position of the quoted string.<br/><br />
+        /// if <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately after the quote character.
+        /// </param>
+        /// <param name="endPos">
+        /// The returned end position of the quoted string.<br/><br />
+        /// If <paramref name="withQuotes"/> is true, this will be the position of the quote character. Otherwise, it will be the position immediately before the quote character.
+        /// </param>
+        /// <param name="interpolationChar">The character that denotes the start of an interpolated string (usually '$')</param>
+        /// <param name="literalChar">>The character that denotes the start of a literal string (usually '@')</param>
+        /// <param name="interpolationBegin">The character the signals the start of code inside of an interpolated string.</param>
+        /// <param name="interpolationEnd">The character the signals the end of code inside of an interpolated string.</param>
+        /// <param name="quoteChar">The quote character to use.</param>
+        /// <param name="escChar">The escape character to use.</param>
+        /// <param name="withQuotes">Return the string in quotes.</param>
+        /// <param name="throwException">True to throw a <see cref="SyntaxErrorException"/> if an unterminated quoted string is found.</param>
+        /// <returns>The requested string, or an empty string if no string is found.</returns>
+        /// <remarks>
+        /// The quote character must be: exactly one before, exactly at, or anywhere after the location specified by 'index'.<br /><br />
+        /// Any text outside of the first discovered quoted string is discarded.<br /><br />
+        /// If <paramref name="withQuotes"/> is true, then the escape characters are returned, verbatim. Otherwise, they are discarded.
+        /// </remarks>
+        /// <exception cref="SyntaxErrorException">If <paramref name="throwException"/> is true, then this error is thrown if the quoted string is unterminated.</exception>
+        ///
+        public static string QuoteFromHere(char[] input, int index, ref int line, out int? startPos, out int? endPos, char interpolationChar, char literalChar, char interpolationBegin, char interpolationEnd, char quoteChar = '\"', char escChar = '\\', bool withQuotes = false, bool throwException = false)
+        {
+            int i = index, c = input.Length;
+            var sb = new StringBuilder();
+
+            startPos = null;
+            endPos = null;
+
+            while (i < c && input[i] != quoteChar)
+            {
+                i++;
+            }
+
+            if (i >= c)
+            {
+                return null;
+            }
+
+            if (input[i] == quoteChar)
+            {
+                startPos = i;
+
+                if (withQuotes)
+                {
+                    sb.Append(input[i]);
+                }
+                else
+                {
+                    startPos++;
+                }
+
+                if (i > c - 1)
+                {
+                    if (throwException)
+                        throw new SyntaxErrorException("Quote at end of file.");
+                    else return null;
+                }
+
+                bool inLiteral = false;
+                bool inInterpolation = false;
+                int interpolationLevel = 0;
+
+                List<bool> quoteOpen = null;
+                List<bool> interpolationLiteral = null;
+
+                if (i > 0 && input[i - 1] == literalChar) inLiteral = true;
+                if (i > 0 && input[i - 1] == interpolationChar)
+                {
+                    inInterpolation = true;
+                    quoteOpen = new List<bool>();
+                    interpolationLiteral = new List<bool>();
+                    quoteOpen.Add(true);
+                    interpolationLiteral.Add(false);
+                }
+
+                for (int j = i + 1; j < c; j++)
+                {
+                    sb.Append(input[j]);
+
+                    if (inInterpolation && input[j] == interpolationBegin)
+                    {
+                        interpolationLevel++;
+                        quoteOpen.Add(false);
+                        interpolationLiteral.Add(false);
+                    }
+                    else if (inInterpolation && input[j] == interpolationEnd)
+                    {
+                        if (!quoteOpen[interpolationLevel])
+                        {
+                            quoteOpen.RemoveAt(interpolationLevel);
+                            interpolationLiteral.RemoveAt(interpolationLevel);
+
+                            interpolationLevel--;
+                        }
+                    }
+                    else if (input[j] == '\n')
+                    {
+                        int oline = line;
+
+                        line++;
+                        j++;
+                        if (j < c) sb.Append(input[j]);
+
+                        continue;
+                    }
+                    if (!inLiteral && input[j] == escChar)
+                    {
+                        if (inInterpolation)
+                        {
+                            if (quoteOpen[interpolationLevel])
+                            {
+                                j++;
+                                if (j < c) sb.Append(input[j]);
+
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            j++;
+                            if (j < c) sb.Append(input[j]);
+
+                            continue;
+                        }
+                    }
+                    else if (input[j] == quoteChar)
+                    {
+                        if (inInterpolation)
+                        {
+                            if (interpolationLiteral[interpolationLevel] && j < c - 1)
+                            {
+                                if (input[j + 1] == quoteChar)
+                                {
+                                    j++;
+                                    if (j < c) sb.Append(input[j]);
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                quoteOpen[interpolationLevel] = !quoteOpen[interpolationLevel];
+                                if (quoteOpen[0] == false)
+                                {
+                                    i = j;
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (inLiteral)
+                            {
+                                if (j < c - 1)
+                                {
+                                    if (input[j + 1] == quoteChar)
+                                    {
+                                        j++;
+                                        if (j < c) sb.Append(input[j]);
+                                        continue;
+                                    }
+                                }
+
+                                i = j;
+                                break;
+                            }
+                            else
+                            {
+                                i = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (i < c)
+                {
+                    if (!withQuotes)
+                    {
+                        endPos = i - 1;
+                        sb.Remove(sb.Length - 1, 1);
+                    }
+                    else
+                    {
+                        endPos = i;
+                    }
+
+                    return sb.ToString();
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Function to retrieve a quote from a string of data.
+        /// </summary>
         /// <param name="value">The string to scan.</param>
         /// <param name="index">The position to begin scanning.</param>
         /// <param name="startPos">

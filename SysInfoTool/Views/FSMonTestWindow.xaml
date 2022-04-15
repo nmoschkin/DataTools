@@ -10,7 +10,8 @@
     Title="FileSystemMonitor Demo"
     Width="810"
     Height="500"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    >
     <Window.Resources>
         <ResourceDictionary Source="/Themes.xaml" />
     </Window.Resources>
@@ -21,13 +22,17 @@
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
         Background="{DynamicResource FSGradient}"
-        ShowGridLines="False">
+        ShowGridLines="False"
+        >
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20" />
-            <RowDefinition x:Name="CenterRow" Height="{Binding}" />
+            <RowDefinition
+                x:Name="CenterRow"
+                Height="{Binding}"
+                />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
@@ -37,13 +42,26 @@
             Grid.ColumnSpan="3"
             Height="20"
             HorizontalAlignment="Stretch"
-            VerticalAlignment="Top">
-            <MenuItem x:Name="fileMenu" Header="_Toggle Monitor">
+            VerticalAlignment="Top"
+            >
+            <MenuItem
+                x:Name="fileMenu"
+                Header="_Toggle Monitor"
+                >
                 <MenuItem.Items>
-                    <MenuItem x:Name="StartWatching" Header="_Start Watching" />
-                    <MenuItem x:Name="StopWatching" Header="S_top Watching" />
+                    <MenuItem
+                        x:Name="StartWatching"
+                        Header="_Start Watching"
+                        />
+                    <MenuItem
+                        x:Name="StopWatching"
+                        Header="S_top Watching"
+                        />
                     <Separator />
-                    <MenuItem x:Name="Quitting" Header="_Quit" />
+                    <MenuItem
+                        x:Name="Quitting"
+                        Header="_Quit"
+                        />
                 </MenuItem.Items>
             </MenuItem>
         </Menu>
@@ -51,7 +69,8 @@
             Grid.Row="1"
             Grid.Column="0"
             CanContentScroll="True"
-            VerticalScrollBarVisibility="Visible">
+            VerticalScrollBarVisibility="Visible"
+            >
 
             <ItemsControl
                 x:Name="FilesList"
@@ -62,7 +81,8 @@
                 Background="{x:Null}"
                 ItemTemplate="{DynamicResource ProgramCell}"
                 ItemsSource="{Binding ElementName=ViewingArea, Path=SelectedItem.Handlers}"
-                SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical" />
+                SelectiveScrollingGrid.SelectiveScrollingOrientation="Vertical"
+                />
         </ScrollViewer>
 
         <ListView
@@ -74,14 +94,9 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             Background="{x:Null}"
-            ItemsSource="{Binding ElementName=FSMonTestWindow, Path=FileTypes.FileTypes}">
+            ItemsSource="{Binding ElementName=FSMonTestWindow, Path=NotifyCol}"
+            >
 
-            <ListView.ContextMenu>
-                <ContextMenu
-                    x:Name="netMenu"
-                    DataContext="{Binding FSMonTestWindow}"
-                    ItemsSource="{Binding ViewMenu}" />
-            </ListView.ContextMenu>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Height" Value="84" />
@@ -93,19 +108,27 @@
                     <GridViewColumn
                         Width="540"
                         DisplayMemberBinding="{Binding Filename}"
-                        Header="Filename" />
+                        Header="Filename"
+                        />
 
                     <GridViewColumn
                         Width="240"
                         DisplayMemberBinding="{Binding Action}"
-                        Header="Event" />
+                        Header="Event"
+                        />
 
                 </GridView>
             </ListView.View>
         </ListView>
-        <Grid Grid.Row="2" Grid.Column="0">
+        <Grid
+            Grid.Row="2"
+            Grid.Column="0"
+            >
 
-            <TextBox x:Name="Status" Text="Ready" />
+            <TextBox
+                x:Name="Status"
+                Text="Ready"
+                />
 
         </Grid>
 
