@@ -86,7 +86,7 @@ namespace DataTools.MathTools.PolarMath
         /// <summary>
         /// Display the value in scientific radians notation
         /// </summary>
-        RadiansScientific = 0x2 | 0x4 | 0x8 | 0x40
+        RadiansScientific = 0x2 | 0x4 | 0x8 | 0x40,
     }
 
     /// <summary>

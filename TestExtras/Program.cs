@@ -123,6 +123,7 @@ namespace TestExtras
             public bool IsExtern { get; set; }
 
             public bool IsReadOnly { get; set; }
+
             public bool IsOverride { get; set; }
 
             public bool IsNew { get; set; }
@@ -132,6 +133,8 @@ namespace TestExtras
             public string Namespace { get; set; }
 
             public string Content { get; set; }
+
+            public string ScanHit { get; set; }
 
             public int StartPos { get; set; }   
 
@@ -183,7 +186,7 @@ namespace TestExtras
 
             //var filename = dlg.FileName;
 
-            var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools\\MathTools\\PolarMath.cs";
+            var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools.Win32.Memory\\SafePtr.cs";
 
             var chars = File.ReadAllText(filename).ToCharArray();
 
@@ -237,18 +240,19 @@ namespace TestExtras
             patterns.Add("Case", new Regex(@"\s*case\s*\(.+\)\s*:"));
             patterns.Add("UsingBlock", new Regex(@"\s*using\s*\(.*\)"));
             patterns.Add("Lock", new Regex(@"\s*lock\s*\(.*\)"));
-            patterns.Add("Unsafe", new Regex(@"\s*unsafe\s*"));
+            patterns.Add("Unsafe", new Regex(@"\s*unsafe\s*$"));
             patterns.Add("Fixed", new Regex(@"\s*fixed\s*"));
             patterns.Add("ForEach", new Regex(@"\s*foreach\s*\(.*\)"));
             patterns.Add("Do", new Regex(@"\s*do\s*(\(.+\)|$)"));
             patterns.Add("Else", new Regex(@"\s*else\s*.*"));
             patterns.Add("ElseIf", new Regex(@"\s*else if\s*(\(.+\)|$)"));
             patterns.Add("If", new Regex(@"\s*if\s*(\(.+\)|$)"));
-            patterns.Add("Get", new Regex(@"\s*get\s*"));
-            patterns.Add("Set", new Regex(@"\s*set\s*"));
-            patterns.Add("Add", new Regex(@"\s*add\s*"));
-            patterns.Add("Remove", new Regex(@"\s*remove\s*"));
+            patterns.Add("Get", new Regex(@"\s*get\s*($|\=\>)"));
+            patterns.Add("Set", new Regex(@"\s*set\s*($|\=\>)"));
+            patterns.Add("Add", new Regex(@"\s*add\s*($|\=\>)"));
+            patterns.Add("Remove", new Regex(@"\s*remove\s*($|\=\>)"));
             patterns.Add("Method", new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)"));
+            patterns.Add("EnumValue", new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
             patterns.Add("Property", new Regex(@".+\s+([A-Za-z0-9_@.]+)"));
 
             int z = 0;
@@ -293,7 +297,7 @@ namespace TestExtras
                     TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, withQuotes: true);
                     i = (int)ept;
                 }
-                else if (chars[i] == ';')
+                else if (chars[i] == ';' || (chars[i] == ',' && currPatt == "Enum"))
                 {
                     var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
 
@@ -306,8 +310,17 @@ namespace TestExtras
                         EndPos = i,
                         EndLine = currLine,
                         EndColumn = ColumnFromHere(chars, i),
-                        Content = new string(chars, startPos, i - startPos + 1)
+                        Content = new string(chars, startPos, i - startPos + 1),
+                        ScanHit = lookback
                     };
+
+                    currMarker.IsAbstract = activas["abstract"];
+                    currMarker.IsVirtual = activas["virtual"];
+                    currMarker.IsStatic = activas["static"];
+                    currMarker.IsExtern = activas["extern"];
+                    currMarker.IsOverride = activas["override"];
+                    currMarker.IsNew = activas["new"];
+
                     markers.Add(currMarker);
                     ResetActivas(activas);
 
@@ -317,6 +330,8 @@ namespace TestExtras
 
                         if (result.Success)
                         {
+                            if (kvp.Key == "EnumValue" && currPatt != "Enum") continue;
+
                             currMarker.Kind = kvp.Key;
                             currMarker.Name = result.Groups[1].Value;
 
@@ -354,7 +369,8 @@ namespace TestExtras
                             StartColumn = ColumnFromHere(chars, startPos),
                             Kind = "Constructor",
                             Name = currName,
-                            AccessModifiers = ActivasToAccessModifiers(activas)
+                            AccessModifiers = ActivasToAccessModifiers(activas),
+                            ScanHit = lookback
                         };
 
                         currPatt = "Constructor";
@@ -387,6 +403,8 @@ namespace TestExtras
 
                                 if (result.Success)
                                 {
+                                    if (kvp.Key == "EnumValue" && currPatt != "Enum") continue;
+
                                     currMarker = new T
                                     {
                                         Namespace = currNS,
@@ -459,6 +477,41 @@ namespace TestExtras
                 }
                 else if (chars[i] == '}')
                 {
+                    if (currPatt == "Enum")
+                    {
+                        var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
+                        var testEnum = patterns["EnumValue"].Match(lookback);
+
+                        if (testEnum.Success)
+                        {
+                            currMarker = new T
+                            {
+                                Namespace = currNS,
+                                StartPos = startPos,
+                                StartLine = startLine,
+                                StartColumn = ColumnFromHere(chars, startPos),
+                                EndPos = i - 1,
+                                EndLine = currLine,
+                                EndColumn = ColumnFromHere(chars, i - 1),
+                                Content = new string(chars, startPos, i - startPos),
+                                ScanHit = lookback,
+                                Name = testEnum.Groups[1].Value
+                            };
+
+                            currMarker.Kind = "EnumValue";
+                            currMarker.IsAbstract = activas["abstract"];
+                            currMarker.IsVirtual = activas["virtual"];
+                            currMarker.IsStatic = activas["static"];
+                            currMarker.IsExtern = activas["extern"];
+                            currMarker.IsOverride = activas["override"];
+                            currMarker.IsNew = activas["new"];
+
+                            markers.Add(currMarker);
+                            ResetActivas(activas);
+                        }
+                    }
+
+
                     --currLevel;
                     currPatt = strack.Pop();
 
@@ -616,7 +669,7 @@ namespace TestExtras
             return markers;
         }
 
-        private static void CleanKids<T, U>(T markers) where T : List<U> where U: Marker<U>
+        private static void CleanKids<T, U>(T markers) where T : List<U> where U: Marker<U>, new()
         {
             int c = markers.Count;
             int i;
@@ -634,6 +687,7 @@ namespace TestExtras
                         markers[i].EndLine = markers[i + 1].EndLine;
                         markers[i].EndColumn = markers[i + 1].EndColumn;
                         markers[i].Content += markers[i + 1].Content;
+                        markers[i].ScanHit += markers[i + 1].ScanHit;
                         markers[i].Kind = "DoWhile";
 
                         if (markers[i].Markers == null && markers[i + 1].Markers != null)
@@ -649,37 +703,57 @@ namespace TestExtras
                         markers.RemoveAt(i + 1);
                         c--;
                     }
-                    //else if (markers[i].Kind == "XMLDoc")
-                    //{
-                    //    int x = i;
-                    //    while (i < c && markers[i].Kind == "XMLDoc")
-                    //    {
-                    //        i++;
-                    //    }
-                    //    if (i < c)
-                    //    {
-                    //        if (markers[i].Markers == null)
-                    //        {
-                    //            markers[i].Markers = new List<U>();
-                    //        }
+                    else if (markers[i].Kind == "XMLDoc" || markers[i].Kind == "LineComment")
+                    {
+                        int x = i;
 
-                    //        for (int z = i - 1; z >= x; z--)
-                    //        {
-                    //            markers[i].Markers.Insert(0, markers[z]);
-                    //            markers[i].Content = markers[z].Content + markers[i].Content;
-                    //        }
+                        while (i < c && (markers[i].Kind == "XMLDoc" || markers[i].Kind == "LineComment"))
+                        {
+                            i++;
+                        }
 
-                    //        markers[i].StartPos = markers[x].StartPos;
-                    //        markers[i].StartLine = markers[x].StartLine;
-                    //        markers[i].StartColumn = markers[x].StartColumn;
-                    //        CleanKids<List<U>, U>(markers[i].Markers);
+                        if (i < c)
+                        {
+                            var mknew = new U();
 
-                    //        markers.RemoveRange(x, i - x);
-                    //        c -= (i - x);
-                    //        i = x;
-                    //    }
-                    //}
-                   
+                            mknew.StartPos = markers[x].StartPos;
+                            mknew.StartLine = markers[x].StartLine;
+                            mknew.StartColumn = markers[x].StartColumn;
+                            
+                            mknew.Markers = new List<U>();
+                            mknew.Content = "";
+
+
+                            for (int z = x; z <= i; z++)
+                            {
+                                if (markers[z].Markers != null) CleanKids<List<U>, U>(markers[z].Markers);
+                                mknew.Content += markers[z].Content;
+                                mknew.Markers.Add(markers[z]);
+                            }
+
+                            mknew.EndPos = markers[i].EndPos;
+                            mknew.EndLine = markers[i].EndLine;
+                            mknew.EndColumn = markers[i].EndColumn;
+
+                            mknew.Kind = markers[i].Kind;
+                            mknew.Name = markers[i].Name;
+                            mknew.ScanHit = markers[i].ScanHit;
+
+                            mknew.AccessModifiers = markers[i].AccessModifiers;
+                            mknew.IsAbstract = markers[i].IsAbstract;
+                            mknew.IsVirtual = markers[i].IsVirtual;
+                            mknew.IsStatic = markers[i].IsStatic;
+                            mknew.IsExtern = markers[i].IsExtern;
+                            mknew.IsOverride = markers[i].IsOverride;
+                            mknew.IsNew = markers[i].IsNew;
+
+                            markers.RemoveRange(x, (i - x) + 1);
+                            markers.Insert(x, mknew);
+                            c -= (i - x);
+                            i = x;
+                        }
+                    }
+
                 }
             }
         }
