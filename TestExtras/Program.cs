@@ -136,6 +136,10 @@ namespace TestExtras
 
             public string ScanHit { get; set; }
 
+            public string MethodParamsString { get; set; }
+
+            public List<string> MethodParams { get; set; }
+
             public int StartPos { get; set; }   
 
             public int EndPos { get; set; }
@@ -247,17 +251,19 @@ namespace TestExtras
             patterns.Add("Else", new Regex(@"\s*else\s*.*"));
             patterns.Add("ElseIf", new Regex(@"\s*else if\s*(\(.+\)|$)"));
             patterns.Add("If", new Regex(@"\s*if\s*(\(.+\)|$)"));
-            patterns.Add("Get", new Regex(@"\s*get\s*($|\=\>)"));
-            patterns.Add("Set", new Regex(@"\s*set\s*($|\=\>)"));
-            patterns.Add("Add", new Regex(@"\s*add\s*($|\=\>)"));
-            patterns.Add("Remove", new Regex(@"\s*remove\s*($|\=\>)"));
-            patterns.Add("Method", new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)"));
+            patterns.Add("Get", new Regex(@"\s*get\s*($|\=\>).*"));
+            patterns.Add("Set", new Regex(@"\s*set\s*($|\=\>).*"));
+            patterns.Add("Add", new Regex(@"\s*add\s*($|\=\>).*"));
+            patterns.Add("Remove", new Regex(@"\s*remove\s*($|\=\>).*"));
+            patterns.Add("FieldValue", new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*\=.+;$"));
+            patterns.Add("Method", new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)\s*(;|\=\>|$|\s*where\s*.+:.+)"));
             patterns.Add("EnumValue", new Regex(@"\s*([A-Za-z0-9_@.]+)(\s*=\s*(.+))?[,]?"));
-            patterns.Add("Property", new Regex(@".+\s+([A-Za-z0-9_@.]+)"));
+            patterns.Add("Property", new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*($|\=\>).*"));
+            patterns.Add("Field", new Regex(@".+\s+([A-Za-z0-9_@.]+)\s*;$"));
 
             int z = 0;
 
-            Regex genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>\s*(\(|;|:|\{).*");
+            Regex genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>.*");
 
             bool lwd = false;
 
@@ -389,7 +395,8 @@ namespace TestExtras
                                 StartLine = startLine,
                                 StartColumn = ColumnFromHere(chars, startPos),
                                 Kind = "Destructor",
-                                Name = currName
+                                Name = currName,
+                                ScanHit = lookback
                             };
 
                             currPatt = "Destructor";
@@ -412,7 +419,8 @@ namespace TestExtras
                                         StartLine = startLine,
                                         StartColumn = ColumnFromHere(chars, startPos),
                                         Kind = kvp.Key,
-                                        Name = result.Groups[1].Value
+                                        Name = result.Groups[1].Value,
+                                        ScanHit = lookback
                                     };
 
                                     currPatt = kvp.Key;
@@ -678,9 +686,9 @@ namespace TestExtras
             {
                 if (markers[i].Markers != null) CleanKids<List<U>, U>(markers[i].Markers);
 
+               
                 if (i < c - 1)
                 {
-
                     if (markers[i].Kind == "Do" && markers[i + 1].Kind == "DoWhile")
                     {
                         markers[i].EndPos = markers[i + 1].EndPos;
@@ -738,6 +746,7 @@ namespace TestExtras
                             mknew.Kind = markers[i].Kind;
                             mknew.Name = markers[i].Name;
                             mknew.ScanHit = markers[i].ScanHit;
+                            mknew.Generics = markers[i].Generics;
 
                             mknew.AccessModifiers = markers[i].AccessModifiers;
                             mknew.IsAbstract = markers[i].IsAbstract;
@@ -754,6 +763,39 @@ namespace TestExtras
                         }
                     }
 
+                }
+
+                if (i < c)
+                {
+                    if ((markers[i].Kind == "Method" || markers[i].Kind == "Constructor") && !string.IsNullOrEmpty(markers[i].ScanHit))
+                    {
+                        var re = new Regex(@".* ([A-Za-z0-9_@.]+)(<(.+)>)?.*\s*\((.*)\)\s+?:?.+?");
+                        var re2 = new Regex(@".* ([A-Za-z0-9_@.]+)(<(.+)>)?.*\s*\((.*)\)");
+
+                        var m = re.Match(markers[i].ScanHit);
+
+                        if (m.Success)
+                        {
+                            markers[i].MethodParamsString = m.Groups[m.Groups.Count - 1].Value;
+                            if (!string.IsNullOrEmpty(markers[i].MethodParamsString))
+                            {
+                                markers[i].MethodParams = new List<string>(TextTools.Split(markers[i].MethodParamsString, ",", trimResults: true));
+                            }
+                        }
+                        else
+                        {
+                            m = re2.Match(markers[i].ScanHit);
+
+                            if (m.Success)
+                            {
+                                markers[i].MethodParamsString = m.Groups[m.Groups.Count - 1].Value;
+                                if (!string.IsNullOrEmpty(markers[i].MethodParamsString))
+                                {
+                                    markers[i].MethodParams = new List<string>(TextTools.Split(markers[i].MethodParamsString, ",", trimResults: true));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
