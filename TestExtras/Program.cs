@@ -27,7 +27,7 @@ namespace TestExtras
         {
             //TestBufferList(args);
             // TestParsing(args);
-            TestCParse(args);
+            TestCParse<Marker>(args);
         }
 
         public static void TestBufferList(string[] args)
@@ -54,14 +54,14 @@ namespace TestExtras
             ltest.Remove("Z");
 
             ltest.Add("Z");
-            foreach (var item in ltest) 
+            foreach (var item in ltest)
             {
                 if (!ltest.Contains(item)) throw new KeyNotFoundException();
             }
 
             var lcomp = new List<string>();
 
-            foreach(var s in ltest)
+            foreach (var s in ltest)
             {
                 lcomp.Add(s);
             }
@@ -75,7 +75,7 @@ namespace TestExtras
             var testcount = 52000;
 
             var rand = new Random();
-            
+
             for (int x = 0; x < testcount; x++)
             {
                 int z = x;
@@ -101,8 +101,36 @@ namespace TestExtras
 
         }
 
-        public class Snippet
+        [Flags]
+        public enum AccessModifiers
         {
+            None = 0x0,
+            Private = 0x1,
+            Protected = 0x2,
+            Internal = 0x4,
+            Public = 0x8,
+        }
+
+        public class Marker<T> where T : Marker<T>
+        {
+
+            public AccessModifiers AccessModifiers { get; set; }
+
+            public bool IsVirtual { get; set; }
+
+            public bool IsAbstract { get; set; }
+
+            public bool IsExtern { get; set; }
+
+            public bool IsReadOnly { get; set; }
+            public bool IsOverride { get; set; }
+
+            public bool IsNew { get; set; }
+
+            public bool IsStatic { get; set; }
+
+            public string Namespace { get; set; }
+
             public string Content { get; set; }
 
             public int StartPos { get; set; }   
@@ -117,22 +145,29 @@ namespace TestExtras
 
             public int EndColumn { get; set; }
 
-            public string Type { get; set; }
+            public string Kind { get; set; }
 
             public string Name { get; set; }
 
+            public string Generics { get; set; }
+
             public int Level { get; set; }
 
-            public List<Snippet> Children { get; set; }
+            public List<T> Markers { get; set; }
 
             public override string ToString()
             {
-                return "(" + Type + ") " + (Name ?? Content ?? "");
+                return "(" + Kind + ") " + (Name ?? Content ?? "");
             }
 
         }
 
-        public static List<Snippet> TestCParse(string[] args)
+        public class Marker : Marker<Marker>
+        {
+        }
+
+
+        public static List<T> TestCParse<T>(string[] args) where T : Marker<T>, new()
         {
 
             //var dlg = new OpenFileDialog()
@@ -148,22 +183,30 @@ namespace TestExtras
 
             //var filename = dlg.FileName;
 
-            var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools\\Observable\\ObservableBase.cs";
-
+            var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools\\MathTools\\PolarMath.cs";
 
             var chars = File.ReadAllText(filename).ToCharArray();
 
+            return ParseCSCode<T>(chars);
+        }
+
+        public static List<T> ParseCSCode<T>(char[] chars) where T : Marker<T>, new()  
+        {
+
             int i, j, c = chars.Length;
 
-            List<Snippet> captured = new List<Snippet>();
-            Snippet currSnip = null;
+            List<T> markers = new List<T>();
+            T currMarker = null;
             var strack = new Stack<string>();
-            var stack = new Stack<Snippet>();
-            var listStack = new Stack<List<Snippet>>();
+            var stack = new Stack<T>();
+            var listStack = new Stack<List<T>>();
+
+            StringBuilder cw = new StringBuilder();
 
             StringBuilder sb;
 
             int startPos = 0;
+            int scanStartPos = 0;
 
             int startLine = 0;
 
@@ -171,68 +214,102 @@ namespace TestExtras
 
             int currLevel = 0;
 
-            Dictionary<string, Regex> patterns = new Dictionary<string, Regex>();
+            string currNS = "";
 
-            patterns.Add("using", new Regex(@"using (.+)\s*;"));
-            patterns.Add("namespace", new Regex(@"namespace (.+)"));
-            patterns.Add("class", new Regex(@".*class ([A-Za-z0-9_@.]+).*"));
-            patterns.Add("get", new Regex(@".*get.*"));
-            patterns.Add("set", new Regex(@".*set.*"));
-            patterns.Add("add", new Regex(@".*add.*"));
-            patterns.Add("remove", new Regex(@".*remove.*"));
-            patterns.Add("this", new Regex(@".*(this)\s*\[.+\].*"));
-            patterns.Add("interface", new Regex(@".*interface ([A-Za-z0-9_@.]+).*")); 
-            patterns.Add("struct", new Regex(@".*struct ([A-Za-z0-9_@.]+).*")); 
-            patterns.Add("enum", new Regex(@".*enum ([A-Za-z0-9_@.]+).*")); 
-            patterns.Add("record", new Regex(@".*record ([A-Za-z0-9_@.]+).*")); 
-            patterns.Add("delegate", new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;")); 
-            patterns.Add("event", new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
-            patterns.Add("operator", new Regex(@".*operator\s+(\S+)\(.*\)"));
-            patterns.Add("method", new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)"));
-            patterns.Add("property", new Regex(@".+ ([A-Za-z0-9_@.]+)"));
-            patterns.Add("for", new Regex(@"\s*for\s*\(.*;.*;.*\)"));
-            patterns.Add("whileend", new Regex(@"\s*while\s*\(.*\)\s*;"));
-            patterns.Add("while", new Regex(@"\s*while\s*\(.*\)"));
-            patterns.Add("usingblock", new Regex(@"\s*using\s*\(.*\)"));
-            patterns.Add("lock", new Regex(@"\s*lock\s*\(.*\)"));
-            patterns.Add("unsafe", new Regex(@"\s*unsafe\s*\{.*\}"));
-            patterns.Add("fixed", new Regex(@"\s*fixed\s*\{.*\}"));
-            patterns.Add("foreach", new Regex(@"\s*foreach\s*\(.*\)"));
-            patterns.Add("do", new Regex(@"\s*do\s*\{"));
+            Dictionary<string, Regex> patterns = new Dictionary<string, Regex>();
+            
+            patterns.Add("Using", new Regex(@"using (.+)\s*;"));
+            patterns.Add("Namespace", new Regex(@"namespace (.+)"));
+            patterns.Add("This", new Regex(@".*(this)\s*\[.+\].*"));
+            patterns.Add("Class", new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add("Interface", new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*")); 
+            patterns.Add("Struct", new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*")); 
+            patterns.Add("Enum", new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*")); 
+            patterns.Add("Record", new Regex(@".*record\s+([A-Za-z0-9_@.]+).*")); 
+            patterns.Add("Delegate", new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;")); 
+            patterns.Add("Event", new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+            patterns.Add("Const", new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
+            patterns.Add("Operator", new Regex(@".*operator\s+(\S+)\(.*\)"));
+            patterns.Add("ForLoop", new Regex(@"\s*for\s*\(.*;.*;.*\)"));
+            patterns.Add("DoWhile", new Regex(@"\s*while\s*\(.*\)\s*;"));
+            patterns.Add("While", new Regex(@"\s*while\s*\(.*\)"));
+            patterns.Add("Switch", new Regex(@"\s*switch\s*\(.+\)"));
+            patterns.Add("Case", new Regex(@"\s*case\s*\(.+\)\s*:"));
+            patterns.Add("UsingBlock", new Regex(@"\s*using\s*\(.*\)"));
+            patterns.Add("Lock", new Regex(@"\s*lock\s*\(.*\)"));
+            patterns.Add("Unsafe", new Regex(@"\s*unsafe\s*"));
+            patterns.Add("Fixed", new Regex(@"\s*fixed\s*"));
+            patterns.Add("ForEach", new Regex(@"\s*foreach\s*\(.*\)"));
+            patterns.Add("Do", new Regex(@"\s*do\s*(\(.+\)|$)"));
+            patterns.Add("Else", new Regex(@"\s*else\s*.*"));
+            patterns.Add("ElseIf", new Regex(@"\s*else if\s*(\(.+\)|$)"));
+            patterns.Add("If", new Regex(@"\s*if\s*(\(.+\)|$)"));
+            patterns.Add("Get", new Regex(@"\s*get\s*"));
+            patterns.Add("Set", new Regex(@"\s*set\s*"));
+            patterns.Add("Add", new Regex(@"\s*add\s*"));
+            patterns.Add("Remove", new Regex(@"\s*remove\s*"));
+            patterns.Add("Method", new Regex(@".* ([A-Za-z0-9_@.]+).*\s*\(.*\)"));
+            patterns.Add("Property", new Regex(@".+\s+([A-Za-z0-9_@.]+)"));
+
+            int z = 0;
+
+            Regex genericPatt = new Regex(@".* ([A-Za-z0-9_@.]+)\s*<(.+)>\s*(\(|;|:|\{).*");
 
             bool lwd = false;
 
             Regex currCons = null;
             Regex currDecons = null;
+
             string currName = null;
             string currPatt = null;
 
+            Dictionary<string, bool> activas = new Dictionary<string, bool>();
+
+            activas.Add("public", false);
+            activas.Add("internal", false);
+            activas.Add("protected", false);
+            activas.Add("private", true);
+            activas.Add("static", false);
+            activas.Add("extern", false);
+            activas.Add("abstract", false);
+            activas.Add("virtual", false);
+            activas.Add("override", false);
+            activas.Add("new", false);
+            activas.Add("readonly", false);
+
             for (i = 0; i < c; i++)
             {
-                if (chars[i] == '\'')
+                if (chars[i] == '\n')
                 {
-                    TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, quoteChar: '\'');
+                    currLine++;
+                }
+                else if (chars[i] == '\'')
+                {
+                    TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, quoteChar: '\'', withQuotes: true);
                     i = (int)ept;
                 }
                 else if (chars[i] == '\"')
                 {
-                    TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept);
+                    TextTools.QuoteFromHere(chars, i, ref currLine, out int? spt, out int? ept, withQuotes: true);
                     i = (int)ept;
                 }
                 else if (chars[i] == ';')
                 {
-                    var lookback = TextTools.OneSpace(new string(chars, startPos, i - startPos + 1).Replace("\r", "").Replace("\n", "").Trim());
+                    var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos + 1).Replace("\r", "").Replace("\n", "").Trim());
 
-                    currSnip = new Snippet();
-
-                    currSnip.StartPos = startPos;
-                    currSnip.StartLine = startLine;
-                    currSnip.StartColumn = ColumnFromHere(chars, startPos);
-                    currSnip.EndPos = i;
-                    currSnip.EndLine = currLine;
-                    currSnip.EndColumn = ColumnFromHere(chars, i);
-                    currSnip.Content = new string(chars, startPos, i - startPos + 1);
-                    captured.Add(currSnip);
+                    currMarker = new T
+                    {
+                        Namespace = currNS,
+                        StartPos = startPos,
+                        StartLine = startLine,
+                        StartColumn = ColumnFromHere(chars, startPos),
+                        EndPos = i,
+                        EndLine = currLine,
+                        EndColumn = ColumnFromHere(chars, i),
+                        Content = new string(chars, startPos, i - startPos + 1)
+                    };
+                    markers.Add(currMarker);
+                    ResetActivas(activas);
 
                     foreach (var kvp in patterns)
                     {
@@ -240,15 +317,22 @@ namespace TestExtras
 
                         if (result.Success)
                         {
-                            currSnip.Type = kvp.Key;
-                            currSnip.Name = result.Groups[1].Value;
+                            currMarker.Kind = kvp.Key;
+                            currMarker.Name = result.Groups[1].Value;
 
                             break;
                         }
                     }
 
-                    startPos = i + 1;
-                    startLine = currLine;
+                    scanStartPos = startPos = i + 1;
+                    if (i < c - 1 && chars[i + 1] == '\n')
+                    {
+                        startLine = currLine + 1;
+                    }
+                    else
+                    {
+                        startLine = currLine;
+                    }
                 }
                 else if (chars[i] == '{')
                 {
@@ -257,20 +341,24 @@ namespace TestExtras
 
                     strack.Push(currPatt);
 
-                    var lookback = TextTools.OneSpace(new string(chars, startPos, i - startPos).Replace("\r", "").Replace("\n", "").Trim());
+                    var lookback = TextTools.OneSpace(new string(chars, scanStartPos, i - scanStartPos).Replace("\r", "").Replace("\n", "").Trim());
                     Match cons = currCons?.Match(lookback) ?? null;
-
-                    if (cons != null && cons.Success)
+                    Match ops = patterns["Operator"].Match(lookback);
+                    if (cons != null && cons.Success && !ops.Success)
                     {
-                        currSnip = new Snippet();
+                        currMarker = new T
+                        {
+                            StartPos = startPos,
+                            Namespace = currNS,
+                            StartLine = startLine,
+                            StartColumn = ColumnFromHere(chars, startPos),
+                            Kind = "Constructor",
+                            Name = currName,
+                            AccessModifiers = ActivasToAccessModifiers(activas)
+                        };
 
-                        currSnip.StartPos = startPos;
-                        currSnip.StartLine = startLine;
-                        currSnip.StartColumn = ColumnFromHere(chars, startPos);
-                        currSnip.Type = "constructor";
-                        currPatt = "constructor";
-                        currSnip.Name = currName;
-                        captured.Add(currSnip);
+                        currPatt = "Constructor";
+                        markers.Add(currMarker);
                     }
                     else
                     {
@@ -278,15 +366,18 @@ namespace TestExtras
 
                         if (cons != null && cons.Success)
                         {
-                            currSnip = new Snippet();
+                            currMarker = new T
+                            {
+                                Namespace = currNS,
+                                StartPos = startPos,
+                                StartLine = startLine,
+                                StartColumn = ColumnFromHere(chars, startPos),
+                                Kind = "Destructor",
+                                Name = currName
+                            };
 
-                            currSnip.StartPos = startPos;
-                            currSnip.StartLine = startLine;
-                            currSnip.StartColumn = ColumnFromHere(chars, startPos);
-                            currSnip.Type = "destructor";
-                            currPatt = "destructor";
-                            currSnip.Name = currName;
-                            captured.Add(currSnip);
+                            currPatt = "Destructor";
+                            markers.Add(currMarker);
                         }
                         else
                         {
@@ -296,23 +387,52 @@ namespace TestExtras
 
                                 if (result.Success)
                                 {
-                                    currSnip = new Snippet();
-
-                                    currSnip.StartPos = startPos;
-                                    currSnip.StartLine = startLine;
-                                    currSnip.StartColumn = ColumnFromHere(chars, startPos);
-                                    currSnip.Type = kvp.Key;
-                                    currPatt = kvp.Key;
-                                    currSnip.Name = result.Groups[1].Value;
-
-                                    captured.Add(currSnip);
-
-                                    if (currPatt == "class" || currPatt == "struct" || currPatt == "record")
+                                    currMarker = new T
                                     {
-                                        currName = currSnip.Name;
+                                        Namespace = currNS,
+                                        StartPos = startPos,
+                                        StartLine = startLine,
+                                        StartColumn = ColumnFromHere(chars, startPos),
+                                        Kind = kvp.Key,
+                                        Name = result.Groups[1].Value
+                                    };
 
-                                        currCons = new Regex($"^.*{currSnip.Name}\\s*\\(.*\\).*$");
-                                        currDecons = new Regex($"^.*\\~{currSnip.Name}\\s*\\(\\)$");
+                                    currPatt = kvp.Key;
+
+                                    if (kvp.Key == "Namespace")
+                                    {
+                                        currNS = result.Groups[1].Value;
+                                    }
+                                    else
+                                    {
+                                        currMarker.AccessModifiers = ActivasToAccessModifiers(activas);
+
+                                        currMarker.IsAbstract = activas["abstract"];
+                                        currMarker.IsVirtual = activas["virtual"];
+                                        currMarker.IsStatic = activas["static"];
+                                        currMarker.IsExtern = activas["extern"];
+                                        currMarker.IsOverride = activas["override"];
+                                        currMarker.IsNew = activas["new"];
+
+
+                                        var genScan = genericPatt.Match(lookback);
+                                        if (genScan.Success)
+                                        {
+                                            if (genScan.Groups[1].Value == currMarker.Name)
+                                            {
+                                                currMarker.Generics = $"<{genScan.Groups[2].Value}>";
+                                            }
+                                        }
+                                    }
+
+                                    markers.Add(currMarker);
+
+                                    if (currPatt == "Class" || currPatt == "Struct" || currPatt == "Record")
+                                    {
+                                        currName = currMarker.Name;
+
+                                        currCons = new Regex($"^.*{currMarker.Name}\\s*\\(.*\\).*$");
+                                        currDecons = new Regex($"^.*\\~{currMarker.Name}\\s*\\(\\)$");
                                     }
 
                                     break;
@@ -321,45 +441,61 @@ namespace TestExtras
                         }
                     }
 
-                    stack.Push(currSnip);
-                    listStack.Push(captured);
-                    captured = new List<Snippet>();
+                    ResetActivas(activas);
 
-                    startPos = i + 1;
-                    startLine = currLine;
+                    stack.Push(currMarker);
+                    listStack.Push(markers);
+                    markers = new List<T>();
+
+                    scanStartPos = startPos = i + 1;
+                    if (i < c - 1 && chars[i + 1] == '\n')
+                    {
+                        startLine = currLine + 1;
+                    }
+                    else
+                    {
+                        startLine = currLine;
+                    }
                 }
                 else if (chars[i] == '}')
                 {
                     --currLevel;
                     currPatt = strack.Pop();
 
-                    currSnip = stack.Pop();
+                    currMarker = stack.Pop();
 
-                    if (currSnip != null)
+                    if (currMarker != null)
                     {
-                        currSnip.EndPos = i;
-                        currSnip.EndLine = currLine;
-                        currSnip.EndColumn = ColumnFromHere(chars, i);
-                        currSnip.Content = new string(chars, currSnip.StartPos, currSnip.EndPos - currSnip.StartPos + 1);
+                        currMarker.EndPos = i;
+                        currMarker.EndLine = currLine;
+                        currMarker.EndColumn = ColumnFromHere(chars, i);
+                        currMarker.Content = new string(chars, currMarker.StartPos, currMarker.EndPos - currMarker.StartPos + 1);
                     }
 
-                    currSnip.Children = captured;
-                    captured = listStack.Pop();
+                    currMarker.Markers = markers;
+                    markers = listStack.Pop();
 
                     lwd = true;
-                    startPos = i + 1;
-                }
-                else if (chars[i] == '\n')
-                {
-                    currLine++;
+                    scanStartPos = startPos = i + 1;
+                    if (i < c - 1 && chars[i + 1] == '\n')
+                    {
+                        startLine = currLine + 1;
+                    }
+                    else
+                    {
+                        startLine = currLine;
+                    }
+                    ResetActivas(activas);
+
                 }
                 else if ((i < c - 1) && (chars[i] == '/' && chars[i + 1] == '/'))
                 {
-                    currSnip = new Snippet()
+                    currMarker = new T()
                     {
                         StartColumn = ColumnFromHere(chars, i),
                         StartLine = currLine,
                         StartPos = i,
+                        Namespace = currNS
                     };
 
                     sb = new StringBuilder();
@@ -378,16 +514,21 @@ namespace TestExtras
 
                         if (chars[j] == '\n')
                         {
-                            currSnip.EndColumn = ColumnFromHere(chars, j - 1);
-                            currSnip.EndLine = currLine;
-                            currSnip.EndPos = j - 1;
-                            currSnip.Content = sb.ToString();
-                            currSnip.Type = docs ? "xmldoc" : "linecomment";
+                            currMarker.EndColumn = ColumnFromHere(chars, j - 1);
+                            currMarker.EndLine = currLine;
+                            currMarker.EndPos = j - 1;
+                            currMarker.Content = sb.ToString();
+                            currMarker.Kind = docs ? "XMLDoc" : "LineComment";
                                 
-                            captured.Add(currSnip);
+                            markers.Add(currMarker);
 
                             currLine++;
-                            startPos = j + 1;
+
+                            if (docs)
+                            {
+                                startPos = scanStartPos = j + 1;
+                                startLine = currLine;
+                            }
                             break;
                         }
 
@@ -398,11 +539,12 @@ namespace TestExtras
                 }
                 else if ((i < c - 3) && (chars[i] == '/' && chars[i + 1] == '*'))
                 {
-                    currSnip = new Snippet()
+                    currMarker = new T()
                     {
                         StartColumn = ColumnFromHere(chars, i),
                         StartLine = currLine,
                         StartPos = i,
+                        Namespace = currNS
 
                     };
 
@@ -418,16 +560,24 @@ namespace TestExtras
                         if (j < c - 1 && chars[j] == '*' && chars[j + 1] == '/')
                         {
                             sb.Append('/');
-                            currSnip.EndColumn = ColumnFromHere(chars, j + 1);
-                            currSnip.EndLine = currLine;
-                            currSnip.EndPos = j + 1;
-                            currSnip.Content = sb.ToString();
-                            currSnip.Type = "blockcomment";
 
-                            captured.Add(currSnip);
+                            currMarker.EndColumn = ColumnFromHere(chars, j + 1);
+                            currMarker.EndLine = currLine;
+                            currMarker.EndPos = j + 1;
+                            currMarker.Content = sb.ToString();
+                            currMarker.Kind = "BlockComment";
 
-                            startPos = j + 2;
+                            markers.Add(currMarker);
 
+                            scanStartPos = j + 2;
+                            if (i < c - 2 && chars[i + 2] == '\n')
+                            {
+                                startLine = currLine + 1;
+                            }
+                            else
+                            {
+                                startLine = currLine;
+                            }
                             break;
                         }
                         else if (chars[j] == '\n')
@@ -442,9 +592,130 @@ namespace TestExtras
                     if (j >= c) break;
                     i = j;
                 }
+                else if (char.IsLetter(chars[i]))
+                {
+                    cw.Append(chars[i]);
+                }
+                else
+                {
+                    if (cw.Length > 0)
+                    {
+                        var cword = cw.ToString();
+
+                        if (activas.ContainsKey(cword))
+                        {
+                            activas[cword] = true;
+                        }
+                        cw.Clear();
+                    }
+                }
             }
 
-            return captured;
+            CleanKids<List<T>, T>(markers);
+
+            return markers;
+        }
+
+        private static void CleanKids<T, U>(T markers) where T : List<U> where U: Marker<U>
+        {
+            int c = markers.Count;
+            int i;
+
+            for (i = 0; i < c; i++)
+            {
+                if (markers[i].Markers != null) CleanKids<List<U>, U>(markers[i].Markers);
+
+                if (i < c - 1)
+                {
+
+                    if (markers[i].Kind == "Do" && markers[i + 1].Kind == "DoWhile")
+                    {
+                        markers[i].EndPos = markers[i + 1].EndPos;
+                        markers[i].EndLine = markers[i + 1].EndLine;
+                        markers[i].EndColumn = markers[i + 1].EndColumn;
+                        markers[i].Content += markers[i + 1].Content;
+                        markers[i].Kind = "DoWhile";
+
+                        if (markers[i].Markers == null && markers[i + 1].Markers != null)
+                        {
+                            markers[i].Markers = markers[i + 1].Markers;
+                        }
+                        else if (markers[i].Markers != null && markers[i + 1].Markers != null)
+                        {
+                            markers[i].Markers.AddRange(markers[i + 1].Markers);
+                        }
+
+                        CleanKids<List<U>, U>(markers[i].Markers);
+                        markers.RemoveAt(i + 1);
+                        c--;
+                    }
+                    //else if (markers[i].Kind == "XMLDoc")
+                    //{
+                    //    int x = i;
+                    //    while (i < c && markers[i].Kind == "XMLDoc")
+                    //    {
+                    //        i++;
+                    //    }
+                    //    if (i < c)
+                    //    {
+                    //        if (markers[i].Markers == null)
+                    //        {
+                    //            markers[i].Markers = new List<U>();
+                    //        }
+
+                    //        for (int z = i - 1; z >= x; z--)
+                    //        {
+                    //            markers[i].Markers.Insert(0, markers[z]);
+                    //            markers[i].Content = markers[z].Content + markers[i].Content;
+                    //        }
+
+                    //        markers[i].StartPos = markers[x].StartPos;
+                    //        markers[i].StartLine = markers[x].StartLine;
+                    //        markers[i].StartColumn = markers[x].StartColumn;
+                    //        CleanKids<List<U>, U>(markers[i].Markers);
+
+                    //        markers.RemoveRange(x, i - x);
+                    //        c -= (i - x);
+                    //        i = x;
+                    //    }
+                    //}
+                   
+                }
+            }
+        }
+
+        public static AccessModifiers ActivasToAccessModifiers(Dictionary<string, bool> activas)
+        {
+            var test = new string[] { "public", "private", "internal", "protected" };
+
+            var sb = new StringBuilder();
+
+            foreach (var t in test)
+            {
+                if (activas[t])
+                {
+                    if (sb.Length > 0) sb.Append(",");
+                    sb.Append(TextTools.TitleCase(t));
+                }
+
+            }
+
+            if (Enum.TryParse<AccessModifiers>(sb.ToString(), out AccessModifiers result))
+            {
+                return result;
+            }
+
+            return AccessModifiers.None;
+
+        }
+
+        public static void ResetActivas(Dictionary<string, bool> activas)
+        {
+            var keys = activas.Keys;
+            foreach (var key in keys)
+            {
+                activas[key] = false;
+            }
         }
 
         public static void EnsureLevels(List<bool> items, int levels)
