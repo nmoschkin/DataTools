@@ -227,18 +227,22 @@ namespace DataTools.Text
         /// <summary>
         /// Parse a string into an array of strings using the specified parameters
         /// </summary>
-        /// <param name="Scan">String to scan</param>
-        /// <param name="Separator">Separator string</param>
-        /// <param name="SkipQuote">Whether to skip over quote blocks</param>
-        /// <param name="Unescape">Whether to unescape quotes.</param>
-        /// <param name="QuoteChar">Quote character to use.</param>
-        /// <param name="EscapeChar">Escape character to use.</param>
-        /// <param name="WithToken">Include the token in the return array.</param>
-        /// <param name="WithTokenIn">Attach the token to the beginning of every string separated by a token (except for string 0).  Requires WithToken to also be set to True.</param>
-        /// <param name="Unquote">Remove quotes from around characters.</param>
+        /// <param name="scan">String to scan</param>
+        /// <param name="separator">Separator string</param>
+        /// <param name="skipQuote">Whether to skip over quote blocks</param>
+        /// <param name="unescape">Whether to unescape quotes.</param>
+        /// <param name="quoteChar">Quote character to use.</param>
+        /// <param name="escChar">Escape character to use.</param>
+        /// <param name="withToken">Include the token in the return array.</param>
+        /// <param name="withTokenIn">Attach the token to the beginning of every string separated by a token (except for string 0).  Requires WithToken to also be set to True.</param>
+        /// <param name="unquote">Remove quotes from around characters.</param>
+        /// <param name="skipAllQuotes">Skips over all standard quotes regardless of the value of <paramref name="quoteChar"/>, including interpolated, single-quote, and literal. This is the default behavior.</param>
+        /// <param name="trimResults">Trim all results. Not enabled by default.</param>
         /// <returns>An array of strings.</returns>
-        /// <remarks></remarks>
-        public static string[] Split(string Scan, string Separator, bool SkipQuote = false, bool Unescape = false, char QuoteChar = '"', char EscapeChar = '\\', bool Unquote = false, bool WithToken = false, bool WithTokenIn = false)
+        /// <remarks>
+        /// <paramref name="skipAllQuotes"/> is true by default, as one of the bonuses this function has over <see cref="string.Split(char[])"/> is the ability to do that.
+        /// </remarks>
+        public static string[] Split(string scan, string separator, bool skipQuote = false, bool unescape = false, char quoteChar = '"', char escChar = '\\', bool unquote = false, bool withToken = false, bool withTokenIn = false, bool skipAllQuotes = true, bool trimResults = false)
         {
 
             int i = 0;
@@ -246,7 +250,7 @@ namespace DataTools.Text
 
             int e = 0;
             int g = 0;
-
+            int line = 0;
             List<string> sOut = new List<string>();
             int c = 0;
 
@@ -256,64 +260,54 @@ namespace DataTools.Text
 
             bool inq = false;
 
-            char[] chrs = Scan.ToCharArray();
-            char[] sep = Separator.ToCharArray();
+            char[] chrs = scan.ToCharArray();
+            char[] sep = separator.ToCharArray();
 
             c = chrs.Length - 1;
             e = sep.Length - 1;
 
             f = 0;
             chOut = new char[c + 1];
+            string snew;
 
             for (i = 0; i <= c; i++)
             {
-                if ((SkipQuote) && (chrs[i] == QuoteChar))
+                if (skipQuote && (chrs[i] == quoteChar))
                 {
-                    if ((!inq) && (i < c) && (chrs[i] == QuoteChar) && (chrs[i + 1] == QuoteChar))
+                    QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: quoteChar, escChar: escChar, withQuotes: true);
+                    if (sqEnd != null)
                     {
-                        i++;
-                        continue;
+                        i = (int)sqEnd;
                     }
-
-                    if ((inq) && (i < c) && (chrs[i] == EscapeChar) && (chrs[i + 1] == QuoteChar))
+                    else
                     {
-                        if (Unescape)
-                        {
-                            i++;
-
-                            chOut[g] = chrs[i];
-                            g++;
-                        }
-                        else
-                        {
-                            chOut[g] = chrs[i];
-                            g++;
-                            i++;
-
-                            chOut[g] = chrs[i];
-                            g++;
-                        }
-                        continue;
-                    }
-
-                    if ((inq) && (chrs[i] == QuoteChar))
-                    {
-                        inq = false;
-                        if (Unquote)
-                        {
-                            continue;
-                        }
-                    }
-                    else if (inq == false)
-                    {
-                        inq = true;
-                        if (Unquote)
-                        {
-                            continue;
-                        }
+                        break;
                     }
                 }
-
+                else if ((skipAllQuotes) && (chrs[i] == '\"'))
+                {
+                    QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: '\"', withQuotes: true);
+                    if (sqEnd != null)
+                    {
+                        i = (int)sqEnd;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else if ((skipAllQuotes) && (chrs[i] == '\''))
+                {
+                    QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: '\'', withQuotes: true);
+                    if (sqEnd != null)
+                    {
+                        i = (int)sqEnd;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
                 if ((!inq) && (chrs[i] == sep[f]))
                 {
                     // save the starting index
@@ -331,13 +325,13 @@ namespace DataTools.Text
 
                     if (f == e + 1)
                     {
-                        if (WithToken && !WithTokenIn && d != 0)
+                        if (withToken && !withTokenIn && d != 0)
                         {
-                            sOut.Add(Separator);
+                            sOut.Add(separator);
                             d++;
                         }
 
-                        if (WithToken && WithTokenIn)
+                        if (withToken && withTokenIn)
                         {
                             foreach (char cs in sep)
                             {
@@ -346,7 +340,9 @@ namespace DataTools.Text
                             }
                         }
 
-                        sOut.Add(new string(chOut, 0, g));
+                        snew = new string(chOut, 0, g);
+                        if (trimResults) snew = snew.Trim();
+                        sOut.Add(snew);
                         g = 0;
 
                         d++;
@@ -371,7 +367,9 @@ namespace DataTools.Text
 
             if (g != 0)
             {
-                sOut.Add(new string(chOut, 0, g));
+                snew = new string(chOut, 0, g);
+                if (trimResults) snew = snew.Trim();
+                sOut.Add(snew);
             }
 
             return sOut.ToArray();
@@ -3082,7 +3080,7 @@ namespace DataTools.Text
             if (input.IndexOf("%") == -1)
                 return input;
 
-            string[] parse = Split(input, "%", WithToken: true, WithTokenIn: true);
+            string[] parse = Split(input, "%", withToken: true, withTokenIn: true);
 
             StringBuilder asc = new StringBuilder();
 
