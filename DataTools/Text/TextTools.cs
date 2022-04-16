@@ -3114,70 +3114,85 @@ namespace DataTools.Text
         /// </remarks>
         public static string PrintEnumDesc<T>(T val) where T : Enum
         {
-            var t = val.GetType();
+            return PrintEnumDesc(typeof(T), val);
+        }
+
+        /// <summary>
+        /// Print enumeration or flags descriptions.
+        /// </summary>
+        /// <param name="t">The Enum type</param>
+        /// <param name="val">The value to print</param>
+        /// <returns>An enum description or a comma-separated list of flag descriptions.</returns>
+        /// <remarks>
+        /// This function utilizes <see cref="System.ComponentModel.DescriptionAttribute"/>.
+        /// </remarks>
+        public static string PrintEnumDesc(Type t, object val)
+        {
             var fs = t.GetFields(BindingFlags.Static | BindingFlags.Public);
             var hfta = t.GetCustomAttribute(typeof(FlagsAttribute));
 
             bool flags = false;
             if (hfta != null) flags = true;
 
-            
-
-            if (flags)
+            if (val is Enum enVal)
             {
-                var sb = new StringBuilder();
-                var p = false;
-
-                foreach (var f in fs)
+                if (flags)
                 {
-                    var x = (T)f.GetValue(null);
-                    
-                    if (x.GetHashCode() == 0) continue;
+                    var sb = new StringBuilder();
+                    var p = false;
 
-                    if (val.HasFlag(x))
+                    foreach (var f in fs)
                     {
-                        if (p) sb.Append(", ");
-                        p = true;
+                        var x = f.GetValue(null);
 
-                        var desc = (DescriptionAttribute)f.GetCustomAttribute(typeof(DescriptionAttribute));
-                        if (desc != null)
-                        {
-                            sb.Append(desc.Description);
-                        }
-                        else
-                        {
-                            sb.Append(x.ToString());
-                        }
+                        if (x.GetHashCode() == 0) continue;
 
+                        if (enVal.HasFlag((Enum)x))
+                        {
+                            if (p) sb.Append(", ");
+                            p = true;
+
+                            var desc = (DescriptionAttribute)f.GetCustomAttribute(typeof(DescriptionAttribute));
+                            if (desc != null)
+                            {
+                                sb.Append(desc.Description);
+                            }
+                            else
+                            {
+                                sb.Append(x.ToString());
+                            }
+
+                        }
+                    }
+
+                    return sb.ToString();
+
+                }
+                else
+                {
+                    foreach (var f in fs)
+                    {
+                        var x = f.GetValue(null);
+
+                        if (x.Equals(enVal))
+                        {
+                            var desc = (DescriptionAttribute)f.GetCustomAttribute(typeof(DescriptionAttribute));
+                            if (desc != null)
+                            {
+                                return desc.Description;
+                            }
+                            else
+                            {
+                                return x.ToString();
+                            }
+                        }
                     }
                 }
 
-                return sb.ToString();
-
+                return enVal.ToString();
             }
-            else
-            {
-                foreach (var f in fs)
-                {
-                    var x = (T)f.GetValue(null);
 
-                    if (x.Equals(val))
-                    {
-                        var desc = (DescriptionAttribute)f.GetCustomAttribute(typeof(DescriptionAttribute));
-                        if (desc != null)
-                        {
-                            return desc.Description;
-                        }
-                        else
-                        {
-                            return x.ToString();
-                        }
-                    }
-                }
-            }
-            
-            return val.ToString();
-            
+            return val?.ToString();
         }
     }
 
@@ -3203,7 +3218,17 @@ namespace DataTools.Text
             return TextTools.Split(Scan, Separator, SkipQuote, Unescape, QuoteChar, EscapeChar, Unquote, WithToken, WithTokenIn);
         }
 
-   }
+        /// <summary>
+        /// Print an enumeration value's description.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns>The contents of the <see cref="DescriptionAttribute"/> or the result of <see cref="Enum.ToString"/>.</returns>
+        public static string Print(this Enum value)
+        {
+            return TextTools.PrintEnumDesc(value);
+        }
+
+    }
 
 
 }

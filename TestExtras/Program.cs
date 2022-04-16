@@ -672,19 +672,19 @@ namespace TestExtras
                 }
             }
 
-            CleanKids<List<T>, T>(markers);
+            PostScanTasks<List<T>, T>(markers);
 
             return markers;
         }
 
-        private static void CleanKids<T, U>(T markers) where T : List<U> where U: Marker<U>, new()
+        private static void PostScanTasks<T, U>(T markers) where T : List<U> where U: Marker<U>, new()
         {
             int c = markers.Count;
             int i;
 
             for (i = 0; i < c; i++)
             {
-                if (markers[i].Markers != null) CleanKids<List<U>, U>(markers[i].Markers);
+                if (markers[i].Markers != null) PostScanTasks<List<U>, U>(markers[i].Markers);
 
                
                 if (i < c - 1)
@@ -707,7 +707,7 @@ namespace TestExtras
                             markers[i].Markers.AddRange(markers[i + 1].Markers);
                         }
 
-                        CleanKids<List<U>, U>(markers[i].Markers);
+                        PostScanTasks<List<U>, U>(markers[i].Markers);
                         markers.RemoveAt(i + 1);
                         c--;
                     }
@@ -734,7 +734,7 @@ namespace TestExtras
 
                             for (int z = x; z <= i; z++)
                             {
-                                if (markers[z].Markers != null) CleanKids<List<U>, U>(markers[z].Markers);
+                                if (markers[z].Markers != null) PostScanTasks<List<U>, U>(markers[z].Markers);
                                 mknew.Content += markers[z].Content;
                                 mknew.Markers.Add(markers[z]);
                             }
