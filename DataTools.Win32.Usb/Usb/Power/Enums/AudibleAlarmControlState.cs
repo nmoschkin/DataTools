@@ -12,4 +12,5 @@ namespace DataTools.Win32.Usb
         Enabled = 2,
         Muted = 3
     }
+
 }

@@ -118,7 +118,39 @@ namespace DataTools.Extras.Expressions
         /// <summary>
         /// Indicates that the expression is a keyword.
         /// </summary>
-        Keyword = 0x8000
+        Keyword = 0x8000,
+
+        /// <summary>
+        /// Indicates that the expression is an access modifier keyword.
+        /// </summary>
+        AccessModifier = 0x18000,
+
+        /// <summary>
+        /// Indicates that the expression is an intrinsic type.
+        /// </summary>
+        IntrinsicType = 0x28000,
+
+        /// <summary>
+        /// Indicates that the expression is an entity type keyword.
+        /// </summary>
+        EntityType = 0x48000,
+
+
+        /// <summary>
+        /// Indicates that the expression is a comment.
+        /// </summary>
+        Comment = 0x200000,
+
+        /// <summary>
+        /// Indicates that the expression is a block comment.
+        /// </summary>
+        BlockComment = 0x210000,
+
+        /// <summary>
+        /// Indicates that the expression is a line comment.
+        /// </summary>
+        LineComment = 0x220000,
+
 
     }
 

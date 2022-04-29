@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 
+
 namespace DataTools.Text
 {
     /// <summary>
@@ -655,7 +656,6 @@ namespace DataTools.Text
             }
 
         }
-
         /// <summary>
         /// Finds the text between two strings.
         /// </summary>
@@ -673,10 +673,31 @@ namespace DataTools.Text
         /// <exception cref="SyntaxErrorException">If the block is not terminated.</exception>
         public static string TextBetween(string value, int startPos, string start, string stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false, bool noQuoteCheck = false)
         {
+            int i = 0;
+            return TextBetween(value.ToCharArray(), startPos, ref i, start, stop, out idxStart, out idxStop, withDelimiters, escChar, throwException, noQuoteCheck);
+        }
+
+        /// <summary>
+        /// Finds the text between two strings.
+        /// </summary>
+        /// <param name="chars">The string to search.</param>
+        /// <param name="startPos">The position of the string to start at.</param>
+        /// <param name="line">Tracks the current line number.</param>
+        /// <param name="start">The start string.</param>
+        /// <param name="stop">The stop character.</param>
+        /// <param name="idxStart">The returned start index of the text between (excluding the start character.)</param>
+        /// <param name="idxStop">The returned stop index of the text between (excluding the stop character.)</param>
+        /// <param name="withDelimiters">Include the <paramref name="start"/> and <paramref name="stop"/> delimiters.</param>
+        /// <param name="escChar">The escape character to use for inside quoted strings (default is '\').</param>
+        /// <param name="throwException">True to throw a <see cref="SyntaxErrorException"/> if the block cannot be completed.</param>
+        /// <returns>The matched string optionally including the <paramref name="start"/> and <paramref name="stop"/> delimiter strings.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If the index is less than 2 positions before the last position in the string.</exception>
+        /// <exception cref="SyntaxErrorException">If the block is not terminated.</exception>
+        public static string TextBetween(char[] chars, int startPos, ref int line, string start, string stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false, bool noQuoteCheck = false)
+        {
             idxStart = null;
             idxStop = null;
 
-            var chars = value.ToCharArray();
             bool inSpan = false;
 
             int rb1Pos = 0;
@@ -688,20 +709,25 @@ namespace DataTools.Text
 
             int level = 0;
             StringBuilder sb = new StringBuilder();
-            sb.Capacity = value.Length;
+            sb.Capacity = chars.Length;
 
-            if (startPos < 0 || startPos >= value.Length - ((start.Length + stop.Length) + 1)) throw new ArgumentOutOfRangeException(nameof(startPos));
+            if (startPos < 0 || startPos >= chars.Length - ((start.Length + stop.Length) + 1)) throw new ArgumentOutOfRangeException(nameof(startPos));
 
             for (int i = startPos; i < chars.Length; i++)
             {
                 char c = chars[i];
-                if (!noQuoteCheck && (c == '"' || c == '\''))
+
+                if (c == '\n')
                 {
-                    var qs = QuoteFromHere(value, i, out int? qstart, out int? qstop, quoteChar: c, escChar: escChar, withQuotes: true, throwException: throwException);
+                    line++;
+                }
+                else if (!noQuoteCheck && (c == '"' || c == '\''))
+                {
+                    var qs = QuoteFromHere(chars, i, ref line, out int? qstart, out int? qstop, quoteChar: c, escChar: escChar, withQuotes: true, throwException: throwException);
 
                     if (!string.IsNullOrEmpty(qs))
                     {
-                        sb.Append(qs);  
+                        sb.Append(qs);
                     }
                     if (qstart != null && qstop != null)
                     {
@@ -713,7 +739,7 @@ namespace DataTools.Text
                         break;
                     }
                 }
-                else 
+                else
                 {
                     s1test = RunBy(start, c, ref rb1Str, ref rb1Pos);
 
@@ -737,7 +763,7 @@ namespace DataTools.Text
                         level++;
                         continue;
                     }
-                    else 
+                    else
                     {
                         s2test = RunBy(stop, c, ref rb2Str, ref rb2Pos);
 
@@ -784,7 +810,6 @@ namespace DataTools.Text
             return sb.ToString();
         }
 
-
         /// <summary>
         /// Finds the text between two characters.
         /// </summary>
@@ -802,26 +827,49 @@ namespace DataTools.Text
         /// <exception cref="SyntaxErrorException">If the block is not terminated.</exception>
         public static string TextBetween(string value, int startPos, char start, char stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false)
         {
+            int i = 0;
+            return TextBetween(value.ToCharArray(), startPos, ref i, start, stop, out idxStart, out idxStop, withDelimiters, escChar, throwException);
+        }
+
+        /// <summary>
+        /// Finds the text between two characters.
+        /// </summary>
+        /// <param name="chars">The string to search.</param>
+        /// <param name="startPos">The position of the string to start at.</param>
+        /// <param name="start">The start character.</param>
+        /// <param name="stop">The stop character.</param>
+        /// <param name="idxStart">The returned start index of the text between (excluding the start character.)</param>
+        /// <param name="idxStop">The returned stop index of the text between (excluding the stop character.)</param>
+        /// <param name="withDelimiters">Include the <paramref name="start"/> and <paramref name="stop"/> delimiters.</param>
+        /// <param name="escChar">The escape character to use for inside quoted strings (default is '\').</param>
+        /// <param name="throwException">True to throw a <see cref="SyntaxErrorException"/> if the block cannot be completed.</param>
+        /// <returns>The matched string optionally including the <paramref name="start"/> and <paramref name="stop"/> delimiter characters.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If the index is less than 2 positions before the last position in the string.</exception>
+        /// <exception cref="SyntaxErrorException">If the block is not terminated.</exception>
+        public static string TextBetween(char[] chars, int startPos, ref int line, char start, char stop, out int? idxStart, out int? idxStop, bool withDelimiters = false, char escChar = '\\', bool throwException = false)
+        {
             idxStart = null;
             idxStop = null;
-
-            var chars = value.ToCharArray();
 
             bool inSpan = false;
 
             int level = 0;
             StringBuilder sb = new StringBuilder();
-            sb.Capacity = value.Length;
+            sb.Capacity = chars.Length;
 
-            if (startPos < 0 || startPos >= value.Length - 2) throw new ArgumentOutOfRangeException(nameof(startPos));
+            if (startPos < 0 || startPos > chars.Length - 2) throw new ArgumentOutOfRangeException(nameof(startPos));
 
             for (int i = startPos; i < chars.Length; i++)
             {
                 char c = chars[i];
 
-                if (c == '"' || c == '\'')
+                if (c == '\n')
                 {
-                    var qs = QuoteFromHere(value, i, out int? qstart, out int? qstop, quoteChar: c, escChar: escChar, withQuotes: true, throwException: throwException);
+                    line++;
+                }
+                else if (c == '"' || c == '\'')
+                {
+                    var qs = QuoteFromHere(chars, i, ref line, out int? qstart, out int? qstop, quoteChar: c, escChar: escChar, withQuotes: true, throwException: throwException);
 
                     if (!string.IsNullOrEmpty(qs))
                     {
@@ -838,7 +886,7 @@ namespace DataTools.Text
                         break;
                     }
                 }
-                else 
+                else
                 {
                     if (c == start)
                     {
@@ -862,7 +910,7 @@ namespace DataTools.Text
                         }
                     }
                 }
-                
+
                 if (inSpan)
                 {
                     sb.Append(c);
@@ -1407,7 +1455,7 @@ namespace DataTools.Text
         {
             var chars = value.ToCharArray();
             var sb = new StringBuilder();
-            
+
             foreach (var ch in chars)
             {
                 if (char.IsDigit(ch))
@@ -1426,14 +1474,14 @@ namespace DataTools.Text
         /// <returns>An numeric primitive (either a Long or a Double).</returns>
         /// <remarks></remarks>
         public static double? FVal(string value)
-        {            
+        {
             double o;
 
             value = value.Trim();
             if (value.Contains(" "))
             {
                 var sp = value.Split(' ');
-                value = sp[0];  
+                value = sp[0];
             }
 
             if (value.Length < 2)
@@ -2050,7 +2098,7 @@ namespace DataTools.Text
                     if (char.IsWhiteSpace(ch))
                     {
                         //if (ch != '\r' && ch != '\n')
-                            SepChars += ch;
+                        SepChars += ch;
                     }
                 }
             }
@@ -2453,7 +2501,7 @@ namespace DataTools.Text
             bool lastWasChar = false;
 
             StringBuilder sb = new StringBuilder(c * 2);
-            
+
             for (i = 0; i < c; i++)
             {
                 if (sepBy && seps.Contains(ch[i]))
@@ -2463,7 +2511,7 @@ namespace DataTools.Text
                         lastWasSeperator = true;
                         sb.Append(sepChar);
                     }
-                    
+
                     continue;
                 }
                 else if (ch[i] == sepChar)
@@ -2473,7 +2521,7 @@ namespace DataTools.Text
                         lastWasSeperator = true;
                         sb.Append(sepChar);
                     }
-                    
+
                     continue;
                 }
 
@@ -2583,7 +2631,7 @@ namespace DataTools.Text
                                 varOut.Append(char.ToUpper(input[a]));
 
                         }
-                        else 
+                        else
                         {
                             varOut.Append(char.ToLower(input[a]));
                         }
@@ -2625,7 +2673,7 @@ namespace DataTools.Text
 
                 if (toks.Length != 4) return 0;
 
-                for (int i = 3; i >= 0; i--) 
+                for (int i = 3; i >= 0; i--)
                 {
                     output = (output << 8) | int.Parse(toks[i]);
                 }
@@ -2636,7 +2684,7 @@ namespace DataTools.Text
             {
                 return 0;
             }
-            
+
 
         }
 

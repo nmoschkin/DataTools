@@ -14,12 +14,12 @@ namespace DataTools.Win32.Usb.Power
     /// </summary>
     public struct DeviceChemistry
     {
-        public static DeviceChemistry PbAc = new DeviceChemistry(nameof(AppResources.pbAc), AppResources.pbAc);
-        public static DeviceChemistry LION = new DeviceChemistry(nameof(AppResources.LION), AppResources.LION);
-        public static DeviceChemistry NiCd = new DeviceChemistry(nameof(AppResources.NiCd), AppResources.NiCd);
-        public static DeviceChemistry NiMH = new DeviceChemistry(nameof(AppResources.NiMH), AppResources.NiMH);
-        public static DeviceChemistry NiZn = new DeviceChemistry(nameof(AppResources.NiZn), AppResources.NiZn);
-        public static DeviceChemistry RAM = new DeviceChemistry(nameof(AppResources.RAM), AppResources.RAM);
+        public static readonly DeviceChemistry PbAc = new DeviceChemistry(nameof(AppResources.pbAc), AppResources.pbAc);
+        public static readonly DeviceChemistry LION = new DeviceChemistry(nameof(AppResources.LION), AppResources.LION);
+        public static readonly DeviceChemistry NiCd = new DeviceChemistry(nameof(AppResources.NiCd), AppResources.NiCd);
+        public static readonly DeviceChemistry NiMH = new DeviceChemistry(nameof(AppResources.NiMH), AppResources.NiMH);
+        public static readonly DeviceChemistry NiZn = new DeviceChemistry(nameof(AppResources.NiZn), AppResources.NiZn);
+        public static readonly DeviceChemistry RAM = new DeviceChemistry(nameof(AppResources.RAM), AppResources.RAM);
 
         private string name;
         private string description;

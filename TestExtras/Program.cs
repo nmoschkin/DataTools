@@ -25,6 +25,7 @@ namespace TestExtras
         [STAThread]
         public static void Main(string[] args)
         {
+            Console.BufferHeight = 2000;
             //TestBufferList(args);
             // TestParsing(args);
             TestCParse<Marker>(args);
@@ -190,7 +191,11 @@ namespace TestExtras
 
             //var filename = dlg.FileName;
 
-            var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools.Win32.Memory\\SafePtr.cs";
+            var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools\\Observable\\ObservableBase.cs";
+
+            var exp = BlockLevelExpressionSegment.LoadFile(filename);
+            
+            PrintExpression(exp);
 
             var chars = File.ReadAllText(filename).ToCharArray();
 
