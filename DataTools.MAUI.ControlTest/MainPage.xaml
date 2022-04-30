@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="DataTools.MAUI.ControlTest.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:cp="clr-namespace:DataTools.MAUI.ColorControls;assembly=DataTools.MAUI.ColorControls">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="25">
+
+            <Label
+                FontSize="18"
+                HorizontalOptions="Center"
+                SemanticProperties.Description="Welcome to dot net Multi platform App U I"
+                SemanticProperties.HeadingLevel="Level1"
+                Text="Welcome to .NET Multi-platform App UI" />
+
+            <Grid>
+
+
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+
+                <cp:ColorPicker
+                    x:Name="Picker"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="8"
+                    HeightRequest="300"
+                    HorizontalOptions="Fill"
+                    SnapToNamedColor="True"
+                    VerticalOptions="Center"
+                    WidthRequest="300" />
+
+                <Label
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="8"
+                    TextColor="Black">
+                    Current Color:
+                </Label>
+
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Margin="8"
+                    BackgroundColor="{Binding Source={x:Reference Picker}, Path=SelectedColor}"
+                    HeightRequest="24" />
+
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Margin="8"
+                    Text="{Binding Source={x:Reference Picker}, Path=SelectedColorName}"
+                    TextColor="Black" />
+
+
+            </Grid>
+            <Image
+                HeightRequest="310"
+                HorizontalOptions="Center"
+                SemanticProperties.Description="Cute dot net bot waving hi to you!"
+                Source="dotnet_bot.png"
+                WidthRequest="250" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
