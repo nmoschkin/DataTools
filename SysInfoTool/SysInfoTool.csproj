@@ -2,7 +2,7 @@
 
   <PropertyGroup>
       <OutputType>WinExe</OutputType>
-	  <TargetFramework>net6.0-windows</TargetFramework>
+	  <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
 	  <UseWPF>true</UseWPF>
 	  <UseWindowsForms>true</UseWindowsForms>
 	  <AssemblyVersion>7.0.2.2022</AssemblyVersion>
@@ -18,6 +18,12 @@
 	  <Platforms>AnyCPU;x64;x86</Platforms>
 	  <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AppCenter" Version="4.5.1" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="4.5.1" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="4.5.1" />
+  </ItemGroup>
 		
   <ItemGroup>
     <ProjectReference Include="..\DataTools.ColorControls\DataTools.ColorControls.csproj" />
