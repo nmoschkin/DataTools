@@ -251,7 +251,7 @@ namespace SysInfoTool
 
         private void Listener_HardwareChange(object sender, EventArgs e)
         {
-            _ = Task.Run(() => RefreshAdapters());
+            _ = Task.Run(() => RefreshAdapters(false));
         }
 
         private void AdapterList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -318,54 +318,78 @@ namespace SysInfoTool
         private void IPWindow_Loaded(object sender, RoutedEventArgs e)
         {
 
-            lrThread = new Thread(() =>
-            {
-                while(true)
-                {
-                    RefreshAdapters();
-                    Thread.Sleep(3275);
-                }
-            });
+            //lrThread = new Thread(() =>
+            //{
+            //    while(true)
+            //    {
+            //        try
+            //        {
+            //            RefreshAdapters(false);
+            //        }
+            //        catch
+            //        {
 
-            lrThread.IsBackground = true;
-            lrThread.Start();
+            //        }
 
+            //        Thread.Sleep(3275);
+            //    }
+            //});
+
+            //lrThread.IsBackground = true;
+            //lrThread.Start();
+            RefreshAdapters(true);
         }
 
 
         bool refreshing = false;
+        object syncRoot = new object();
 
-        private void RefreshAdapters()
+        private void RefreshAdapters(bool totalRefresh)
         {
-
-            if (refreshing) return;
-            refreshing = true;
-
-            if (_Adapters != null)
+            lock (syncRoot)
             {
-                //Dispatcher.Invoke(() =>
-               // {
-                    _Adapters.Refresh();
-                //});
-            }
-            else
-            {
-                Dispatcher.Invoke(() =>
+                if (refreshing) return;
+                refreshing = true;
+
+                try
                 {
-                    _Adapters = new ObservableAdaptersCollection();
-                });
+                    if (_Adapters != null)
+                    {
+                        _Adapters.Refresh();
+
+                        if (totalRefresh)
+                        {
+                            Dispatcher.Invoke(() =>
+                            {
+                                this.AdapterList.ItemsSource = _Adapters;
+                                ViewMenu = new VirtualMenu(this, this.AdapterList);
+                                this.netMenu.ItemsSource = ViewMenu;
+
+                            });
+                        }
+                    }
+                    else
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            _Adapters = new ObservableAdaptersCollection();
+
+                            this.AdapterList.ItemsSource = _Adapters;
+
+                            ViewMenu = new VirtualMenu(this, this.AdapterList);
+                            this.netMenu.ItemsSource = ViewMenu;
+                        });
+                    }
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+                    refreshing = false;
+                }
             }
-
-            Dispatcher.Invoke(() =>
-            {
-                this.AdapterList.ItemsSource = _Adapters;
-
-                ViewMenu = new VirtualMenu(this, this.AdapterList);
-                this.netMenu.ItemsSource = ViewMenu;
-
-            });
-
-            refreshing = false;
         }
     }
 
