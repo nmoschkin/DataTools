@@ -5,7 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:DataTools.ColorControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    >
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -15,7 +16,8 @@
         <local:NamedColorPicker
             x:Name="Ncp"
             Grid.Column="0"
-            Margin="0,0,4,0" />
+            Margin="0,0,4,0"
+            />
 
 
         <Button
@@ -23,7 +25,8 @@
             Grid.Column="1"
             Width="32"
             Click="BtnMore_Click"
-            Content="..." />
+            Content="..."
+            />
 
     </Grid>
 </UserControl>

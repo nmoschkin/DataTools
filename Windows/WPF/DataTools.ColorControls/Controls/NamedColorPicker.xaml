@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="40"
     d:DesignWidth="300"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    >
 
     <ComboBox.GroupStyle>
         <GroupStyle>
@@ -17,7 +18,8 @@
                         Margin="0,2,0,2"
                         Background="LightSlateGray"
                         BorderBrush="DarkSlateGray"
-                        BorderThickness="0.75">
+                        BorderThickness="0.75"
+                        >
 
                         <Grid>
                             <Grid.RowDefinitions>
@@ -34,7 +36,8 @@
                                 FontSize="12"
                                 FontWeight="Bold"
                                 Foreground="White"
-                                Text="{Binding Name}" />
+                                Text="{Binding Name}"
+                                />
 
                         </Grid>
 
@@ -58,7 +61,8 @@
                     Height="24"
                     Margin="8,2"
                     VerticalAlignment="Top"
-                    Stroke="{x:Static SystemColors.ActiveBorderBrush}">
+                    Stroke="{x:Static SystemColors.ActiveBorderBrush}"
+                    >
 
                     <Rectangle.Fill>
                         <SolidColorBrush Color="{Binding Color, Mode=OneWay}" />
@@ -72,7 +76,8 @@
                     VerticalAlignment="Center"
                     FontFamily="Segoe UI"
                     FontSize="14"
-                    Text="{Binding Name}" />
+                    Text="{Binding Name}"
+                    />
 
             </Grid>
         </DataTemplate>

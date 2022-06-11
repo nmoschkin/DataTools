@@ -28,6 +28,32 @@ namespace DataTools.ColorControls
         }
 
 
+
+
+        public Color SelectedColor
+        {
+            get { return (Color)GetValue(SelectedColorProperty); }
+            set { SetValue(SelectedColorProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for SelectedColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty SelectedColorProperty =
+            DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ExtendedColorDropDown), new PropertyMetadata(Colors.Transparent  , OnSelectedColorChanged));
+
+        private static void OnSelectedColorChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (sender is ExtendedColorDropDown owner)
+            {
+                if (e.NewValue is Color value)
+                {
+
+                }
+            }
+        }
+
+
+
+
         public CatalogOptions CatalogType
         {
             get { return (CatalogOptions)GetValue(CatalogTypeProperty); }
@@ -36,7 +62,7 @@ namespace DataTools.ColorControls
 
         // Using a DependencyProperty as the backing store for CatalogType.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty CatalogTypeProperty =
-            DependencyProperty.Register("CatalogType", typeof(CatalogOptions), typeof(NamedColorPicker), new PropertyMetadata(CatalogOptions.Extended, OnCatalogTypeChanged));
+            DependencyProperty.Register("CatalogType", typeof(CatalogOptions), typeof(ExtendedColorDropDown), new PropertyMetadata(CatalogOptions.Extended, OnCatalogTypeChanged));
 
 
         private static void OnCatalogTypeChanged(object sender, DependencyPropertyChangedEventArgs e)
