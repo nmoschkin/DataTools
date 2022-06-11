@@ -1,8 +1,19 @@
 # DataTools Utility Libraries #
-## Version 7.0.0 Alpha ##
+## Version 7.0.0-pre-alpha ##
 
 
 ## Updates ##
+
+**April 29, 2022**
+
+Finally got around to moving all of the related projects into their respective real folders (as opposed to just being virtually separated with solution folders.)
+
+
+Continuing to refactor and bug-fix.
+
+**ADDED MAUI PROJECTS**
+
+The MAUI ColorControls port will be finished pending a complete re-installation of .NET 6.0 Preview and Visual Studio 2022 Preview (due to difficulties.)
 
 **January 30, 2022**
 
