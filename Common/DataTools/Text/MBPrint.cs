@@ -1,11 +1,10 @@
 ﻿// ************************************************* ''
 // DataTools C# Native Utility Library For Windows 
-// Adapted for C#/Xamarin
 //
 // Module: Prints and Interprets Numeric Values
 //         From Any Printed Base.
 // 
-// Copyright (C) 2011-2015, 2019 Nathan Moschkin
+// Copyright (C) 1999-2022 Nathan Moschkin
 // All Rights Reserved
 //
 // Licensed Under the MIT License   
