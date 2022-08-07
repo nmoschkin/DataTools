@@ -133,7 +133,7 @@ namespace DataTools.Shell.Native
         {
             get
             {
-                PropertyInfo pi = typeof(DataTools.Desktop.Win32.Shell.Resources.LocalizedProperties).GetProperty(Name);
+                PropertyInfo pi = typeof(DataTools.Shell.Resources.LocalizedProperties).GetProperty(Name);
                 
                 if (pi != null)
                 {

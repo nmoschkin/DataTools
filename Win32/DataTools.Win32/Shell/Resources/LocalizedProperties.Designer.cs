@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DataTools.Desktop.Win32.Shell.Resources {
+namespace DataTools.Shell.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace DataTools.Desktop.Win32.Shell.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DataTools.Desktop.Win32.Shell.Resources.LocalizedProperties", typeof(LocalizedProperties).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("DataTools.Shell.Resources.LocalizedProperties", typeof(LocalizedProperties).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

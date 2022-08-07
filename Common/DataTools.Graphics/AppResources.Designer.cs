@@ -95,41 +95,29 @@ namespace DataTools.Graphics {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to FFFFFF|White
-        ///C0C0C0|Silver
-        ///808080|Gray
-        ///000000|Black
-        ///FF0000|Red
-        ///800000|Maroon
-        ///FFFF00|Yellow
-        ///808000|Olive
-        ///00FF00|Lime
-        ///008000|Green
-        ///00FFFF|Aqua
-        ///008080|Teal
-        ///0000FF|Blue
-        ///000080|Navy
-        ///FF00FF|Fuchsia
-        ///800080|Purple
+        ///   Looks up a localized string similar to FFFFFF|White (Standard)
+        ///C0C0C0|Silver (Standard)
+        ///808080|Gray (Standard)
+        ///000000|Black (Standard)
+        ///FF0000|Red (Standard)
+        ///800000|Maroon (Standard)
+        ///FFFF00|Yellow (Standard)
+        ///808000|Olive (Standard)
+        ///00FF00|Lime (Standard)
+        ///008000|Green (Standard)
+        ///00FFFF|Aqua (Standard)
+        ///008080|Teal (Standard)
+        ///0000FF|Blue (Standard)
+        ///000080|Navy (Standard)
+        ///FF00FF|Fuchsia (Standard)
+        ///800080|Purple (Standard)
         ///C71585|MediumVioletRed
         ///FF1493|DeepPink
         ///DB7093|PaleVioletRed
         ///FF69B4|HotPink
         ///FFB6C1|LightPink
         ///FFC0CB|Pink
-        ///8B0000|DarkRed
-        ///FF0000|Red
-        ///B22222|Firebrick
-        ///DC143C|Crimson
-        ///CD5C5C|IndianRed
-        ///F08080|LightCoral
-        ///FA8072|Salmon
-        ///E9967A|DarkSalmon
-        ///FFA07A|LightSalmon
-        ///FF4500|OrangeRed
-        ///FF6347|Tomato
-        ///FF8C00|DarkOrange
-        ///FF7F50|Co [rest of string was truncated]&quot;;.
+        ///8B00 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string WebPalette {
             get {
