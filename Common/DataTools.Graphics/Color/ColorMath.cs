@@ -175,7 +175,8 @@ namespace DataTools.Graphics
 
         public static void ColorToHSV(UniColor color, ref HSVDATA hsv)
         {
-            double h, s, v;
+            double s, v;
+            HUE h;
 
             ColorToHSV(color, out h, out s, out v);
 
@@ -184,7 +185,7 @@ namespace DataTools.Graphics
             hsv.Value = v;
         }
 
-        public static void ColorToHSV(UniColor color, out double hue, out double saturation, out double value)
+        public static void ColorToHSV(UniColor color, out HUE hue, out double saturation, out double value)
         {
             hue = default(double);
 
@@ -210,7 +211,7 @@ namespace DataTools.Graphics
 
             if (chroma == 0)
             {
-                hue = -1;
+                hue = new HUE(true);
                 
                 switch (val)
                 {
@@ -288,7 +289,7 @@ namespace DataTools.Graphics
         // I adapted the equation from the one in Wikipedia.
         // I wish I could offer a better explanation.  But this isn't wikipedia, and they'd do a better job.
         //
-        public static void HSVToColorRaw(double hue, double saturation, double value, ref int retColor)
+        public static void HSVToColorRaw(HUE hue, double saturation, double value, ref int retColor)
         {
             unchecked
             {
@@ -308,10 +309,7 @@ namespace DataTools.Graphics
                 
                 double n;
                 
-                if (hue >= 360d)
-                    hue -= 360d;
-                
-                if (hue == -1)
+                if (hue.IsGrayScale)
                 {
                     if (saturation > value)
                     {
@@ -329,6 +327,9 @@ namespace DataTools.Graphics
                     retColor = j | (ab << 16) | (ab << 8) | ab;
                     return;
                 }
+
+                while (hue >= 360d)
+                    hue -= 360d;
 
                 chroma = value * saturation;
                 

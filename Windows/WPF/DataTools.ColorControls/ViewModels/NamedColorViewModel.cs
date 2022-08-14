@@ -196,7 +196,7 @@ namespace DataTools.ColorControls
             {
                 Category = "Standard";
             }
-            else if (hsv.Hue == -1)
+            else if (hsv.Hue.IsGrayScale)
             {
                 Category = "Grayscale";
             }

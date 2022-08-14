@@ -71,10 +71,10 @@ namespace DataTools.Graphics
                 match = true;
 
                 var hsv2 = ColorMath.ColorToHSV(vl.Color);
-                if (hsv1.Hue == -1 && hsv2.Hue >= 0) continue;
-                if (hsv2.Hue == -1 && hsv1.Hue >= 0) continue;
+                if (hsv1.Hue.IsGrayScale && hsv2.Hue >= 0) continue;
+                if (hsv2.Hue.IsGrayScale && hsv1.Hue >= 0) continue;
 
-                dhue = Math.Abs(hsv2.Hue - hsv1.Hue);
+                dhue = hsv2.Hue - hsv1.Hue;
                 dsat = Math.Abs(hsv2.Saturation - hsv1.Saturation);
                 dval = Math.Abs(hsv2.Value - hsv1.Value);
 
@@ -95,7 +95,7 @@ namespace DataTools.Graphics
 
                 if (match)
                 {
-                    lhue = Math.Abs(hsv2.Hue - hsv1.Hue);
+                    lhue = hsv2.Hue - hsv1.Hue;
                     lsat = Math.Abs(hsv2.Saturation - hsv1.Saturation);
                     lval = Math.Abs(hsv2.Value - hsv1.Value);
 

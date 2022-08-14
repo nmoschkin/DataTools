@@ -7,7 +7,7 @@ namespace DataTools.Graphics
 {
     public struct HSVDATA
     {
-        public double Hue;
+        public HUE Hue;
         public double Saturation;
         public double Value;
 
@@ -162,8 +162,6 @@ namespace DataTools.Graphics
                 return v1.Hue >= v2.Hue;
             }
         }
-
-
 
         public static bool operator <(HSVDATA v1, HSVDATA v2)
         {

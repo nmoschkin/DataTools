@@ -5,7 +5,7 @@ namespace DataTools.Graphics
 {
     public struct HSLDATA
     {
-        public double Hue;
+        public HUE Hue;
         public double Saturation;
         public double Lightness;
     }
