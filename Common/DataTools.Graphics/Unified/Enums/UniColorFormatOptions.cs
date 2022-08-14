@@ -34,6 +34,7 @@ namespace DataTools.Graphics
 
         public static UniColorFormatOptions ProvideFormatOptions(string format)
         {
+            if (string.IsNullOrEmpty(format)) return UniColorFormatOptions.Default;
             var chars = format?.ToCharArray() ?? throw new ArgumentNullException(nameof(format));
             int val = 0;
 

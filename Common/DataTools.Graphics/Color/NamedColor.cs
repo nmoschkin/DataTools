@@ -29,6 +29,8 @@ namespace DataTools.Graphics
         private string nidxstr;
         private string eidxstr;
 
+        public static double DefaultMaxDeviation { get; set; } = 0.013;
+
         public static NamedColor FindColor(UniColor value, out int index)
         {
             NamedColor r;
@@ -49,8 +51,10 @@ namespace DataTools.Graphics
             return r;
         }
 
-        public static NamedColor GetClosestColor(UniColor value, double maxDeviation = 0.013d, bool ignoreValue = true, bool ignoreSaturation = false, bool ignoreHue = false, bool useWebCatalog = false)
+        public static NamedColor GetClosestColor(UniColor value, double? maxDeviation = null, bool ignoreValue = true, bool ignoreSaturation = false, bool ignoreHue = false, bool useWebCatalog = false)
         {
+            var maxDev = maxDeviation ?? DefaultMaxDeviation;
+
             var hsv1 = ColorMath.ColorToHSV(value);
 
             NamedColor closest = null;
@@ -62,7 +66,7 @@ namespace DataTools.Graphics
             double dhue, dsat, dval;
             bool match;
 
-            var mxd = Math.Abs(maxDeviation);
+            var mxd = Math.Abs(maxDev);
 
             var workcat = useWebCatalog ? webCatalog : catalog;
 
