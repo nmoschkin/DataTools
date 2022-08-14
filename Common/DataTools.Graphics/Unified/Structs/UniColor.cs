@@ -8,6 +8,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using DataTools.Text;
 
+using Newtonsoft.Json;
+
 namespace DataTools.Graphics
 {
     /// <summary>
@@ -26,6 +28,7 @@ namespace DataTools.Graphics
     /// without any modification or type coercion.
     /// </summary>
     /// <remarks></remarks>
+    [JsonConverter(typeof(UniColorConverter))]
     [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Size = 4)]
     public struct UniColor : IComparable<UniColor>, IFormattable
     {
