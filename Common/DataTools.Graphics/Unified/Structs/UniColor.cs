@@ -179,7 +179,7 @@ namespace DataTools.Graphics
         /// <summary>
         /// Gets or sets the hue
         /// </summary>
-        public double H
+        public HUE H
         {
             get
             {
@@ -535,7 +535,11 @@ namespace DataTools.Graphics
         {
             string hexCase = (format & UniColorFormatOptions.LowerCase) == UniColorFormatOptions.LowerCase ? "x" : "X";
 
-            var argbVals = BitConverter.GetBytes((format & UniColorFormatOptions.Reverse) == UniColorFormatOptions.Reverse);
+            var argbVals = BitConverter.GetBytes(this.IntValue);
+            if ((format & UniColorFormatOptions.Reverse) == UniColorFormatOptions.Reverse)
+            {
+                Array.Reverse(argbVals);
+            }
 
             string[] argbStrs = null;
 

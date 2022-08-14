@@ -328,8 +328,8 @@ namespace DataTools.Graphics
                     return;
                 }
 
-                while (hue >= 360d)
-                    hue -= 360d;
+                //while (hue.Value >= 360d)
+                //    hue -= 360d;
 
                 chroma = value * saturation;
                 
