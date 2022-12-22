@@ -14,6 +14,7 @@
 
 
 using System;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
 using DataTools.Text;
@@ -65,24 +66,22 @@ namespace DataTools.Win32.Network
         /// <returns></returns>
         public static string CurrentUserFullName(ExtendedNameFormat type = ExtendedNameFormat.NameDisplay)
         {
-            string CurrentUserFullNameRet = default;
-            MemPtr lps;
+            string ret;
             int cb = 10240;
 
-            lps = new MemPtr(10240L);
-            lps.ZeroMemory();
-
-            if (GetUserNameEx(type, lps.Handle, ref cb))
+            using (var lps = new SafePtr(cb))
             {
-                CurrentUserFullNameRet = lps.ToString();
-            }
-            else
-            {
-                CurrentUserFullNameRet = null;
-            }
+                if (GetUserNameEx(type, lps, ref cb))
+                {
+                    ret = lps.ToString();
+                }
+                else
+                {
+                    ret = null;
+                }
 
-            lps.Free();
-            return CurrentUserFullNameRet;
+                return ret;
+            }
         }
 
         /// <summary>
@@ -91,22 +90,19 @@ namespace DataTools.Win32.Network
         /// <returns></returns>
         public static string CurrentUserName()
         {
-            string CurrentUserNameRet = default;
-            MemPtr lps = new MemPtr();
             int cb = 10240;
-            lps.ReAlloc(10240L);
-            lps.ZeroMemory();
-            if (GetUserName(lps.Handle, ref cb))
-            {
-                CurrentUserNameRet = lps.ToString();
-            }
-            else
-            {
-                CurrentUserNameRet = null;
-            }
 
-            lps.Free();
-            return CurrentUserNameRet;
+            using (SafePtr lps = new SafePtr(cb))
+            {
+                if (GetUserName(lps, ref cb))
+                {
+                    return lps.ToString();
+                }
+                else
+                {
+                    return null;
+                }
+            }
         }
 
 
@@ -125,27 +121,41 @@ namespace DataTools.Win32.Network
             int en = 0;
             int ten = 0;
             
-            ServerInfo101[] servers;
+            ServerInfo101[] servers = null;
             
             int i;
             int c;
 
             var inul = new IntPtr();
 
-            NetServerEnum(null, 101, ref mm, -1, ref en, ref ten, ServerTypes.WindowsNT, null, ref inul);
-
-            adv = mm;
-            c = ten;
-
-            servers = new ServerInfo101[c + 1];
-
-            for (i = 0; i < c; i++)
+            try
             {
-                servers[i] = adv.ToStruct<ServerInfo101>();
-                adv = adv + Marshal.SizeOf<ServerInfo101>();
+                var result = NetServerEnum(null, 101, ref mm, -1, ref en, ref ten, ServerTypes.WindowsNT, null, ref inul);
+
+                if (result == NET_API_STATUS.NERR_Success)
+                {
+                    adv = mm;
+                    c = ten;
+
+                    servers = new ServerInfo101[c + 1];
+                    var cbstr = Marshal.SizeOf<ServerInfo101>();
+
+                    for (i = 0; i < c; i++)
+                    {
+                        servers[i] = adv.ToStruct<ServerInfo101>();
+                        adv += cbstr;
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                mm.NetFree();
             }
 
-            mm.NetFree();
             return servers;
         }
 
@@ -155,12 +165,29 @@ namespace DataTools.Win32.Network
         /// <param name="computer">Computer for which to retrieve the information.</param>
         /// <param name="info">A ServerInfo101 structure that receives the information.</param>
         /// <remarks></remarks>
-        public static void GetServerInfo(string computer, ref ServerInfo101 info)
+        public static bool GetServerInfo(string computer, ref ServerInfo101 info)
         {
             var mm = new MemPtr();
-            NetInfo.NetServerGetInfo(computer, 101, ref mm);
-            info = mm.ToStruct<ServerInfo101>();
-            mm.NetFree();
+
+            try
+            {
+                var result = NetServerGetInfo(computer, 101, ref mm);
+                if (result == NET_API_STATUS.NERR_Success)
+                {
+                    info = mm.ToStruct<ServerInfo101>();
+                    return true;
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                mm.NetFree();
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -180,24 +207,38 @@ namespace DataTools.Win32.Network
 
             var inul = new IntPtr();
 
-            NetInfo.NetGroupEnum(computer, 2, ref mm, -1, ref en, ref ten, ref inul);
-            
-            adv = mm;
-
-            int i;
-            int c = ten;
-
-            grp = new GroupInfo2[c + 1];
-
-            for (i = 0; i < c; i++)
+            try
             {
-                grp[i] = adv.ToStruct<GroupInfo2>();
-                adv = adv + Marshal.SizeOf<GroupInfo2>();
+                var result = NetGroupEnum(computer, 2, ref mm, -1, ref en, ref ten, ref inul);
+                if (result == NET_API_STATUS.NERR_Success)
+                {
+                    adv = mm;
+
+                    int i;
+                    int c = ten;
+
+                    grp = new GroupInfo2[c + 1];
+                    var cbstr = Marshal.SizeOf<GroupInfo2>();
+                    for (i = 0; i < c; i++)
+                    {
+                        grp[i] = adv.ToStruct<GroupInfo2>();
+                        adv += cbstr;
+                    }
+
+                    return grp;
+                }
+
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                mm.NetFree();
             }
 
-            mm.NetFree();
-
-            return grp;
+            return null;
         }
 
         /// <summary>
@@ -217,23 +258,39 @@ namespace DataTools.Win32.Network
 
             var inul = new IntPtr();
 
-            NetInfo.NetLocalGroupEnum(computer, 1, ref mm, -1, ref en, ref ten, ref inul);
-            adv = mm;
-
-            int i;
-            int c = ten;
-
-            grp = new LocalGroupInfo1[c + 1];
-
-            for (i = 0; i < c; i++)
+            try
             {
-                grp[i] = adv.ToStruct<LocalGroupInfo1>();
-                adv = adv + Marshal.SizeOf<LocalGroupInfo1>();
+                var result = NetLocalGroupEnum(computer, 1, ref mm, -1, ref en, ref ten, ref inul);
+                if (result == NET_API_STATUS.NERR_Success)
+                {
+                    adv = mm;
+
+                    int i;
+                    int c = ten;
+
+                    grp = new LocalGroupInfo1[c + 1];
+                    var cbstr = Marshal.SizeOf<LocalGroupInfo1>();
+                    for (i = 0; i < c; i++)
+                    {
+                        grp[i] = adv.ToStruct<LocalGroupInfo1>();
+                        adv += cbstr;
+                    }
+
+                    return grp;
+
+                }
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                mm.NetFree();
+
             }
 
-            mm.NetFree();
-
-            return grp;
+            return null;
         }
 
         /// <summary>
@@ -247,7 +304,7 @@ namespace DataTools.Win32.Network
         {
             var mm = new MemPtr();
 
-            MemPtr op = new MemPtr();
+            MemPtr origPtr = new MemPtr();
 
             int cbt = 0;
             int cb = 0;
@@ -258,31 +315,36 @@ namespace DataTools.Win32.Network
             {
                 var inul = new IntPtr();
 
-                if (NetInfo.NetGroupGetUsers(computer, group, 0, ref mm, -1, ref cb, ref cbt, ref inul) == NET_API_STATUS.NERR_Success)
+                if (NetGroupGetUsers(computer, group, 0, ref mm, -1, ref cb, ref cbt, ref inul) == NET_API_STATUS.NERR_Success)
                 {
-                    op = mm;
+                    origPtr = mm;
                     UserGroup0 z;
                     int i;
 
                     s = new string[cb];
-                    
+                    var cbstr = Marshal.SizeOf<UserGroup0>();
+
                     for (i = 0; i < cb; i++)
                     {
                         z = mm.ToStruct<UserGroup0>();
                         s[i] = z.Name;
 
-                        mm = mm + Marshal.SizeOf<UserGroup0>();
+                        mm += cbstr;
                     }
+
+                    return s;
                 }
             }
             catch
             {
                 throw new NativeException();
             }
+            finally
+            {
+                origPtr.NetFree();
+            }
 
-            op.NetFree();
-            
-            return s;
+            return null;
         }
 
         /// <summary>
@@ -297,7 +359,7 @@ namespace DataTools.Win32.Network
         {
             var mm = new MemPtr();
 
-            MemPtr op = new MemPtr();
+            MemPtr origPtr = new MemPtr();
 
             int x = 0;
             int cbt = 0;
@@ -308,7 +370,7 @@ namespace DataTools.Win32.Network
             try
             {
                 var inul = new IntPtr();
-                if (NetInfo.NetLocalGroupGetMembers(computer, group, 1, ref mm, -1, ref cb, ref cbt, ref inul) == NET_API_STATUS.NERR_Success)
+                if (NetLocalGroupGetMembers(computer, group, 1, ref mm, -1, ref cb, ref cbt, ref inul) == NET_API_STATUS.NERR_Success)
                 {
                     if (cb == 0)
                     {
@@ -316,7 +378,7 @@ namespace DataTools.Win32.Network
                         return null;
                     }
 
-                    op = mm;
+                    origPtr = mm;
 
                     UserLocalGroup1 z;
                     int i;
@@ -335,15 +397,20 @@ namespace DataTools.Win32.Network
                     }
 
                     Array.Resize(ref s, x);
+                    return s;
+
                 }
             }
             catch
             {
                 throw new NativeException();
             }
+            finally
+            {
+                origPtr.NetFree();
+            }
 
-            op.NetFree();
-            return s;
+            return null;
         }
 
         /// <summary>
@@ -355,22 +422,30 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         public static string GrabJoin(ref NetworkJoinStatus joinStatus, string Computer = null)
         {
+            var mm = new MemPtr();
+        
             try
             {
-                var mm = new MemPtr();
                 mm.NetAlloc(1024);
 
-                NetInfo.NetGetJoinInformation(Computer, ref mm.handle, ref joinStatus);
+                var result = NetGetJoinInformation(Computer, ref mm.handle, ref joinStatus);
+                if (result == NET_API_STATUS.NERR_Success)
+                {
+                    string s = (string)mm;
+                    return s;
+                }
 
-                string s = (string)mm;
-                mm.NetFree();
-
-                return s;
             }
             catch
             {
                 throw new NativeException();
             }
+            finally
+            {
+                mm.NetFree();
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -382,12 +457,13 @@ namespace DataTools.Win32.Network
         public static UserInfo11[] EnumUsers11(string machine = null)
         {
 
+            MemPtr rh = IntPtr.Zero;
+
             try
             {
                 int cb = 0;
                 int er = 0;
 
-                MemPtr rh = IntPtr.Zero;
 
                 int te = 0;
 
@@ -404,29 +480,38 @@ namespace DataTools.Win32.Network
                 }
 
                 var inul = new IntPtr();
-                var err = NetInfo.NetUserEnum(machine, 11, 0, ref buff, -1, ref er, ref te, ref inul);
+                var err = NetUserEnum(machine, 11, 0, ref buff, -1, ref er, ref te, ref inul);
 
-                rh = buff;
-                usas = new UserInfo11[te];
-
-                for (int i = 0; i < te; i++)
+                if (err == NET_API_STATUS.NERR_Success)
                 {
-                    
-                    usas[i] = buff.ToStruct<UserInfo11>();
-                    usas[i].LogonHours = IntPtr.Zero;
-                
-                    buff = buff + cb;
-                }
+                    rh = buff;
+                    usas = new UserInfo11[te];
 
-                rh.NetFree();
-                return usas;
+                    for (int i = 0; i < te; i++)
+                    {
+
+                        usas[i] = buff.ToStruct<UserInfo11>();
+                        usas[i].LogonHours = IntPtr.Zero;
+
+                        buff = buff + cb;
+                    }
+
+                    return usas;
+                }
 
             }
             catch
             {
                 throw new NativeException();
             }
+            finally
+            {
+                rh.NetFree();
+            }
+
+            return null;
         }
+
 
         /// <summary>
         /// For Windows 8, retrieves the user's Microsoft login account information.
@@ -436,12 +521,14 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         public static UserInfo24[] EnumUsers24(string machine = null)
         {
+            MemPtr rh = IntPtr.Zero;
+
             try
             {
-                MemPtr rh = IntPtr.Zero;
 
                 int i = 0;
                 var uorig = EnumUsers11();
+                if (uorig == null) return null;
 
                 UserInfo24[] usas;
 
@@ -451,10 +538,12 @@ namespace DataTools.Win32.Network
 
                 for (i = 0; i < c; i++)
                 {
-                    NetInfo.NetUserGetInfo(machine, uorig[i].Name, 24, ref rh);
-                    usas[i] = rh.ToStruct<UserInfo24>();
+                    var result = NetUserGetInfo(machine, uorig[i].Name, 24, ref rh);
 
-                    rh.NetFree();
+                    if (result == NET_API_STATUS.NERR_Success)
+                    {
+                        usas[i] = rh.ToStruct<UserInfo24>();
+                    }
                 }
 
                 return usas;
@@ -463,6 +552,13 @@ namespace DataTools.Win32.Network
             {
                 throw new NativeException();
             }
+            finally
+            {
+                rh.NetFree();
+            }
+
+            return null;
+
         }
     }
 }
