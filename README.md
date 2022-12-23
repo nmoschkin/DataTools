@@ -96,18 +96,15 @@ __That being said.  Let's have a look at what this project provides, and where I
     
 Etc, etc.. 
 
-So I've realized that I've written all of these projects somewhat dependent on one-another, but there is a hierarchy (everything requires DataTools, for example). But, as the Win32 projects are all separate, right now, untangling could be a bit messy.
+This is basically a collection of things I find repetitively useful in the course of development work.  I recognize it's basically a hodge-podge of "slightly-more-organized-than-code-snippets."  So I have to think about which pieces really belong together, and which pieces belong in wholly different projects.
 
-But the future is NuGet packages. So, now I have to determine what's too big to go all in the same lib, and what even makes sense to go in the same lib? Display adapter info and processor info are very small compared to the implementation of printers and networking, for example.  Should I make those bigger libraries into one package or make the entire hardware library into one package?
+But, I've realized that, over the (many) years, I've written all of these projects to be somewhat dependent on one-another in various intricate ways. There is a hierarchy (everything requires DataTools, for example), but especially with regard to the Win32 projects, the dependencies are all over the place.
 
-There is also the matter of confusing organization and unused references with regard to the p/Invoke situation.  
+So, my goal is to work all that out, and make this project useful to the public.
 
-So.  All of that's being figured, factored, refactored, and worked out. 
-
-The most difficult re-organization will be with the Win32 libraries. Nearly everything else is pretty much organized as it should be.
+The most difficult re-organization will be with the Win32 libraries. 
 
 More to come!
-
 
 
 ## Version 7.2.0-pre-alpha ##
