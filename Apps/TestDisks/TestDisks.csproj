@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <nullable>disable</nullable>
 	  <AssemblyVersion>7.1.5.2023</AssemblyVersion>
 	  <FileVersion>7.1.5.2023</FileVersion>
 	  <Authors>Nathaniel Moschkin</Authors>

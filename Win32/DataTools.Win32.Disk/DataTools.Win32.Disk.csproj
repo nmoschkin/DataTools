@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <nullable>disable</nullable>
     <RootNamespace>DataTools</RootNamespace>
 	  <AssemblyVersion>7.0.2.2022</AssemblyVersion>
 	  <FileVersion>7.0.2.2022</FileVersion>

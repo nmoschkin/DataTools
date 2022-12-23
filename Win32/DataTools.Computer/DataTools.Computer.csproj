@@ -13,7 +13,7 @@
 	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
 	  <RepositoryType>GitHub</RepositoryType>
 	  <NeutralLanguage>en-US</NeutralLanguage>
-	  <Nullable>enable</Nullable>
+	  <nullable>disable</nullable>
 	  <RootNamespace>DataTools</RootNamespace>
 	  <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>

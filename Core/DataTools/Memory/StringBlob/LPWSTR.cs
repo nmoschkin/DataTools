@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DataTools.Memory;
 
-using DataTools.Standard.Memory;
-
-namespace DataTools.Standard.Memory.StringBlob
+namespace DataTools.Memory.StringBlob
 {
-    public class LPWSTR 
+    public class LPWSTR
     {
         private SafePtr mem = null;
 
@@ -17,7 +16,7 @@ namespace DataTools.Standard.Memory.StringBlob
             {
                 if (value == (mem?.handle ?? IntPtr.Zero)) return;
 
-                if (mem != null) 
+                if (mem != null)
                 {
                     mem.Dispose();
                 }
@@ -48,7 +47,7 @@ namespace DataTools.Standard.Memory.StringBlob
             mem = new SafePtr(m);
         }
 
-        public unsafe LPWSTR(void *m)
+        public unsafe LPWSTR(void* m)
         {
             mem = new SafePtr(m);
         }

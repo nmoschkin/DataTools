@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTools.Standard.Memory
+namespace DataTools.Memory
 {
     public static class MemoryTools
     {

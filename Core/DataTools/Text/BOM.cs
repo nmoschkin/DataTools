@@ -24,13 +24,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using DataTools.Standard.Memory;
 
 using System.Security.Authentication;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using DataTools.Streams;
+using DataTools.Memory;
 
 namespace DataTools.Text.ByteOrderMark
 {

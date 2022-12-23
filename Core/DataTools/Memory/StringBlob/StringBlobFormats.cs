@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataTools.Standard.Memory.StringBlob
+namespace DataTools.Memory.StringBlob
 {
     public enum StringBlobFormats
     {

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using DataTools.Memory;
 
-namespace DataTools.Standard.Memory.StringBlob
+namespace DataTools.Memory.StringBlob
 {
     public class BSTR
     {
@@ -10,10 +11,10 @@ namespace DataTools.Standard.Memory.StringBlob
 
         internal IntPtr _ptr
         {
-            get => (mem?.handle + 4) ?? IntPtr.Zero;
+            get => mem?.handle + 4 ?? IntPtr.Zero;
             set
             {
-                if ((value - 4) == (mem?.handle ?? IntPtr.Zero)) return;
+                if (value - 4 == (mem?.handle ?? IntPtr.Zero)) return;
 
                 if (mem != null)
                 {
@@ -43,11 +44,11 @@ namespace DataTools.Standard.Memory.StringBlob
         public void SetValue(string s)
         {
             if (mem == null)
-                mem = new SafePtr((s.Length * sizeof(char)) + sizeof(int));
+                mem = new SafePtr(s.Length * sizeof(char) + sizeof(int));
             else
-                mem.Length = (s.Length * sizeof(char)) + sizeof(int);
+                mem.Length = s.Length * sizeof(char) + sizeof(int);
 
-            mem.IntAt(0) = (s.Length * sizeof(char));
+            mem.IntAt(0) = s.Length * sizeof(char);
 
             mem.SetString(sizeof(int), s, false);
         }

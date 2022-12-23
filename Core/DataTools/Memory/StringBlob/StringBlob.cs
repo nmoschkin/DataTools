@@ -4,8 +4,9 @@ using System.Text;
 using DataTools.Text.ByteOrderMark;
 using System.Collections;
 using System.Runtime.InteropServices;
+using DataTools.Memory;
 
-namespace DataTools.Standard.Memory.StringBlob
+namespace DataTools.Memory.StringBlob
 {
     /// <summary>
     /// StringBlob manages unmanaged arrays of strings in memory (either the LPWSTR or BSTR varierty.)
@@ -24,7 +25,7 @@ namespace DataTools.Standard.Memory.StringBlob
         {
             var sb = new StringBuilder();
             var i = 0;
-            foreach(var s in this)
+            foreach (var s in this)
             {
                 if (!string.IsNullOrEmpty(customFormat))
                 {
@@ -84,7 +85,7 @@ namespace DataTools.Standard.Memory.StringBlob
 
             int i = 0;
 
-            foreach(var s in this)
+            foreach (var s in this)
             {
                 i += (s.Length + 1) * sizeof(char);
             }
@@ -107,9 +108,9 @@ namespace DataTools.Standard.Memory.StringBlob
 
         public static StringBlob FromByteArray(byte[] val)
         {
-            var mm = (SafePtr)(val);
+            var mm = (SafePtr)val;
 
-            var sb = StringBlob.FromNullTermPtr(mm.handle);
+            var sb = FromNullTermPtr(mm.handle);
             mm.Free();
 
             return sb;
@@ -128,7 +129,7 @@ namespace DataTools.Standard.Memory.StringBlob
         /// <returns></returns>
         public override string ToString()
         {
-            return this.ToFormattedString(StringBlobFormats.None);
+            return ToFormattedString(StringBlobFormats.None);
         }
 
 
@@ -183,7 +184,7 @@ namespace DataTools.Standard.Memory.StringBlob
         {
             if (operand2 is null || operand2.Length == 0)
                 return operand1;
-            
+
             operand1.Add(operand2);
             return operand1;
         }
