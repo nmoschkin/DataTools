@@ -1,10 +1,25 @@
 # DataTools Utility Libraries #
-## Version 7.0.0-pre-alpha ##
-
+## Version 8.0 Development ##
 
 ## Updates ##
 
 **December 23, 2022**
+
+__I have decided that I'm going to skip what would have been version 7.0, because version 7.0 would have been based on the old project organization scheme, and I am reorganizing the project in dramatic ways (including some major core deprecations.) I realized I could not sensibly call this project version 7.0, anymore, and so welcome to Version 8.0 Development Phase 1!__
+
+_Migrated to .NET 7.0, preparing to create NuGet packages._
+_All references to __IntPtr__ have been replaced with __nint__ except in the .NET Standard 2.0 projects._
+
+
+
+
+### Going Forward
+
+__The .NET Standard 2.0 core libraries of DataTools, DataTools.Graphics, DataTools.Extras and the PluginFramework are being refactored into .NET 7.0+.__
+
+The old .NET Standard 2.0 libraries have been put in a folder called Standard. I will try to keep some core aspects in sync with their new .NET 7.0+ counterparts, but as Xamarin.Forms becomes more legacy, the usefulness of keeping these libraries around evaporates in tandem with that eventuality.
+
+All projects in _this_ solution (save the Xamarin projects) will be using the .NET 7.0 version of the libraries. Also, all of my other public repositories that depend on projects in this repository will be transitioned to .NET 7.0 libraries.
 
 So, I have gone several dramatic ways in attempting to determine how best to refactor these projects. 
 
@@ -32,12 +47,18 @@ __That being said.  Let's have a look at what this project provides, and where I
  - Expressions
    - Expression Parsing
    - Unit Conversion to/from SI units
+ - Plug-In Framework
  - Sorting
    - Quick Sort
    - Binary Search
    - Red/Black Collection
  - Memory
    - Memory manipulation with safe classes and unsafe structs
+ - Cross Platform
+   - Color Controls
+   - Xamarin
+   - MAUI
+   - _???_
  - Windows
    - Win32 Memory Objects
      - _Very Swiss-Army-Knife-ish_
@@ -85,9 +106,15 @@ There is also the matter of confusing organization and unused references with re
 
 So.  All of that's being figured, factored, refactored, and worked out. 
 
+The most difficult re-organization will be with the Win32 libraries. Nearly everything else is pretty much organized as it should be.
+
 More to come!
 
 
+
+## Version 7.2.0-pre-alpha ##
+
+## Updates ##
 
 **April 29, 2022**
 
