@@ -10,7 +10,7 @@ __I have decided that I'm going to skip what would have been version 7.0, becaus
 _Migrated to .NET 7.0, preparing to create NuGet packages._
 _All references to __IntPtr__ have been replaced with __nint__ except in the .NET Standard 2.0 projects._
 
-
+__Note__: Active development is occurring in the __dev-8.0__ branch.
 
 
 ### Going Forward
