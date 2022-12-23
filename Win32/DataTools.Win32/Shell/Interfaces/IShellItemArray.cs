@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: NativeShell
@@ -7,11 +7,11 @@
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // Some classes and interfaces were ported from the WindowsAPICodePack.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections.Generic;
@@ -38,24 +38,24 @@ namespace DataTools.Shell.Native
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult BindToHandler(
-            [In, MarshalAs(UnmanagedType.Interface)] IntPtr pbc,
+            [In, MarshalAs(UnmanagedType.Interface)] nint pbc,
             [In] ref Guid rbhid,
             [In] ref Guid riid,
-            out IntPtr ppvOut);
+            out nint ppvOut);
 
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetPropertyStore(
             [In] int Flags,
             [In] ref Guid riid,
-            out IntPtr ppv);
+            out nint ppv);
 
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetPropertyDescriptionList(
             [In] ref PropertyKey keyType,
             [In] ref Guid riid,
-            out IntPtr ppv);
+            out nint ppv);
 
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
@@ -77,6 +77,6 @@ namespace DataTools.Shell.Native
         // Not supported: IEnumShellItems (will use GetCount and GetItemAt instead).
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        HResult EnumItems([MarshalAs(UnmanagedType.Interface)] out IntPtr ppenumShellItems);
+        HResult EnumItems([MarshalAs(UnmanagedType.Interface)] out nint ppenumShellItems);
     }
 }

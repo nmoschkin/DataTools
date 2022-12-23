@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <RootNamespace>DataTools</RootNamespace>
 	  <AssemblyVersion>7.0.2.2022</AssemblyVersion>
 	  <FileVersion>7.0.2.2022</FileVersion>
@@ -21,7 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
     <ProjectReference Include="..\DataTools.Win32\DataTools.Win32.csproj" />
-    <ProjectReference Include="..\..\Common\DataTools\DataTools.csproj" />
   </ItemGroup>
 
 </Project>

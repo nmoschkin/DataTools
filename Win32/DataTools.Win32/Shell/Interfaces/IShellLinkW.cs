@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: NativeShell
@@ -7,11 +7,11 @@
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // Some classes and interfaces were ported from the WindowsAPICodePack.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections.Generic;
@@ -38,10 +38,10 @@ namespace DataTools.Shell.Native
             [Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile,
             int cchMaxPath,
             //ref _WIN32_FIND_DATAW pfd,
-            IntPtr pfd,
+            nint pfd,
             uint fFlags);
-        void GetIDList(out IntPtr ppidl);
-        void SetIDList(IntPtr pidl);
+        void GetIDList(out nint ppidl);
+        void SetIDList(nint pidl);
         void GetDescription(
             [Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile,
             int cchMaxName);
@@ -72,7 +72,7 @@ namespace DataTools.Shell.Native
         void SetRelativePath(
             [MarshalAs(UnmanagedType.LPWStr)] string pszPathRel,
             uint dwReserved);
-        void Resolve(IntPtr hwnd, uint fFlags);
+        void Resolve(nint hwnd, uint fFlags);
         void SetPath(
             [MarshalAs(UnmanagedType.LPWStr)] string pszFile);
     }

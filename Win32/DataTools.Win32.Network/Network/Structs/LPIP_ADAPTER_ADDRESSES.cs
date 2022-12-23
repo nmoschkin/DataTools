@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: IfDefApi
@@ -7,11 +7,11 @@
 //
 // (and an exercise in creative problem solving and data-structure marshaling.)
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -36,7 +36,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Handle.Handle == IntPtr.Zero)
+            if (Handle.Handle == nint.Zero)
                 return "NULL";
             return Struct.FriendlyName;
         }
@@ -62,7 +62,7 @@ namespace DataTools.Win32.Network
         public IP_ADAPTER_ADDRESSES ToAdapterStruct()
         {
             IP_ADAPTER_ADDRESSES ToAdapterStructRet = default;
-            if (Handle == IntPtr.Zero)
+            if (Handle == nint.Zero)
                 return default;
             ToAdapterStructRet = Handle.ToStruct<IP_ADAPTER_ADDRESSES>();
             return ToAdapterStructRet;
@@ -88,7 +88,7 @@ namespace DataTools.Win32.Network
             return a;
         }
 
-        //public static implicit operator LPIP_ADAPTER_ADDRESSES(IntPtr operand)
+        //public static implicit operator LPIP_ADAPTER_ADDRESSES(nint operand)
         //{
         
     }//    var a = new LPIP_ADAPTER_ADDRESSES();
@@ -96,7 +96,7 @@ namespace DataTools.Win32.Network
         //    return a;
         //}
 
-        //public static implicit operator IntPtr(LPIP_ADAPTER_ADDRESSES operand)
+        //public static implicit operator nint(LPIP_ADAPTER_ADDRESSES operand)
         //{
         //    return operand.Handle.Handle;
         //}

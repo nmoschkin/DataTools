@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: IfDefApi
@@ -7,11 +7,11 @@
 //
 // (and an exercise in creative problem solving and data-structure marshaling.)
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -36,7 +36,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Handle.Handle == IntPtr.Zero)
+            if (Handle.Handle == nint.Zero)
                 return "NULL";
             return "" + IPAddress.ToString() + " (" + AddressFamily.ToString() + ")";
         }
@@ -78,7 +78,7 @@ namespace DataTools.Win32.Network
         public SOCKADDR ToSockAddr()
         {
             SOCKADDR ToSockAddrRet = default;
-            if (Handle == IntPtr.Zero)
+            if (Handle == nint.Zero)
                 return new SOCKADDR();
             ToSockAddrRet = Handle.ToStruct<SOCKADDR>();
             return ToSockAddrRet;
@@ -87,7 +87,7 @@ namespace DataTools.Win32.Network
         public SOCKADDRV6 ToSockAddr6()
         {
             SOCKADDRV6 ToSockAddr6Ret = default;
-            if (Handle == IntPtr.Zero)
+            if (Handle == nint.Zero)
                 return default;
             ToSockAddr6Ret = Handle.ToStruct<SOCKADDRV6>();
             return ToSockAddr6Ret;
@@ -102,7 +102,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle.Handle == IntPtr.Zero)
+                if (Handle.Handle == nint.Zero)
                     return AddressFamily.AfUnspecified;
                 return ToSockAddr().AddressFamily;
             }
@@ -127,14 +127,14 @@ namespace DataTools.Win32.Network
             }
         }
 
-        public static implicit operator LPSOCKADDR(IntPtr operand)
+        public static implicit operator LPSOCKADDR(nint operand)
         {
             var a = new LPSOCKADDR();
             a.Handle = operand;
             return a;
         }
 
-        public static implicit operator IntPtr(LPSOCKADDR operand)
+        public static implicit operator nint(LPSOCKADDR operand)
         {
             return operand.Handle.Handle;
         }

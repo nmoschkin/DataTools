@@ -12,13 +12,13 @@ namespace DataTools.Win32.Memory
     {
 
         /// <summary>
-        /// Returns true if the handle is one of the invalid handle values (<see cref="IntPtr.Zero"/> or (<see cref="IntPtr"/>)(-1).)
+        /// Returns true if the handle is one of the invalid handle values (<see cref="nint.Zero"/> or (<see cref="nint"/>)(-1).)
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static bool IsInvalidHandle(this IntPtr value)
+        public static bool IsInvalidHandle(this nint value)
         {
-            return (value == IntPtr.Zero || value == (IntPtr)(-1));
+            return (value == nint.Zero || value == (nint)(-1));
         }
 
 

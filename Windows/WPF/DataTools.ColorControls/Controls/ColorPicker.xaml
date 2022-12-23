@@ -10,28 +10,33 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <local:ColorConverter x:Key="colorConv" />
-            <local:BoolConverter x:Key="visConv" Mode="Visibility" />
+            <local:BoolConverter
+                x:Key="visConv"
+                Mode="Visibility" />
 
-            <Style x:Key="Elements" TargetType="TextBox">
+            <Style
+                x:Key="Elements"
+                TargetType="TextBox">
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="HorizontalAlignment" Value="Right" />
+                <Setter Property="Margin" Value="8,8,0,8" />
+                <Setter Property="Padding" Value="2,4" />
+                <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Width" Value="60" />
-                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+
+            <Style
+                x:Key="BigElements"
+                TargetType="TextBox">
+                <Setter Property="FontFamily" Value="Segoe UI" />
+                <Setter Property="FontSize" Value="14" />
                 <Setter Property="HorizontalAlignment" Value="Right" />
                 <Setter Property="Margin" Value="8,8,0,8" />
                 <Setter Property="Padding" Value="2,4" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontSize" Value="14" />
-            </Style>
-
-            <Style x:Key="BigElements" TargetType="TextBox">
+                <Setter Property="VerticalAlignment" Value="Center" />
                 <Setter Property="Width" Value="160" />
-                <Setter Property="VerticalAlignment" Value="Center" />
-                <Setter Property="HorizontalAlignment" Value="Right" />
-                <Setter Property="Margin" Value="8,8,0,8" />
-                <Setter Property="Padding" Value="2,4" />
-                <Setter Property="FontFamily" Value="Segoe UI" />
-                <Setter Property="FontSize" Value="14" />
             </Style>
-
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -61,7 +66,6 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-
             <local:ColorElement
                 x:Name="ColorSwatch"
                 Grid.Row="0"
@@ -76,7 +80,6 @@
                 SelectedColor="{Binding SelectedColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                 SelectedColorName="{Binding SelectedColorName, Mode=OneWayToSource}" />
 
-
             <Rectangle
                 Grid.Row="1"
                 Width="{Binding ElementName=ColorSwatch, Path=ActualWidth}"
@@ -86,7 +89,6 @@
                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
                         <GradientStop Offset="0" Color="Black" />
                         <GradientStop Offset="1" Color="White" />
-
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
@@ -101,9 +103,7 @@
                 TickPlacement="TopLeft"
                 Ticks="0.01"
                 Value="{Binding V, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-
         </Grid>
-
 
         <Grid
             Grid.Row="0"
@@ -150,9 +150,7 @@
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
-
             </TextBox>
-
 
             <TextBlock
                 Grid.Row="1"
@@ -177,9 +175,7 @@
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
-
             </TextBox>
-
 
             <TextBlock
                 Grid.Row="2"
@@ -204,7 +200,6 @@
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
-
             </TextBox>
 
             <TextBlock
@@ -230,9 +225,7 @@
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
-
             </TextBox>
-
 
             <TextBlock
                 Grid.Row="1"
@@ -257,7 +250,6 @@
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
-
             </TextBox>
 
             <TextBlock
@@ -283,7 +275,6 @@
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
-
             </TextBox>
 
             <CheckBox
@@ -321,10 +312,7 @@
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
-
             </TextBox>
-
-
 
             <TextBlock
                 Grid.Row="4"
@@ -346,17 +334,15 @@
                 Visibility="{Binding ShowWebHexValue, Converter={StaticResource visConv}, Mode=OneWay}">
 
                 <TextBox.Text>
-                    <Binding Converter="{StaticResource colorConv}" Path="SelectedColor">
+                    <Binding
+                        Converter="{StaticResource colorConv}"
+                        Path="SelectedColor">
                         <Binding.ValidationRules>
                             <local:ColorValidator ValidateWebHex="True" />
                         </Binding.ValidationRules>
                     </Binding>
                 </TextBox.Text>
-
             </TextBox>
-
-
-
         </Grid>
 
         <Grid
@@ -382,7 +368,6 @@
                     <RowDefinition />
                 </Grid.RowDefinitions>
 
-
                 <TextBlock
                     Margin="14,8,14,2"
                     Text="Named Colors:"
@@ -399,7 +384,6 @@
                     SelectedItem="{Binding SelectedNamedColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                     Visibility="{Binding ShowNamedColors, Converter={StaticResource visConv}}" />
             </Grid>
-
 
             <StackPanel
                 x:Name="SelPanel"
@@ -425,7 +409,6 @@
                         FontFamily="Segoe UI"
                         FontSize="14"
                         Text="{Binding ElementName=ColorSwatch, Path=SelectedColorName}" />
-
                 </StackPanel>
 
                 <Rectangle
@@ -441,13 +424,7 @@
                         <SolidColorBrush Color="{Binding SelectedColor, Mode=OneWay}" />
                     </Rectangle.Fill>
                 </Rectangle>
-
             </StackPanel>
-
-
         </Grid>
-
-
     </Grid>
-
 </UserControl>

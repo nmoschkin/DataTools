@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: NativeShell
@@ -7,11 +7,11 @@
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // Some classes and interfaces were ported from the WindowsAPICodePack.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections.Generic;
@@ -215,8 +215,8 @@ namespace DataTools.Shell.Native
         // ushort _wReserved3;
 
         // In order to allow x64 compat, we need to allow for
-        // expansion of the IntPtr. However, the BLOB struct
-        // uses a 4-byte int, followed by an IntPtr, so
+        // expansion of the nint. However, the BLOB struct
+        // uses a 4-byte int, followed by an nint, so
         // although the valueData field catches most pointer values,
         // we need an additional 4-bytes to get the BLOB
         // pointer. The valueDataExt field provides this, as well as
@@ -224,10 +224,10 @@ namespace DataTools.Shell.Native
         // architectures.
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources")]
         [FieldOffset(12)]
-        private IntPtr _ptr2;
+        private nint _ptr2;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources")]
         [FieldOffset(8)]
-        private IntPtr _ptr;
+        private nint _ptr;
         [FieldOffset(8)]
         private int _int32;
         [FieldOffset(8)]
@@ -600,7 +600,7 @@ namespace DataTools.Shell.Native
                 for (int i = 0, l = array.Length; i < l; i++)
                 {
                     var obj = array.GetValue(i);
-                    var punk = obj is object ? Marshal.GetIUnknownForObject(obj) : IntPtr.Zero;
+                    var punk = obj is object ? Marshal.GetIUnknownForObject(obj) : nint.Zero;
                     Marshal.WriteIntPtr(pvData, i * IntPtr.Size, punk);
                 }
             }
@@ -890,7 +890,7 @@ namespace DataTools.Shell.Native
             return array;
         }
 
-        private static Array CrackSingleDimSafeArray(IntPtr psa)
+        private static Array CrackSingleDimSafeArray(nint psa)
         {
             uint cDims = PropVariantNativeMethods.SafeArrayGetDim(psa);
             if (cDims != 1L)

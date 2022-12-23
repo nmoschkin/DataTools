@@ -1,15 +1,15 @@
-﻿// ************************************************* ''
+﻿// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: AdapterCollection
 //         Encapsulates the network interface environment
 //         of the currently running system.
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections;
@@ -83,9 +83,9 @@ namespace DataTools.Win32.Network
                 string s = @"::{7007ACC7-3202-11D1-AAD2-00805FC1270E}\" + AdapterName;
                 var mm = new MemPtr();
 
-                NativeShell.SHParseDisplayName(s, IntPtr.Zero, out mm.handle, 0, out _);
+                NativeShell.SHParseDisplayName(s, nint.Zero, out mm.handle, 0, out _);
 
-                if (mm.Handle != IntPtr.Zero)
+                if (mm.Handle != nint.Zero)
                 {
                     // Get a WPFImage 
 
@@ -214,7 +214,7 @@ namespace DataTools.Win32.Network
         /// </summary>
         /// <param name="hwnd"></param>
         /// <remarks></remarks>
-        public void ShowConnectionPropertiesDialog(IntPtr hwnd = default)
+        public void ShowConnectionPropertiesDialog(nint hwnd = default)
         {
             if (deviceInfo is null)
                 return;
@@ -237,7 +237,7 @@ namespace DataTools.Win32.Network
         /// </summary>
         /// <param name="hwnd"></param>
         /// <remarks></remarks>
-        public void ShowNetworkStatusDialog(IntPtr hwnd = default)
+        public void ShowNetworkStatusDialog(nint hwnd = default)
         {
             var shex = new SHELLEXECUTEINFO();
 

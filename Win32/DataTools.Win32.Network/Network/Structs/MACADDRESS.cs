@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: IfDefApi
@@ -7,21 +7,18 @@
 //
 // (and an exercise in creative problem solving and data-structure marshaling.)
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
-
-
-using System;
-using System.ComponentModel;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
+// Licensed Under the Apache 2.0 License
+// *************************************************
 
 using DataTools.Streams;
-using DataTools.Win32;
+using DataTools.Text;
+
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace DataTools.Win32.Network
 {
@@ -35,7 +32,7 @@ namespace DataTools.Win32.Network
     {
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U1, SizeConst = IfDefApi.MAX_ADAPTER_ADDRESS_LENGTH)]
         public byte[] Data;
-        
+
         public static bool operator ==(MACADDRESS val1, MACADDRESS val2)
         {
             for (int i = 0; i < IfDefApi.MAX_ADAPTER_ADDRESS_LENGTH; i++)
@@ -95,7 +92,6 @@ namespace DataTools.Win32.Network
 
             Data = new byte[IfDefApi.MAX_ADAPTER_ADDRESS_LENGTH];
             int j = Data.Length - 1;
-
 
             for (i = c; i >= 0; i--)
             {
@@ -158,9 +154,9 @@ namespace DataTools.Win32.Network
 
             StringBuilder sb = new StringBuilder();
             string fmt = upperCase ? "X2" : "x2";
-           
+
             bool sc = true;
-            
+
             for (i = c - 1; i >= 0; i--)
             {
                 if (Data[i] != 0)
@@ -184,11 +180,9 @@ namespace DataTools.Win32.Network
                 }
 
                 sb.Append(Data[i].ToString(fmt));
-
             }
 
             return sb.ToString();
-
         }
     }
 }

@@ -40,7 +40,7 @@ namespace DataTools.Win32.Usb
             }
         }
 
-        public void CopyTo(IntPtr buffer)
+        public void CopyTo(nint buffer)
         {
             unsafe
             {

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
 	  <AssemblyVersion>7.0.2.2022</AssemblyVersion>
 	  <FileVersion>7.0.2.2022</FileVersion>
@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Standard\DataTools\DataTools.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Bluetooth\DataTools.Win32.Bluetooth.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Disk\DataTools.Win32.Disk.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Display\DataTools.Win32.Display.csproj" />
@@ -28,7 +29,6 @@
     <ProjectReference Include="..\DataTools.Win32.Processor\DataTools.Win32.Processor.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Usb\DataTools.Win32.Usb.csproj" />
     <ProjectReference Include="..\DataTools.Win32\DataTools.Win32.csproj" />
-    <ProjectReference Include="..\..\Common\DataTools\DataTools.csproj" />
   </ItemGroup>
 
 </Project>

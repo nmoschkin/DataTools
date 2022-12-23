@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: Native
@@ -11,11 +11,11 @@
 
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 
@@ -34,7 +34,7 @@ namespace DataTools.Win32
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct PAINTSTRUCT
     {
-        public IntPtr hDC;
+        public nint hDC;
         public int fErase;
         public W32RECT rcpaint;
         public int fRestore;

@@ -1,13 +1,13 @@
-﻿// ************************************************* ''
+﻿// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: DeviceInfo Hardware Information Class
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.ComponentModel;
@@ -810,7 +810,7 @@ namespace DataTools.Win32
         /// Display the system device properties dialog page for this device.
         /// </summary>
         /// <remarks></remarks>
-        public void ShowDevicePropertiesDialog(IntPtr hwnd = default)
+        public void ShowDevicePropertiesDialog(nint hwnd = default)
         {
             DevPropDialog.OpenDeviceProperties(InstanceId, hwnd);
         }

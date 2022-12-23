@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: Printers
@@ -8,11 +8,11 @@
 //         Other knowledge and references obtained through various sources
 //         and all is considered public domain/common knowledge.
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -88,7 +88,7 @@ namespace DataTools.Hardware.Printers
             var sp = new List<string>();
             int ps = Marshal.SizeOf(pif);
             string ts;
-            PrinterModule.EnumPrinters(PrinterModule.PRINTER_ENUM_NAME, "", 4U, IntPtr.Zero, 0U, ref cb, ref rc);
+            PrinterModule.EnumPrinters(PrinterModule.PRINTER_ENUM_NAME, "", 4U, nint.Zero, 0U, ref cb, ref rc);
             if (cb > 0L)
             {
                 mm.Alloc(cb);

@@ -1,14 +1,14 @@
-﻿// ************************************************* ''
+﻿// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: DiskDeviceInfo derived class for disks and
 //         volumes.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.ComponentModel;
@@ -181,7 +181,7 @@ namespace DataTools.Win32.Disk
 
                         Partitioning.DRIVE_LAYOUT_INFORMATION_EX arglayInfo = new Partitioning.DRIVE_LAYOUT_INFORMATION_EX();
 
-                        p = Partitioning.GetPartitions(@"\\.\PhysicalDrive" + PhysicalDevice, IntPtr.Zero, layInfo: ref arglayInfo);
+                        p = Partitioning.GetPartitions(@"\\.\PhysicalDrive" + PhysicalDevice, nint.Zero, layInfo: ref arglayInfo);
                         
                     }
                     catch

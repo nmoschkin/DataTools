@@ -1,62 +1,43 @@
-﻿// ************************************************* ''
+﻿// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: AdapterCollection
 //         Encapsulates the network interface environment
 //         of the currently running system.
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License
+// *************************************************
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security;
-using DataTools.Text;
-using DataTools.Desktop;
-using DataTools.Win32;
-using DataTools.Shell.Native;
-using DataTools.Win32.Network;
-using System.Threading.Tasks;
-using System.Net;
-using System.Net.Sockets;
-using System.Net.NetworkInformation;
-using System.Reflection;
 using DataTools.SortedLists;
 using DataTools.Win32.Memory;
-using System.Windows;
-using System.Collections.Specialized;
-using System.Linq.Expressions;
+
+using System.Collections;
+using System.Net;
+using System.Net.Sockets;
+using System.Reflection;
+using System.Security;
 
 namespace DataTools.Win32.Network
 {
-
-    #region Deprecated 
+    #region Deprecated
 
     //    //'' <summary>
     //    //'' System network adapter information thin wrappers.
     //    //'' </summary>
     //    //'' <remarks>
     //    //'' The observable collection is more suitable for use as a WPF data source.
-    //    //'' 
+    //    //''
     //    //'' The NetworkAdapter class cannot be created independently.
-    //    //'' 
+    //    //''
     //    //'' For most usage cases, the AdaptersCollection object should be used.
-    //    //'' 
+    //    //''
     //    //'' The <see cref="NetworkAdapters"/> collection is also a viable option
     //    //'' and possibly of a lighter variety.
     //    //'' </remarks>
     //    // Public Module NetworkWrappers
-
 
     //    /// <summary>
     //    /// Managed wrapper collection for all adapters.
@@ -162,7 +143,6 @@ namespace DataTools.Win32.Network
     //            return new IP_ADAPTER_ADDRESSES_Enumerator(this);
     //        }
 
-
     //        private bool disposedValue; // To detect redundant calls
 
     //        // IDisposable
@@ -188,7 +168,7 @@ namespace DataTools.Win32.Network
 
     //        protected void Free()
     //        {
-    //            if (_origPtr.Handle != IntPtr.Zero)
+    //            if (_origPtr.Handle != nint.Zero)
     //            {
     //                _origPtr.Free(true);
     //            }
@@ -202,7 +182,6 @@ namespace DataTools.Win32.Network
     //            Dispose(true);
     //            GC.SuppressFinalize(this);
     //        }
-
 
     //        public void Add(IP_ADAPTER_ADDRESSES item)
     //        {
@@ -302,7 +281,6 @@ namespace DataTools.Win32.Network
     //            pos = -1;
     //        }
 
-
     //        private bool disposedValue; // To detect redundant calls
 
     //        protected virtual void Dispose(bool disposing)
@@ -327,9 +305,7 @@ namespace DataTools.Win32.Network
 
     //    }
 
-    #endregion
-
-
+    #endregion Deprecated
 
     /// <summary>
     /// Represents the various states of internet connectivity.
@@ -352,8 +328,6 @@ namespace DataTools.Win32.Network
         NoInternet
     }
 
-
-
     /// <summary>
     /// A managed observable collection wrapper of NetworkAdapter wrapper objects.  This collection wraps the
     /// Windows Network Interface Api.  All objects are thin wrappers around the original unmanaged
@@ -363,11 +337,11 @@ namespace DataTools.Win32.Network
     /// The array memory is allocated as one very long block by the GetAdapters function.
     /// We keep it in this collection and the members in the unmanaged memory source serve
     /// as the backbone for the collection of NetworkAdapter objects.
-    /// 
+    ///
     /// For this reason, the NetworkAdapter object cannot be created publically, as the
     /// AdaptersCollection object is managing a single block of unmanaged memory for the entire collection.
     /// Therefore, there can be no singleton instances of the NetworkAdapter object.
-    /// 
+    ///
     /// We will use Finalize() to free this (rather large) resource when this class is destroyed.
     /// </remarks>
     [SecurityCritical()]
@@ -423,7 +397,7 @@ namespace DataTools.Win32.Network
             }
         }
 
-        public AdaptersCollection() 
+        public AdaptersCollection()
         {
             Refresh();
         }
@@ -459,7 +433,6 @@ namespace DataTools.Win32.Network
             }
 
             return (T)maker.Invoke(new object[0]);
-            
         }
 
         /// <summary>
@@ -467,15 +440,14 @@ namespace DataTools.Win32.Network
         /// </summary>
         public void Refresh()
         {
-
-            lock(lockObj)
+            lock (lockObj)
             {
                 var nad = new Dictionary<int, T>();
                 var lOut = new List<T>();
 
                 var newmm = new MemPtr();
 
-                // Get the array of unmanaged IP_ADAPTER_ADDRESSES structures 
+                // Get the array of unmanaged IP_ADAPTER_ADDRESSES structures
                 var newads = IfDefApi.GetAdapters(ref newmm, true);
 
                 var di = DeviceEnum.EnumerateDevices<DeviceInfo>(DevProp.GUID_DEVINTERFACE_NET);
@@ -524,7 +496,6 @@ namespace DataTools.Win32.Network
                     {
                         adapters.Add(kv.Value);
                     }
-
                 }
                 else
                 {
@@ -555,7 +526,6 @@ namespace DataTools.Win32.Network
                             AddItem(kv.Value);
                         }
                     }
-
                 }
 
                 if (_origPtr != MemPtr.Empty)
@@ -566,7 +536,6 @@ namespace DataTools.Win32.Network
                 _origPtr = newmm;
 
                 if (sortOnRefresh) Sort();
-
             }
         }
 
@@ -608,7 +577,6 @@ namespace DataTools.Win32.Network
                             socket.Close();
                             adapter.HasInternet = InternetStatus.NoInternet;
                         }
-
                     }
                     catch
                     {
@@ -634,7 +602,7 @@ namespace DataTools.Win32.Network
                     throw new InvalidOperationException("Cannot sort when no comparison is defined.");
                 }
 
-                QuickSort.Sort(adapters, sortComparison);
+                QuickSort.Sort(adapters, (a, b) => sortComparison(a, b));
             }
         }
 
@@ -661,14 +629,13 @@ namespace DataTools.Win32.Network
                 adapters.RemoveAt(index);
             }
         }
-        
+
         private bool disposedValue; // To detect redundant calls
 
         public int Count => ((IReadOnlyCollection<T>)adapters).Count;
 
         public T this[int index] => ((IReadOnlyList<T>)adapters)[index];
 
-        
         /// <summary>
         /// Dispose of the object.
         /// </summary>
@@ -706,7 +673,6 @@ namespace DataTools.Win32.Network
         }
     }
 
-
     /// <summary>
     /// A managed observable collection wrapper of NetworkAdapter wrapper objects.  This collection wraps the
     /// Windows Network Interface Api.  All objects are thin wrappers around the original unmanaged
@@ -716,19 +682,18 @@ namespace DataTools.Win32.Network
     /// The array memory is allocated as one very long block by the GetAdapters function.
     /// We keep it in this collection and the members in the unmanaged memory source serve
     /// as the backbone for the collection of NetworkAdapter objects.
-    /// 
+    ///
     /// For this reason, the NetworkAdapter object cannot be created publically, as the
     /// AdaptersCollection object is managing a single block of unmanaged memory for the entire collection.
     /// Therefore, there can be no singleton instances of the NetworkAdapter object.
-    /// 
+    ///
     /// We will use Finalize() to free this (rather large) resource when this class is destroyed.
     /// </remarks>
     [SecurityCritical()]
-    public class AdaptersCollection : AdaptersCollection<NetworkAdapter>    
+    public class AdaptersCollection : AdaptersCollection<NetworkAdapter>
     {
         public AdaptersCollection() : base()
         {
         }
     }
-
 }

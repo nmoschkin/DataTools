@@ -1,14 +1,14 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: DiskApi
 //         Native Disk Serivces.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -47,7 +47,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             // principalPerm.Demand()
 
 
-            var hfile = IO.CreateFile(devicePath, IO.GENERIC_READ | IO.GENERIC_WRITE, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_FLAG_NO_BUFFERING | IO.FILE_FLAG_RANDOM_ACCESS, IntPtr.Zero);
+            var hfile = IO.CreateFile(devicePath, IO.GENERIC_READ | IO.GENERIC_WRITE, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_FLAG_NO_BUFFERING | IO.FILE_FLAG_RANDOM_ACCESS, nint.Zero);
 
             if (hfile == IO.INVALID_HANDLE_VALUE)
                 return false;
@@ -76,7 +76,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             long lp2 = 0L;
             var mm = new MemPtr(bps * 2L);
             IO.SetFilePointerEx(hfile, 0L, ref lp, IO.FilePointerMoveMethod.Begin);
-            IO.ReadFile(hfile, mm.Handle, bps * 2, ref br, IntPtr.Zero);
+            IO.ReadFile(hfile, mm.Handle, bps * 2, ref br, nint.Zero);
             var mbr = new RAW_MBR();
             var gpt = new RAW_GPT_HEADER();
             RAW_GPT_PARTITION[] gpp = null;
@@ -110,7 +110,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                 mm.ZeroMemory();
 
                 // read the partition information into the pointer.
-                IO.ReadFile(hfile, mm.Handle, (uint)lp, ref br, IntPtr.Zero);
+                IO.ReadFile(hfile, mm.Handle, (uint)lp, ref br, nint.Zero);
 
                 // check the partition table CRC.
                 if (mm.CalculateCrc32() == gpt.PartitionArrayCRC32)

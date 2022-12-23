@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataTools.MathTools;
-using DataTools.Win32;
+﻿using DataTools.Win32.Memory;
+
 using System.Drawing;
 using System.Runtime.InteropServices;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32
 {
     public static class BitmapTools
     {
-
         public const long BI_RGB = 0L;
         public const long BI_RLE8 = 1L;
         public const long BI_RLE4 = 2L;
@@ -21,9 +14,8 @@ namespace DataTools.Win32
         public const long BI_JPEG = 4L;
         public const long BI_PNG = 5L;
 
-
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        internal static extern IntPtr CreateDIBSection(IntPtr hdc, IntPtr pbmi, uint usage, ref IntPtr ppvBits, IntPtr hSection, int offset);
+        internal static extern nint CreateDIBSection(nint hdc, nint pbmi, uint usage, ref nint ppvBits, nint hSection, int offset);
 
         /// <summary>
         /// Gray out an icon.
@@ -39,7 +31,7 @@ namespace DataTools.Win32
             g.DrawIcon(icn, 0, 0);
             g.Dispose();
             var bm = new System.Drawing.Imaging.BitmapData();
-            var mm = new MemPtr(n.Width * n.Height * 4);
+            var mm = new MemPtr((long)n.Width * n.Height * 4);
             bm.Stride = n.Width * 4;
             bm.Scan0 = mm;
             bm.PixelFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
@@ -78,10 +70,10 @@ namespace DataTools.Win32
         /// <param name="icn"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static IntPtr DIBFromIcon(Icon icn)
+        public static nint DIBFromIcon(Icon icn)
         {
             var bmp = IconToTransparentBitmap(icn);
-            var _d = new IntPtr();
+            var _d = new nint();
 
             return MakeDIBSection(bmp, ref _d);
         }
@@ -93,7 +85,7 @@ namespace DataTools.Win32
         /// <param name="bitPtr">Optional variable to receive a pointer to the bitmap bits.</param>
         /// <returns>A new DIB handle that must be destroyed with DeleteObject().</returns>
         /// <remarks></remarks>
-        public static IntPtr MakeDIBSection(Bitmap img, ref IntPtr bitPtr)
+        public static nint MakeDIBSection(Bitmap img, ref nint bitPtr)
         {
             // Build header.
             // adapted from C++ code examples.
@@ -117,10 +109,10 @@ namespace DataTools.Win32
             pbmih.biYPelsPerMeter = (int)(24.5d * 1000d); // pixels per meter!
             pbmih.biClrUsed = 0;
             pbmih.biClrImportant = 0;
-            var pPixels = IntPtr.Zero;
+            var pPixels = nint.Zero;
             int DIB_RGB_COLORS = 0;
             Marshal.StructureToPtr(pbmih, mm.Handle, false);
-            var hPreviewBitmap = BitmapTools.CreateDIBSection(IntPtr.Zero, mm.Handle, (uint)DIB_RGB_COLORS, ref pPixels, IntPtr.Zero, 0);
+            var hPreviewBitmap = BitmapTools.CreateDIBSection(nint.Zero, mm.Handle, (uint)DIB_RGB_COLORS, ref pPixels, nint.Zero, 0);
             bitPtr = pPixels;
             var bm = new System.Drawing.Imaging.BitmapData();
             bm = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppPArgb, bm);
@@ -162,7 +154,5 @@ namespace DataTools.Win32
             g.Dispose();
             return n;
         }
-
-
     }
 }

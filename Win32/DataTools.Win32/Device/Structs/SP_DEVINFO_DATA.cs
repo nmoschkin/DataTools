@@ -1,14 +1,14 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: DevProp
 //         Native Device Properites.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.ComponentModel;
@@ -26,6 +26,6 @@ namespace DataTools.Win32
         public uint cbSize;
         public Guid ClassGuid;
         public uint DevInst;
-        public IntPtr Reserved;
+        public nint Reserved;
     }
 }

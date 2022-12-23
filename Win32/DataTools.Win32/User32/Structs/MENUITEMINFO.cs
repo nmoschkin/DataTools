@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: Native
@@ -11,11 +11,11 @@
 
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 
@@ -39,15 +39,15 @@ namespace DataTools.Win32
         public int fType;
         public int fState;
         public int wID;
-        public IntPtr hSubMenu;
-        public IntPtr hbmpChecked;
-        public IntPtr hbmpUnchecked;
-        public IntPtr dwItemData;
-        public IntPtr dwTypeData;
+        public nint hSubMenu;
+        public nint hbmpChecked;
+        public nint hbmpUnchecked;
+        public nint dwItemData;
+        public nint dwTypeData;
         public int cch;
 
         // Declared for Windows 2000/98.  Still backward compatible
 
-        public IntPtr hbmpItem;
+        public nint hbmpItem;
     }
 }

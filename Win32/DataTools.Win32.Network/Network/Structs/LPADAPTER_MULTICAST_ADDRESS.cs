@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: IfDefApi
@@ -7,11 +7,11 @@
 //
 // (and an exercise in creative problem solving and data-structure marshaling.)
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -34,7 +34,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == IntPtr.Zero)
+                if (Handle == nint.Zero)
                     return null;
                 int c = 0;
                 var mx = this;
@@ -46,7 +46,7 @@ namespace DataTools.Win32.Network
                     mx = mx.Next;
                     c += 1;
                 }
-                while (mx.Handle.Handle != IntPtr.Zero);
+                while (mx.Handle.Handle != nint.Zero);
                 return ac;
             }
         }
@@ -55,7 +55,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == IntPtr.Zero)
+                if (Handle == nint.Zero)
                     return default;
                 return Struct.Next;
             }
@@ -63,7 +63,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Handle.Handle == IntPtr.Zero)
+            if (Handle.Handle == nint.Zero)
                 return "NULL";
             return "" + IPAddress.ToString() + " (" + AddressFamily.ToString() + ")";
         }
@@ -72,7 +72,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == IntPtr.Zero)
+                if (Handle == nint.Zero)
                     return null;
                 return Struct.Address.lpSockaddr.IPAddress;
             }
@@ -83,7 +83,7 @@ namespace DataTools.Win32.Network
             get
             {
                 ADAPTER_MULTICAST_ADDRESS StructRet = default;
-                if (Handle == IntPtr.Zero)
+                if (Handle == nint.Zero)
                     return default;
                 StructRet = ToAddress();
                 return StructRet;
@@ -93,7 +93,7 @@ namespace DataTools.Win32.Network
         public ADAPTER_MULTICAST_ADDRESS ToAddress()
         {
             ADAPTER_MULTICAST_ADDRESS ToAddressRet = default;
-            if (Handle == IntPtr.Zero)
+            if (Handle == nint.Zero)
                 return default;
             ToAddressRet = Handle.ToStruct<ADAPTER_MULTICAST_ADDRESS>();
             return ToAddressRet;
@@ -108,7 +108,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == IntPtr.Zero)
+                if (Handle == nint.Zero)
                     return AddressFamily.AfUnspecified;
                 return Struct.Address.lpSockaddr.AddressFamily;
             }
@@ -118,20 +118,20 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == IntPtr.Zero)
+                if (Handle == nint.Zero)
                     return null;
                 return Struct.Address.lpSockaddr.Data;
             }
         }
 
-        public static implicit operator LPADAPTER_MULTICAST_ADDRESS(IntPtr operand)
+        public static implicit operator LPADAPTER_MULTICAST_ADDRESS(nint operand)
         {
             var a = new LPADAPTER_MULTICAST_ADDRESS();
             a.Handle = operand;
             return a;
         }
 
-        public static implicit operator IntPtr(LPADAPTER_MULTICAST_ADDRESS operand)
+        public static implicit operator nint(LPADAPTER_MULTICAST_ADDRESS operand)
         {
             return operand.Handle;
         }

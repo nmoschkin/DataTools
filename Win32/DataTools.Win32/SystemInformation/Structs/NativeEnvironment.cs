@@ -1,15 +1,15 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows 
 //
 // Module: SystemInfo
 //         Provides basic information about the
 //         current computer.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System.Runtime.InteropServices;
 
@@ -40,12 +40,12 @@ namespace DataTools.SystemInformation
         /// <summary>
         /// Minimum allowed application memory address
         /// </summary>
-        public readonly IntPtr MinimumApplicationAddress;
+        public readonly nint MinimumApplicationAddress;
 
         /// <summary>
         /// Maximum allowed application memory address
         /// </summary>
-        public readonly IntPtr MaximumApplicationAddress;
+        public readonly nint MaximumApplicationAddress;
 
         /// <summary>
         /// Active processor mask

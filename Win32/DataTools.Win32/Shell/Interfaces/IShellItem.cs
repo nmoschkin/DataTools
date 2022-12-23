@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: NativeShell
@@ -6,22 +6,15 @@
 //
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // Some classes and interfaces were ported from the WindowsAPICodePack.
-// 
-// Copyright (C) 2011-2020 Nathan Moschkin
+//
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License
+// *************************************************
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 
 //using DataTools.Hardware.MessageResources;
 //using DataTools.Hardware;
@@ -38,7 +31,7 @@ namespace DataTools.Shell.Native
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult BindToHandler(
-            [In] IntPtr pbc,
+            [In] nint pbc,
             [In] ref Guid bhid,
             [In] ref Guid riid,
             [Out, MarshalAs(UnmanagedType.Interface)] out IShellFolder ppv);
@@ -46,11 +39,10 @@ namespace DataTools.Shell.Native
         //[PreserveSig]
         //[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         //HResult BindToHandler(
-        //    [In] IntPtr pbc,
+        //    [In] nint pbc,
         //    [In] ref Guid bhid,
         //    [In] ref Guid riid,
         //    [Out, MarshalAs(UnmanagedType.Interface)] out IPropertyStore ppv);
-
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void GetParent([MarshalAs(UnmanagedType.Interface)] out IShellItem ppsi);
@@ -59,7 +51,7 @@ namespace DataTools.Shell.Native
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetDisplayName(
             [In] ShellItemDesignNameOptions sigdnName,
-            out IntPtr ppszName);
+            out CoTaskMemPtr ppszName);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void GetAttributes([In] ShellFileGetAttributesOptions sfgaoMask, out ShellFileGetAttributesOptions psfgaoAttribs);
@@ -71,7 +63,6 @@ namespace DataTools.Shell.Native
             [In] SICHINTF hint,
             out int piOrder);
     }
-
 
     [ComImport,
    Guid(ShellIIDGuid.IShellItem),
@@ -82,7 +73,7 @@ namespace DataTools.Shell.Native
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult BindToHandler(
-            [In] IntPtr pbc,
+            [In] nint pbc,
             [In] ref Guid bhid,
             [In] ref Guid riid,
             [Out, MarshalAs(UnmanagedType.Interface)] out IPropertyStore ppv);
@@ -90,11 +81,10 @@ namespace DataTools.Shell.Native
         //[PreserveSig]
         //[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         //HResult BindToHandler(
-        //    [In] IntPtr pbc,
+        //    [In] nint pbc,
         //    [In] ref Guid bhid,
         //    [In] ref Guid riid,
         //    [Out, MarshalAs(UnmanagedType.Interface)] out IPropertyStore ppv);
-
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void GetParent([MarshalAs(UnmanagedType.Interface)] out IShellItem ppsi);
@@ -103,7 +93,7 @@ namespace DataTools.Shell.Native
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetDisplayName(
             [In] ShellItemDesignNameOptions sigdnName,
-            out IntPtr ppszName);
+            out nint ppszName);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void GetAttributes([In] ShellFileGetAttributesOptions sfgaoMask, out ShellFileGetAttributesOptions psfgaoAttribs);
@@ -115,5 +105,4 @@ namespace DataTools.Shell.Native
             [In] SICHINTF hint,
             out int piOrder);
     }
-
 }

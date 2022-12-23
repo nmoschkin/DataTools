@@ -1,4 +1,4 @@
-﻿// ************************************************* ''
+﻿// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: UsbApi
@@ -8,11 +8,11 @@
 //         Other knowledge and references obtained through various sources
 //         and all is considered public domain/common knowledge.
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 
@@ -54,26 +54,26 @@ namespace DataTools.Win32.Usb
         /// <param name="write">Attempt to open with write access.</param>
         /// <returns>A handle to the open device (close with CloseHid).</returns>
         /// <remarks></remarks>
-        public static IntPtr OpenHid(HidDeviceInfo device, bool write = false)
+        public static nint OpenHid(HidDeviceInfo device, bool write = false)
         {
-            IntPtr hhid;
+            nint hhid;
            
             try
             {
                 if (write)
                 {
-                    hhid = IO.CreateFile(device.DevicePath, IO.FILE_WRITE_ACCESS, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
+                    hhid = IO.CreateFile(device.DevicePath, IO.FILE_WRITE_ACCESS, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
                 }
                 else
                 {
-                    hhid = IO.CreateFile(device.DevicePath, 0, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
+                    hhid = IO.CreateFile(device.DevicePath, 0, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
                 }
 
-                if (hhid.IsInvalidHandle()) return IntPtr.Zero;
+                if (hhid.IsInvalidHandle()) return nint.Zero;
             }
             catch
             {
-                return IntPtr.Zero;
+                return nint.Zero;
             }
 
             return hhid;
@@ -84,7 +84,7 @@ namespace DataTools.Win32.Usb
         /// </summary>
         /// <param name="handle">The handle of the device to be freed.</param>
         /// <remarks></remarks>
-        public static void CloseHid(IntPtr handle)
+        public static void CloseHid(nint handle)
         {
             if (!handle.IsInvalidHandle())
                 User32.CloseHandle(handle);
@@ -123,7 +123,7 @@ namespace DataTools.Win32.Usb
         /// <param name="datalen"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static HidFeatureValue? GetHIDFeature(IntPtr hhid, byte code, int datalen = 16)
+        public static HidFeatureValue? GetHIDFeature(nint hhid, byte code, int datalen = 16)
         {
             HidFeatureValue? result;
 

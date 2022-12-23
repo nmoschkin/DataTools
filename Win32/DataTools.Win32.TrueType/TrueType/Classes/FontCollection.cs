@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: TrueType.
@@ -6,11 +6,11 @@
 //         Adapted from the CodeProject article: http://www.codeproject.com/Articles/2293/Retrieving-font-name-from-TTF-file?msg=4714219#xx4714219xx
 //
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections;
@@ -31,10 +31,10 @@ namespace DataTools.Desktop
     {
 
         [DllImport("gdi32")]
-        static extern bool DeleteDC(IntPtr hdc);
+        static extern bool DeleteDC(nint hdc);
 
         [DllImport("gdi32", EntryPoint = "CreateDCW", CharSet = CharSet.Unicode)]
-        static extern IntPtr CreateDC([MarshalAs(UnmanagedType.LPWStr)] string lpszDriver, [MarshalAs(UnmanagedType.LPWStr)] string lpszDevice, IntPtr lpszOutput, IntPtr devMode);
+        static extern nint CreateDC([MarshalAs(UnmanagedType.LPWStr)] string lpszDriver, [MarshalAs(UnmanagedType.LPWStr)] string lpszDevice, nint lpszOutput, nint devMode);
         
         public enum FontSearchOptions
         {
@@ -45,10 +45,10 @@ namespace DataTools.Desktop
 
         private List<FontInfo> _List = new List<FontInfo>();
 
-        private delegate int EnumFontFamExProc(ref ENUMLOGFONTEX lpelfe, IntPtr lpntme, uint FontType, IntPtr lparam);
+        private delegate int EnumFontFamExProc(ref ENUMLOGFONTEX lpelfe, nint lpntme, uint FontType, nint lparam);
 
         [DllImport("gdi32.dll", CharSet = CharSet.Auto)]
-        private static extern int EnumFontFamiliesEx(IntPtr hdc, IntPtr lpLogFont, [MarshalAs(UnmanagedType.FunctionPtr)] EnumFontFamExProc lpEnumFontFamExProc, IntPtr lparam, uint dwflags);
+        private static extern int EnumFontFamiliesEx(nint hdc, nint lpLogFont, [MarshalAs(UnmanagedType.FunctionPtr)] EnumFontFamExProc lpEnumFontFamExProc, nint lparam, uint dwflags);
 
         /// <summary>
         /// Returns a static collection of all fonts on the system in the default character set.
@@ -117,7 +117,7 @@ namespace DataTools.Desktop
         /// <returns></returns>
         public static FontCollection GetFonts(FontFamilies families = FontFamilies.DontCare, FontPitch pitch = FontPitch.Default, FontCharSet charset = FontCharSet.Default, FontWeight weight = FontWeight.DontCare, object Script = null, object Style = null)
         {
-            IntPtr hdc;
+            nint hdc;
 
             var fonts = new List<ENUMLOGFONTEX>();
 
@@ -168,12 +168,12 @@ namespace DataTools.Desktop
             lf.lfFaceName = "";
             mm.Alloc(Marshal.SizeOf(lf));
             mm.FromStruct(lf);
-            hdc = CreateDC("DISPLAY", null, IntPtr.Zero, IntPtr.Zero);
+            hdc = CreateDC("DISPLAY", null, nint.Zero, nint.Zero);
 
             int e;
             bool bo = false;
 
-            e = EnumFontFamiliesEx(hdc, mm, (ref ENUMLOGFONTEX lpelfe, IntPtr lpntme, uint FontType, IntPtr lParam) =>
+            e = EnumFontFamiliesEx(hdc, mm, (ref ENUMLOGFONTEX lpelfe, nint lpntme, uint FontType, nint lParam) =>
             {
                 int z;
                 if (fonts is null)
@@ -232,7 +232,7 @@ namespace DataTools.Desktop
                     return 1;
                 fonts.Add(lpelfe);
                 return 1;
-            }, IntPtr.Zero, 0U);
+            }, nint.Zero, 0U);
             DeleteDC(hdc);
             mm.Free();
 

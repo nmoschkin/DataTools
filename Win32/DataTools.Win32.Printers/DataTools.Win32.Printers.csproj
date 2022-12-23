@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	  <RootNamespace>DataTools</RootNamespace>
@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\Standard\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\Standard\DataTools\DataTools.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
     <ProjectReference Include="..\DataTools.Win32\DataTools.Win32.csproj" />
-    <ProjectReference Include="..\..\Common\DataTools\DataTools.csproj" />
   </ItemGroup>
 
 </Project>

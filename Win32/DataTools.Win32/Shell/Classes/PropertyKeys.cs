@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using System.Reflection;
 
 namespace DataTools.Shell.Native
 {
     public static class PropertyKeys
     {
-
         private static Dictionary<string, PropertyKey> proplist = new Dictionary<string, PropertyKey>();
 
         /// <summary>
@@ -54,7 +48,6 @@ namespace DataTools.Shell.Native
         {
             var unsprop = typeof(PropertyKeys).GetFields(BindingFlags.Public | BindingFlags.Static);
 
-
             var fis = new List<FieldInfo>(unsprop);
 
             fis.Sort((a, b) =>
@@ -73,9 +66,13 @@ namespace DataTools.Shell.Native
             }
         }
 
+        /// <summary>
+        /// Gets the name for the specified property key
+        /// </summary>
+        /// <param name="pk"></param>
+        /// <returns></returns>
         public static string GetPropertyName(PropertyKey pk)
         {
-
             string s;
 
             foreach (var prop in proplist)
@@ -94,7 +91,6 @@ namespace DataTools.Shell.Native
         {
             return new ReadOnlyDictionary<string, PropertyKey>(proplist);
         }
-
 
         public static readonly PropertyKey PKEY_Address_Country = new PropertyKey(new Guid(0xC07B4199, 0xE1DF, 0x4493, 0xB1, 0xE1, 0xDE, 0x59, 0x46, 0xFB, 0x58, 0xF8), 100);
         public static readonly PropertyKey PKEY_Address_CountryCode = new PropertyKey(new Guid(0xC07B4199, 0xE1DF, 0x4493, 0xB1, 0xE1, 0xDE, 0x59, 0x46, 0xFB, 0x58, 0xF8), 101);
@@ -1130,6 +1126,5 @@ namespace DataTools.Shell.Native
         public static readonly PropertyKey PKEY_Volume_FileSystem = new PropertyKey(new Guid(0x9B174B35, 0x40FF, 0x11D2, 0xA2, 0x7E, 0x00, 0xC0, 0x4F, 0xC3, 0x08, 0x71), 4);
         public static readonly PropertyKey PKEY_Volume_IsMappedDrive = new PropertyKey(new Guid(0x149C0B69, 0x2C2D, 0x48FC, 0x80, 0x8F, 0xD3, 0x18, 0xD7, 0x8C, 0x46, 0x36), 2);
         public static readonly PropertyKey PKEY_Volume_IsRoot = new PropertyKey(new Guid(0x9B174B35, 0x40FF, 0x11D2, 0xA2, 0x7E, 0x00, 0xC0, 0x4F, 0xC3, 0x08, 0x71), 10);
-
     }
 }

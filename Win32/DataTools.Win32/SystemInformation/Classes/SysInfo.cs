@@ -1,15 +1,15 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows 
 //
 // Module: SystemInfo
 //         Provides basic information about the
 //         current computer.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections.Generic;
@@ -92,7 +92,7 @@ namespace DataTools.SystemInformation
         internal static extern void GetNativeSystemInfo(ref NativeEnvironment lpSysInfo);
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
-        internal static extern bool GetLogicalProcessorInformation(IntPtr buffer, ref int ReturnLength);
+        internal static extern bool GetLogicalProcessorInformation(nint buffer, ref int ReturnLength);
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
         internal static extern bool GlobalMemoryStatusEx(ref MemoryStatusDetails lpStatusEx);

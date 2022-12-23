@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: Printers
@@ -8,11 +8,11 @@
 //         Other knowledge and references obtained through various sources
 //         and all is considered public domain/common knowledge.
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -45,7 +45,7 @@ namespace DataTools.Hardware.Printers
         private MemPtr _ptr;
         private MemPtr _str;
 
-        internal JobInfo(IntPtr ptr) : base(IntPtr.Zero, true)
+        internal JobInfo(nint ptr) : base(nint.Zero, true)
         {
             _ptr = ptr;
             _str = ptr + 4;
@@ -56,7 +56,7 @@ namespace DataTools.Hardware.Printers
         {
             get
             {
-                return _ptr.Handle == IntPtr.Zero;
+                return _ptr.Handle == nint.Zero;
             }
         }
 
@@ -64,7 +64,7 @@ namespace DataTools.Hardware.Printers
         {
             try
             {
-                if (_ptr.Handle != IntPtr.Zero)
+                if (_ptr.Handle != nint.Zero)
                     _ptr.Free();
                 return true;
             }
@@ -244,11 +244,11 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        internal IntPtr DevMode
+        internal nint DevMode
         {
             get
             {
-                return IntPtr.Size == 8 ? (IntPtr)_str.LongAt(9L) : (IntPtr)_str.IntAt(9L);
+                return IntPtr.Size == 8 ? (nint)_str.LongAt(9L) : (nint)_str.IntAt(9L);
             }
 
             set
@@ -281,11 +281,11 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        internal IntPtr SecurityDescriptor
+        internal nint SecurityDescriptor
         {
             get
             {
-                return IntPtr.Size == 8 ? (IntPtr)_str.LongAt(11L) : (IntPtr)_str.IntAt(11L);
+                return IntPtr.Size == 8 ? (nint)_str.LongAt(11L) : (nint)_str.IntAt(11L);
             }
 
             set

@@ -1,14 +1,14 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: DiskApi
 //         Native Disk Serivces.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -269,16 +269,16 @@ namespace DataTools.Win32.Disk.Partition
         /// <param name="layInfo">Optionally receives the layout information.</param>
         /// <returns>An array of PARTITION_INFORMATION_EX structures.</returns>
         /// <remarks></remarks>
-        public static PARTITION_INFORMATION_EX[] GetPartitions(string devicePath, IntPtr hfile, ref DRIVE_LAYOUT_INFORMATION_EX layInfo)
+        public static PARTITION_INFORMATION_EX[] GetPartitions(string devicePath, nint hfile, ref DRIVE_LAYOUT_INFORMATION_EX layInfo)
         {
             bool hf = false;
-            if (hfile != IntPtr.Zero)
+            if (hfile != nint.Zero)
             {
                 hf = true;
             }
             else
             {
-                hfile = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, 0, IntPtr.Zero);
+                hfile = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, 0, nint.Zero);
             }
 
             var pex = new MemPtr();
@@ -296,7 +296,7 @@ namespace DataTools.Win32.Disk.Partition
             do
             {
                 pex.ReAlloc(sbs);
-                succeed = NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_LAYOUT_EX, IntPtr.Zero, 0U, pex.Handle, (uint)pex.Length, ref cb, IntPtr.Zero);
+                succeed = NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_LAYOUT_EX, nint.Zero, 0U, pex.Handle, (uint)pex.Length, ref cb, nint.Zero);
                 if (!succeed)
                 {
                     int xErr = User32.GetLastError();

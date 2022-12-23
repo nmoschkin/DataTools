@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>DataTools.WinUI.ColorControls</RootNamespace>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
@@ -31,16 +31,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ProjectReunion" Version="0.8.8" />
-    <PackageReference Include="Microsoft.ProjectReunion.Foundation" Version="0.8.8" />
-    <PackageReference Include="Microsoft.ProjectReunion.WinUI" Version="0.8.8" />
-    <PackageReference Include="SkiaSharp" Version="2.88.0-preview.256" />
+    <PackageReference Include="Microsoft.ProjectReunion" Version="0.8.12" />
+    <PackageReference Include="Microsoft.ProjectReunion.Foundation" Version="0.8.12" />
+    <PackageReference Include="Microsoft.ProjectReunion.WinUI" Version="0.8.12" />
+    <PackageReference Include="SkiaSharp" Version="2.88.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\..\Standard\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\..\Standard\DataTools\DataTools.csproj" />
     <ProjectReference Include="..\DataTools.WinUI\DataTools.WinUI.csproj" />
-    <ProjectReference Include="..\..\..\Common\DataTools\DataTools.csproj" />
   </ItemGroup>
 
   <ItemGroup>

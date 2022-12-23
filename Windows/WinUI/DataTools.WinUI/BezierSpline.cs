@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 using Windows.Foundation;
 
-namespace CPOL
+namespace DataTools.WinUI
 {
     /// <summary>
     /// Bezier Spline methods

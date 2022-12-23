@@ -1,22 +1,20 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: UsbHid
 //         HID-related structures, enums and functions.
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License
+// *************************************************
 
-using DataTools.Extras.Converters;
+using DataTools.Converters;
 
 using Newtonsoft.Json;
 
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 
 namespace DataTools.Win32.Usb
 {
@@ -156,12 +154,10 @@ namespace DataTools.Win32.Usb
         [Description("Usage Modifier")]
         UM = 0x8000,
 
-        
         /// <summary>
         /// Item
         /// </summary>
         [Description("Item")]
         Item = 0x10000
-
     }
 }

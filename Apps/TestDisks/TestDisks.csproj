@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	  <AssemblyVersion>7.1.5.2023</AssemblyVersion>
+	  <FileVersion>7.1.5.2023</FileVersion>
+	  <Authors>Nathaniel Moschkin</Authors>
+	  <Version>7.1.5</Version>
+	  <Product>DataTools Disk Test</Product>
+	  <Description>DataTools Utility Library</Description>
+	  <Copyright>Copyright (C) 2022 Nathaniel Moschkin</Copyright>
+	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
+	  <RepositoryType>GitHub</RepositoryType>
+	  <NeutralLanguage>en-US</NeutralLanguage>
+	  <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Win32\DataTools.Win32.Disk\DataTools.Win32.Disk.csproj" />
+    <ProjectReference Include="..\..\Win32\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
+    <ProjectReference Include="..\..\Win32\DataTools.Win32\DataTools.Win32.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: NativeShell
@@ -7,11 +7,11 @@
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // Some classes and interfaces were ported from the WindowsAPICodePack.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections.Generic;
@@ -34,10 +34,10 @@ namespace DataTools.Shell.Native
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     interface ISharedBitmap
     {
-        void GetSharedBitmap([Out] out IntPtr phbm);
+        void GetSharedBitmap([Out] out nint phbm);
         void GetSize([Out] out Size pSize);
         void GetFormat([Out] out ThumbnailAlphaType pat);
-        void InitializeBitmap([In] IntPtr hbm, [In] ThumbnailAlphaType wtsAT);
-        void Detach([Out] out IntPtr phbm);
+        void InitializeBitmap([In] nint hbm, [In] ThumbnailAlphaType wtsAT);
+        void Detach([Out] out nint phbm);
     }
 }

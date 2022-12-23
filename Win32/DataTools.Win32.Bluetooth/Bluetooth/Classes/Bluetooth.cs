@@ -1,15 +1,15 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows 
 //
 // Module: Bluetooth API
 //         Complete Translation of
 //         BluetoothAPI.h
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections.Generic;
@@ -1796,7 +1796,7 @@ namespace DataTools.Win32
                 return mm;
             }
 
-            public static BTH_DEVICE_INFO_LIST FromPointer(IntPtr ptr)
+            public static BTH_DEVICE_INFO_LIST FromPointer(nint ptr)
             {
                 BTH_DEVICE_INFO_LIST op;
                 MemPtr mm = ptr;
@@ -1842,7 +1842,7 @@ namespace DataTools.Win32
 
             public void Free()
             {
-                if (_ptr != IntPtr.Zero & _ptr != (IntPtr)(-1))
+                if (_ptr != nint.Zero & _ptr != (nint)(-1))
                 {
                     try
                     {
@@ -1852,7 +1852,7 @@ namespace DataTools.Win32
                     {
                     }
 
-                    _ptr = IntPtr.Zero;
+                    _ptr = nint.Zero;
                 }
             }
 
@@ -1876,17 +1876,17 @@ namespace DataTools.Win32
 
             public BTH_DEVICE_INFO Devices(uint index)
             {
-                var offset = new IntPtr(Marshal.SizeOf<uint>() + Marshal.SizeOf<BTH_DEVICE_INFO>() * index);
+                var offset = new nint(Marshal.SizeOf<uint>() + Marshal.SizeOf<BTH_DEVICE_INFO>() * index);
                 var mm = _ptr + offset;
                 return mm.ToStruct<BTH_DEVICE_INFO>();
             }
 
-            public static explicit operator IntPtr(PBTH_DEVICE_INFO_LIST var1)
+            public static explicit operator nint(PBTH_DEVICE_INFO_LIST var1)
             {
                 return var1._ptr.Handle;
             }
 
-            public static explicit operator PBTH_DEVICE_INFO_LIST(IntPtr var1)
+            public static explicit operator PBTH_DEVICE_INFO_LIST(nint var1)
             {
                 var p = new PBTH_DEVICE_INFO_LIST();
                 p._ptr = var1;
@@ -1976,8 +1976,8 @@ namespace DataTools.Win32
         // of each universal attribute's accordance to the spec.
         //
         public const int SDP_SEARCH_NO_FORMAT_CHECK = 0x2;
-        public readonly static IntPtr HANDLE_SDP_NULL = IntPtr.Zero;
-        public readonly static IntPtr HANDLE_SDP_LOCAL = new IntPtr(-2);
+        public readonly static nint HANDLE_SDP_NULL = nint.Zero;
+        public readonly static nint HANDLE_SDP_LOCAL = new nint(-2);
 
         public struct SDP_LARGE_INTEGER_16
         {
@@ -2058,7 +2058,7 @@ namespace DataTools.Win32
             // When the connect request returns, this will specify the handle to the
             // SDP connection to the remote server
             //
-            public IntPtr hConnection;
+            public nint hConnection;
 
             //
             // Timeout, in seconds, for the requests on ths SDP channel.  If the request
@@ -2076,7 +2076,7 @@ namespace DataTools.Win32
             //
             // hConnection returned by BTH_SDP_CONNECT
             //
-            public IntPtr hConnection;
+            public nint hConnection;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -2120,7 +2120,7 @@ namespace DataTools.Win32
                 return mm;
             }
 
-            public static BTH_SDP_RECORD FromPointer(IntPtr ptr)
+            public static BTH_SDP_RECORD FromPointer(nint ptr)
             {
                 BTH_SDP_RECORD op;
                 MemPtr mm = ptr;
@@ -2139,7 +2139,7 @@ namespace DataTools.Win32
             //
             // Handle returned by the connect request Or HANDLE_SDP_LOCAL
             //
-            public IntPtr hConnection;
+            public nint hConnection;
 
             //
             // Array of UUIDs.  Each entry can be either a 2 byte, 4 byte Or 16 byte
@@ -2154,7 +2154,7 @@ namespace DataTools.Win32
             //
             // Handle returned by the connect request Or HANDLE_SDP_LOCAL
             //
-            public IntPtr hConnection;
+            public nint hConnection;
 
             //
             // Combo of SDP_SEARCH_Xxx flags
@@ -2213,7 +2213,7 @@ namespace DataTools.Win32
             //
             // Handle returned by the connect request Or HANDLE_SDP_LOCAL
             //
-            public IntPtr hConnection;
+            public nint hConnection;
 
             //
             // Combo of SDP_SEARCH_Xxx flags
@@ -2296,7 +2296,7 @@ namespace DataTools.Win32
             //
             public byte[] response;
 
-            public static BTH_SDP_STREAM_RESPONSE FromPointer(IntPtr ptr)
+            public static BTH_SDP_STREAM_RESPONSE FromPointer(nint ptr)
             {
                 BTH_SDP_STREAM_RESPONSE op;
                 MemPtr mm = ptr;
@@ -2374,7 +2374,7 @@ namespace DataTools.Win32
                 return mm;
             }
 
-            public static BTH_VENDOR_SPECIFIC_COMMAND FromPointer(IntPtr ptr)
+            public static BTH_VENDOR_SPECIFIC_COMMAND FromPointer(nint ptr)
             {
                 BTH_VENDOR_SPECIFIC_COMMAND op;
                 MemPtr mm = ptr;
@@ -2420,7 +2420,7 @@ namespace DataTools.Win32
                 return mm;
             }
 
-            public static BTH_VENDOR_PATTERN FromPointer(IntPtr ptr)
+            public static BTH_VENDOR_PATTERN FromPointer(nint ptr)
             {
                 MemPtr mm = ptr;
                 BTH_VENDOR_PATTERN op;
@@ -2464,7 +2464,7 @@ namespace DataTools.Win32
                 return mm;
             }
 
-            public static BTH_VENDOR_EVENT_INFO FromPointer(IntPtr ptr)
+            public static BTH_VENDOR_EVENT_INFO FromPointer(nint ptr)
             {
                 BTH_VENDOR_EVENT_INFO op;
                 MemPtr mm = ptr;
@@ -2516,7 +2516,7 @@ namespace DataTools.Win32
             [MarshalAs(UnmanagedType.Bool)]
             public bool fIssueInquiry;
             public byte cTimeoutMultiplier;
-            public IntPtr hRadio;
+            public nint hRadio;
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -2537,28 +2537,28 @@ namespace DataTools.Win32
         public const int BLUETOOTH_DEVICE_NAME_SIZE = 256;
 
         [DllImport("bluetoothapis.dll", CharSet = CharSet.Unicode)]
-        public static extern IntPtr BluetoothFindFirstRadio(ref BLUETOOTH_FIND_RADIO_PARAMS pbtfrp, out IntPtr phradio);
+        public static extern nint BluetoothFindFirstRadio(ref BLUETOOTH_FIND_RADIO_PARAMS pbtfrp, out nint phradio);
         [DllImport("bluetoothapis.dll", CharSet = CharSet.Unicode)]
-        public static extern bool BluetoothFindNextRadio(IntPtr hFind, out IntPtr phRadio);
+        public static extern bool BluetoothFindNextRadio(nint hFind, out nint phRadio);
         [DllImport("bluetoothapis.dll", CharSet = CharSet.Unicode)]
-        public static extern bool BluetoothFindRadioClose(IntPtr hFind);
+        public static extern bool BluetoothFindRadioClose(nint hFind);
         [DllImport("bluetoothapis.dll", CharSet = CharSet.Unicode)]
-        public static extern IntPtr BluetoothFindFirstDevice(ref BLUETOOTH_DEVICE_SEARCH_PARAMS pbtdsp, ref BLUETOOTH_DEVICE_INFO pbtdi);
+        public static extern nint BluetoothFindFirstDevice(ref BLUETOOTH_DEVICE_SEARCH_PARAMS pbtdsp, ref BLUETOOTH_DEVICE_INFO pbtdi);
         [DllImport("bluetoothapis.dll", CharSet = CharSet.Unicode)]
-        public static extern bool BluetoothFindNextDevice(IntPtr hFind, ref BLUETOOTH_DEVICE_INFO pbtdi);
+        public static extern bool BluetoothFindNextDevice(nint hFind, ref BLUETOOTH_DEVICE_INFO pbtdi);
         [DllImport("bluetoothapis.dll", CharSet = CharSet.Unicode)]
-        public static extern bool BluetoothFindDeviceClose(IntPtr hFind);
+        public static extern bool BluetoothFindDeviceClose(nint hFind);
         [DllImport("bluetoothapis.dll", CharSet = CharSet.Unicode)]
-        public static extern uint BluetoothGetRadioInfo(IntPtr hRadio, ref BLUETOOTH_RADIO_INFO pRadioInfo);
+        public static extern uint BluetoothGetRadioInfo(nint hRadio, ref BLUETOOTH_RADIO_INFO pRadioInfo);
 
         public static BLUETOOTH_DEVICE_INFO[] _internalEnumBluetoothDevices()
         {
             var bl = new List<BLUETOOTH_DEVICE_INFO>();
 
-            // Dim hDevice As IntPtr
-            IntPtr hRadio;
-            IntPtr hFind;
-            IntPtr radFind;
+            // Dim hDevice As nint
+            nint hRadio;
+            nint hFind;
+            nint radFind;
             BLUETOOTH_FIND_RADIO_PARAMS radParams;
             var btparam = default(BLUETOOTH_DEVICE_SEARCH_PARAMS);
             BLUETOOTH_DEVICE_INFO brInfo;
@@ -2566,7 +2566,7 @@ namespace DataTools.Win32
             bool frad;
             radParams.dwSize = 4U;
             radFind = BluetoothFindFirstRadio(ref radParams, out hRadio);
-            if (radFind == IntPtr.Zero)
+            if (radFind == nint.Zero)
                 return null;
             do
             {
@@ -2583,7 +2583,7 @@ namespace DataTools.Win32
                 brInfo.dwSize = Marshal.SizeOf<BLUETOOTH_DEVICE_INFO>();
 
                 hFind = BluetoothFindFirstDevice(ref btparam, ref brInfo);
-                if (hFind == IntPtr.Zero)
+                if (hFind == nint.Zero)
                 {
                     try
                     {
@@ -2620,14 +2620,14 @@ namespace DataTools.Win32
         public static BLUETOOTH_RADIO_INFO[] _internalEnumBluetoothRadios()
         {
             var bl = new List<BLUETOOTH_RADIO_INFO>();
-            IntPtr hRadio;
-            IntPtr hFind;
+            nint hRadio;
+            nint hFind;
             BLUETOOTH_FIND_RADIO_PARAMS @params;
             BLUETOOTH_RADIO_INFO brInfo;
             bool fr;
             @params.dwSize = 4U;
             hFind = BluetoothFindFirstRadio(ref @params, out hRadio);
-            if (hFind == IntPtr.Zero)
+            if (hFind == nint.Zero)
                 return null;
             do
             {

@@ -1,14 +1,14 @@
-﻿// ************************************************* ''
+﻿// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: Async
 //         Native Async.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -156,6 +156,6 @@ namespace DataTools.Win32
         public const int JOB_OBJECT_ALL_ACCESS = IO.STANDARD_RIGHTS_REQUIRED | IO.SYNCHRONIZE | 0x1F;
 
         [DllImport("kernel32")]
-        public static extern IntPtr OpenThread(int wdDesiredAccess, bool binheritHandle, int dwThreadId);
+        public static extern nint OpenThread(int wdDesiredAccess, bool binheritHandle, int dwThreadId);
     }
 }

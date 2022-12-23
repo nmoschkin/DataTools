@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: NativeShell
@@ -7,11 +7,11 @@
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // Some classes and interfaces were ported from the WindowsAPICodePack.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections.Generic;
@@ -66,11 +66,11 @@ namespace DataTools.Shell.Native
         // where lVal is from the ParseErrorType enumeration. The valid
         // values for riid are IID_IEnumUnknown and IID_IEnumVARIANT.
         [PreserveSig]
-        HResult GetErrors([In] ref Guid riid, [Out] out /* void** */ IntPtr ppParseErrors);
+        HResult GetErrors([In] ref Guid riid, [Out] out /* void** */ nint ppParseErrors);
 
         // Report the query string, how it was tokenized and what LCID and word breaker were used (for recognizing keywords).
         // ppszInputString, ppTokens, pLocale and ppWordBreaker may be NULL.
         [PreserveSig]
-        HResult GetLexicalData([MarshalAs(UnmanagedType.LPWStr)] out string ppszInputString, [Out] /* ITokenCollection** */ out IntPtr ppTokens, [Out] out uint plcid, [Out] /* IUnknown** */ out IntPtr ppWordBreaker);
+        HResult GetLexicalData([MarshalAs(UnmanagedType.LPWStr)] out string ppszInputString, [Out] /* ITokenCollection** */ out nint ppTokens, [Out] out uint plcid, [Out] /* IUnknown** */ out nint ppWordBreaker);
     }
 }

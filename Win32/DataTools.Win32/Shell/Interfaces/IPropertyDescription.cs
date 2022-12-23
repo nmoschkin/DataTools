@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: NativeShell
@@ -7,11 +7,11 @@
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // Some classes and interfaces were ported from the WindowsAPICodePack.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections.Generic;
@@ -43,10 +43,10 @@ namespace DataTools.Shell.Native
         HResult GetPropertyType(ref VarEnum pvartype);
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         [PreserveSig]
-        HResult GetDisplayName(ref IntPtr ppszName);
+        HResult GetDisplayName(ref nint ppszName);
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        HResult GetEditInvitation(ref IntPtr ppszInvite);
+        HResult GetEditInvitation(ref nint ppszInvite);
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetTypeFlags([In] PropertyTypeOptions mask, ref PropertyTypeOptions ppdtFlags);
@@ -74,7 +74,7 @@ namespace DataTools.Shell.Native
         HResult GetSortDescription(ref PropertySortDescription psd);
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        HResult GetSortDescriptionLabel([In] bool fDescending, ref IntPtr ppszDescription);
+        HResult GetSortDescriptionLabel([In] bool fDescending, ref nint ppszDescription);
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetAggregationType(ref PropertyAggregationType paggtype);

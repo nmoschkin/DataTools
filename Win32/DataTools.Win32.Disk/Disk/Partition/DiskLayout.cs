@@ -29,7 +29,7 @@ namespace DataTools.Win32.Disk.Partition
         /// <param name="disk"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        internal static IDiskLayout CreateLayout(IntPtr disk)
+        internal static IDiskLayout CreateLayout(nint disk)
         {
             IDiskLayout CreateLayoutRet = default;
             Partitioning.DRIVE_LAYOUT_INFORMATION_EX lay = default;
@@ -60,7 +60,7 @@ namespace DataTools.Win32.Disk.Partition
             IDiskLayout CreateLayoutRet = default;
             Partitioning.DRIVE_LAYOUT_INFORMATION_EX lay = default;
             Partitioning.PARTITION_INFORMATION_EX[] p;
-            p = Partitioning.GetPartitions(disk, IntPtr.Zero, ref lay);
+            p = Partitioning.GetPartitions(disk, nint.Zero, ref lay);
             if (p is null)
                 return null;
             if (lay.PartitionStyle == PartitionStyle.Gpt)

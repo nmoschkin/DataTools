@@ -88,7 +88,7 @@ namespace DataTools.Win32.Disk
                     {
                         inf.IsVolume = true;
 
-                        disk = IO.CreateFile(inf.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
+                        disk = IO.CreateFile(inf.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, nint.Zero);
 
                         if (disk != DevProp.INVALID_HANDLE_VALUE)
                         {
@@ -120,7 +120,7 @@ namespace DataTools.Win32.Disk
                     }
                     else if (inf.Type != StorageType.Optical)
                     {
-                        disk = IO.CreateFile(inf.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
+                        disk = IO.CreateFile(inf.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, nint.Zero);
 
                         if (disk != DevProp.INVALID_HANDLE_VALUE)
                         {
@@ -160,7 +160,7 @@ namespace DataTools.Win32.Disk
                     if (inf.FriendlyName == "Microsoft Virtual Disk")
                     {
                         inf.Type = StorageType.Virtual;
-                        disk = IO.CreateFile(@"\\.\PhysicalDrive" + inf.PhysicalDevice, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
+                        disk = IO.CreateFile(@"\\.\PhysicalDrive" + inf.PhysicalDevice, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, nint.Zero);
                         if (disk == DevProp.INVALID_HANDLE_VALUE)
                             continue;
                         var sdi = default(STORAGE_DEPENDENCY_INFO_V2);
@@ -232,7 +232,7 @@ namespace DataTools.Win32.Disk
         /// <param name="disk">The disk device object to populate.</param>
         /// <param name="handle">Optional handle to an open disk.</param>
         /// <remarks></remarks>
-        public static void PopulateVolumeInfo(DiskDeviceInfo disk, IntPtr handle = default)
+        public static void PopulateVolumeInfo(DiskDeviceInfo disk, nint handle = default)
         {
             int pLen = (IO.MAX_PATH + 1) * 2;
 
@@ -258,7 +258,7 @@ namespace DataTools.Win32.Disk
 
             mm1.ZeroMemory();
 
-            if (handle == IntPtr.Zero || handle == DevProp.INVALID_HANDLE_VALUE)
+            if (handle == nint.Zero || handle == DevProp.INVALID_HANDLE_VALUE)
             {
                 string arglpRootPathName = disk.VolumeGuidPath;
                 uint arglpVolumeSerialNumber = disk.SerialNumber;

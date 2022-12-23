@@ -16,7 +16,7 @@ namespace DataTools.Win32.Network
 
         [DllImport("Iphlpapi.dll", CharSet = CharSet.Unicode)]
         public static extern int GetIfTable(
-         IntPtr pIfTable,
+         nint pIfTable,
          ref int pdwSize,
          bool bOrder
        );
@@ -42,7 +42,7 @@ namespace DataTools.Win32.Network
             int x, cb = 0;
             var ret = new LPMIB_IFTABLE();
 
-            x = GetIfTable(IntPtr.Zero, ref cb, false);
+            x = GetIfTable(nint.Zero, ref cb, false);
 
             if (x != ERROR_INSUFFICIENT_BUFFER) return null;
 

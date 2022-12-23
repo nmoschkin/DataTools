@@ -35,20 +35,20 @@ namespace DataTools.Win32
         public const uint DBT_DEVTYP_HANDLE = 0x00000006;  // file system handle
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "RegisterDeviceNotificationW")]
-        public static extern IntPtr RegisterDeviceNotification(
-          IntPtr hRecipient,
-          IntPtr NotificationFilter,
+        public static extern nint RegisterDeviceNotification(
+          nint hRecipient,
+          nint NotificationFilter,
           uint Flags
         );
 
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "UnregisterDeviceNotification")]
         public static extern bool UnregisterDeviceNotification(
-            IntPtr Handle
+            nint Handle
         );
 
 
-        public static IntPtr DoRegisterDeviceClassNotification(IntPtr hWnd, Guid devclass) 
+        public static nint DoRegisterDeviceClassNotification(nint hWnd, Guid devclass) 
         {
             var mm = new MemPtr();
 

@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: Printers
@@ -8,11 +8,11 @@
 //         Other knowledge and references obtained through various sources
 //         and all is considered public domain/common knowledge.
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -784,25 +784,25 @@ namespace DataTools.Hardware.Printers
         
         
         [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "OpenPrinterW")]
-        public static extern bool OpenPrinter([MarshalAs(UnmanagedType.LPWStr)] string pPrinterName, ref IntPtr hPrinter, IntPtr pDefault);
+        public static extern bool OpenPrinter([MarshalAs(UnmanagedType.LPWStr)] string pPrinterName, ref nint hPrinter, nint pDefault);
         [DllImport("winspool.drv")]
-        public static extern bool ClosePrinter(IntPtr hPrinter);
+        public static extern bool ClosePrinter(nint hPrinter);
         [DllImport("winspool.drv", EntryPoint = "GetPrinterW")]
-        public static extern bool GetPrinter(IntPtr hPrinter, uint level, IntPtr pPrinter, uint cbBuf, ref uint pcbNeeded);
+        public static extern bool GetPrinter(nint hPrinter, uint level, nint pPrinter, uint cbBuf, ref uint pcbNeeded);
         [DllImport("winspool.drv", EntryPoint = "GetJobW")]
-        public static extern bool GetJob(IntPtr hPrinter, uint JobId, uint Lovel, IntPtr pJob, uint cbBuf, ref uint pcbNeeded);
+        public static extern bool GetJob(nint hPrinter, uint JobId, uint Lovel, nint pJob, uint cbBuf, ref uint pcbNeeded);
         [DllImport("winspool.drv", CharSet = CharSet.Unicode, EntryPoint = "DeviceCapabilitiesW")]
-        public static extern uint DeviceCapabilities([MarshalAs(UnmanagedType.LPWStr)] string pDevice, [MarshalAs(UnmanagedType.LPWStr)] string pPort, ushort fwCapability, IntPtr pOutput, IntPtr pDevMode);
+        public static extern uint DeviceCapabilities([MarshalAs(UnmanagedType.LPWStr)] string pDevice, [MarshalAs(UnmanagedType.LPWStr)] string pPort, ushort fwCapability, nint pOutput, nint pDevMode);
         [DllImport("winspool.drv", CharSet = CharSet.Unicode, EntryPoint = "EnumPrintersW")]
-        public static extern bool EnumPrinters(uint Flags, [MarshalAs(UnmanagedType.LPWStr)] string Name, uint Level, IntPtr pPrinterEnum, uint cbBuf, ref uint pcbNeeded, ref uint pcbReturned);
+        public static extern bool EnumPrinters(uint Flags, [MarshalAs(UnmanagedType.LPWStr)] string Name, uint Level, nint pPrinterEnum, uint cbBuf, ref uint pcbNeeded, ref uint pcbReturned);
         [DllImport("gdi32.dll")]
-        public static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+        public static extern int GetDeviceCaps(nint hdc, int nIndex);
 
 
         [DllImport("winspool.drv", CharSet = CharSet.Unicode, EntryPoint = "EnumPrinterKeyW")]
-        public static extern uint EnumPrinterKey(IntPtr hPrinter, [MarshalAs(UnmanagedType.LPWStr)] string pKeyName, IntPtr pSubkey, uint cbSubKey, ref uint pcbSubkey);
+        public static extern uint EnumPrinterKey(nint hPrinter, [MarshalAs(UnmanagedType.LPWStr)] string pKeyName, nint pSubkey, uint cbSubKey, ref uint pcbSubkey);
 
-        //public static LinearSize GetMaxDPIForPrinter(PrinterObject printer, IntPtr hPrinter)
+        //public static LinearSize GetMaxDPIForPrinter(PrinterObject printer, nint hPrinter)
         //{
         //    uint cb = 0U;
         //    uint r = 0U;
@@ -812,9 +812,9 @@ namespace DataTools.Hardware.Printers
 
         //    PrinterObject pn;
 
-        //    IntPtr cpx;
+        //    nint cpx;
 
-        //    EnumPrinters(6U, "", 2U, IntPtr.Zero, 0U, ref cb, ref r);
+        //    EnumPrinters(6U, "", 2U, nint.Zero, 0U, ref cb, ref r);
 
         //    if (cb != 0L)
         //    {

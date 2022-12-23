@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	  <UseWindowsForms>true</UseWindowsForms>
@@ -21,9 +21,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataTools.Desktop.WPF\DataTools.Desktop.WPF.csproj" />
+    <ProjectReference Include="..\..\..\Standard\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\..\Standard\DataTools\DataTools.csproj" />
     <ProjectReference Include="..\..\..\Win32\DataTools.Win32.Network\DataTools.Win32.Network.csproj" />
-    <ProjectReference Include="..\..\..\Common\DataTools\DataTools.csproj" />
+    <ProjectReference Include="..\DataTools.Desktop.WPF\DataTools.Desktop.WPF.csproj" />
   </ItemGroup>
 
 </Project>

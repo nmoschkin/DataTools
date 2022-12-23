@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: NativeShell
@@ -7,11 +7,11 @@
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // Some classes and interfaces were ported from the WindowsAPICodePack.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections.Generic;
@@ -52,7 +52,7 @@ namespace DataTools.Shell.Native
 
 
         [DllImport("OleAut32.dll", PreserveSig = true)]
-        internal static extern IntPtr SafeArrayCreateVector(ushort vt, int lowerBound, uint cElems);
+        internal static extern nint SafeArrayCreateVector(ushort vt, int lowerBound, uint cElems);
 
         // returns hresult
 
@@ -62,7 +62,7 @@ namespace DataTools.Shell.Native
 
 
         [DllImport("OleAut32.dll", PreserveSig = false)]
-        internal static extern IntPtr SafeArrayAccessData(IntPtr psa);
+        internal static extern nint SafeArrayAccessData(nint psa);
 
         // returns hresult
 
@@ -72,7 +72,7 @@ namespace DataTools.Shell.Native
 
 
         [DllImport("OleAut32.dll", PreserveSig = false)]
-        internal static extern void SafeArrayUnaccessData(IntPtr psa);
+        internal static extern void SafeArrayUnaccessData(nint psa);
 
         // retuns uint32
 
@@ -82,7 +82,7 @@ namespace DataTools.Shell.Native
 
 
         [DllImport("OleAut32.dll", PreserveSig = true)]
-        internal static extern uint SafeArrayGetDim(IntPtr psa);
+        internal static extern uint SafeArrayGetDim(nint psa);
 
         // returns hresult
 
@@ -92,7 +92,7 @@ namespace DataTools.Shell.Native
 
 
         [DllImport("OleAut32.dll", PreserveSig = false)]
-        internal static extern int SafeArrayGetLBound(IntPtr psa, uint nDim);
+        internal static extern int SafeArrayGetLBound(nint psa, uint nDim);
 
         // returns hresult
 
@@ -102,7 +102,7 @@ namespace DataTools.Shell.Native
 
 
         [DllImport("OleAut32.dll", PreserveSig = false)]
-        internal static extern int SafeArrayGetUBound(IntPtr psa, uint nDim);
+        internal static extern int SafeArrayGetUBound(nint psa, uint nDim);
 
         // This decl for SafeArrayGetElement is only valid for cDims==1!
         // returns hresult
@@ -113,7 +113,7 @@ namespace DataTools.Shell.Native
 
 
         [DllImport("OleAut32.dll", PreserveSig = false)]
-        internal static extern object SafeArrayGetElement(IntPtr psa, ref int rgIndices);
+        internal static extern object SafeArrayGetElement(nint psa, ref int rgIndices);
 
 
         //
@@ -256,7 +256,7 @@ namespace DataTools.Shell.Native
 
 
         [DllImport("propsys.dll", CharSet = CharSet.Unicode, SetLastError = true, PreserveSig = false)]
-        internal static extern void PropVariantGetStringElem([In] PropVariant propVar, [In] uint iElem, IntPtr ppszVal);
+        internal static extern void PropVariantGetStringElem([In] PropVariant propVar, [In] uint iElem, nint ppszVal);
 
 
 

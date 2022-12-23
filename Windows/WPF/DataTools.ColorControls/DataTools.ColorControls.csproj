@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
 	  <UseWindowsForms>true</UseWindowsForms>
 	  <AssemblyVersion>7.0.2.2022</AssemblyVersion>
@@ -43,10 +43,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataTools.Desktop.WPF\DataTools.Desktop.WPF.csproj" />
-    <ProjectReference Include="..\..\..\Common\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\..\Standard\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\..\Standard\DataTools\DataTools.csproj" />
     <ProjectReference Include="..\..\..\Win32\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
-    <ProjectReference Include="..\..\..\Common\DataTools\DataTools.csproj" />
+    <ProjectReference Include="..\..\..\Win32\DataTools.Win32\DataTools.Win32.csproj" />
+    <ProjectReference Include="..\DataTools.Desktop.WPF\DataTools.Desktop.WPF.csproj" />
   </ItemGroup>
 
   <ItemGroup>

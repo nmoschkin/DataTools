@@ -784,25 +784,25 @@ namespace DataTools.Hardware.Printers
         
         
         [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "OpenPrinterW")]
-        public static extern bool OpenPrinter([MarshalAs(UnmanagedType.LPWStr)] string pPrinterName, ref IntPtr hPrinter, IntPtr pDefault);
+        public static extern bool OpenPrinter([MarshalAs(UnmanagedType.LPWStr)] string pPrinterName, ref nint hPrinter, nint pDefault);
         [DllImport("winspool.drv")]
-        public static extern bool ClosePrinter(IntPtr hPrinter);
+        public static extern bool ClosePrinter(nint hPrinter);
         [DllImport("winspool.drv", EntryPoint = "GetPrinterW")]
-        public static extern bool GetPrinter(IntPtr hPrinter, uint level, IntPtr pPrinter, uint cbBuf, ref uint pcbNeeded);
+        public static extern bool GetPrinter(nint hPrinter, uint level, nint pPrinter, uint cbBuf, ref uint pcbNeeded);
         [DllImport("winspool.drv", EntryPoint = "GetJobW")]
-        public static extern bool GetJob(IntPtr hPrinter, uint JobId, uint Lovel, IntPtr pJob, uint cbBuf, ref uint pcbNeeded);
+        public static extern bool GetJob(nint hPrinter, uint JobId, uint Lovel, nint pJob, uint cbBuf, ref uint pcbNeeded);
         [DllImport("winspool.drv", CharSet = CharSet.Unicode, EntryPoint = "DeviceCapabilitiesW")]
-        public static extern uint DeviceCapabilities([MarshalAs(UnmanagedType.LPWStr)] string pDevice, [MarshalAs(UnmanagedType.LPWStr)] string pPort, ushort fwCapability, IntPtr pOutput, IntPtr pDevMode);
+        public static extern uint DeviceCapabilities([MarshalAs(UnmanagedType.LPWStr)] string pDevice, [MarshalAs(UnmanagedType.LPWStr)] string pPort, ushort fwCapability, nint pOutput, nint pDevMode);
         [DllImport("winspool.drv", CharSet = CharSet.Unicode, EntryPoint = "EnumPrintersW")]
-        public static extern bool EnumPrinters(uint Flags, [MarshalAs(UnmanagedType.LPWStr)] string Name, uint Level, IntPtr pPrinterEnum, uint cbBuf, ref uint pcbNeeded, ref uint pcbReturned);
+        public static extern bool EnumPrinters(uint Flags, [MarshalAs(UnmanagedType.LPWStr)] string Name, uint Level, nint pPrinterEnum, uint cbBuf, ref uint pcbNeeded, ref uint pcbReturned);
         [DllImport("gdi32.dll")]
-        public static extern int GetDeviceCaps(IntPtr hdc, int nIndex);
+        public static extern int GetDeviceCaps(nint hdc, int nIndex);
 
 
         [DllImport("winspool.drv", CharSet = CharSet.Unicode, EntryPoint = "EnumPrinterKeyW")]
-        public static extern uint EnumPrinterKey(IntPtr hPrinter, [MarshalAs(UnmanagedType.LPWStr)] string pKeyName, IntPtr pSubkey, uint cbSubKey, ref uint pcbSubkey);
+        public static extern uint EnumPrinterKey(nint hPrinter, [MarshalAs(UnmanagedType.LPWStr)] string pKeyName, nint pSubkey, uint cbSubKey, ref uint pcbSubkey);
 
-        //public static LinearSize GetMaxDPIForPrinter(PrinterObject printer, IntPtr hPrinter)
+        //public static LinearSize GetMaxDPIForPrinter(PrinterObject printer, nint hPrinter)
         //{
         //    uint cb = 0U;
         //    uint r = 0U;
@@ -812,9 +812,9 @@ namespace DataTools.Hardware.Printers
 
         //    PrinterObject pn;
 
-        //    IntPtr cpx;
+        //    nint cpx;
 
-        //    EnumPrinters(6U, "", 2U, IntPtr.Zero, 0U, ref cb, ref r);
+        //    EnumPrinters(6U, "", 2U, nint.Zero, 0U, ref cb, ref r);
 
         //    if (cb != 0L)
         //    {
@@ -2001,7 +2001,7 @@ namespace DataTools.Hardware.Printers
         private MemPtr _ptr;
         private MemPtr _str;
 
-        internal JobInfo(IntPtr ptr) : base(IntPtr.Zero, true)
+        internal JobInfo(nint ptr) : base(nint.Zero, true)
         {
             _ptr = ptr;
             _str = ptr + 4;
@@ -2012,7 +2012,7 @@ namespace DataTools.Hardware.Printers
         {
             get
             {
-                return _ptr.Handle == IntPtr.Zero;
+                return _ptr.Handle == nint.Zero;
             }
         }
 
@@ -2020,7 +2020,7 @@ namespace DataTools.Hardware.Printers
         {
             try
             {
-                if (_ptr.Handle != IntPtr.Zero)
+                if (_ptr.Handle != nint.Zero)
                     _ptr.Free();
                 return true;
             }
@@ -2200,11 +2200,11 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        internal IntPtr DevMode
+        internal nint DevMode
         {
             get
             {
-                return IntPtr.Size == 8 ? (IntPtr)_str.LongAt(9L) : (IntPtr)_str.IntAt(9L);
+                return IntPtr.Size == 8 ? (nint)_str.LongAt(9L) : (nint)_str.IntAt(9L);
             }
 
             set
@@ -2237,11 +2237,11 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        internal IntPtr SecurityDescriptor
+        internal nint SecurityDescriptor
         {
             get
             {
-                return IntPtr.Size == 8 ? (IntPtr)_str.LongAt(11L) : (IntPtr)_str.IntAt(11L);
+                return IntPtr.Size == 8 ? (nint)_str.LongAt(11L) : (nint)_str.IntAt(11L);
             }
 
             set
@@ -2503,7 +2503,7 @@ namespace DataTools.Hardware.Printers
             var sp = new List<string>();
             int ps = Marshal.SizeOf(pif);
             string ts;
-            PrinterModule.EnumPrinters(PrinterModule.PRINTER_ENUM_NAME, "", 4U, IntPtr.Zero, 0U, ref cb, ref rc);
+            PrinterModule.EnumPrinters(PrinterModule.PRINTER_ENUM_NAME, "", 4U, nint.Zero, 0U, ref cb, ref rc);
             if (cb > 0L)
             {
                 mm.Alloc(cb);
@@ -2584,19 +2584,19 @@ namespace DataTools.Hardware.Printers
         {
         }
 
-        internal PrinterObject(IntPtr ptr, bool fOwn)
+        internal PrinterObject(nint ptr, bool fOwn)
         {
             _fOwn = fOwn;
             _ptr = ptr;
             MemPtr mm = ptr;
             if (IntPtr.Size == 4)
             {
-                _DevMode = new DeviceMode((IntPtr)mm.IntAt(7L), false);
+                _DevMode = new DeviceMode((nint)mm.IntAt(7L), false);
             }
             // MsgBox("Got a pointer! x86 mode.")
             else
             {
-                _DevMode = new DeviceMode((IntPtr)mm.LongAt(7L), false);
+                _DevMode = new DeviceMode((nint)mm.LongAt(7L), false);
                 // MsgBox("Got a pointer! x64 mode.")
                 // If printer._DevMode IsNot Nothing Then MsgBox("DevMode retrieval successful, devmode reports device name as '" & printer._DevMode.DeviceName & "'")
             }
@@ -2649,8 +2649,8 @@ namespace DataTools.Hardware.Printers
             dev.PrintQuality = (short)resolution.cx;
             dev.PaperSize = paper;
             dev.Orientation = (short)orientation;
-            var hdc = User32.CreateDC(null, printer.PrinterName, IntPtr.Zero, printer._DevMode._ptr);
-            if (hdc != IntPtr.Zero)
+            var hdc = User32.CreateDC(null, printer.PrinterName, nint.Zero, printer._DevMode._ptr);
+            if (hdc != nint.Zero)
             {
                 int cx = PrinterModule.GetDeviceCaps(hdc, PrinterModule.PHYSICALWIDTH);
                 int cy = PrinterModule.GetDeviceCaps(hdc, PrinterModule.PHYSICALHEIGHT);
@@ -2679,7 +2679,7 @@ namespace DataTools.Hardware.Printers
         }
 
         [DllImport("winspool.drv", EntryPoint = "GetDefaultPrinterW", CharSet = CharSet.Unicode)]
-        private static extern bool GetDefaultPrinter(IntPtr pszBuffer, ref uint pcchBuffer);
+        private static extern bool GetDefaultPrinter(nint pszBuffer, ref uint pcchBuffer);
 
         /// <summary>
         /// Returns the default printer for the system.
@@ -2702,7 +2702,7 @@ namespace DataTools.Hardware.Printers
                 string DefaultPrinterNameRet = default;
                 uint l = 0U;
                 MemPtr mm = new MemPtr();
-                GetDefaultPrinter(IntPtr.Zero, ref l);
+                GetDefaultPrinter(nint.Zero, ref l);
                 if (l <= 0L)
                     return null;
                 l = (uint)(l * 2L + 2L);
@@ -2733,7 +2733,7 @@ namespace DataTools.Hardware.Printers
 
             var mm = new MemPtr();
             uint cb = 0U;
-            var hprinter = IntPtr.Zero;
+            var hprinter = nint.Zero;
 
             if (string.IsNullOrEmpty(name))
             {
@@ -2742,7 +2742,7 @@ namespace DataTools.Hardware.Printers
                 return;
             }
 
-            if (!PrinterModule.OpenPrinter(name, ref hprinter, IntPtr.Zero))
+            if (!PrinterModule.OpenPrinter(name, ref hprinter, nint.Zero))
             {
                 // Interaction.MsgBox("OpenPrinter failed, last Win32 Error: " + NativeErrorMethods.FormatLastError((uint)Marshal.GetLastWin32Error()));
                 return;
@@ -2751,7 +2751,7 @@ namespace DataTools.Hardware.Printers
             // MsgBox("Open Printer for '" & name & "' succeeded...")
             try
             {
-                PrinterModule.GetPrinter(hprinter, 2U, IntPtr.Zero, 0U, ref cb);
+                PrinterModule.GetPrinter(hprinter, 2U, nint.Zero, 0U, ref cb);
                 mm.Alloc(cb);
                 PrinterModule.GetPrinter(hprinter, 2U, mm, cb, ref cb);
                 if (printer is null)
@@ -2761,7 +2761,7 @@ namespace DataTools.Hardware.Printers
                 }
                 else
                 {
-                    if (printer._ptr.Handle != IntPtr.Zero)
+                    if (printer._ptr.Handle != nint.Zero)
                     {
                         try
                         {
@@ -2777,12 +2777,12 @@ namespace DataTools.Hardware.Printers
 
                 if (IntPtr.Size == 4)
                 {
-                    printer._DevMode = new DeviceMode((IntPtr)mm.IntAt(7L), false);
+                    printer._DevMode = new DeviceMode((nint)mm.IntAt(7L), false);
                 }
                 // MsgBox("Got a pointer! x86 mode.")
                 else
                 {
-                    printer._DevMode = new DeviceMode((IntPtr)mm.LongAt(7L), false);
+                    printer._DevMode = new DeviceMode((nint)mm.LongAt(7L), false);
                     // MsgBox("Got a pointer! x64 mode.")
                     // If printer._DevMode IsNot Nothing Then MsgBox("DevMode retrieval successful, devmode reports device name as '" & printer._DevMode.DeviceName & "'")
                 }
@@ -2807,13 +2807,13 @@ namespace DataTools.Hardware.Printers
                 // MsgBox("Polling printer for available print quality resolution.")
 
                 uint[] res;
-                uint l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_ENUMRESOLUTIONS, IntPtr.Zero, IntPtr.Zero);
+                uint l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_ENUMRESOLUTIONS, nint.Zero, nint.Zero);
                 if (printer.PrinterName.Contains("HP LaserJet"))
                 {
                     if (l == 0xFFFFFFFFU)
                     {
                         // MsgBox("Attempt to get resolutions failed miserably, let's try it without the port name...")
-                        l = PrinterModule.DeviceCapabilities(printer.PrinterName, null, PrinterModule.DC_ENUMRESOLUTIONS, IntPtr.Zero, IntPtr.Zero);
+                        l = PrinterModule.DeviceCapabilities(printer.PrinterName, null, PrinterModule.DC_ENUMRESOLUTIONS, nint.Zero, nint.Zero);
                         if (l == 0xFFFFFFFFU)
                         {
                             // MsgBox("That still failed.  We are going to give the LaserJet practical resolutions, 600x600 and 1200x1200 so that it won't barf")
@@ -2828,7 +2828,7 @@ namespace DataTools.Hardware.Printers
                         // MsgBox("HP LaserJet SAYS it has " & l & " resolutions.")
                         res = null;
                         mm = new MemPtr(l * 8L);
-                        l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_ENUMRESOLUTIONS, mm, IntPtr.Zero);
+                        l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_ENUMRESOLUTIONS, mm, nint.Zero);
 
                         // MsgBox("Retrieved printer resolutions, RetVal=" & l)
 
@@ -2882,7 +2882,7 @@ namespace DataTools.Hardware.Printers
                 {
                     res = null;
                     mm = new MemPtr(l * 8L);
-                    l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_ENUMRESOLUTIONS, mm, IntPtr.Zero);
+                    l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_ENUMRESOLUTIONS, mm, nint.Zero);
                     try
                     {
                         res = mm.ToArray<uint>();
@@ -2924,13 +2924,13 @@ namespace DataTools.Hardware.Printers
 
                 // MsgBox("Getting paper class sizes")
                 // Get the supported paper types.
-                l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_PAPERS, IntPtr.Zero, IntPtr.Zero);
+                l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_PAPERS, nint.Zero, nint.Zero);
 
                 // supported paper types are short ints:
                 if (l > 0L)
                 {
                     mm = new MemPtr(l * 2L);
-                    l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_PAPERS, mm, IntPtr.Zero);
+                    l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_PAPERS, mm, nint.Zero);
                     printer._PaperSizes = SystemPaperTypes.TypeListFromCodes(mm.ToArray<short>());
                     mm.Free();
                 }
@@ -2939,13 +2939,13 @@ namespace DataTools.Hardware.Printers
 
                 // MsgBox("Looking for the printer trays.")
                 // get the names of the supported paper bins.
-                l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_BINNAMES, IntPtr.Zero, IntPtr.Zero);
+                l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_BINNAMES, nint.Zero, nint.Zero);
                 if (l > 0L)
                 {
                     mm = new MemPtr(l * 24L * 2L);
                     mm.ZeroMemory();
 
-                    PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_BINNAMES, mm, IntPtr.Zero);
+                    PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_BINNAMES, mm, nint.Zero);
                     printer._Bins.Clear();
 
                     string srs;
@@ -2982,9 +2982,9 @@ namespace DataTools.Hardware.Printers
                     mm.Free();
                 }
 
-                l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_COLORDEVICE, IntPtr.Zero, IntPtr.Zero);
+                l = PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_COLORDEVICE, nint.Zero, nint.Zero);
                 printer.IsColorPrinter = l == 0 ? false : true;
-                printer._LandscapeRotation = (int)PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_ORIENTATION, IntPtr.Zero, IntPtr.Zero);
+                printer._LandscapeRotation = (int)PrinterModule.DeviceCapabilities(printer.PrinterName, printer.PortName, PrinterModule.DC_ORIENTATION, nint.Zero, nint.Zero);
             }
             catch (Exception ex)
             {
@@ -3435,11 +3435,11 @@ namespace DataTools.Hardware.Printers
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public IntPtr SecurityDescriptor
+        public nint SecurityDescriptor
         {
             get
             {
-                return (IntPtr)_ptr.LongAt(12L);
+                return (nint)_ptr.LongAt(12L);
             }
 
             internal set
@@ -3592,10 +3592,10 @@ namespace DataTools.Hardware.Printers
         public PrinterStatus UpdateStatus()
         {
             uint cb = 0U;
-            var hprinter = IntPtr.Zero;
-            if (!PrinterModule.OpenPrinter(PrinterName, ref hprinter, IntPtr.Zero))
+            var hprinter = nint.Zero;
+            if (!PrinterModule.OpenPrinter(PrinterName, ref hprinter, nint.Zero))
                 return PrinterStatus.Error;
-            PrinterModule.GetPrinter(hprinter, 6U, IntPtr.Zero, 0U, ref cb);
+            PrinterModule.GetPrinter(hprinter, 6U, nint.Zero, 0U, ref cb);
             if (cb > 16L)
             {
                 _mm.ReAlloc(cb);
@@ -3673,7 +3673,7 @@ namespace DataTools.Hardware.Printers
         internal MemPtr _ptr;
         private bool _own = true;
 
-        internal DeviceMode(IntPtr ptr, bool fOwn)
+        internal DeviceMode(nint ptr, bool fOwn)
         {
             _ptr = ptr;
             _own = fOwn;

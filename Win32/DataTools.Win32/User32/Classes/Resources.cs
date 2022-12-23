@@ -1,29 +1,25 @@
-﻿// ************************************************* ''
+﻿// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: Resources.
 //         Tools for grabbing resources from EXE and DLL modules.
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License
+// *************************************************
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Runtime.InteropServices;
+using DataTools.Shell.Native;
 using DataTools.Text;
 using DataTools.Win32;
-using DataTools.Shell.Native;
 using DataTools.Win32.Memory;
+
+using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace DataTools.Desktop
 {
-
-
     /// <summary>
     /// Flags to be used with LoadLibraryEx
     /// </summary>
@@ -31,7 +27,6 @@ namespace DataTools.Desktop
     [Flags]
     public enum LoadLibraryExFlags
     {
-
         /// <summary>
         /// If this value is used, and the executable module is a DLL, the system does not call DllMain for process and thread initialization and termination. Also, the system does not load additional executable modules that are referenced by the specified module.
         /// </summary>
@@ -93,8 +88,6 @@ namespace DataTools.Desktop
     /// </summary>
     public static class Resources
     {
-
-
         public const int RT_CURSOR = 1;
         public const int RT_BITMAP = 2;
         public const int RT_ICON = 3;
@@ -116,41 +109,45 @@ namespace DataTools.Desktop
         public const int RT_ANICURSOR = 21;
         public const int RT_ANIICON = 22;
 
-
         [DllImport("shell32.dll", EntryPoint = "ExtractAssociatedIconExW")]
-        static extern IntPtr ExtractAssociatedIconEx(IntPtr hInst, [MarshalAs(UnmanagedType.LPTStr)] string lpIconPath, ref int lpiIconIndex, ref int lpiIconId);
+        private static extern nint ExtractAssociatedIconEx(nint hInst, [MarshalAs(UnmanagedType.LPTStr)] string lpIconPath, ref int lpiIconIndex, ref int lpiIconId);
+
         [DllImport("user32", EntryPoint = "LoadStringW", CharSet = CharSet.Unicode)]
-        static extern int LoadString(IntPtr hInstance, int uID, MemPtr lpBuffer, int nBufferMax);
+        private static extern int LoadString(nint hInstance, int uID, MemPtr lpBuffer, int nBufferMax);
+
         [DllImport("kernel32")]
-        static extern IntPtr LockResource(IntPtr hResData);
+        private static extern nint LockResource(nint hResData);
+
         [DllImport("kernel32")]
-        static extern IntPtr LoadResource(IntPtr hModule, IntPtr hResInfo);
+        private static extern nint LoadResource(nint hModule, nint hResInfo);
+
         [DllImport("kernel32")]
-        static extern int SizeofResource(IntPtr hModule, IntPtr hResInfo);
+        private static extern int SizeofResource(nint hModule, nint hResInfo);
+
         [DllImport("kernel32", EntryPoint = "LoadLibraryExW", CharSet = CharSet.Unicode)]
+        private static extern nint LoadLibraryEx(string lpFileName, nint hFile, LoadLibraryExFlags flags);
 
-        static extern IntPtr LoadLibraryEx(string lpFileName, IntPtr hFile, LoadLibraryExFlags flags);
+        public delegate bool EnumResNameProc(nint hModule, string lpszType, string lpszName, nint lParam);
 
-        public delegate bool EnumResNameProc(IntPtr hModule, string lpszType, string lpszName, IntPtr lParam);
-
-        public delegate bool EnumResNameProcPtr(IntPtr hModule, MemPtr lpszType, MemPtr lpszName, IntPtr lParam);
+        public delegate bool EnumResNameProcPtr(nint hModule, MemPtr lpszType, MemPtr lpszName, nint lParam);
 
         [DllImport("kernel32", EntryPoint = "EnumResourceNamesExW", CharSet = CharSet.Unicode)]
+        private static extern bool EnumResourceNamesEx(nint hModule, string lpszType, EnumResNameProc lpEnumFunc, nint lParam, int dwFlags, int langId);
 
-        static extern bool EnumResourceNamesEx(IntPtr hModule, string lpszType, EnumResNameProc lpEnumFunc, IntPtr lParam, int dwFlags, int langId);
         [DllImport("kernel32", EntryPoint = "EnumResourceNamesExW", CharSet = CharSet.Unicode)]
+        private static extern bool EnumResourceNamesEx(nint hModule, nint lpszType, EnumResNameProcPtr lpEnumFunc, nint lParam, int dwFlags, int langId);
 
-        static extern bool EnumResourceNamesEx(IntPtr hModule, IntPtr lpszType, EnumResNameProcPtr lpEnumFunc, IntPtr lParam, int dwFlags, int langId);
         [DllImport("user32")]
-        static extern int LookupIconIdFromDirectoryEx(IntPtr presbits, [MarshalAs(UnmanagedType.Bool)] bool fIcon, int cxDesired, int cyDesired, int Flags);
-        [DllImport("kernel32", EntryPoint = "FindResourceExW", CharSet = CharSet.Unicode)]
+        private static extern int LookupIconIdFromDirectoryEx(nint presbits, [MarshalAs(UnmanagedType.Bool)] bool fIcon, int cxDesired, int cyDesired, int Flags);
 
-        static extern IntPtr FindResourceEx(IntPtr hModule, [MarshalAs(UnmanagedType.LPWStr)] string lpType, [MarshalAs(UnmanagedType.LPWStr)] string lpName, ushort wLanguage);
         [DllImport("kernel32", EntryPoint = "FindResourceExW", CharSet = CharSet.Unicode)]
+        private static extern nint FindResourceEx(nint hModule, [MarshalAs(UnmanagedType.LPWStr)] string lpType, [MarshalAs(UnmanagedType.LPWStr)] string lpName, ushort wLanguage);
 
-        static extern IntPtr FindResourceEx(IntPtr hModule, IntPtr lpType, IntPtr lpName, ushort wLanguage);
+        [DllImport("kernel32", EntryPoint = "FindResourceExW", CharSet = CharSet.Unicode)]
+        private static extern nint FindResourceEx(nint hModule, nint lpType, nint lpName, ushort wLanguage);
+
         [DllImport("user32")]
-        static extern IntPtr CreateIconFromResourceEx(IntPtr phIconBits, int cbIconBits, [MarshalAs(UnmanagedType.Bool)] bool fIcon, int dwVersion, int cxDesired, int cyDesired, int uFlags);
+        private static extern nint CreateIconFromResourceEx(nint phIconBits, int cbIconBits, [MarshalAs(UnmanagedType.Bool)] bool fIcon, int dwVersion, int cxDesired, int cyDesired, int uFlags);
 
         public enum SystemIconSizes
         {
@@ -307,7 +304,7 @@ namespace DataTools.Desktop
         /// <param name="restype">The resource type.</param>
         /// <returns>An array of MemPtr structures.</returns>
         /// <remarks></remarks>
-        public static ResCol EnumResources(IntPtr hmod, IntPtr restype)
+        public static ResCol EnumResources(nint hmod, nint restype)
         {
             var _ptrs = new ResCol();
             int c = 0;
@@ -316,7 +313,7 @@ namespace DataTools.Desktop
                 _ptrs.Add(lpszName);
                 c += 1;
                 return true;
-            }), IntPtr.Zero, 0, 0);
+            }), nint.Zero, 0, 0);
             return _ptrs;
         }
 
@@ -326,7 +323,7 @@ namespace DataTools.Desktop
         /// <param name="ptr"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static bool IsIntResource(IntPtr ptr)
+        public static bool IsIntResource(nint ptr)
         {
             return (ptr.ToInt64() & 0xFFFFL) == ptr.ToInt64();
         }
@@ -360,7 +357,7 @@ namespace DataTools.Desktop
         public static string LoadStringResource(string fileName, int resId, LoadLibraryExFlags uFlags = LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE | LoadLibraryExFlags.LOAD_LIBRARY_AS_IMAGE_RESOURCE, bool parseResName = false, int maxBuffer = 4096)
         {
             string LoadStringResourceRet = default;
-            IntPtr hmod;
+            nint hmod;
             if (parseResName)
             {
                 fileName = ParseResourceFilename(fileName, ref resId);
@@ -373,14 +370,14 @@ namespace DataTools.Desktop
 
             try
             {
-                hmod = Resources.LoadLibraryEx(fileName, IntPtr.Zero, uFlags);
+                hmod = Resources.LoadLibraryEx(fileName, nint.Zero, uFlags);
             }
             catch
             {
                 return null;
             }
 
-            if (hmod == IntPtr.Zero)
+            if (hmod == nint.Zero)
             {
                 throw new NativeException(User32.GetLastError());
             }
@@ -402,7 +399,6 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public class LibraryIcon
         {
-
             /// <summary>
             /// The name of the library icon (or the resource identifier).
             /// </summary>
@@ -452,28 +448,27 @@ namespace DataTools.Desktop
         {
             fileName = Environment.ExpandEnvironmentVariables(fileName);
             var l = new System.Collections.ObjectModel.ObservableCollection<LibraryIcon>();
-            IntPtr hmod;
+            nint hmod;
             try
             {
-                hmod = Resources.LoadLibraryEx(fileName, IntPtr.Zero, uFlags);
+                hmod = Resources.LoadLibraryEx(fileName, nint.Zero, uFlags);
             }
             catch
             {
                 return null;
             }
 
-            if (hmod == IntPtr.Zero)
+            if (hmod == nint.Zero)
             {
                 throw new NativeException();
             }
 
-            var enumres = EnumResources(hmod, (IntPtr)RT_GROUP_ICON);
+            var enumres = EnumResources(hmod, (nint)RT_GROUP_ICON);
 
             string s;
             int i;
 
             int c = enumres.Count;
-
 
             for (i = 0; i < c; i++)
             {
@@ -497,7 +492,7 @@ namespace DataTools.Desktop
         public static Icon LoadLibraryIcon(string fileName, StandardIcons desiredSize, LoadLibraryExFlags uFlags = LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE | LoadLibraryExFlags.LOAD_LIBRARY_AS_IMAGE_RESOURCE, ResCol enumRes = null)
         {
             Icon LoadLibraryIconRet = default;
-            LoadLibraryIconRet = _internalLoadLibraryIcon(fileName, 0x80000, null, desiredSize, uFlags, enumRes, true, IntPtr.Zero);
+            LoadLibraryIconRet = _internalLoadLibraryIcon(fileName, 0x80000, null, desiredSize, uFlags, enumRes, true, nint.Zero);
             return LoadLibraryIconRet;
         }
 
@@ -514,7 +509,7 @@ namespace DataTools.Desktop
         public static Icon LoadLibraryIcon(string fileName, int iIcon, StandardIcons desiredSize, LoadLibraryExFlags uFlags = LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE | LoadLibraryExFlags.LOAD_LIBRARY_AS_IMAGE_RESOURCE, ResCol enumRes = null)
         {
             Icon LoadLibraryIconRet = default;
-            LoadLibraryIconRet = _internalLoadLibraryIcon(fileName, iIcon, null, desiredSize, uFlags, enumRes, false, IntPtr.Zero);
+            LoadLibraryIconRet = _internalLoadLibraryIcon(fileName, iIcon, null, desiredSize, uFlags, enumRes, false, nint.Zero);
             return LoadLibraryIconRet;
         }
 
@@ -531,7 +526,7 @@ namespace DataTools.Desktop
         public static Icon LoadLibraryIcon(string fileName, string resIcon, StandardIcons desiredSize, LoadLibraryExFlags uFlags = LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE | LoadLibraryExFlags.LOAD_LIBRARY_AS_IMAGE_RESOURCE, ResCol enumRes = null)
         {
             Icon LoadLibraryIconRet = default;
-            LoadLibraryIconRet = _internalLoadLibraryIcon(fileName, 0x80000, resIcon, desiredSize, uFlags, enumRes, false, IntPtr.Zero);
+            LoadLibraryIconRet = _internalLoadLibraryIcon(fileName, 0x80000, resIcon, desiredSize, uFlags, enumRes, false, nint.Zero);
             return LoadLibraryIconRet;
         }
 
@@ -548,12 +543,12 @@ namespace DataTools.Desktop
         /// <param name="hMod">The handle to an open module or 0.</param>
         /// <returns>A managed-code .NET Framework Icon object.</returns>
         /// <remarks></remarks>
-        private static Icon _internalLoadLibraryIcon(string fileName, int iIcon, string resIcon, StandardIcons desiredSize, LoadLibraryExFlags uFlags, ResCol enumRes, bool parseIconIndex, IntPtr hMod)
+        private static Icon _internalLoadLibraryIcon(string fileName, int iIcon, string resIcon, StandardIcons desiredSize, LoadLibraryExFlags uFlags, ResCol enumRes, bool parseIconIndex, nint hMod)
         {
             Icon _internalLoadLibraryIconRet = default;
             string lk = null;
             Icon icn = null;
-            bool noh = hMod == IntPtr.Zero;
+            bool noh = hMod == nint.Zero;
             BITMAPINFOHEADER idata;
             if (parseIconIndex)
             {
@@ -597,11 +592,11 @@ namespace DataTools.Desktop
                 return icn;
             }
 
-            IntPtr hicon;
+            nint hicon;
             int idx = iIcon;
-            IntPtr hres;
-            IntPtr hdata;
-            IntPtr hglob;
+            nint hres;
+            nint hdata;
+            nint hglob;
 
             // if it's an actual icon file, we use our own IconImage class to read it.
             if (Path.GetExtension(fileName) == ".ico")
@@ -610,7 +605,6 @@ namespace DataTools.Desktop
                 IconImageEntry fa = null;
                 foreach (var fe in fi.Entries)
                 {
-
                     // find the closest size greater than the requested size image.
                     if (fe.EntryInfo.wBitsPixel == 32)
                     {
@@ -633,14 +627,14 @@ namespace DataTools.Desktop
             {
                 try
                 {
-                    hMod = Resources.LoadLibraryEx(fileName, IntPtr.Zero, uFlags);
+                    hMod = Resources.LoadLibraryEx(fileName, nint.Zero, uFlags);
                 }
                 catch
                 {
                     return null;
                 }
 
-                if (hMod == IntPtr.Zero)
+                if (hMod == nint.Zero)
                 {
                     throw new NativeException();
                 }
@@ -655,12 +649,12 @@ namespace DataTools.Desktop
 
             // we want RT_GROUP_ICON resources.
             if (enumRes is null)
-                enumRes = EnumResources(hMod, (IntPtr)RT_GROUP_ICON);
+                enumRes = EnumResources(hMod, (nint)RT_GROUP_ICON);
 
             // no RT_GROUP_ICONs, they must want an actual ICON.
             if (enumRes is null)
             {
-                enumRes = EnumResources(hMod, (IntPtr)RT_ICON);
+                enumRes = EnumResources(hMod, (nint)RT_ICON);
 
                 // are we looking for the integer name of the icon resource?
                 if (iIcon < 0)
@@ -712,7 +706,7 @@ namespace DataTools.Desktop
                 }
 
                 // find the icon.
-                hres = FindResourceEx(hMod, new IntPtr(RT_ICON), enumRes[idx].Handle, 0);
+                hres = FindResourceEx(hMod, new nint(RT_ICON), enumRes[idx].Handle, 0);
 
                 // load the resource.
                 hglob = LoadResource(hMod, hres);
@@ -789,8 +783,8 @@ namespace DataTools.Desktop
             }
 
             // find the group icon resource.
-            hres = FindResourceEx(hMod, new IntPtr(RT_GROUP_ICON), enumRes[idx].Handle, 0);
-            if (hres != IntPtr.Zero)
+            hres = FindResourceEx(hMod, new nint(RT_GROUP_ICON), enumRes[idx].Handle, 0);
+            if (hres != nint.Zero)
             {
                 // load the resource.
                 hglob = LoadResource(hMod, hres);
@@ -809,7 +803,7 @@ namespace DataTools.Desktop
                 }
 
                 // find THAT icon resource.
-                hres = FindResourceEx(hMod, new IntPtr(RT_ICON), new IntPtr(i), 0);
+                hres = FindResourceEx(hMod, new nint(RT_ICON), new nint(i), 0);
 
                 //load that resource.
                 hglob = LoadResource(hMod, hres);
@@ -827,7 +821,7 @@ namespace DataTools.Desktop
 
                 // clone the unmanaged icon.
 
-                if (hicon != IntPtr.Zero)
+                if (hicon != nint.Zero)
                 {
                     icn = (Icon)Icon.FromHandle(hicon).Clone();
 
@@ -856,8 +850,8 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static int GetLibraryIconCount(string library = @"%systemroot%\system32\shell32.dll")
         {
-            var a = new IntPtr();
-            var b = new IntPtr();
+            var a = new nint();
+            var b = new nint();
 
             return User32.ExtractIconEx(Environment.ExpandEnvironmentVariables(library), -1, ref a, ref b, 0U);
         }
@@ -875,11 +869,11 @@ namespace DataTools.Desktop
         {
             Bitmap GetLibraryBitmapRet = default;
             var hInst = User32.LoadLibrary(Environment.ExpandEnvironmentVariables(library));
-            IntPtr hBmp;
-            if (hInst == IntPtr.Zero)
+            nint hBmp;
+            if (hInst == nint.Zero)
                 return null;
-            hBmp = User32.LoadImage(hInst, (IntPtr)iBmp, User32.IMAGE_BITMAP, iSize.Width, iSize.Height, uFlags);
-            if (hBmp == IntPtr.Zero)
+            hBmp = User32.LoadImage(hInst, (nint)iBmp, User32.IMAGE_BITMAP, iSize.Width, iSize.Height, uFlags);
+            if (hBmp == nint.Zero)
                 return null;
             User32.FreeLibrary(hInst);
             GetLibraryBitmapRet = Image.FromHbitmap(hBmp);
@@ -897,12 +891,12 @@ namespace DataTools.Desktop
             var sgfin = default(ShellFileGetAttributesOptions);
             var sgfout = default(ShellFileGetAttributesOptions);
             var lpInfo = new SHFILEINFO();
-            IntPtr x;
+            nint x;
             int iFlags = 0;
             iFlags = iFlags | User32.SHGFI_SYSICONINDEX | User32.SHGFI_PIDL;
             SafePtr mm = (SafePtr)filename;
             mm.Length += 2L;
-            NativeShell.SHParseDisplayName(mm.handle, IntPtr.Zero, out x, sgfin, ref sgfout);
+            NativeShell.SHParseDisplayName(mm.handle, nint.Zero, out x, sgfin, out sgfout);
             mm.Free();
             User32.SHGetItemInfo(x, 0, ref lpInfo, Marshal.SizeOf(lpInfo), iFlags);
             Marshal.FreeCoTaskMem(x);
@@ -922,7 +916,7 @@ namespace DataTools.Desktop
             // The shell system image list
             var riid = new Guid("46EB5926-582E-4017-9FDF-E8998DAA0950");
             Icon icn = null;
-            IntPtr i = new IntPtr();
+            nint i = new nint();
             int iIcon;
             iIcon = (iIndex is object && iIndex > 0) == true ? (int)iIndex : GetIconIndex(lpFilename);
             if (iIcon == 0)
@@ -934,8 +928,8 @@ namespace DataTools.Desktop
             }
 
             User32.SHGetImageList((int)shil, ref riid, ref i);
-            i = (IntPtr)User32.ImageList_GetIcon(i, iIcon, 0U);
-            if (i != IntPtr.Zero)
+            i = (nint)User32.ImageList_GetIcon(i, iIcon, 0U);
+            if (i != nint.Zero)
             {
                 icn = (Icon)Icon.FromHandle(i).Clone();
                 User32.DestroyIcon(i);
@@ -953,7 +947,6 @@ namespace DataTools.Desktop
             }
         }
 
-
         /// <summary>
         /// Gets the system imagelist cache index for the icon for the shell item pointed to by lpItemID
         /// </summary>
@@ -962,7 +955,7 @@ namespace DataTools.Desktop
         /// <param name="hIml">Unused</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static int GetItemIconIndex(IntPtr lpItemID, bool fSmall)
+        public static int GetItemIconIndex(nint lpItemID, bool fSmall)
         {
             var lpInfo = new SHFILEINFO();
             int i;
@@ -1009,9 +1002,9 @@ namespace DataTools.Desktop
         /// <param name="shil">The image size for the image list to retrieve.</param>
         /// <returns>A pointer to a system image list for images of the specified size.</returns>
         /// <remarks></remarks>
-        public static IntPtr GetSystemImageList(SystemIconSizes shil)
+        public static nint GetSystemImageList(SystemIconSizes shil)
         {
-            IntPtr i = new IntPtr();
+            nint i = new nint();
             var riid = new Guid("46EB5926-582E-4017-9FDF-E8998DAA0950");
 
             User32.SHGetImageList((int)shil, ref riid, ref i);
@@ -1027,7 +1020,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static Icon GetFileIconFromIndex(int index, SystemIconSizes shil = SystemIconSizes.ExtraLarge)
         {
-            IntPtr i = new IntPtr();
+            nint i = new nint();
             Icon icn;
             var riid = new Guid("46EB5926-582E-4017-9FDF-E8998DAA0950");
 
@@ -1036,9 +1029,9 @@ namespace DataTools.Desktop
 
             User32.SHGetImageList((int)shil, ref riid, ref i);
 
-            i = (IntPtr)User32.ImageList_GetIcon(i, index, 0U);
+            i = (nint)User32.ImageList_GetIcon(i, index, 0U);
 
-            if (i != IntPtr.Zero)
+            if (i != nint.Zero)
             {
                 icn = (Icon)Icon.FromHandle(i).Clone();
                 User32.DestroyIcon(i);
@@ -1057,10 +1050,10 @@ namespace DataTools.Desktop
         /// <param name="shil">The size of the icon to retrieve.</param>
         /// <returns>A System.Drawing.Icon object.</returns>
         /// <remarks></remarks>
-        public static Icon GetItemIcon(IntPtr lpItemID, SystemIconSizes shil = SystemIconSizes.ExtraLarge)
+        public static Icon GetItemIcon(nint lpItemID, SystemIconSizes shil = SystemIconSizes.ExtraLarge)
         {
             var lpInfo = new SHFILEINFO();
-            IntPtr i = new IntPtr();
+            nint i = new nint();
             Icon icn;
             var riid = new Guid("46EB5926-582E-4017-9FDF-E8998DAA0950");
             // iFlags = SHGFI_ICON
@@ -1073,8 +1066,8 @@ namespace DataTools.Desktop
             }
 
             User32.SHGetImageList((int)shil, ref riid, ref i);
-            i = (IntPtr)User32.ImageList_GetIcon(i, lpInfo.iIcon, 0U);
-            if (i != IntPtr.Zero)
+            i = (nint)User32.ImageList_GetIcon(i, lpInfo.iIcon, 0U);
+            if (i != nint.Zero)
             {
                 icn = (Icon)Icon.FromHandle(i).Clone();
                 User32.DestroyIcon(i);
@@ -1095,12 +1088,13 @@ namespace DataTools.Desktop
         public static Image GrayIcon(Icon icn)
         {
             var n = new Bitmap(icn.Width, icn.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
             var g = System.Drawing.Graphics.FromImage(n);
             g.FillRectangle(Brushes.Transparent, new Rectangle(0, 0, n.Width, n.Height));
             g.DrawIcon(icn, 0, 0);
             g.Dispose();
             var bm = new System.Drawing.Imaging.BitmapData();
-            var mm = new MemPtr(n.Width * n.Height * 4);
+            var mm = new MemPtr((long)(n.Width * n.Height * 4));
             bm.Stride = n.Width * 4;
             bm.Scan0 = mm;
             bm.PixelFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
@@ -1140,10 +1134,10 @@ namespace DataTools.Desktop
         /// <param name="icn"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static IntPtr DIBFromIcon(Icon icn)
+        public static nint DIBFromIcon(Icon icn)
         {
             var bmp = IconToTransparentBitmap(icn);
-            var _d = new IntPtr();
+            var _d = new nint();
 
             return MakeDIBSection(bmp, ref _d);
         }
@@ -1155,7 +1149,7 @@ namespace DataTools.Desktop
         /// <param name="bitPtr">Optional variable to receive a pointer to the bitmap bits.</param>
         /// <returns>A new DIB handle that must be destroyed with DeleteObject().</returns>
         /// <remarks></remarks>
-        public static IntPtr MakeDIBSection(Bitmap img, ref IntPtr bitPtr)
+        public static nint MakeDIBSection(Bitmap img, ref nint bitPtr)
         {
             // Build header.
             // adapted from C++ code examples.
@@ -1179,10 +1173,10 @@ namespace DataTools.Desktop
             pbmih.biYPelsPerMeter = (int)(24.5d * 1000d); // pixels per meter!
             pbmih.biClrUsed = 0;
             pbmih.biClrImportant = 0;
-            var pPixels = IntPtr.Zero;
+            var pPixels = nint.Zero;
             int DIB_RGB_COLORS = 0;
             Marshal.StructureToPtr(pbmih, mm.Handle, false);
-            var hPreviewBitmap = User32.CreateDIBSection(IntPtr.Zero, mm.Handle, (uint)DIB_RGB_COLORS, ref pPixels, IntPtr.Zero, 0);
+            var hPreviewBitmap = User32.CreateDIBSection(nint.Zero, mm.Handle, (uint)DIB_RGB_COLORS, ref pPixels, nint.Zero, 0);
             bitPtr = pPixels;
             var bm = new System.Drawing.Imaging.BitmapData();
             bm = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppPArgb, bm);
@@ -1203,7 +1197,6 @@ namespace DataTools.Desktop
             img.UnlockBits(bm);
             return hPreviewBitmap;
         }
-
 
         /// <summary>
         /// Converts a 32 bit icon into a 32 bit Argb transparent bitmap.
@@ -1228,6 +1221,5 @@ namespace DataTools.Desktop
 
             return n;
         }
-
     }
 }

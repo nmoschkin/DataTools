@@ -14,9 +14,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Dispatching;
 using System.IO;
 using System.Drawing.Imaging;
-using DataTools.WinUI;
 
-namespace DataTools.Desktop
+namespace DataTools.WinUI
 {
     public class BitmapTools
     {
@@ -85,8 +84,8 @@ namespace DataTools.Desktop
         {
             if (icn is null)
                 return null;
-            var n = new Bitmap(icn.Width, icn.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            var g = System.Drawing.Graphics.FromImage(n);
+            var n = new Bitmap(icn.Width, icn.Height, PixelFormat.Format32bppArgb);
+            var g = Graphics.FromImage(n);
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
             g.Clear(Color.Transparent);
@@ -95,7 +94,7 @@ namespace DataTools.Desktop
             return n;
         }
 
-        public static async Task<ImageSource> MakeWinUIImage(System.Drawing.Icon img)
+        public static async Task<ImageSource> MakeWinUIImage(Icon img)
         {
             var _d = new IntPtr();
             return await MakeWinUIImage(IconToTransparentBitmap(img));

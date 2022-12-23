@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: Native
@@ -11,11 +11,11 @@
 
 // Some enum documentation copied from the MSDN (and in some cases, updated).
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 
@@ -36,9 +36,9 @@ namespace DataTools.Win32
     {
         public int cbSize;
         public uint fMask;
-        public IntPtr hWnd;
+        public nint hWnd;
         [MarshalAs(UnmanagedType.LPTStr)]
-        public IntPtr lpVerb;
+        public nint lpVerb;
         [MarshalAs(UnmanagedType.LPTStr)]
         public string lpFile;
         [MarshalAs(UnmanagedType.LPTStr)]
@@ -46,13 +46,13 @@ namespace DataTools.Win32
         [MarshalAs(UnmanagedType.LPTStr)]
         public string lpDirectory;
         public int nShow;
-        public IntPtr hInstApp;
-        public IntPtr lpIDList;
+        public nint hInstApp;
+        public nint lpIDList;
         [MarshalAs(UnmanagedType.LPTStr)]
         public string lpClass;
-        public IntPtr hkeyClass;
+        public nint hkeyClass;
         public int dwHotKey;
-        public IntPtr hIcon;
-        public IntPtr hProcess;
+        public nint hIcon;
+        public nint hProcess;
     }
 }

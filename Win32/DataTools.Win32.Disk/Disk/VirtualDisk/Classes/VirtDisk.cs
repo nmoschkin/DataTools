@@ -1,14 +1,14 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: VDiskDecl
 //         Port of virtdisk.h (in its entirety)
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -35,22 +35,22 @@ namespace DataTools.Win32.Disk
 
         // Functions
         [DllImport("VirtDisk.dll")]
-        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V1 Parameters, IntPtr Overlapped, ref IntPtr Handle);
+        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V1 Parameters, nint Overlapped, ref nint Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, IntPtr Overlapped, ref IntPtr Handle);
+        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, nint Overlapped, ref nint Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, IntPtr SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V1 Parameters, IntPtr Overlapped, ref IntPtr Handle);
+        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, nint SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V1 Parameters, nint Overlapped, ref nint Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, IntPtr SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, IntPtr Overlapped, ref IntPtr Handle);
+        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, nint SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, nint Overlapped, ref nint Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, IntPtr Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, ref IntPtr Handle);
+        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, nint Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, ref nint Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, ref IntPtr Handle);
+        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, ref nint Handle);
         [DllImport("VirtDisk.dll")]
         public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, ref long Handle);
         [DllImport("VirtDisk.dll", EntryPoint = "OpenVirtualDisk")]
 
-        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V2 Paramaters, ref IntPtr Handle);
+        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V2 Paramaters, ref nint Handle);
 
         //
         // This value causes the implementation defaults to be used for block size:
@@ -67,23 +67,23 @@ namespace DataTools.Win32.Disk
 
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint AttachVirtualDisk(IntPtr Handle, IntPtr SecurityDescriptor, ATTACH_VIRTUAL_DISK_FLAG Flags, uint ProviderSpecificFlags, IntPtr Parameters, IntPtr Overlapped);
+        public static extern uint AttachVirtualDisk(nint Handle, nint SecurityDescriptor, ATTACH_VIRTUAL_DISK_FLAG Flags, uint ProviderSpecificFlags, nint Parameters, nint Overlapped);
         [DllImport("VirtDisk.dll")]
-        public static extern uint AttachVirtualDisk(IntPtr Handle, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, ATTACH_VIRTUAL_DISK_FLAG Flags, uint ProviderSpecificFlags, ATTACH_VIRTUAL_DISK_PARAMETERS Parameters, IntPtr Overlapped);
+        public static extern uint AttachVirtualDisk(nint Handle, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, ATTACH_VIRTUAL_DISK_FLAG Flags, uint ProviderSpecificFlags, ATTACH_VIRTUAL_DISK_PARAMETERS Parameters, nint Overlapped);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint DetachVirtualDisk(IntPtr Handle, DETACH_VIRTUAL_DISK_FLAG Flag, uint ProviderSpecificFlags);
+        public static extern uint DetachVirtualDisk(nint Handle, DETACH_VIRTUAL_DISK_FLAG Flag, uint ProviderSpecificFlags);
 
         //
         // GetVirtualDiskPhysicalPath
         //
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskPhysicalPath(IntPtr Handle, ref uint DiskPathSizeInBytes, [MarshalAs(UnmanagedType.LPWStr)] ref string DiskPath);
+        public static extern uint GetVirtualDiskPhysicalPath(nint Handle, ref uint DiskPathSizeInBytes, [MarshalAs(UnmanagedType.LPWStr)] ref string DiskPath);
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskPhysicalPath(IntPtr Handle, ref uint DiskPathSizeInBytes, byte[] DiskPath);
+        public static extern uint GetVirtualDiskPhysicalPath(nint Handle, ref uint DiskPathSizeInBytes, byte[] DiskPath);
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskPhysicalPath(IntPtr Handle, ref uint DiskPathSizeInBytes, IntPtr DiskPath);
+        public static extern uint GetVirtualDiskPhysicalPath(nint Handle, ref uint DiskPathSizeInBytes, nint DiskPath);
         //
         // GetAllAttachedVirtualDiskPhysicalPaths
         //
@@ -92,94 +92,94 @@ namespace DataTools.Win32.Disk
         public static extern uint GetAllAttachedVirtualDiskPhysicalPaths(ref uint PathsBufferSizeInBytes, [MarshalAs(UnmanagedType.LPWStr)] string PathsBuffer);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetStorageDependencyInformation(IntPtr Handle, GET_STORAGE_DEPENDENCY_FLAG Flags, uint StorageDependencyInfoSize, IntPtr StorageDependencyInfo, ref uint SizeUsed);
+        public static extern uint GetStorageDependencyInformation(nint Handle, GET_STORAGE_DEPENDENCY_FLAG Flags, uint StorageDependencyInfoSize, nint StorageDependencyInfo, ref uint SizeUsed);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_SIZE VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_SIZE VirtualDiskInfo, ref uint SizeUsed);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_IDENTIFIER VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_IDENTIFIER VirtualDiskInfo, ref uint SizeUsed);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_PARENT_LOCATION VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_PARENT_LOCATION VirtualDiskInfo, ref uint SizeUsed);
 
         // Since I foresee problems with the above declare (seems useless) this one will be the catch-all
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, IntPtr VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, nint VirtualDiskInfo, ref uint SizeUsed);
 
 
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_PARENT_IDENTIFIER VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_PARENT_IDENTIFIER VirtualDiskInfo, ref uint SizeUsed);
 
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_PARENT_TIMESTAMP VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_PARENT_TIMESTAMP VirtualDiskInfo, ref uint SizeUsed);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_VIRTUAL_STORAGE_TYPE VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_VIRTUAL_STORAGE_TYPE VirtualDiskInfo, ref uint SizeUsed);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_PROVIDER_SUBTYPE VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_PROVIDER_SUBTYPE VirtualDiskInfo, ref uint SizeUsed);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_IS4KALIGNED VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_IS4KALIGNED VirtualDiskInfo, ref uint SizeUsed);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_ISLOADED VirtualDiskInfo, ref uint SizeUsed);
-
-        //
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_ISLOADED VirtualDiskInfo, ref uint SizeUsed);
 
         //
+
+        //
         //
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_LOGICAL_SECTOR_SIZE VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_LOGICAL_SECTOR_SIZE VirtualDiskInfo, ref uint SizeUsed);
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_VHD_PHYSICAL_SECTOR_SIZE VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_VHD_PHYSICAL_SECTOR_SIZE VirtualDiskInfo, ref uint SizeUsed);
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_SMALLEST_SAFE_VIRTUAL_SIZE VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_SMALLEST_SAFE_VIRTUAL_SIZE VirtualDiskInfo, ref uint SizeUsed);
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_FRAGMENTATION VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_FRAGMENTATION VirtualDiskInfo, ref uint SizeUsed);
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_VIRTUAL_DISK_ID VirtualDiskInfo, ref uint SizeUsed);
+        public static extern uint GetVirtualDiskInformation(nint Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_VIRTUAL_DISK_ID VirtualDiskInfo, ref uint SizeUsed);
         [DllImport("VirtDisk.dll")]
-        public static extern uint SetVirtualDiskInformation(IntPtr VirtualDiskHandle, SET_VIRTUAL_DISK_INFO_PARENT_FILE_PATH VirtualDiskInfo);
+        public static extern uint SetVirtualDiskInformation(nint VirtualDiskHandle, SET_VIRTUAL_DISK_INFO_PARENT_FILE_PATH VirtualDiskInfo);
         [DllImport("VirtDisk.dll")]
-        public static extern uint SetVirtualDiskInformation(IntPtr VirtualDiskHandle, SET_VIRTUAL_DISK_INFO_UNIQUE_ID VirtualDiskInfo);
+        public static extern uint SetVirtualDiskInformation(nint VirtualDiskHandle, SET_VIRTUAL_DISK_INFO_UNIQUE_ID VirtualDiskInfo);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint SetVirtualDiskInformation(IntPtr VirtualDiskHandle, SET_VIRTUAL_DISK_INFO_PARENT_PATH_WITH_DEPTH_INFO VirtualDiskInfo);
+        public static extern uint SetVirtualDiskInformation(nint VirtualDiskHandle, SET_VIRTUAL_DISK_INFO_PARENT_PATH_WITH_DEPTH_INFO VirtualDiskInfo);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint SetVirtualDiskInformation(IntPtr VirtualDiskHandle, SET_VIRTUAL_DISK_INFO_VHD_SECTOR_SIZE VirtualDiskInfo);
+        public static extern uint SetVirtualDiskInformation(nint VirtualDiskHandle, SET_VIRTUAL_DISK_INFO_VHD_SECTOR_SIZE VirtualDiskInfo);
 
         // Points to as list of Guids (in Items)
         [DllImport("VirtDisk.dll")]
-        public static extern uint EnumerateVirtualDiskMetadata(IntPtr VirtualDiskHandle, ref uint NumberOfItems, IntPtr Items);
+        public static extern uint EnumerateVirtualDiskMetadata(nint VirtualDiskHandle, ref uint NumberOfItems, nint Items);
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskMetadata(IntPtr VirtualDiskHandle, Guid Item, ref uint MetaDataSize, IntPtr MetaData);
+        public static extern uint GetVirtualDiskMetadata(nint VirtualDiskHandle, Guid Item, ref uint MetaDataSize, nint MetaData);
         [DllImport("VirtDisk.dll")]
-        public static extern uint SetVirtualDiskMetadata(IntPtr VirtualDiskHandle, Guid Item, uint MetaDataSize, IntPtr MetaData);
+        public static extern uint SetVirtualDiskMetadata(nint VirtualDiskHandle, Guid Item, uint MetaDataSize, nint MetaData);
         [DllImport("VirtDisk.dll")]
-        public static extern uint DeleteVirtualDiskMetadata(IntPtr VirtualDiskHandle, Guid Item);
+        public static extern uint DeleteVirtualDiskMetadata(nint VirtualDiskHandle, Guid Item);
 
 
 
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetVirtualDiskOperationProgress(IntPtr VirtualDiskHandle, IntPtr Overlapped, VIRTUAL_DISK_PROGRESS Progress);
+        public static extern uint GetVirtualDiskOperationProgress(nint VirtualDiskHandle, nint Overlapped, VIRTUAL_DISK_PROGRESS Progress);
         [DllImport("VirtDisk.dll")]
-        public static extern uint CompactVirtualDisk(IntPtr VirtualDiskHandle, COMPACT_VIRTUAL_DISK_FLAG Flags, COMPACT_VIRTUAL_DISK_PARAMETERS Parameters, IntPtr Overlapped);
+        public static extern uint CompactVirtualDisk(nint VirtualDiskHandle, COMPACT_VIRTUAL_DISK_FLAG Flags, COMPACT_VIRTUAL_DISK_PARAMETERS Parameters, nint Overlapped);
         // Versioned parameter structure for MergeVirtualDisk
         public const int MERGE_VIRTUAL_DISK_DEFAULT_MERGE_DEPTH = 1;
         [DllImport("VirtDisk.dll")]
-        public static extern uint MergeVirtualDisk(IntPtr VirtualDiskHandle, MERGE_VIRTUAL_DISK_FLAG Flags, MERGE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, IntPtr Overlapped);
+        public static extern uint MergeVirtualDisk(nint VirtualDiskHandle, MERGE_VIRTUAL_DISK_FLAG Flags, MERGE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, nint Overlapped);
         [DllImport("VirtDisk.dll")]
-        public static extern uint ExpandVirtualDisk(IntPtr VirtualDiskHandle, EXPAND_VIRTUAL_DISK_FLAG Flags, EXPAND_VIRTUAL_DISK_PARAMETERS Parameters, IntPtr Overlapped);
+        public static extern uint ExpandVirtualDisk(nint VirtualDiskHandle, EXPAND_VIRTUAL_DISK_FLAG Flags, EXPAND_VIRTUAL_DISK_PARAMETERS Parameters, nint Overlapped);
         [DllImport("VirtDisk.dll")]
-        public static extern uint ResizeVirtualDisk(IntPtr VirtualDiskHandle, RESIZE_VIRTUAL_DISK_FLAG Flags, RESIZE_VIRTUAL_DISK_PARAMETERS Parameters, IntPtr Overlapped);
+        public static extern uint ResizeVirtualDisk(nint VirtualDiskHandle, RESIZE_VIRTUAL_DISK_FLAG Flags, RESIZE_VIRTUAL_DISK_PARAMETERS Parameters, nint Overlapped);
         [DllImport("VirtDisk.dll")]
-        public static extern uint MirrorVirtualDisk(IntPtr VirtualDiskHandle, MIRROR_VIRTUAL_DISK_FLAG Flags, MIRROR_VIRTUAL_DISK_PARAMETERS Parameters, IntPtr Overlapped);
+        public static extern uint MirrorVirtualDisk(nint VirtualDiskHandle, MIRROR_VIRTUAL_DISK_FLAG Flags, MIRROR_VIRTUAL_DISK_PARAMETERS Parameters, nint Overlapped);
 
         // NTDDI_VERSION >= NTDDI_WIN8
 
@@ -188,7 +188,7 @@ namespace DataTools.Win32.Disk
         //
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint BreakMirrorVirtualDisk(IntPtr VirtualDiskHandle);
+        public static extern uint BreakMirrorVirtualDisk(nint VirtualDiskHandle);
 
         // NTDDI_VERSION >= NTDDI_WIN8
 
@@ -197,7 +197,7 @@ namespace DataTools.Win32.Disk
         //
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint AddVirtualDiskParent(IntPtr VirtualDiskHandle, [MarshalAs(UnmanagedType.LPWStr)] string ParentPath);
+        public static extern uint AddVirtualDiskParent(nint VirtualDiskHandle, [MarshalAs(UnmanagedType.LPWStr)] string ParentPath);
 
     }
 }

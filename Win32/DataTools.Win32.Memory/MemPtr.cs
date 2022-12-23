@@ -1,26 +1,21 @@
-﻿using System;
+﻿using DataTools.Streams;
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-using System.ComponentModel;
-using System.Security.Policy;
-using DataTools.Streams;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace DataTools.Win32.Memory
 {
-
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct MemPtr : ICloneable
     {
-        internal IntPtr handle;
+        internal nint handle;
 
-        public static readonly MemPtr Empty = new MemPtr((IntPtr)0);
+        public static readonly MemPtr Empty = new MemPtr((nint)0);
 
-        private static IntPtr procHeap = Native.GetProcessHeap();
-
+        private static nint procHeap = Native.GetProcessHeap();
 
         /// <summary>
         /// Gets the size of the allocated buffer in bytes.
@@ -34,7 +29,7 @@ namespace DataTools.Win32.Memory
         {
             get
             {
-                if (handle == IntPtr.Zero) return 0;
+                if (handle == nint.Zero) return 0;
 
                 try
                 {
@@ -77,7 +72,7 @@ namespace DataTools.Win32.Memory
         /// <summary>
         /// Gets or sets the handle value
         /// </summary>
-        public IntPtr Handle
+        public nint Handle
         {
             get
             {
@@ -98,31 +93,30 @@ namespace DataTools.Win32.Memory
         public MemPtr(long size)
         {
             if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
-            handle = (IntPtr)0;
+            handle = (nint)0;
             Alloc(size);
         }
 
-        public MemPtr(IntPtr ptr)
+        public MemPtr(nint ptr)
         {
             handle = ptr;
         }
 
         public unsafe MemPtr(void* ptr)
         {
-            handle = (IntPtr)ptr;
+            handle = (nint)ptr;
         }
 
         public uint CalculateCrc32()
         {
             long c = Size;
-            if (handle == IntPtr.Zero || c <= 0) return 0;
+            if (handle == nint.Zero || c <= 0) return 0;
 
             unsafe
             {
                 return Crc32.Calculate((byte*)handle, c);
             }
         }
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref byte ByteAt(long index)
@@ -141,7 +135,6 @@ namespace DataTools.Win32.Memory
                 return ref *(sbyte*)((long)handle + index);
             }
         }
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ref char CharAt(long index)
@@ -366,7 +359,7 @@ namespace DataTools.Win32.Memory
         }
 
         /// <summary>
-        /// Copies one structure into another.  
+        /// Copies one structure into another.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
@@ -398,7 +391,7 @@ namespace DataTools.Win32.Memory
         }
 
         /// <summary>
-        /// Copies a stucture into an array of structures.  
+        /// Copies a stucture into an array of structures.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
@@ -430,7 +423,7 @@ namespace DataTools.Win32.Memory
         }
 
         /// <summary>
-        /// Copies an array of structures into a structure.  
+        /// Copies an array of structures into a structure.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="U"></typeparam>
@@ -452,7 +445,7 @@ namespace DataTools.Win32.Memory
 
             unsafe
             {
-                IntPtr h1 = gc1.AddrOfPinnedObject();
+                nint h1 = gc1.AddrOfPinnedObject();
                 //void* h2 = (void*)gc2.AddrOfPinnedObject();
 
                 val2 = Marshal.PtrToStructure<U>(h1);
@@ -475,7 +468,7 @@ namespace DataTools.Win32.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T ToStruct<T>() where T : struct
         {
-            if (handle == IntPtr.Zero) return default;
+            if (handle == nint.Zero) return default;
             return (T)Marshal.PtrToStructure(handle, typeof(T));
         }
 
@@ -488,7 +481,7 @@ namespace DataTools.Win32.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void FromStruct<T>(T val) where T : struct
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
             {
                 Alloc(Marshal.SizeOf(val));
             }
@@ -506,7 +499,7 @@ namespace DataTools.Win32.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T ToStructAt<T>(long byteIndex) where T : struct
         {
-            return (T)Marshal.PtrToStructure((IntPtr)((long)handle + byteIndex), typeof(T));
+            return (T)Marshal.PtrToStructure((nint)((long)handle + byteIndex), typeof(T));
         }
 
         /// <summary>
@@ -519,18 +512,18 @@ namespace DataTools.Win32.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void FromStructAt<T>(long byteIndex, T val) where T : struct
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
             {
                 Alloc(Marshal.SizeOf(val) + byteIndex);
             }
 
-            Marshal.StructureToPtr(val, (IntPtr)((long)handle + byteIndex), false);
+            Marshal.StructureToPtr(val, (nint)((long)handle + byteIndex), false);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] ToByteArray(long index = 0, long length = 0)
         {
-            if (handle == IntPtr.Zero || length < 0) return null;
+            if (handle == nint.Zero || length < 0) return null;
 
             long len = length;
             if (len == 0) len = Length;
@@ -546,11 +539,10 @@ namespace DataTools.Win32.Memory
             unsafe
             {
                 void* ptr1 = (void*)((long)handle + index);
-                fixed(void* ptr2 = output)
+                fixed (void* ptr2 = output)
                 {
                     Buffer.MemoryCopy(ptr1, ptr2, len, len);
                 }
-
             }
 
             return output;
@@ -559,7 +551,7 @@ namespace DataTools.Win32.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public char[] ToCharArray(long index = 0, int length = 0)
         {
-            if (handle == IntPtr.Zero || length < 0) return null;
+            if (handle == nint.Zero || length < 0) return null;
 
             long len = length * sizeof(char);
             long size;
@@ -583,11 +575,10 @@ namespace DataTools.Win32.Memory
             unsafe
             {
                 void* ptr1 = (void*)((long)handle + index);
-                fixed(void* ptr2 = output)
+                fixed (void* ptr2 = output)
                 {
                     Buffer.MemoryCopy(ptr1, ptr2, len, len);
                 }
-
             }
 
             return output;
@@ -596,7 +587,7 @@ namespace DataTools.Win32.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T[] ToArray<T>(long index = 0, int length = 0) where T : struct
         {
-            if (handle == IntPtr.Zero || length < 0) return null;
+            if (handle == nint.Zero || length < 0) return null;
 
             unsafe
             {
@@ -632,10 +623,9 @@ namespace DataTools.Win32.Memory
             }
         }
 
-
         public void FromByteArray(byte[] value, long index = 0)
         {
-            if (handle != IntPtr.Zero)
+            if (handle != nint.Zero)
             {
                 ReAlloc(value.Length + index);
             }
@@ -655,7 +645,7 @@ namespace DataTools.Win32.Memory
 
         public void FromCharArray(char[] value, long index = 0)
         {
-            if (handle != IntPtr.Zero)
+            if (handle != nint.Zero)
             {
                 ReAlloc(value.Length * sizeof(char) + index);
             }
@@ -677,7 +667,7 @@ namespace DataTools.Win32.Memory
         {
             var cb = Marshal.SizeOf<T>();
 
-            if (handle != IntPtr.Zero)
+            if (handle != nint.Zero)
             {
                 ReAlloc(value.Length * cb + index);
             }
@@ -701,7 +691,7 @@ namespace DataTools.Win32.Memory
 
         public MemPtr Clone()
         {
-            if (handle == IntPtr.Zero) return new MemPtr(IntPtr.Zero);
+            if (handle == nint.Zero) return new MemPtr(nint.Zero);
 
             var cb = Size;
             var mm = new MemPtr(cb);
@@ -728,7 +718,6 @@ namespace DataTools.Win32.Memory
             }
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetString(long index, string value, bool addNull = true)
         {
@@ -743,7 +732,7 @@ namespace DataTools.Win32.Memory
         {
             unsafe
             {
-                char* ptr = (char*)*(IntPtr*)((long)handle + index);
+                char* ptr = (char*)*(nint*)((long)handle + index);
                 internalSetString(ptr, value, addNull);
             }
         }
@@ -753,7 +742,7 @@ namespace DataTools.Win32.Memory
         {
             unsafe
             {
-                char* ptr = (char*)*(IntPtr*)((long)handle + index);
+                char* ptr = (char*)*(nint*)((long)handle + index);
                 return new string(ptr);
             }
         }
@@ -772,7 +761,7 @@ namespace DataTools.Win32.Memory
         {
             unsafe
             {
-                return internalGetUTF8String((byte*)*(IntPtr*)((long)handle + index));
+                return internalGetUTF8String((byte*)*(nint*)((long)handle + index));
             }
         }
 
@@ -801,7 +790,7 @@ namespace DataTools.Win32.Memory
         {
             unsafe
             {
-                internalSetUTF8String((byte*)*(IntPtr*)((long)handle + index), value, addNull);
+                internalSetUTF8String((byte*)*(nint*)((long)handle + index), value, addNull);
             }
         }
 
@@ -813,14 +802,13 @@ namespace DataTools.Win32.Memory
 
             byte* b1 = ptr;
 
-            fixed(byte* ptr2 = data)
+            fixed (byte* ptr2 = data)
             {
                 byte* b2 = ptr2;
                 for (int i = 0; i < slen; i++)
                 {
                     *b1++ = *b2++;
                 }
-
             }
 
             if (addNull) *b1++ = 0;
@@ -833,7 +821,7 @@ namespace DataTools.Win32.Memory
             var data = Encoding.Unicode.GetBytes(value);
 
             char* b1 = ptr;
-            fixed(void*ptr2 = data)
+            fixed (void* ptr2 = data)
             {
                 char* b2 = (char*)ptr2;
                 for (int i = 0; i < slen; i++)
@@ -845,7 +833,6 @@ namespace DataTools.Win32.Memory
             if (addNull) *b1++ = '\x0';
         }
 
-
         /// <summary>
         /// Returns the string array at the byteIndex.
         /// </summary>
@@ -855,8 +842,7 @@ namespace DataTools.Win32.Memory
         {
             unsafe
             {
-
-                if (handle == IntPtr.Zero) return null;
+                if (handle == nint.Zero) return null;
 
                 string s = null;
 
@@ -869,7 +855,6 @@ namespace DataTools.Win32.Memory
 
                 while (true)
                 {
-
                     if (*ap == (char)0)
                     {
                         if (x != 0)
@@ -897,9 +882,7 @@ namespace DataTools.Win32.Memory
 
                 return o.ToArray();
             }
-
         }
-
 
         // These are the normal (canonical) memory allocation functions.
 
@@ -964,10 +947,9 @@ namespace DataTools.Win32.Memory
                 {
                     *bp1++ = 0;
                 } while (bp1 < bep);
-
             }
 
-            // Native.n_memset(handle, 0, (IntPtr)len);
+            // Native.n_memset(handle, 0, (nint)len);
         }
 
         #region Editing
@@ -979,7 +961,7 @@ namespace DataTools.Win32.Memory
         /// <remarks></remarks>
         public bool Reverse()
         {
-            if (handle == IntPtr.Zero || Size == 0)
+            if (handle == nint.Zero || Size == 0)
                 return false;
 
             long l = Size;
@@ -1015,8 +997,8 @@ namespace DataTools.Win32.Memory
         /// <param name="index">The index of the first byte in the affected block.</param>
         /// <param name="length">The length of the block.</param>
         /// <param name="offset">
-        /// The offset amount of the slide.  If the amount is negative, 
-        /// the block slides toward the beginning of the memory buffer. 
+        /// The offset amount of the slide.  If the amount is negative,
+        /// the block slides toward the beginning of the memory buffer.
         /// If it is positive, it slides to the right.
         /// </param>
         /// <remarks></remarks>
@@ -1033,11 +1015,11 @@ namespace DataTools.Win32.Memory
                 throw new IndexOutOfRangeException("Index out of bounds DataTools.Memory.MemPtr.Slide().");
             }
 
-            IntPtr p1;
-            IntPtr p2;
+            nint p1;
+            nint p2;
 
-            p1 = (IntPtr)((long)handle + index);
-            p2 = (IntPtr)((long)handle + index + offset);
+            p1 = (nint)((long)handle + index);
+            p2 = (nint)((long)handle + index + offset);
 
             long a = offset < 0 ? offset * -1 : offset;
 
@@ -1047,7 +1029,7 @@ namespace DataTools.Win32.Memory
             Native.MemCpy(p1, m.Handle, length);
             Native.MemCpy(p2, n.Handle, a);
 
-            p1 = (IntPtr)((long)handle + index + offset + length);
+            p1 = (nint)((long)handle + index + offset + length);
             Native.MemCpy(n.Handle, p1, a);
             Native.MemCpy(m.Handle, p2, length);
 
@@ -1056,7 +1038,7 @@ namespace DataTools.Win32.Memory
         }
 
         /// <summary>
-        /// Pulls the data in from the specified index. 
+        /// Pulls the data in from the specified index.
         /// </summary>
         /// <param name="index">The index where contraction begins. The contraction starts at this position.</param>
         /// <param name="amount">Number of bytes to pull in.</param>
@@ -1130,7 +1112,7 @@ namespace DataTools.Win32.Memory
         }
 
         /// <summary>
-        /// Pulls the data in from the specified character index. 
+        /// Pulls the data in from the specified character index.
         /// </summary>
         /// <param name="index">The index where contraction begins. The contraction starts at this position.</param>
         /// <param name="amount">Number of characters to pull in.</param>
@@ -1154,7 +1136,7 @@ namespace DataTools.Win32.Memory
         }
 
         /// <summary>
-        /// Parts the string in both directions from index.  
+        /// Parts the string in both directions from index.
         /// </summary>
         /// <param name="index">The index from which to expand.</param>
         /// <param name="amount">The amount of expansion, in both directions, so the total expansion will be amount * 1.</param>
@@ -1162,7 +1144,7 @@ namespace DataTools.Win32.Memory
         /// <remarks></remarks>
         public void Part(long index, long amount, bool addPressure = false)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
             {
                 Alloc(amount);
                 return;
@@ -1269,10 +1251,10 @@ namespace DataTools.Win32.Memory
             PullIn(index, amount);
         }
 
-        #endregion
+        #endregion Editing
 
         /// <summary>
-        /// Allocate a block of memory on a heap (typically the process heap).  
+        /// Allocate a block of memory on a heap (typically the process heap).
         /// </summary>
         /// <param name="size">The size to attempt to allocate</param>
         /// <param name="addPressure">Whether or not to call GC.AddMemoryPressure</param>
@@ -1283,7 +1265,7 @@ namespace DataTools.Win32.Memory
         /// <param name="zeroMem">Whether or not to zero the contents of the memory on allocation.</param>
         /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
         /// <remarks></remarks>
-        public bool Alloc(long size, bool addPressure = false, IntPtr? hHeap = null, bool zeroMem = true)
+        public bool Alloc(long size, bool addPressure = false, nint? hHeap = null, bool zeroMem = true)
         {
             long l = Size;
             bool al;
@@ -1300,8 +1282,8 @@ namespace DataTools.Win32.Memory
                 return ReAlloc(size);
             }
 
-            handle = Native.HeapAlloc((IntPtr)hHeap, zeroMem ? 8u : 0, (IntPtr)size);
-            al = handle != IntPtr.Zero;
+            handle = Native.HeapAlloc((nint)hHeap, zeroMem ? 8u : 0, (nint)size);
+            al = handle != nint.Zero;
 
             // see if we need to tell the garbage collector anything.
             if (al && addPressure)
@@ -1311,7 +1293,7 @@ namespace DataTools.Win32.Memory
         }
 
         /// <summary>
-        /// Allocate a block of memory on the process heap.  
+        /// Allocate a block of memory on the process heap.
         /// </summary>
         /// <param name="size">The size to attempt to allocate</param>
         /// <param name="addPressure">Whether or not to call GC.AddMemoryPressure</param>
@@ -1322,9 +1304,8 @@ namespace DataTools.Win32.Memory
             return Alloc(size, addPressure, null, true);
         }
 
-
         /// <summary>
-        /// Allocate a block of memory on the process heap.  
+        /// Allocate a block of memory on the process heap.
         /// </summary>
         /// <param name="size">The size to attempt to allocate</param>
         /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
@@ -1345,11 +1326,10 @@ namespace DataTools.Win32.Memory
         /// </param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool AllocZero(long size, bool addPressure = false, IntPtr? hHeap = null)
+        public bool AllocZero(long size, bool addPressure = false, nint? hHeap = null)
         {
             return Alloc(size, addPressure, hHeap, true);
         }
-
 
         /// <summary>
         /// Allocates memory aligned to a particular byte boundary.
@@ -1363,12 +1343,12 @@ namespace DataTools.Win32.Memory
         /// If you use an alternate heap handle, you will need to free the memory using the same heap handle or an error will occur.
         /// </param>
         /// <returns></returns>
-        public bool AlignedAlloc(long size, long alignment = 512, bool addPressure = false, IntPtr? hHeap = null)
+        public bool AlignedAlloc(long size, long alignment = 512, bool addPressure = false, nint? hHeap = null)
         {
             if (alignment == 0 || (alignment & 1) != 0)
                 return false;
 
-            if (handle != IntPtr.Zero)
+            if (handle != nint.Zero)
             {
                 if (!Free())
                     return false;
@@ -1381,16 +1361,16 @@ namespace DataTools.Win32.Memory
             if (l < 1)
                 return false;
 
-            IntPtr p = Native.HeapAlloc((IntPtr)hHeap, 8, (IntPtr)l);
+            nint p = Native.HeapAlloc((nint)hHeap, 8, (nint)l);
 
-            if (p == IntPtr.Zero) return false;
+            if (p == nint.Zero) return false;
 
-            IntPtr p2 = (IntPtr)((long)p + (alignment - 1) + 8);
+            nint p2 = (nint)((long)p + (alignment - 1) + 8);
 
-            if (p == IntPtr.Zero)
+            if (p == nint.Zero)
                 return false;
 
-            p2 = (IntPtr)((long)p2 - p2.ToInt64() % alignment);
+            p2 = (nint)((long)p2 - p2.ToInt64() % alignment);
 
             MemPtr mm = p2;
 
@@ -1412,28 +1392,27 @@ namespace DataTools.Win32.Memory
         /// If you use an alternate heap handle, you will need to free the memory using the same heap handle or an error will occur.
         /// </param>
         /// <returns></returns>
-        public bool AlignedFree(bool removePressure = false, IntPtr? hHeap = null)
+        public bool AlignedFree(bool removePressure = false, nint? hHeap = null)
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
                 return true;
             if (hHeap == null)
                 hHeap = procHeap;
 
-            IntPtr p = (IntPtr)LongAt(-1);
-            long l = Convert.ToInt64(Native.HeapSize((IntPtr)hHeap, 0, p));
+            nint p = (nint)LongAt(-1);
+            long l = Convert.ToInt64(Native.HeapSize((nint)hHeap, 0, p));
 
-            if (!Native.HeapFree((IntPtr)hHeap, 0, p))
+            if (!Native.HeapFree((nint)hHeap, 0, p))
             {
                 if (removePressure)
                     GC.RemoveMemoryPressure(l);
 
-                handle = IntPtr.Zero;
+                handle = nint.Zero;
                 return true;
             }
             else
                 return false;
         }
-
 
         /// <summary>
         /// Reallocate a block of memory to a different size on the task heap.
@@ -1445,9 +1424,9 @@ namespace DataTools.Win32.Memory
         /// </param>
         /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
         /// <remarks></remarks>
-        public bool ReAlloc(long size, bool modifyPressure = false, IntPtr? hHeap = null)
+        public bool ReAlloc(long size, bool modifyPressure = false, nint? hHeap = null)
         {
-            if (handle == IntPtr.Zero) return Alloc(size, modifyPressure, hHeap);
+            if (handle == nint.Zero) return Alloc(size, modifyPressure, hHeap);
 
             long l = Size;
             bool ra;
@@ -1464,8 +1443,8 @@ namespace DataTools.Win32.Memory
                 return Alloc(size);
             }
 
-            handle = Native.HeapReAlloc((IntPtr)hHeap, 8, handle, new IntPtr(size));
-            ra = handle != IntPtr.Zero;
+            handle = Native.HeapReAlloc((nint)hHeap, 8, handle, new nint(size));
+            ra = handle != nint.Zero;
 
             // see if we need to tell the garbage collector anything.
             if (ra && modifyPressure)
@@ -1490,14 +1469,13 @@ namespace DataTools.Win32.Memory
         /// The handle pointed to by the internal pointer must have been previously allocated with the same heap handle.
         /// </param>
         /// <remarks></remarks>
-        public bool Free(bool removePressure = false, IntPtr? hHeap = null)
+        public bool Free(bool removePressure = false, nint? hHeap = null)
         {
             // While the function doesn't need to call HeapFree, it hasn't necessarily failed, either.
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
                 return true;
             else
             {
-
                 if (hHeap == null) hHeap = procHeap;
 
                 long l = 0;
@@ -1505,12 +1483,12 @@ namespace DataTools.Win32.Memory
                 // see if we need to tell the garbage collector anything.
                 if (removePressure) l = Size;
 
-                var res = Native.HeapFree((IntPtr)hHeap, 0, handle);
+                var res = Native.HeapFree((nint)hHeap, 0, handle);
 
                 // see if we need to tell the garbage collector anything.
                 if (res)
                 {
-                    handle = IntPtr.Zero;
+                    handle = nint.Zero;
                     if (removePressure) GC.RemoveMemoryPressure(l);
                 }
 
@@ -1526,7 +1504,7 @@ namespace DataTools.Win32.Memory
         /// <remarks></remarks>
         public bool Validate()
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
             {
                 return false;
             }
@@ -1541,12 +1519,12 @@ namespace DataTools.Win32.Memory
         /// <remarks></remarks>
         public bool LocalFree()
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
                 return false;
             else
             {
                 handle = Native.LocalFree(handle);
-                return handle != IntPtr.Zero;
+                return handle != nint.Zero;
             }
         }
 
@@ -1557,12 +1535,12 @@ namespace DataTools.Win32.Memory
         /// <remarks></remarks>
         public bool GlobalFree()
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
                 return false;
             else
             {
                 handle = Native.GlobalFree(handle);
-                return handle == IntPtr.Zero;
+                return handle == nint.Zero;
             }
         }
 
@@ -1575,10 +1553,9 @@ namespace DataTools.Win32.Memory
             Marshal.FreeCoTaskMem(handle);
         }
 
-
         // NetApi Memory functions should be used carefully and not within the context
         // of any scenario when you may accidentally call normal memory management functions
-        // on any region of memory allocated with the network memory functions. 
+        // on any region of memory allocated with the network memory functions.
         // Be mindful of usage.
         // Some normal functions such as Length and SetLength cannot be used.
         // Normal allocation and deallocation functions cannot be used, at all.
@@ -1593,10 +1570,10 @@ namespace DataTools.Win32.Memory
         public void NetAlloc(int size)
         {
             // just ignore an allocated buffer.
-            if (handle != IntPtr.Zero)
+            if (handle != nint.Zero)
                 return;
 
-            Native.NetApiBufferAllocate(size, ref handle);
+            Native.NetApiBufferAllocate(size, out handle);
         }
 
         /// <summary>
@@ -1605,17 +1582,16 @@ namespace DataTools.Win32.Memory
         /// <remarks></remarks>
         public void NetFree()
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
                 return;
 
             Native.NetApiBufferFree(handle);
-            handle = IntPtr.Zero;
+            handle = nint.Zero;
         }
-
 
         // Virtual Memory should be used carefully and not within the context
         // of any scenario when you may accidentally call normal memory management functions
-        // on any region of memory allocated with the Virtual functions. 
+        // on any region of memory allocated with the Virtual functions.
         // Be mindful of usage.
         // Some normal functions such as Length and SetLength cannot be used (use VirtualLength).
         // Normal allocation and deallocation functions cannot be used, at all.
@@ -1634,12 +1610,11 @@ namespace DataTools.Win32.Memory
             bool va;
 
             // While the function doesn't need to call VirtualAlloc, it hasn't necessarily failed, either.
-            if (size == l && handle != IntPtr.Zero) return true;
+            if (size == l && handle != nint.Zero) return true;
 
+            handle = Native.VirtualAlloc(nint.Zero, (nint)size, VMemAllocFlags.MEM_COMMIT | VMemAllocFlags.MEM_RESERVE, MemoryProtectionFlags.PAGE_READWRITE);
 
-            handle = Native.VirtualAlloc(IntPtr.Zero, (IntPtr)size, VMemAllocFlags.MEM_COMMIT | VMemAllocFlags.MEM_RESERVE, MemoryProtectionFlags.PAGE_READWRITE);
-
-            va = handle != IntPtr.Zero;
+            va = handle != nint.Zero;
 
             if (va && addPressure)
                 GC.AddMemoryPressure(VirtualLength());
@@ -1659,7 +1634,7 @@ namespace DataTools.Win32.Memory
             bool vf;
 
             // While the function doesn't need to call vf, it hasn't necessarily failed, either.
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
                 vf = true;
             else
             {
@@ -1672,7 +1647,7 @@ namespace DataTools.Win32.Memory
                 // see if we need to tell the garbage collector anything.
                 if (vf)
                 {
-                    handle = IntPtr.Zero;
+                    handle = nint.Zero;
                     if (removePressure)
                         GC.RemoveMemoryPressure(l);
                 }
@@ -1688,17 +1663,16 @@ namespace DataTools.Win32.Memory
         /// <remarks></remarks>
         public long VirtualLength()
         {
-            if (handle == IntPtr.Zero)
+            if (handle == nint.Zero)
                 return 0;
 
             MEMORY_BASIC_INFORMATION m = new MEMORY_BASIC_INFORMATION();
 
-            if (Native.VirtualQuery(handle, ref m, (IntPtr)Marshal.SizeOf(m)) != IntPtr.Zero)
+            if (Native.VirtualQuery(handle, ref m, (nint)Marshal.SizeOf(m)) != nint.Zero)
                 return Convert.ToInt64(m.RegionSize);
 
             return 0;
         }
-
 
         public void ZeroMemory()
         {
@@ -1711,10 +1685,9 @@ namespace DataTools.Win32.Memory
             }
         }
 
-
         public override string ToString()
         {
-            if (handle == IntPtr.Zero) return "";
+            if (handle == nint.Zero) return "";
             return GetString(0);
         }
 
@@ -1745,23 +1718,20 @@ namespace DataTools.Win32.Memory
             }
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator string(MemPtr val)
         {
-            if (val.handle == (IntPtr)0) return null;
+            if (val.handle == (nint)0) return null;
             return val.GetString(0);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator MemPtr(string val)
         {
-            var op = new MemPtr((val.Length + 1) * sizeof(char));
+            var op = new MemPtr((long)(val.Length + 1) * sizeof(char));
             op.SetString(0, val);
             return op;
         }
-
-
 
         public static explicit operator byte[](MemPtr val)
         {
@@ -1775,8 +1745,6 @@ namespace DataTools.Win32.Memory
             return n;
         }
 
-
-
         public static explicit operator char[](MemPtr val)
         {
             return val.ToCharArray();
@@ -1788,7 +1756,6 @@ namespace DataTools.Win32.Memory
             n.FromCharArray(val);
             return n;
         }
-
 
         public static explicit operator sbyte[](MemPtr val)
         {
@@ -1814,7 +1781,6 @@ namespace DataTools.Win32.Memory
             return n;
         }
 
-
         public static explicit operator ushort[](MemPtr val)
         {
             return val.ToArray<ushort>();
@@ -1826,7 +1792,6 @@ namespace DataTools.Win32.Memory
             n.FromArray(val);
             return n;
         }
-
 
         public static explicit operator int[](MemPtr val)
         {
@@ -1840,7 +1805,6 @@ namespace DataTools.Win32.Memory
             return n;
         }
 
-
         public static explicit operator uint[](MemPtr val)
         {
             return val.ToArray<uint>();
@@ -1852,8 +1816,6 @@ namespace DataTools.Win32.Memory
             n.FromArray(val);
             return n;
         }
-
-
 
         public static explicit operator long[](MemPtr val)
         {
@@ -1867,7 +1829,6 @@ namespace DataTools.Win32.Memory
             return n;
         }
 
-
         public static explicit operator ulong[](MemPtr val)
         {
             return val.ToArray<ulong>();
@@ -1879,8 +1840,6 @@ namespace DataTools.Win32.Memory
             n.FromArray(val);
             return n;
         }
-
-
 
         public static explicit operator float[](MemPtr val)
         {
@@ -1894,7 +1853,6 @@ namespace DataTools.Win32.Memory
             return n;
         }
 
-
         public static explicit operator double[](MemPtr val)
         {
             return val.ToArray<double>();
@@ -1906,8 +1864,6 @@ namespace DataTools.Win32.Memory
             n.FromArray(val);
             return n;
         }
-
-
 
         public static explicit operator decimal[](MemPtr val)
         {
@@ -1921,7 +1877,6 @@ namespace DataTools.Win32.Memory
             return n;
         }
 
-
         public static explicit operator DateTime[](MemPtr val)
         {
             return val.ToArray<DateTime>();
@@ -1934,7 +1889,6 @@ namespace DataTools.Win32.Memory
             return n;
         }
 
-
         public static explicit operator Guid[](MemPtr val)
         {
             return val.ToArray<Guid>();
@@ -1946,7 +1900,6 @@ namespace DataTools.Win32.Memory
             n.FromArray(val);
             return n;
         }
-
 
         public static MemPtr operator +(MemPtr val1, byte[] val2)
         {
@@ -1996,51 +1949,49 @@ namespace DataTools.Win32.Memory
 
         public static MemPtr operator +(MemPtr val1, long val2)
         {
-            val1.handle = (IntPtr)((long)val1.handle + val2);
+            val1.handle = (nint)((long)val1.handle + val2);
             return val1;
         }
 
         public static MemPtr operator -(MemPtr val1, long val2)
         {
-            val1.handle = (IntPtr)((long)val1.handle - val2);
+            val1.handle = (nint)((long)val1.handle - val2);
             return val1;
         }
 
-
         public static MemPtr operator +(MemPtr val1, uint val2)
         {
-            val1.handle = (IntPtr)((uint)val1.handle + val2);
+            val1.handle = (nint)((uint)val1.handle + val2);
             return val1;
         }
 
         public static MemPtr operator -(MemPtr val1, uint val2)
         {
-            val1.handle = (IntPtr)((uint)val1.handle - val2);
+            val1.handle = (nint)((uint)val1.handle - val2);
             return val1;
         }
 
-
         public static MemPtr operator +(MemPtr val1, ulong val2)
         {
-            val1.handle = (IntPtr)((ulong)val1.handle + val2);
+            val1.handle = (nint)((ulong)val1.handle + val2);
             return val1;
         }
 
         public static MemPtr operator -(MemPtr val1, ulong val2)
         {
-            val1.handle = (IntPtr)((ulong)val1.handle - val2);
+            val1.handle = (nint)((ulong)val1.handle - val2);
             return val1;
         }
 
-        public static MemPtr operator +(MemPtr val1, IntPtr val2)
+        public static MemPtr operator +(MemPtr val1, nint val2)
         {
-            val1.handle = (IntPtr)((long)val1.handle + (long)val2);
+            val1.handle = (nint)((long)val1.handle + (long)val2);
             return val1;
         }
 
-        public static MemPtr operator -(MemPtr val1, IntPtr val2)
+        public static MemPtr operator -(MemPtr val1, nint val2)
         {
-            val1.handle = (IntPtr)((long)val1.handle - (long)val2);
+            val1.handle = (nint)((long)val1.handle - (long)val2);
             return val1;
         }
 
@@ -2054,27 +2005,27 @@ namespace DataTools.Win32.Memory
             return val1.Handle != val2.handle;
         }
 
-        public static bool operator ==(IntPtr val1, MemPtr val2)
+        public static bool operator ==(nint val1, MemPtr val2)
         {
             return val1 == val2.handle;
         }
 
-        public static bool operator !=(IntPtr val1, MemPtr val2)
+        public static bool operator !=(nint val1, MemPtr val2)
         {
             return val1 != val2.handle;
         }
 
-        public static bool operator ==(MemPtr val2, IntPtr val1)
+        public static bool operator ==(MemPtr val2, nint val1)
         {
             return val1 == val2.handle;
         }
 
-        public static bool operator !=(MemPtr val2, IntPtr val1)
+        public static bool operator !=(MemPtr val2, nint val1)
         {
             return val1 != val2.handle;
         }
 
-        public static implicit operator IntPtr(MemPtr val)
+        public static implicit operator nint(MemPtr val)
         {
             unsafe
             {
@@ -2082,13 +2033,13 @@ namespace DataTools.Win32.Memory
             }
         }
 
-        public static implicit operator MemPtr(IntPtr val)
+        public static implicit operator MemPtr(nint val)
         {
             unsafe
             {
                 return new MemPtr
                 {
-                    handle = (IntPtr)(void*)val
+                    handle = (nint)(void*)val
                 };
             }
         }
@@ -2107,10 +2058,9 @@ namespace DataTools.Win32.Memory
             {
                 return new MemPtr
                 {
-                    handle = (IntPtr)(void*)val
+                    handle = (nint)(void*)val
                 };
             }
         }
-
     }
 }

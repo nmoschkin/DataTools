@@ -1,14 +1,14 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: DiskApi
 //         Native Disk Serivces.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -312,9 +312,9 @@ namespace DataTools.Win32
         }
 
         [DllImport("kernel32.dll")]
-        public static extern bool DeviceIoControl(IntPtr hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, IntPtr lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, IntPtr lpOverlapped);
+        public static extern bool DeviceIoControl(nint hDevice, uint dwIoControlCode, nint lpInBuffer, uint nInBufferSize, nint lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, nint lpOverlapped);
         [DllImport("kernel32.dll")]
-        public static extern bool DeviceIoControl(IntPtr hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, ref STORAGE_DEVICE_NUMBER lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, IntPtr lpOverlapped);
+        public static extern bool DeviceIoControl(nint hDevice, uint dwIoControlCode, nint lpInBuffer, uint nInBufferSize, ref STORAGE_DEVICE_NUMBER lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, nint lpOverlapped);
 
         
         
@@ -349,7 +349,7 @@ namespace DataTools.Win32
             public int Space;
             public DISK_EXTENT[] Extents;
 
-            public static VOLUME_DISK_EXTENTS FromPtr(IntPtr ptr)
+            public static VOLUME_DISK_EXTENTS FromPtr(nint ptr)
             {
                 VOLUME_DISK_EXTENTS FromPtrRet = default;
                 var ve = new VOLUME_DISK_EXTENTS();
@@ -374,13 +374,13 @@ namespace DataTools.Win32
 
         [DllImport("kernel32.dll", EntryPoint = "GetVolumeInformationW")]
 
-        public static extern bool GetVolumeInformation([MarshalAs(UnmanagedType.LPWStr)] string lpRootPathName, IntPtr lpVolumeNameBuffer, int nVolumeNameSize, ref uint lpVolumeSerialNumber, ref int lpMaximumComponentLength, ref FileSystemFlags lpFileSystemFlags, IntPtr lpFileSystemNameBuffer, int nFileSystemNameSize);
+        public static extern bool GetVolumeInformation([MarshalAs(UnmanagedType.LPWStr)] string lpRootPathName, nint lpVolumeNameBuffer, int nVolumeNameSize, ref uint lpVolumeSerialNumber, ref int lpMaximumComponentLength, ref FileSystemFlags lpFileSystemFlags, nint lpFileSystemNameBuffer, int nFileSystemNameSize);
         [DllImport("kernel32.dll", EntryPoint = "GetVolumeInformationByHandleW")]
 
-        public static extern bool GetVolumeInformationByHandle(IntPtr hFile, IntPtr lpVolumeNameBuffer, int nVolumeNameSize, ref uint lpVolumeSerialNumber, ref int lpMaximumComponentLength, ref FileSystemFlags lpFileSystemFlags, IntPtr lpFileSystemNameBuffer, int nFileSystemNameSize);
+        public static extern bool GetVolumeInformationByHandle(nint hFile, nint lpVolumeNameBuffer, int nVolumeNameSize, ref uint lpVolumeSerialNumber, ref int lpMaximumComponentLength, ref FileSystemFlags lpFileSystemFlags, nint lpFileSystemNameBuffer, int nFileSystemNameSize);
         [DllImport("kernel32.dll", EntryPoint = "GetVolumePathNamesForVolumeNameW")]
 
-        public static extern bool GetVolumePathNamesForVolumeName([MarshalAs(UnmanagedType.LPWStr)] string lpszVolumeName, IntPtr lpszVolumePathNames, int cchBufferLength, ref int lpcchReturnLength);
+        public static extern bool GetVolumePathNamesForVolumeName([MarshalAs(UnmanagedType.LPWStr)] string lpszVolumeName, nint lpszVolumePathNames, int cchBufferLength, ref int lpcchReturnLength);
 
 
         /// <summary>
@@ -394,12 +394,12 @@ namespace DataTools.Win32
             DiskExtent[] deOut = null;
             MemPtr inBuff = new MemPtr();
             int inSize;
-            IntPtr file;
+            nint file;
             int h = 0;
             var de = new DISK_EXTENT();
             var ve = new VOLUME_DISK_EXTENTS();
             bool r;
-            file = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
+            file = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, nint.Zero);
             if (file == IO.INVALID_HANDLE_VALUE)
             {
                 return null;
@@ -409,12 +409,12 @@ namespace DataTools.Win32
 
             inSize = Marshal.SizeOf(de) + Marshal.SizeOf(ve);
             inBuff.Length = inSize;
-            r = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
+            r = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, nint.Zero, 0, inBuff, (uint)inSize, ref arb, nint.Zero);
 
             if (!r && User32.GetLastError() == ERROR_MORE_DATA)
             {
                 inBuff.Length = inSize * inBuff.IntAt(0L);
-                r = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
+                r = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, nint.Zero, 0, inBuff, (uint)inSize, ref arb, nint.Zero);
             }
 
             if (!r)

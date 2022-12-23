@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <Platforms>AnyCPU;x64</Platforms>
     <LangVersion>preview</LangVersion>
     <RootNamespace>DataTools</RootNamespace>
@@ -34,7 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\DataTools\DataTools.csproj" />
+    <ProjectReference Include="..\..\Standard\DataTools\DataTools.csproj" />
   </ItemGroup>
 
 </Project>

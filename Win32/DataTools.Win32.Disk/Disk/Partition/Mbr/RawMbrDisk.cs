@@ -79,7 +79,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
             // principalPerm.Demand()
 
 
-            var hfile = IO.CreateFile(devicePath, IO.GENERIC_READ | IO.GENERIC_WRITE, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_FLAG_NO_BUFFERING | IO.FILE_FLAG_RANDOM_ACCESS, IntPtr.Zero);
+            var hfile = IO.CreateFile(devicePath, IO.GENERIC_READ | IO.GENERIC_WRITE, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_FLAG_NO_BUFFERING | IO.FILE_FLAG_RANDOM_ACCESS, nint.Zero);
             if (hfile == IO.INVALID_HANDLE_VALUE)
                 return false;
 
@@ -88,7 +88,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
             var mm = new SafePtr(bps);
 			var p = mm;
 
-            var res = IO.ReadFile(hfile, mm, bps, ref br, IntPtr.Zero);
+            var res = IO.ReadFile(hfile, mm, bps, ref br, nint.Zero);
 			if (!res || br == 0)
             {
 				throw new NativeException();
@@ -114,7 +114,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
 					IO.SetFilePointerEx(hfile, ebrStart, ref newFace, IO.FilePointerMoveMethod.Begin);
 
 					mm.ZeroMemory();
-					res = IO.ReadFile(hfile, mm, bps, ref br, IntPtr.Zero);
+					res = IO.ReadFile(hfile, mm, bps, ref br, nint.Zero);
 					
 					if (!res || br == 0)
 					{
@@ -134,7 +134,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
 							IO.SetFilePointerEx(hfile, nextEbrStart, ref newFace, IO.FilePointerMoveMethod.Begin);
 
 							mm.ZeroMemory();
-							res = IO.ReadFile(hfile, mm, bps, ref br, IntPtr.Zero);
+							res = IO.ReadFile(hfile, mm, bps, ref br, nint.Zero);
 						}
 
 					} while (ebrInfo.PartTable[1].StartLBA != 0);

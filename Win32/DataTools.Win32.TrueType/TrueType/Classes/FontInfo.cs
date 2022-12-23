@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: TrueType.
@@ -6,11 +6,11 @@
 //         Adapted from the CodeProject article: http://www.codeproject.com/Articles/2293/Retrieving-font-name-from-TTF-file?msg=4714219#xx4714219xx
 //
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 using System;
 using System.Collections;
@@ -153,7 +153,7 @@ namespace DataTools.Desktop
         /// Copy the ENUMLOGFONTEX structure for this object into a memory buffer.
         /// </summary>
         /// <param name="lpElf">Pointer to a buffer to receive the ENUMLOGFONTEX structure.  The memory must already be allocated and freed by the caller.</param>
-        public void GetElfEx(IntPtr lpElf)
+        public void GetElfEx(nint lpElf)
         {
             var mm = new MemPtr(lpElf);
             mm.FromStruct(elf);

@@ -1,4 +1,4 @@
-﻿// ************************************************* ''
+﻿// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: SecurityDescriptor
@@ -6,11 +6,11 @@
 //         from the Windows API.  These are Not used 
 //         all that often in this assembly.
 // 
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 
@@ -25,7 +25,7 @@ namespace DataTools.Win32
     internal struct SECURITY_ATTRIBUTES
     {
         public int nLength;
-        public IntPtr lpSecurityDescriptor;
+        public nint lpSecurityDescriptor;
         // <MarshalAs(UnmanagedType.Bool)>
         public byte bInheritHandle;
     }
@@ -197,8 +197,8 @@ namespace DataTools.Win32
             public byte Revision;
             public byte Sbz1;
             public SECURITY_DESCRIPTOR_CONTROL Control;
-            public IntPtr Owner;
-            public IntPtr Group;
+            public nint Owner;
+            public nint Group;
             public ACL Sacl;
             public ACL Dacl;
         }
@@ -209,19 +209,19 @@ namespace DataTools.Win32
             public byte Revision;
             public byte Sbz1;
             public SECURITY_DESCRIPTOR_CONTROL Control;
-            public IntPtr Owner;
-            public IntPtr Group;
-            public IntPtr Sacl;
-            public IntPtr Dacl;
+            public nint Owner;
+            public nint Group;
+            public nint Sacl;
+            public nint Dacl;
 
             public void Dispose()
             {
-                if (Sacl != IntPtr.Zero)
+                if (Sacl != nint.Zero)
                 {
                     Marshal.FreeCoTaskMem(Sacl);
                 }
 
-                if (Dacl != IntPtr.Zero)
+                if (Dacl != nint.Zero)
                 {
                     Marshal.FreeCoTaskMem(Dacl);
                 }
@@ -283,15 +283,15 @@ namespace DataTools.Win32
 
         [DllImport("advapi32.dll", EntryPoint = "ConvertStringSecurityDescriptorToSecurityDescriptorW")]
 
-        public static extern bool ConvertStringSecurityDescriptorToSecurityDescriptor([MarshalAs(UnmanagedType.LPWStr)] string StringSecurityDescriptor, uint StringSDRevision, ref IntPtr SecurityDescriptor, ref uint SecurityDescriptorSize);
+        public static extern bool ConvertStringSecurityDescriptorToSecurityDescriptor([MarshalAs(UnmanagedType.LPWStr)] string StringSecurityDescriptor, uint StringSDRevision, ref nint SecurityDescriptor, ref uint SecurityDescriptorSize);
 
         public static SECURITY_DESCRIPTOR StringToSecurityDescriptor(string strSD)
         {
             SECURITY_DESCRIPTOR StringToSecurityDescriptorRet = default;
-            MemPtr ptr = IntPtr.Zero;
+            MemPtr ptr = nint.Zero;
             uint ls = 0U;
             SECURITY_DESCRIPTOR sd;
-            IntPtr argSecurityDescriptor = ptr;
+            nint argSecurityDescriptor = ptr;
             SecurityDescriptor.ConvertStringSecurityDescriptorToSecurityDescriptor(strSD, 1U, ref argSecurityDescriptor, ref ls);
             sd = ptr.ToStruct<SECURITY_DESCRIPTOR>();
             ptr.LocalFree();

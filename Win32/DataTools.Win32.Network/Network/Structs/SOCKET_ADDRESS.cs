@@ -1,4 +1,4 @@
-// ************************************************* ''
+// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: IfDefApi
@@ -7,11 +7,11 @@
 //
 // (and an exercise in creative problem solving and data-structure marshaling.)
 //
-// Copyright (C) 2011-2020 Nathan Moschkin
+// Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the MIT License   
-// ************************************************* ''
+// Licensed Under the Apache 2.0 License   
+// *************************************************
 
 
 using System;
@@ -33,7 +33,7 @@ namespace DataTools.Win32.Network
         public override string ToString()
         {
             string ToStringRet = default;
-            if (lpSockaddr.Handle.Handle == IntPtr.Zero)
+            if (lpSockaddr.Handle.Handle == nint.Zero)
                 return "NULL";
             ToStringRet = lpSockaddr.ToString();
             return ToStringRet;

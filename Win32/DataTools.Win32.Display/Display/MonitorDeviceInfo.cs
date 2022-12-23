@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using DataTools.MathTools.PolarMath;
-using DataTools.Win32;
+﻿using DataTools.MathTools.PolarMath;
 using DataTools.Win32.Memory;
 
+using System.Runtime.InteropServices;
+
 using static DataTools.Win32.DeviceEnum;
+
 namespace DataTools.Win32.Display
 {
     public class MonitorDeviceInfo : DeviceInfo
     {
-
-        MonitorInfo source;
+        private MonitorInfo source;
 
         public MonitorInfo Source
         {
@@ -105,11 +100,11 @@ namespace DataTools.Win32.Display
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        internal IntPtr hMonitor
+        internal nint hMonitor
         {
             get
             {
-                return (IntPtr)source.hMonitor;
+                return (nint)source.hMonitor;
             }
         }
 
@@ -132,7 +127,6 @@ namespace DataTools.Win32.Display
         {
             this.source = source;
         }
-
 
         /// <summary>
         /// Enumerate all display monitors.
@@ -166,16 +160,13 @@ namespace DataTools.Win32.Display
                             dev.dmSize = (ushort)Marshal.SizeOf<DEVMODE>();
                             dev.dmDriverExtra = 0;
 
-                            var mm2 = new MemPtr(65535 + dev.dmSize);
-
-
+                            var mm2 = new MemPtr(65535L + dev.dmSize);
 
                             var b = MultiMon.EnumDisplaySettingsEx(y.DevicePath, 0xffffffff, ref dev, 0);
                             if (!b)
                             {
                                 var s = NativeErrorMethods.FormatLastError();
                             }
-
 
                             mm2.Free();
 
@@ -198,18 +189,8 @@ namespace DataTools.Win32.Display
             return minf;
         }
 
-
-
         public MonitorDeviceInfo()
         {
         }
-
     }
-
-
-
-
-
-
-
 }
