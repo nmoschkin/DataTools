@@ -21,9 +21,7 @@ The old .NET Standard 2.0 libraries have been put in a folder called Standard. I
 
 All projects in _this_ solution (save the Xamarin projects) will be using the .NET 7.0 version of the libraries. Also, all of my other public repositories that depend on projects in this repository will be transitioned to .NET 7.0 libraries.
 
-So, I have gone several dramatic ways in attempting to determine how best to refactor these projects. 
-
-I have decided I think git submodules are useful in specific scenarios, but not when you use your own libraries everywhere to develop all kinds of apps across a wide variety of platforms.
+I have decided I think git submodules are useful in specific scenarios, but not when you use your own libraries everywhere to develop all kinds of apps across a wide variety of platforms. Facing this situation, head-on, I've decided that I need to build NuGet packages, at least locally, for myself. I will probably also get a code signing certificate, soon, too.  But this project is not ready for prime-time, yet, so it's not a priority.
 
 __That being said.  Let's have a look at what this project provides, and where I want it to go:__
 
