@@ -4,6 +4,91 @@
 
 ## Updates ##
 
+**December 23, 2022**
+
+So, I have gone several dramatic ways in attempting to determine how best to refactor these projects. 
+
+I have decided I think git submodules are useful in specific scenarios, but not when you use your own libraries everywhere to develop all kinds of apps across a wide variety of platforms.
+
+__That being said.  Let's have a look at what this project provides, and where I want it to go:__
+
+ - Text Manipulation
+   - Basic text cleanup and parsing
+   - Byte Order Mark
+   - Native-type strings
+   - CSV
+   - Advanced
+     - Expression Parsing
+ - Math
+   - Radians <-> Cartesean
+ - Graphics
+   - Color Math
+     - CMYK
+     - RGB
+     - HSV
+     - Grayscale
+   - Color Wheel
+   - Screen Coordinate Conversions
+ - Expressions
+   - Expression Parsing
+   - Unit Conversion to/from SI units
+ - Sorting
+   - Quick Sort
+   - Binary Search
+   - Red/Black Collection
+ - Memory
+   - Memory manipulation with safe classes and unsafe structs
+ - Windows
+   - Win32 Memory Objects
+     - _Very Swiss-Army-Knife-ish_
+     - MemPtr (struct)
+     - SafePtrBase (based on SafeHandle)
+       - SafePtr
+       - CoTaskMemPtr
+       - VirtualMemPtr
+       - NetworkMemPtr
+   - Win32 Desktop
+     - Icons
+     - Fonts
+     - Shell Abstractions
+   - Win32 Hardware
+     - Device Information
+      - Bluetooth
+      - Display Adapters
+      - Disks
+        - Low Level Read/Write
+        - GPT Partitions
+        - MBR Partitions
+        - Virtual Disks and ISO Images
+          - Mounting
+          - Creating
+          - Unmounting
+      - Security and Networking
+        - In-depth Adapter Information
+        - Network Neighborhood
+        - Local and Remote principal and machine enumeration
+      - Printers
+        - Paper Types
+        - Printer Queue
+        - Print
+      - Processor Info
+      - USB
+        - HID Device Probing
+    
+Etc, etc.. 
+
+So I've realized that I've written all of these projects somewhat dependent on one-another, but there is a hierarchy (everything requires DataTools, for example). But, as the Win32 projects are all separate, right now, untangling could be a bit messy.
+
+But the future is NuGet packages. So, now I have to determine what's too big to go all in the same lib, and what even makes sense to go in the same lib? Display adapter info and processor info are very small compared to the implementation of printers and networking, for example.  Should I make those bigger libraries into one package or make the entire hardware library into one package?
+
+There is also the matter of confusing organization and unused references with regard to the p/Invoke situation.  
+
+So.  All of that's being figured, factored, refactored, and worked out. 
+
+More to come!
+
+
+
 **April 29, 2022**
 
 Finally got around to moving all of the related projects into their respective real folders (as opposed to just being virtually separated with solution folders.)
