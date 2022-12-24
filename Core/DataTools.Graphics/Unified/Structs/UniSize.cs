@@ -1,20 +1,18 @@
+using DataTools.MathTools.Polar;
+
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-
-using DataTools.MathTools.Polar;
-using DataTools.Text;
 
 namespace DataTools.Graphics
 {
     /// <summary>
-    /// Unified point structure for WinForms, WPF and the Win32 API.
+    /// Unified size structure for WinForms, Win32 API, and SkiaSharp.
     /// </summary>
-    /// <remarks></remarks>
+    /// <remarks>
+    /// Platform-specific libraries within this library family will implement extensions to convert to platform-specific objects.
+    /// </remarks>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct UniSize
     {
@@ -364,9 +362,9 @@ namespace DataTools.Graphics
             return new UniSize(operand.Item1, operand.Item2);
         }
 
-        public static implicit operator LinearSize(UniSize point)
+        public static implicit operator LinearSize(UniSize size)
         {
-            return new LinearSize(point.width, point.height);
+            return new LinearSize(size.width, size.height);
         }
 
         public static implicit operator UniSize(LinearSize coordinates)

@@ -1,17 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-
 using DataTools.Text;
 
 using Newtonsoft.Json;
 
 using SkiaSharp;
+
+using System;
+using System.Drawing;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace DataTools.Graphics
 {
@@ -30,7 +26,7 @@ namespace DataTools.Graphics
     /// <remarks></remarks>
     [JsonConverter(typeof(UniColorConverter))]
     [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Size = 4)]
-    public struct UniColor : IComparable<UniColor>, IFormattable
+    public struct UniColor : IComparable<UniColor>, IEquatable<UniColor>, IFormattable
     {
         public static readonly UniColor Empty = new UniColor(0, 0, 0, 0);
         public static readonly UniColor Transparent = new UniColor(0, 0, 0, 0);
@@ -54,7 +50,8 @@ namespace DataTools.Graphics
         private byte _B;
 
         /// <summary>
-        /// Indicates whether the default behavior of ToString() is to display a detailed description of the current named color.
+        /// Indicates whether the default behavior of ToString() is to display a
+        /// detailed description of the current named color.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
@@ -246,23 +243,32 @@ namespace DataTools.Graphics
             }
         }
 
+        public bool Equals(UniColor other)
+        {
+            return other._Value == _Value;
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is UniColor other)
             {
-                return other._intvalue == this._intvalue;
+                return other._Value == _Value;
             }
-            else if (obj is System.Drawing.Color color)
+            else if (obj is uint ui)
             {
-                return color.ToArgb() == this._intvalue;
+                return ui == this._Value;
             }
             else if (obj is int i)
             {
                 return i == this._intvalue;
             }
-            else if (obj is uint ui)
+            else if (obj is SKColor skcolor)
             {
-                return ui == this._Value;
+                return (uint)skcolor == _Value;
+            }
+            else if (obj is Color color)
+            {
+                return color.ToArgb() == this._intvalue;
             }
             else
             {
@@ -272,7 +278,7 @@ namespace DataTools.Graphics
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return _Value.GetHashCode();
         }
 
         /// <summary>
@@ -282,7 +288,8 @@ namespace DataTools.Graphics
         public int ToArgb() => IntValue;
 
         /// <summary>
-        /// Initialize a new <see cref="UniColor"/> structure with the specified unsigned <see cref="uint" /> value.
+        /// Initialize a new <see cref="UniColor"/> structure with the specified
+        /// unsigned <see cref="uint"/> value.
         /// </summary>
         /// <param name="color">The 32-bit ARGB color value.</param>
         /// <remarks></remarks>
@@ -296,7 +303,8 @@ namespace DataTools.Graphics
         }
 
         /// <summary>
-        /// Initialize a new <see cref="UniColor"/> structure with the specified signed <see cref="int" /> value.
+        /// Initialize a new <see cref="UniColor"/> structure with the specified
+        /// signed <see cref="int"/> value.
         /// </summary>
         /// <param name="color">The 32-bit ARGB color value.</param>
         /// <remarks></remarks>
@@ -310,7 +318,8 @@ namespace DataTools.Graphics
         }
 
         /// <summary>
-        /// Initialize a new <see cref="UniColor"/> structure with the specified signed <see cref="SKColor" /> value.
+        /// Initialize a new <see cref="UniColor"/> structure with the specified
+        /// signed <see cref="SKColor"/> value.
         /// </summary>
         /// <param name="color">The 32-bit ARGB color value.</param>
         /// <remarks></remarks>
@@ -324,7 +333,8 @@ namespace DataTools.Graphics
         }
 
         /// <summary>
-        /// Initialize a new <see cref="UniColor"/> structure with the specified <see cref="System.Drawing.Color"/> structure.
+        /// Initialize a new <see cref="UniColor"/> structure with the specified
+        /// <see cref="System.Drawing.Color"/> structure.
         /// </summary>
         /// <param name="color">The color.</param>
         public UniColor(System.Drawing.Color color)
@@ -337,7 +347,8 @@ namespace DataTools.Graphics
         }
 
         /// <summary>
-        /// Initialize a new <see cref="UniColor"/> structure with the specified named color.
+        /// Initialize a new <see cref="UniColor"/> structure with the specified
+        /// named color.
         /// </summary>
         /// <param name="color">The named color.</param>
         /// <remarks>
@@ -488,25 +499,14 @@ namespace DataTools.Graphics
         /// <param name="format">The format options string.</param>
         /// <param name="formatProvider">Format provider (not used.)</param>
         /// <remarks>
-        /// Format options: <br />
-        ///  <br /><br />
-        /// g - Default (0) <br />
-        /// D - DecimalDigit (1) <br />
-        /// h/H - hex (2) or HEX (2 | 0x8000) <br />
-        /// C - CStyle (4) <br />
-        /// V - VBStyle (8) <br />
-        /// A - AsmStyle (16) <br />
-        /// S - Spaced (32) <br />
-        /// d - CommaDelimited (64) <br />
-        /// r - Rgb (128) <br />
-        /// a - Argb (256) <br />
-        /// w - WebFormat (512) <br />
-        /// N - DetailNamedColors (0x2000) <br />
-        /// R - Reverse (0x4000) <br />
-        /// M - ClosestNamedColor (0x10000)
-        ///  <br /><br />
-        /// These may be combined into many possible combinations.
-        ///  <br />
+        /// Format options: <br/><br/><br/> g - Default (0) <br/> D -
+        /// DecimalDigit (1) <br/> h/H - hex (2) or HEX (2 | 0x8000) <br/> C -
+        /// CStyle (4) <br/> V - VBStyle (8) <br/> A - AsmStyle (16) <br/> S -
+        /// Spaced (32) <br/> d - CommaDelimited (64) <br/> r - Rgb (128) <br/>
+        /// a - Argb (256) <br/> w - WebFormat (512) <br/> N - DetailNamedColors
+        /// (0x2000) <br/> R - Reverse (0x4000) <br/> M - ClosestNamedColor
+        /// (0x10000) <br/><br/> These may be combined into many possible
+        /// combinations. <br/>
         /// </remarks>
         /// <returns>A string representing the current color value.</returns>
         public string ToString(string format, IFormatProvider formatProvider)
@@ -519,25 +519,14 @@ namespace DataTools.Graphics
         /// </summary>
         /// <param name="format">The format options string.</param>
         /// <remarks>
-        /// Format options: <br />
-        ///  <br /><br />
-        /// g - Default (0) <br />
-        /// D - DecimalDigit (1) <br />
-        /// h/H - hex (2) or HEX (2 | 0x8000) <br />
-        /// C - CStyle (4) <br />
-        /// V - VBStyle (8) <br />
-        /// A - AsmStyle (16) <br />
-        /// S - Spaced (32) <br />
-        /// d - CommaDelimited (64) <br />
-        /// r - Rgb (128) <br />
-        /// a - Argb (256) <br />
-        /// w - WebFormat (512) <br />
-        /// N - DetailNamedColors (0x2000) <br />
-        /// R - Reverse (0x4000) <br />
-        /// M - ClosestNamedColor (0x10000)
-        ///  <br /><br />
-        /// These may be combined into many possible combinations.
-        ///  <br />
+        /// Format options: <br/><br/><br/> g - Default (0) <br/> D -
+        /// DecimalDigit (1) <br/> h/H - hex (2) or HEX (2 | 0x8000) <br/> C -
+        /// CStyle (4) <br/> V - VBStyle (8) <br/> A - AsmStyle (16) <br/> S -
+        /// Spaced (32) <br/> d - CommaDelimited (64) <br/> r - Rgb (128) <br/>
+        /// a - Argb (256) <br/> w - WebFormat (512) <br/> N - DetailNamedColors
+        /// (0x2000) <br/> R - Reverse (0x4000) <br/> M - ClosestNamedColor
+        /// (0x10000) <br/><br/> These may be combined into many possible
+        /// combinations. <br/>
         /// </remarks>
         /// <returns>A string representing the current color value.</returns>
         public string ToString(string format)
@@ -548,7 +537,9 @@ namespace DataTools.Graphics
         /// <summary>
         /// Format the color for a variety of scenarios including named color detection.
         /// </summary>
-        /// <param name="format">Extensive formatting flags. Some may not be used in conjunction with others.</param>
+        /// <param name="format">
+        /// Extensive formatting flags. Some may not be used in conjunction with others.
+        /// </param>
         /// <returns>A string representing the current color value.</returns>
         public string ToString(UniColorFormatOptions format)
         {
@@ -758,7 +749,8 @@ namespace DataTools.Graphics
             bool flip = false;
             bool alf = false;
 
-            // if this is a straight integer value, we can return a new color right away.
+            // if this is a straight integer value, we can return a new color
+            // right away.
             bool x = int.TryParse(value.Trim().Trim('#'), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.CurrentCulture, out i);
 
             unchecked
@@ -939,7 +931,9 @@ namespace DataTools.Graphics
         /// <param name="value"></param>
         /// <param name="result"></param>
         /// <returns></returns>
-        /// <remarks>This may replace my main IsHex function in the DataTools library.</remarks>
+        /// <remarks>
+        /// This may replace my main IsHex function in the DataTools library.
+        /// </remarks>
         private static bool IsHex(string value, [Optional, DefaultParameterValue(0)] ref int result)
         {
             string chIn = value;

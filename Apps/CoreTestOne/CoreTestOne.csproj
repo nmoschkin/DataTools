@@ -19,7 +19,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\DataTools\DataTools.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
   </ItemGroup>
 
 </Project>

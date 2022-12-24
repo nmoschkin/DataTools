@@ -1,9 +1,7 @@
-﻿// ColorMath class.  Copyright (C) 1999-2022 Nathaniel Moschkin.
-
-using System;
-using System.Drawing;
-using System.Runtime.InteropServices;
+﻿using System;
 using System.Text;
+
+// ColorMath class.  Copyright (C) 1999-2022 Nathaniel Moschkin.
 
 using static DataTools.MathTools.MathLib;
 

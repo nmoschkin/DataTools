@@ -1,20 +1,19 @@
+using DataTools.MathTools.Polar;
+
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-
-using DataTools.MathTools.Polar;
-using DataTools.Text;
 
 namespace DataTools.Graphics
 {
     /// <summary>
-    /// Unified rectangle structure for WinForms, WPF and the Win32 API.
+    /// Unified rectangle structure for WinForms, Win32 API, and SkiaSharp.
     /// </summary>
-    /// <remarks></remarks>
+    /// <remarks>
+    /// Platform-specific libraries within this library family will implement extensions to convert to platform-specific objects.
+    /// </remarks>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct UniRect : INotifyPropertyChanged
     {

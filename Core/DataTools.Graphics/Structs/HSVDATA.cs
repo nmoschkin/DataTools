@@ -1,17 +1,21 @@
 using System;
 using System.Runtime.InteropServices;
 
-using System.Collections.Generic;
-
 namespace DataTools.Graphics
 {
-    public struct HSVDATA
+    [StructLayout(LayoutKind.Explicit, Size = 24)]
+    public struct HSVDATA : IEquatable<HSVDATA>, IComparable<HSVDATA>
     {
+        [FieldOffset(0)]
         public Hue Hue;
+
+        [FieldOffset(8)]
         public double Saturation;
+
+        [FieldOffset(16)]
         public double Value;
 
-        public HSVDATA(double h, double s, double v)
+        public HSVDATA(Hue h, double s, double v)
         {
             Hue = h;
             Saturation = s;
@@ -30,13 +34,12 @@ namespace DataTools.Graphics
 
         public override int GetHashCode()
         {
-            List<byte> bl = new List<byte>();
+            return (Hue, Saturation, Value).GetHashCode();
+        }
 
-            bl.AddRange(BitConverter.GetBytes(Hue));
-            bl.AddRange(BitConverter.GetBytes(Saturation));
-            bl.AddRange(BitConverter.GetBytes(Value));
-
-            return (int)Streams.Crc32.Hash(bl.ToArray());
+        public bool Equals(HSVDATA other)
+        {
+            return (other.Hue == Hue && other.Saturation == Saturation && other.Value == Value);
         }
 
         public override bool Equals(object obj)
@@ -45,7 +48,7 @@ namespace DataTools.Graphics
 
             if (obj is HSVDATA h)
             {
-                return (h.Hue == Hue && h.Saturation == Saturation && h.Value == Value);
+                return Equals(h);
             }
             else
             {
@@ -55,7 +58,24 @@ namespace DataTools.Graphics
 
         public override string ToString()
         {
-            return $"H: {Hue}, S: {Saturation}, V: {Value}";
+            return $"HSV({Hue}, {Saturation}, {Value})";
+        }
+
+        public int CompareTo(HSVDATA other)
+        {
+            var r = Hue.CompareTo(other.Hue);
+
+            if (r == 0)
+            {
+                r = Saturation.CompareTo(other.Saturation);
+
+                if (r == 0)
+                {
+                    r = Value.CompareTo(other.Value);
+                }
+            }
+
+            return r;
         }
 
         public HSVDATA Abs()
@@ -87,14 +107,17 @@ namespace DataTools.Graphics
         {
             return new HSVDATA(v1.Hue + v2, v1.Saturation + v2, v1.Value + v2);
         }
+
         public static HSVDATA operator -(HSVDATA v1, double v2)
         {
             return new HSVDATA(v1.Hue - v2, v1.Saturation - v2, v1.Value - v2);
         }
+
         public static HSVDATA operator /(HSVDATA v1, double v2)
         {
             return new HSVDATA(v1.Hue / v2, v1.Saturation / v2, v1.Value / v2);
         }
+
         public static HSVDATA operator *(HSVDATA v1, double v2)
         {
             return new HSVDATA(v1.Hue * v2, v1.Saturation * v2, v1.Value * v2);
@@ -109,7 +132,6 @@ namespace DataTools.Graphics
         {
             return !v1.Equals(v2);
         }
-
 
         public static bool operator >(HSVDATA v1, HSVDATA v2)
         {
@@ -214,7 +236,5 @@ namespace DataTools.Graphics
                 return v1.Hue <= v2.Hue;
             }
         }
-
-
     }
 }

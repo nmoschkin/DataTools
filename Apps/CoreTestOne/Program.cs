@@ -1,4 +1,6 @@
-﻿using DataTools.Memory;
+﻿using DataTools.Graphics;
+using DataTools.Graphics.Structs;
+using DataTools.Memory;
 using DataTools.Memory.StringBlob;
 using DataTools.Streams;
 
@@ -77,6 +79,28 @@ namespace CoreTestOne
             return Crc32.Hash(b.ToArray());
         }
 
+        public RGBDATA TheBless { get; set; }
+
+        public static implicit operator string(MySampleThing obj)
+        {
+            return obj.ValueA;
+        }
+
+        public static implicit operator MySampleThing(string obj)
+        {
+            return new MySampleThing(obj, 0);
+        }
+
+        public static implicit operator MySampleThing(int obj)
+        {
+            return new MySampleThing(obj.ToString(), obj);
+        }
+
+        public static implicit operator int(MySampleThing obj)
+        {
+            return obj.ValueI;
+        }
+
         public override string ToString()
         {
             return $"{ValueI}: {ValueA}";
@@ -87,6 +111,13 @@ namespace CoreTestOne
     {
         public static void Main(string[] args)
         {
+            var booo = new RGBDATA()
+            {
+                Red = 255,
+                Green = 0,
+                Blue = 255,
+            };
+
             BSTR bustr = "This is my buster";
             bustr += " Busrrramvvoov";
 
@@ -96,11 +127,29 @@ namespace CoreTestOne
             {
                 Console.Write(ch + " ");
             }
+            Console.WriteLine();
 
             var obj1 = new MySampleThing("This is verdna", 7);
+
+            obj1.TheBless = booo;
+
             var obj2 = new MySampleThing("This is verdna", 7);
             var obj3 = new MySampleThing("This tamburo", 4);
             var obj4 = new MySampleThing("This tamburo", 4);
+
+            object boxed = obj1.TheBless;
+            dynamic dyna = boxed;
+
+            string s = boxed.ToString();
+
+            if (dyna is IParseableColorData p)
+            {
+                dyna = IParseableColorData.Parse(p.GetType(), "RGB(45, 90, 230)");
+            }
+
+            RGBDATA u = (RGBDATA)dyna;
+
+            //6Console.WriteLine(s);
 
             var obarr = new MySampleThing[] { obj1, obj2, obj3, obj4 };
 
@@ -125,8 +174,6 @@ namespace CoreTestOne
             object boxed2 = obj2;
             object boxed3 = obj3;
             object boxed4 = obj4;
-
-            return;
 
             SafePtr sf = (SafePtr)("CoreTest UNO") + Guid.NewGuid().ToString() + Guid.NewGuid().ToString() + Guid.NewGuid().ToString() + Guid.NewGuid().ToString();
 
