@@ -114,7 +114,7 @@ namespace DataTools.Win32.Memory
 
             unsafe
             {
-                return Crc32.Calculate((byte*)handle, c);
+                return Crc32.Hash((byte*)handle, c);
             }
         }
 
@@ -1703,7 +1703,7 @@ namespace DataTools.Win32.Memory
             }
             else if (obj is byte[] buffer)
             {
-                return Crc32.Calculate(buffer) == CalculateCrc32();
+                return Crc32.Hash(buffer) == CalculateCrc32();
             }
 
             return false;
@@ -1714,7 +1714,7 @@ namespace DataTools.Win32.Memory
             unsafe
             {
                 if (handle.IsInvalidHandle()) return 0;
-                return (int)Crc32.Calculate((byte*)handle, Length);
+                return (int)Crc32.Hash((byte*)handle, Length);
             }
         }
 

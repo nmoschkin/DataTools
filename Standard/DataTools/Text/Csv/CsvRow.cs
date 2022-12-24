@@ -379,7 +379,7 @@ namespace DataTools.Text.Csv
 
         public override int GetHashCode()
         {
-            return (int)Streams.Crc32.Calculate(Encoding.UTF8.GetBytes(Text));
+            return (int)Streams.Crc32.Hash(Encoding.UTF8.GetBytes(Text));
         }
 
         public override bool Equals(object obj)

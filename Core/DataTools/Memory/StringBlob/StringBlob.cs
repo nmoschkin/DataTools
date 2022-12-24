@@ -71,7 +71,7 @@ namespace DataTools.Memory.StringBlob
         }
 
 
-        public static StringBlob FromNullTermPtr(IntPtr ptr)
+        public static StringBlob FromNullTermPtr(nint ptr)
         {
             var sb = new StringBlob();
             var b = new SafePtr(ptr);

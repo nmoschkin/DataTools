@@ -1,23 +1,19 @@
-﻿// Basic Math Functions
-// Copyright (C) 2022 Nathaniel Moschkin
-
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
+﻿using System;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
-using System.Text;
 
-using DataTools.Text;
+// Basic Math Functions
+// Copyright (C) 2023 Nathaniel Moschkin
+
+using System.Text;
 
 namespace DataTools.MathTools
 {
     public static class MathLib
     {
-        // Copyright (C) 2022 Nathaniel Moschkin.  All Rights Reserved.
-        // MIT License
-        // 
+        // Copyright (C) 2023 Nathaniel Moschkin.  All Rights Reserved.
+        // Apache 2.0 License
+        //
+
         public static double InchesToMillimeters(double value)
         {
             return value * 25.4d;
@@ -31,22 +27,26 @@ namespace DataTools.MathTools
         public static double[] InchesToMillimeters(double[] value)
         {
             int i;
-            int c = value.Count();
+            int c = value.Length;
+
+            var output = new double[c];
 
             for (i = 0; i < c; i++)
-                value[i] *= 25.4d;
-            return value;
+                output[i] = value[i] * 25.4d;
+            return output;
         }
 
         public static double[] MillimetersToInches(double[] value)
         {
             int i;
-            int c = value.Count();
-            for (i = 0; i < c; i++)
-                value[i] /= 25.4d;
-            return value;
-        }
+            int c = value.Length;
 
+            var output = new double[c];
+
+            for (i = 0; i < c; i++)
+                output[i] = value[i] / 25.4d;
+            return output;
+        }
 
         /// <summary>
         /// Prints a fractional number from a double value. (More Consistently Human-Readable Version)
@@ -77,7 +77,7 @@ namespace DataTools.MathTools
 
             var lastTest = default(double);
 
-            if (Math.Round(value, maxSignificantDigits) == 0)
+            if (System.Math.Round(value, maxSignificantDigits) == 0)
             {
                 return "0";
             }
@@ -85,7 +85,7 @@ namespace DataTools.MathTools
             // test to see if there is a whole-number component, and place it off to the side.
             if ((double)value >= 1.0d)
             {
-                wholePart = Math.Floor(value);
+                wholePart = System.Math.Floor(value);
                 value -= wholePart;
 
                 // if there is no fractional component, there's no reason to go on.
@@ -95,23 +95,23 @@ namespace DataTools.MathTools
 
             if (maxSignificantDigits > 18)
                 maxSignificantDigits = 18;
-            
+
             // Go from 1 to the maximum number of significant digits.
-            retry:            
-            
+            retry:
+
             for (currSig = 1; currSig <= maxSignificantDigits; currSig++)
             {
                 // get the rounded, working value for the test.
-                workVal = Math.Round(value, currSig);
+                workVal = System.Math.Round(value, currSig);
 
                 // iterate the numerator to the maximum denominator value.
                 for (numerator = 1; numerator < maxDenominator; numerator++)
                 {
                     // iterate the denomenator to the maximum denominator value.
                     for (denominator = 1; denominator <= maxDenominator; denominator++)
-                    {                        
+                    {
                         // create the test value.
-                        testVal = Math.Round(numerator / denominator, currSig);
+                        testVal = System.Math.Round(numerator / denominator, currSig);
                         if (testVal == workVal && testVal != 0)
                         {
                             // at this significant digit, the test and working values
@@ -125,7 +125,7 @@ namespace DataTools.MathTools
 
                             // add the compatible pair to a list
                             foundFractions[fi++] = (((int)numerator, (int)denominator));
-        
+
                             // break to the next significant digit, there's
                             // no reason to do any more work.
                             lastTest = testVal;
@@ -170,7 +170,7 @@ namespace DataTools.MathTools
             if (wholePart > 0)
             {
                 if (sb.Length != 0) sb.Append(' ');
-                sb.Append($"{wholePart}");               
+                sb.Append($"{wholePart}");
             }
 
             // Finally, add the fraction.
@@ -199,17 +199,17 @@ namespace DataTools.MathTools
                 throw new ArgumentOutOfRangeException("accuracy", "Must be > 0 and < 1.");
             }
             double orgVal = value;
-            int sign = Math.Sign(value);
+            int sign = System.Math.Sign(value);
 
             if (sign == -1)
             {
-                value = Math.Abs(value);
+                value = System.Math.Abs(value);
             }
 
             // Accuracy is the maximum relative error; convert to absolute maxError
             double maxError = accuracy; // sign == 0 ? accuracy : value * accuracy;
-            
-            int n = (int)Math.Floor(value);
+
+            int n = (int)System.Math.Floor(value);
             value -= n;
 
             if (value < maxError)
@@ -221,7 +221,6 @@ namespace DataTools.MathTools
             {
                 return $"{sign * (n + 1)}/1";
             }
-
 
             // The lower fraction is 0/1
             int lower_n = 0;
@@ -254,7 +253,7 @@ namespace DataTools.MathTools
                     // Middle is our best fraction
 
                     var s = "";
-                    if (addQuasiMark && ((n * sign) + ((double)middle_n/middle_d) != orgVal))
+                    if (addQuasiMark && ((n * sign) + ((double)middle_n / middle_d) != orgVal))
                     {
                         s = "~ ";
                     }
@@ -268,8 +267,6 @@ namespace DataTools.MathTools
 
             // We're done!
         }
-
-
 
         /// <summary>
         /// Find the greatest common factor between a group of integers.
@@ -314,7 +311,7 @@ namespace DataTools.MathTools
 
                 // it may seem counter-intuitive that we're looking for the lesser value to get the 'greatest' common factor.
                 // but it's simply that we are looking for the largest number that will go into all numbers.
-                // if the number we just got is less than then number that we already had (the candidate), 
+                // if the number we just got is less than then number that we already had (the candidate),
                 // that means that new, smaller number becomes the new largest possible value.
 
                 // so, we're looking for 1 result for each pair of numbers.
@@ -323,7 +320,7 @@ namespace DataTools.MathTools
                 // and so we have a set of 'biggest numbers possible'.
 
                 // and we're looking for the smallest number in that set.
-                // because THAT will ultimately be the final 'biggest number possible.' 
+                // because THAT will ultimately be the final 'biggest number possible.'
 
                 if (gcf == -1 || candidate < gcf) gcf = candidate;
 
@@ -334,7 +331,6 @@ namespace DataTools.MathTools
             return gcf;
         }
 
-      
         /// <summary>
         /// Swap nibbles
         /// </summary>
@@ -369,7 +365,6 @@ namespace DataTools.MathTools
             return BitConverter.ToInt32(b, 0);
         }
 
-
         public static double Min(params double[] vars)
         {
             double d;
@@ -379,7 +374,7 @@ namespace DataTools.MathTools
                 return double.NaN;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -393,7 +388,7 @@ namespace DataTools.MathTools
             d = vars[0];
 
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -406,7 +401,7 @@ namespace DataTools.MathTools
                 return float.NaN;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -419,7 +414,7 @@ namespace DataTools.MathTools
                 return float.NaN;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -432,7 +427,7 @@ namespace DataTools.MathTools
                 return decimal.Zero;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -445,7 +440,7 @@ namespace DataTools.MathTools
                 return decimal.Zero;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -458,7 +453,7 @@ namespace DataTools.MathTools
                 return 0L;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -471,7 +466,7 @@ namespace DataTools.MathTools
                 return 0L;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -484,7 +479,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -497,7 +492,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -510,7 +505,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -523,7 +518,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -536,7 +531,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -549,7 +544,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -562,7 +557,7 @@ namespace DataTools.MathTools
                 return 0UL;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -575,7 +570,7 @@ namespace DataTools.MathTools
                 return 0UL;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -588,7 +583,7 @@ namespace DataTools.MathTools
                 return 0U;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -601,7 +596,7 @@ namespace DataTools.MathTools
                 return 0U;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -614,7 +609,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -627,7 +622,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -640,7 +635,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Min(d, vars[i]);
+                d = System.Math.Min(d, vars[i]);
             return d;
         }
 
@@ -653,7 +648,7 @@ namespace DataTools.MathTools
                 return 0;
             d = vars[0];
             for (i = 1; i < c; i++)
-                d = Math.Max(d, vars[i]);
+                d = System.Math.Max(d, vars[i]);
             return d;
         }
 
@@ -682,8 +677,5 @@ namespace DataTools.MathTools
                 d += vars[i];
             return d;
         }
-
     }
-
-
 }

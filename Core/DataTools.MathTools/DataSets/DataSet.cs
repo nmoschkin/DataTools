@@ -7,7 +7,7 @@ namespace DataTools.MathTools
     /// Represents a collection of items upon which logical operations can be performed.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class DataSet<T> : List<T>
+    public class DataSet<T> : List<T>, IEquatable<DataSet<T>>
     {
         public DataSet() : base()
         {
@@ -147,79 +147,29 @@ namespace DataTools.MathTools
 
         public static bool operator ==(DataSet<T> set1, DataSet<T> set2)
         {
-            if (set1 is object && !(set2 is object))
+            if (set1 is object)
+            {
+                return set1.Equals(set2);
+            }
+            else if (set2 is object)
             {
                 return false;
             }
-            else if (!(set1 is object) && (set2 is object))
-            {
-                return false;
-            }
-            else if (!(set1 is object) && !(set2 is object))
+            else
             {
                 return true;
             }
-
-            if (set1.Count != set2.Count) return false;
-
-            int i, c;
-            c = set1.Count;
-
-            for (i = 0; i < c; i++)
-            {
-                if (set1[i] is object)
-                {
-                    if (!set1[i].Equals(set2[i])) return false;
-                }
-                else if (set2[i] is object)
-                {
-                    if (!set2[i].Equals(set1[i])) return false;
-                }
-            }
-
-            return true;
         }
 
         public static bool operator !=(DataSet<T> set1, DataSet<T> set2)
         {
-            if (set1 is object && !(set2 is object))
+            if (set1 is object)
+            {
+                return !set1.Equals(set2);
+            }
+            else if (set2 is object)
             {
                 return true;
-            }
-            else if (!(set1 is object) && (set2 is object))
-            {
-                return true;
-            }
-            else if (!(set1 is object) && !(set2 is object))
-            {
-                return false;
-            }
-
-            if (set1.Count != set2.Count) return true;
-
-            int i, c;
-            c = set1.Count;
-
-            for (i = 0; i < c; i++)
-            {
-                if (set1[i] is T)
-                {
-                    if (!set1[i].Equals(set2[i])) return true;
-                }
-                else if (set2[i] is T)
-                {
-                    if (!set2[i].Equals(set1[i])) return true;
-                }
-            }
-
-            return false;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is DataSet<T> d)
-            {
-                return d == this;
             }
             else
             {
@@ -227,82 +177,56 @@ namespace DataTools.MathTools
             }
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is DataSet<T> d)
+            {
+                return Equals(d);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool Equals(DataSet<T> set2)
+        {
+            var set1 = this;
+
+            if (set1 != null && set2 != null)
+            {
+                if (set1.Count != set2.Count) return false;
+
+                int i, c;
+                c = set1.Count;
+
+                for (i = 0; i < c; i++)
+                {
+                    if (set1[i] is object)
+                    {
+                        if (!set1[i].Equals(set2[i])) return false;
+                    }
+                    else if (set2[i] is object)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            else if (set1 != null || set2 != null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public override int GetHashCode()
         {
-            int hc = 0;
-            foreach (var item in this)
-            {
-                hc = hc << 1 | item.GetHashCode();
-            }
-
-            return hc;
-        }
-    }
-
-    public class ComparableDataSet<T> : DataSet<T> where T : class, IComparable<T>
-    {
-        public static bool operator >(ComparableDataSet<T> val1, ComparableDataSet<T> val2)
-        {
-            int x = 0;
-
-            foreach (var item1 in val1)
-            {
-                foreach (var item2 in val2)
-                {
-                    var ev = item1.CompareTo(item2);
-                    x += ev;
-                }
-            }
-
-            return x > 0;
-        }
-
-        public static bool operator <(ComparableDataSet<T> val1, ComparableDataSet<T> val2)
-        {
-            int x = 0;
-
-            foreach (var item1 in val1)
-            {
-                foreach (var item2 in val2)
-                {
-                    var ev = item1.CompareTo(item2);
-                    x += ev;
-                }
-            }
-
-            return x < 0;
-        }
-
-        public static bool operator >=(ComparableDataSet<T> val1, ComparableDataSet<T> val2)
-        {
-            int x = 0;
-
-            foreach (var item1 in val1)
-            {
-                foreach (var item2 in val2)
-                {
-                    var ev = item1.CompareTo(item2);
-                    x += ev;
-                }
-            }
-
-            return x >= 0;
-        }
-
-        public static bool operator <=(ComparableDataSet<T> val1, ComparableDataSet<T> val2)
-        {
-            int x = 0;
-
-            foreach (var item1 in val1)
-            {
-                foreach (var item2 in val2)
-                {
-                    var ev = item1.CompareTo(item2);
-                    x += ev;
-                }
-            }
-
-            return x <= 0;
+            return base.GetHashCode();
         }
     }
 }

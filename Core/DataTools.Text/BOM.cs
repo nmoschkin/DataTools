@@ -1,15 +1,14 @@
 ﻿// *************************************************
-// DataTools C# Native Utility Library For Windows 
+// DataTools C# Native Utility Library For Windows
 //
 // Module: Byte Order Marker Library
 //         For Mulitple Character Encodings
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
-
 
 using System;
 using System.Collections.Generic;
@@ -29,8 +28,6 @@ using System.Security.Authentication;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using DataTools.Streams;
-using DataTools.Memory;
 
 namespace DataTools.Text.ByteOrderMark
 {
@@ -53,9 +50,9 @@ namespace DataTools.Text.ByteOrderMark
 
     public enum ControlCodes
     {
-
         // C0 control constants
         NUL = 0x0,
+
         SOH = 0x1,
         STX = 0x2,
         ETX = 0x3,
@@ -92,6 +89,7 @@ namespace DataTools.Text.ByteOrderMark
 
         // C1 control constants
         PAD = 0x80,
+
         HOP = 0x81,
         BPH = 0x82,
         NBH = 0x83,
@@ -126,6 +124,7 @@ namespace DataTools.Text.ByteOrderMark
 
         // EBCDIC Specific
         NSP = 0xE1,
+
         EO = 0xFF
     }
 
@@ -135,8 +134,6 @@ namespace DataTools.Text.ByteOrderMark
         Ctrl = 1,
         Esc = 2
     }
-
-
 
     [Description("Contains an escape sequence")]
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -457,7 +454,6 @@ namespace DataTools.Text.ByteOrderMark
                 if (uint.TryParse(s[1], NumberStyles.HexNumber, CultureInfo.CurrentCulture, out val))
                 {
                     cp.Unicode = (char)val;
-
                 }
             }
 
@@ -466,7 +462,6 @@ namespace DataTools.Text.ByteOrderMark
                 if (uint.TryParse(s[2], NumberStyles.HexNumber, CultureInfo.CurrentCulture, out val))
                 {
                     cp.Code = (char)val;
-
                 }
                 return cp;
             }
@@ -474,7 +469,6 @@ namespace DataTools.Text.ByteOrderMark
             if (uint.TryParse(s[3], NumberStyles.HexNumber, CultureInfo.CurrentCulture, out val))
             {
                 cp.Code = (char)val;
-
             }
 
             if (cp.Type == CPCharTypes.Undefined)
@@ -511,8 +505,6 @@ namespace DataTools.Text.ByteOrderMark
             return cp;
         }
     }
-
-
 
     public enum BOMTYPE : short
     {
@@ -964,10 +956,9 @@ namespace DataTools.Text.ByteOrderMark
 
         public override int GetHashCode()
         {
-            return (int)Crc32.Calculate(_BOM);
+            return _BOM.GetHashCode();
         }
     }
-
 
     public class SignalSorter : IComparer<SignalElement>
     {
@@ -984,7 +975,6 @@ namespace DataTools.Text.ByteOrderMark
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class ControlSignals : List<SignalElement>
     {
-
         public new void Sort()
         {
             Sort(new SignalSorter());
@@ -1059,7 +1049,6 @@ namespace DataTools.Text.ByteOrderMark
         }
     }
 
-
     public class CPSorter : IComparer
     {
         public int Compare(object x, object y)
@@ -1070,6 +1059,7 @@ namespace DataTools.Text.ByteOrderMark
             return (int)cp1.Code - (int)cp2.Code;
         }
     }
+
     [Serializable()]
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public class CodePage : CollectionBase
@@ -1091,7 +1081,6 @@ namespace DataTools.Text.ByteOrderMark
 
         public void Sort()
         {
-
             InnerList.Sort(new CPSorter());
         }
 
@@ -1128,7 +1117,6 @@ namespace DataTools.Text.ByteOrderMark
 
             return ch.ToString();
         }
-
 
         public byte[] FromUnicodeString(string subject)
         {
@@ -1243,15 +1231,12 @@ namespace DataTools.Text.ByteOrderMark
         {
             if (!typeof(CodePageElement).IsAssignableFrom(value.GetType()))
                 throw new ArgumentException("value must be of type Object.", "value");
-        } // OnValidate 
+        } // OnValidate
 
         public CodePage() : base()
         {
         }
     }
-
-
-
 
     [Serializable()]
     [TypeConverter(typeof(ExpandableObjectConverter))]
@@ -1366,7 +1351,7 @@ namespace DataTools.Text.ByteOrderMark
         {
             if (!typeof(CodePage).IsAssignableFrom(value.GetType()))
                 throw new ArgumentException("value must be of type Object.", "value");
-        } // OnValidate 
+        } // OnValidate
 
         internal CodePageCollection() : base()
         {
@@ -1385,7 +1370,6 @@ namespace DataTools.Text.ByteOrderMark
 
             CodePages = new CodePageCollection();
             InitEBCDIC();
-
         }
 
         public static string SafeTextRead(byte[] b)
@@ -1421,8 +1405,6 @@ namespace DataTools.Text.ByteOrderMark
                 case BOMTYPE.UTF7d:
                 case BOMTYPE.UTF7e:
                     {
-
-
 #pragma warning disable SYSLIB0001 // Type or member is obsolete
                         s = Encoding.UTF7.GetString(bOut);
 #pragma warning restore SYSLIB0001 // Type or member is obsolete
@@ -1456,11 +1438,10 @@ namespace DataTools.Text.ByteOrderMark
         public static byte[] SafeTextWrite(string str, BOMTYPE enc = BOMTYPE.UTF16LE)
         {
             BOM bm = new BOM();
-            SafePtr bl;
-
             bm.Type = enc;
 
             byte[] bOut;
+            var bret = new List<byte>();
 
             switch (bm.Type)
             {
@@ -1508,7 +1489,6 @@ namespace DataTools.Text.ByteOrderMark
 
 #pragma warning restore SYSLIB0001 // Type or member is obsolete
 
-
                 case BOMTYPE.UTF32LE:
                     bm = BOM.UTF32LE;
                     bOut = Encoding.UTF32.GetBytes(str);
@@ -1527,21 +1507,14 @@ namespace DataTools.Text.ByteOrderMark
                     break;
             }
 
-            bl = (SafePtr)bm._BOM;
+            bret.AddRange(bm._BOM);
+            bret.AddRange(bOut);
 
-            bl += bOut;
-            bOut = (byte[])bl;
-
-            bl.Dispose();
-
-            return bOut;
+            return bret.ToArray();
         }
-
-
 
         internal static void InitControlSignalCatalog()
         {
-
             // Signals.AddSignal("C0")
             // Signals.AddSignal("Seq	Dec	Hex	Acro	Symb	Name	C	Description")
             Signals.AddSignal(@"^@	00	00	NUL	␀	Null	\0	Originally used to allow gaps to be left on paper tape for edits. Later used for padding after a code that might take a terminal some time to process (e.g. a carriage return or line feed on a printing terminal). Now often used as a string terminator, especially in the C programming language.");

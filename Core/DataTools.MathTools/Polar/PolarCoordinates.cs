@@ -12,221 +12,10 @@
  **************************************************/
 
 using System;
-using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace DataTools.MathTools.PolarMath
+namespace DataTools.MathTools.Polar
 {
-    /// <summary>
-    /// Flags to be used for formatting the display of a <see cref="PolarCoordinates"/> structure utilizing the <see cref="PolarCoordinates.ToString(PolarCoordinatesFormattingFlags, int)"/> function.
-    /// </summary>
-    public enum PolarCoordinatesFormattingFlags
-    {
-        /// <summary>
-        /// Basic formatting
-        /// </summary>
-        Default = 0x0,
-
-        /// <summary>
-        /// Use the degrees symbol
-        /// </summary>
-        UseDegreeSymbol = 0x1,
-
-        /// <summary>
-        /// Use the polar symbol
-        /// </summary>
-        UsePolarSymbol = 0x2,
-
-        /// <summary>
-        /// Use the pi symbol
-        /// </summary>
-        UsePiSymbol = 0x4,
-
-        /// <summary>
-        /// Use the radians indicator
-        /// </summary>
-        UseRadianIndicator = 0x8,
-
-        /// <summary>
-        /// Use parentheses
-        /// </summary>
-        UseParenthesis = 0x10,
-
-        /// <summary>
-        /// Use brackets
-        /// </summary>
-        UseBrackets = 0x20,
-
-        /// <summary>
-        /// Display the value in radians
-        /// </summary>
-        DisplayInRadians = 0x40,
-
-        /// <summary>
-        /// Display the value in standard notation
-        /// </summary>
-        Standard = 0x1,
-
-        /// <summary>
-        /// Display the value in formatted radians
-        /// </summary>
-        Radians = 0x4 | 0x8 | 0x40,
-
-        /// <summary>
-        /// Display the value in standard scientific notation
-        /// </summary>
-        StandardScientific = 0x2,
-
-        /// <summary>
-        /// Display the value in scientific radians notation
-        /// </summary>
-        RadiansScientific = 0x2 | 0x4 | 0x8 | 0x40,
-    }
-
-    /// <summary>
-    /// A structure that contains linear (X, Y) coordinates on a 2D cartesean plane.
-    /// </summary>
-    public struct LinearCoordinates
-    {
-        /// <summary>
-        /// Represents the X (horizontal) coordinate
-        /// </summary>
-        public double X;
-
-        /// <summary>
-        /// Represents the Y (vertical) coordinate
-        /// </summary>
-        public double Y;
-
-        /// <summary>
-        /// Create a new instance of the <see cref="LinearCoordinates"/> structure with the specified X and Y coordinates.
-        /// </summary>
-        /// <param name="x">The X coordinate.</param>
-        /// <param name="y">The Y coordinate.</param>
-        public LinearCoordinates(double x, double y)
-        {
-            X = x;
-            Y = y;
-        }
-    }
-
-    /// <summary>
-    /// A structure that contains linear (Width, Height) sizes on a 2D cartesean plane.
-    /// </summary>
-    public struct LinearSize
-    {
-        /// <summary>
-        /// Represents the horizontal extent
-        /// </summary>
-        public double Width;
-
-        /// <summary>
-        /// Represents the vertical extent
-        /// </summary>
-        public double Height;
-
-        /// <summary>
-        /// Create a new instance of the <see cref="LinearSize"/> structure with the specified width and height.
-        /// </summary>
-        /// <param name="width">The width, or horizontal extent value.</param>
-        /// <param name="height">The height, or vertical extent value.</param>
-        public LinearSize(double width, double height)
-        {
-            Width = width;
-            Height = height;
-        }
-    }
-
-    /// <summary>
-    /// A structure that contains a rectangle (Left, Top, Right, Bottom) on a 2D cartesean plane.
-    /// </summary>
-    public struct LinearRect
-    {
-        public double Left;
-        public double Top;
-        public double Right;
-        public double Bottom;
-
-        /// <summary>
-        /// Creates a new rectangle from the specified location and size.
-        /// </summary>
-        /// <param name="left">The left-most coordinate.</param>
-        /// <param name="top">The top-most coordinate.</param>
-        /// <param name="width">The width of the rectangle.</param>
-        /// <param name="height">The height of the rectangle.</param>
-        public LinearRect(double left, double top, double width, double height)
-        {
-            Left = left;
-            Top = top;
-            Right = left + width;
-            Bottom = top + height;
-        }
-
-        /// <summary>
-        /// Creates a new rectangle from the specified location and size.
-        /// </summary>
-        /// <param name="leftTop">The location.</param>
-        /// <param name="size">The size.</param>
-        public LinearRect(LinearCoordinates leftTop, LinearSize size)
-        {
-            Left = leftTop.X;
-            Top = leftTop.Y;
-
-            Right = leftTop.X + size.Width;
-            Bottom = leftTop.Y + size.Height;
-        }
-
-        /// <summary>
-        /// Gets or sets the width of the rectangle.
-        /// </summary>
-        /// <remarks>
-        /// When this property is set, <see cref="Right"/> is recomputed.
-        /// </remarks>
-        public double Width
-        {
-            get => Right - Left;
-            set
-            {
-                Right = Left + value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the height of the rectangle.
-        /// </summary>
-        /// <remarks>
-        /// When this property is set, <see cref="Bottom"/> is recomputed.
-        /// </remarks>
-        public double Height
-        {
-            get => Bottom - Top;
-            set
-            {
-                Bottom = Top + value;
-            }
-        }
-
-        public static explicit operator RectangleF(LinearRect rc)
-        {
-            return new RectangleF((float)rc.Left, (float)rc.Top, (float)rc.Width, (float)rc.Height);
-        }
-
-        public static explicit operator Rectangle(LinearRect rc)
-        {
-            return new Rectangle((int)rc.Left, (int)rc.Top, (int)rc.Width, (int)rc.Height);
-        }
-
-        public static implicit operator LinearRect(RectangleF rc)
-        {
-            return new LinearRect(rc.Left, rc.Top, rc.Width, rc.Height);
-        }
-
-        public static implicit operator LinearRect(Rectangle rc)
-        {
-            return new LinearRect(rc.Left, rc.Top, rc.Width, rc.Height);
-        }
-    }
-
     /// <summary>
     /// A structure that contains a set of polar coordinates (arc sweep and radius) on a 2D plane.
     /// </summary>
@@ -296,13 +85,13 @@ namespace DataTools.MathTools.PolarMath
                 s += "{";
             }
 
-            s += Math.Round(r, precision).ToString() + ", ";
+            s += System.Math.Round(r, precision).ToString() + ", ";
             if ((formatting & PolarCoordinatesFormattingFlags.DisplayInRadians) == PolarCoordinatesFormattingFlags.DisplayInRadians)
             {
                 a *= RadianConst;
             }
 
-            s += Math.Round(a, precision).ToString();
+            s += System.Math.Round(a, precision).ToString();
             if ((formatting & PolarCoordinatesFormattingFlags.UsePiSymbol) == PolarCoordinatesFormattingFlags.UsePiSymbol)
             {
                 s += PiSymbol;
@@ -370,8 +159,8 @@ namespace DataTools.MathTools.PolarMath
 
             a /= RadianConst;
 
-            x = r * Math.Sin(a);
-            y = r * Math.Cos(a);
+            x = r * System.Math.Sin(a);
+            y = r * System.Math.Cos(a);
 
             return new LinearCoordinates(x, -y);
         }
@@ -425,10 +214,10 @@ namespace DataTools.MathTools.PolarMath
             double r;
             double a;
 
-            r = Math.Sqrt(x * x + y * y);
+            r = System.Math.Sqrt(x * x + y * y);
 
             // screen coordinates are funny, had to reverse this.
-            a = Math.Atan(x / y);
+            a = System.Math.Atan(x / y);
             a *= RadianConst;
 
             if (!(x >= 0 && y < 0))

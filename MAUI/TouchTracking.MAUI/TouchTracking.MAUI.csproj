@@ -15,46 +15,55 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+		<AssemblyVersion>8.0.0.1000</AssemblyVersion>
+		<FileVersion>8.0.0.1000</FileVersion>
+		<Authors>Nathaniel Moschkin</Authors>
+		<Version>8.0.0</Version>
+		<Product>DataTools Network Adapters Test</Product>
+		<Description>DataTools Utility Library</Description>
+		<Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
+		<RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
+		<RepositoryType>GitHub</RepositoryType>
+		<NeutralLanguage>en-US</NeutralLanguage>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Folder Include="Platforms\Android\" />
-	  <Folder Include="Platforms\iOS\" />
-	  <Folder Include="Platforms\MacCatalyst\" />
-	  <Folder Include="Platforms\Tizen\" />
-	  <Folder Include="Platforms\Windows\" />
+		<Folder Include="Platforms\Android\" />
+		<Folder Include="Platforms\iOS\" />
+		<Folder Include="Platforms\MacCatalyst\" />
+		<Folder Include="Platforms\Tizen\" />
+		<Folder Include="Platforms\Windows\" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Platforms\iOS\TouchRecognizer.cs" />
+		<None Remove="Platforms\iOS\TouchRecognizer.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Platforms\iOS\TouchHandler.cs" />
+		<None Remove="Platforms\iOS\TouchHandler.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Platforms\iOS\TouchEffect.cs" />
+		<None Remove="Platforms\iOS\TouchEffect.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Platforms\Android\ContextExtensions.cs" />
+		<None Remove="Platforms\Android\ContextExtensions.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Platforms\Android\TouchHandler.cs" />
+		<None Remove="Platforms\Android\TouchHandler.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Platforms\Android\TouchEffect.cs" />
+		<None Remove="Platforms\Android\TouchEffect.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Platforms\Windows\TouchHandler.cs" />
+		<None Remove="Platforms\Windows\TouchHandler.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Platforms\Windows\TouchEffect.cs" />
+		<None Remove="Platforms\Windows\TouchEffect.cs" />
 	</ItemGroup>
-
 </Project>

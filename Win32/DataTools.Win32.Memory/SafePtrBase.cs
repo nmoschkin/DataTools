@@ -1629,7 +1629,7 @@ namespace DataTools.Win32.Memory
 
             unsafe
             {
-                return Crc32.Calculate((byte*)handle, c);
+                return Crc32.Hash((byte*)handle, c);
             }
         }
 
@@ -1705,7 +1705,7 @@ namespace DataTools.Win32.Memory
                 if (handle.IsInvalidHandle()) return 0;
                 if (Length == 0) return -1;
 
-                return (int)Crc32.Calculate((byte*)handle, Length);
+                return (int)Crc32.Hash((byte*)handle, Length);
             }
         }
 

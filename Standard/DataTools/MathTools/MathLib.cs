@@ -1,5 +1,5 @@
 ﻿// Basic Math Functions
-// Copyright (C) 2022 Nathaniel Moschkin
+// Copyright (C) 2023 Nathaniel Moschkin
 
 using System;
 using System.Collections.Generic;
@@ -15,8 +15,8 @@ namespace DataTools.MathTools
 {
     public static class MathLib
     {
-        // Copyright (C) 2022 Nathaniel Moschkin.  All Rights Reserved.
-        // MIT License
+        // Copyright (C) 2023 Nathaniel Moschkin.  All Rights Reserved.
+        // Apache 2.0 License
         // 
         public static double InchesToMillimeters(double value)
         {
