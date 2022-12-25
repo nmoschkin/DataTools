@@ -19,6 +19,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 
+// TODO: Refactor this entire module
+
 using static DataTools.Win32.DevProp;
 
 namespace DataTools.Win32
