@@ -1,13 +1,13 @@
-﻿using DataTools.Shell.Native;
+﻿using DataTools.Desktop;
+using DataTools.Memory;
+using DataTools.Shell.Native;
 using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using DataTools.Desktop;
 
 namespace DataTools.Desktop_Old
 {
@@ -33,7 +33,7 @@ namespace DataTools.Desktop_Old
         private Bitmap iconBmp;
         private StandardIcons iconSize = StandardIcons.Icon48;
         private IShellFolderObject parent;
-        
+
         private bool special;
 
         private IShellFolder shellFld;
@@ -611,8 +611,8 @@ namespace DataTools.Desktop_Old
             IShellFolder shfld;
             IEnumIDList enumer;
 
-            MemPtr mm;
-            var mm2 = new MemPtr();
+            DataTools.Win32.Memory.MemPtr mm;
+            var mm2 = new DataTools.Win32.Memory.MemPtr();
 
             string fp;
 
@@ -681,7 +681,7 @@ namespace DataTools.Desktop_Old
                         mm2.IntAt(0L) = 2;
 
                         shfld.GetDisplayNameOf(mm, (uint)ShellItemDesignNameOptions.ParentRelativeParsing, mm2.handle);
-                        MemPtr inv;
+                        DataTools.Win32.Memory.MemPtr inv;
 
                         if (IntPtr.Size == 4)
                         {

@@ -1,4 +1,4 @@
-﻿using DataTools.MathTools.PolarMath;
+﻿using DataTools.MathTools.Polar;
 using DataTools.Win32.Memory;
 
 using System.Runtime.InteropServices;
@@ -152,7 +152,7 @@ namespace DataTools.Win32.Display
                 {
                     foreach (var y in mon)
                     {
-                        if (MultiMon.EnumDisplayDevices(y.DevicePath, 0, mm, MultiMon.EDD_GET_DEVICE_INTERFACE_NAME))
+                        if (MultiMon.EnumDisplayDevices(y.DevicePath, 0, (IntPtr)mm, MultiMon.EDD_GET_DEVICE_INTERFACE_NAME))
                         {
                             dd = mm.ToStruct<DISPLAY_DEVICE>();
                             DEVMODE dev = new DEVMODE();

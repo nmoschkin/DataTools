@@ -1,16 +1,14 @@
 ﻿using DataTools.Win32.Memory;
 
+using SkiaSharp;
+
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
-using DataTools.Graphics;
-using System.Runtime.InteropServices;
-using static DataTools.Win32.BitmapTools;
 using System.Windows.Media.Imaging;
-using System.CodeDom;
+
+using static DataTools.Win32.BitmapTools;
 
 namespace DataTools.Desktop
 {
@@ -27,7 +25,7 @@ namespace DataTools.Desktop
         {
             if (cachedImages.TryGetValue(icon.Handle, out BitmapSource result))
             {
-                return result;  
+                return result;
             }
             else
             {
@@ -58,7 +56,7 @@ namespace DataTools.Desktop
                 cachedImages.Add(img.Handle, result);
             }
 
-            return result;  
+            return result;
         }
 
         public static BitmapSource? MakeWPFImage(Bitmap img)
@@ -103,9 +101,8 @@ namespace DataTools.Desktop
             if (img.Height == 0)
                 throw new ArgumentOutOfRangeException(nameof(img.Height));
 
-
             int BytesPerRow = (int)((double)(img.Width * 32 + 31 & ~31) / 8d);
-            
+
             int size = img.Height * BytesPerRow;
             var bm = new System.Drawing.Imaging.BitmapData();
 
@@ -133,6 +130,67 @@ namespace DataTools.Desktop
 
             img.UnlockBits(bm);
             return bmp;
+        }
+
+        public static BitmapSource MakeWPFImage(SKImage img)
+        {
+            IntPtr _d = default;
+            return MakeWPFImage(img, ref _d);
+        }
+
+        /// <summary>
+        /// Creates a WPF BitmapSource from a Bitmap.
+        /// </summary>
+        /// <param name="img">The <see cref="System.Drawing.Image"/> object to convert.</param>
+        /// <param name="bitPtr">Set this to zero.</param>
+        /// <param name="dpiX">The X DPI to use to create the new image (default is 96.0)</param>
+        /// <param name="dpiY">The Y DPI to use to create the new image (default is 96.0)</param>
+        /// <param name="createOnApplicationThread"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public static BitmapSource MakeWPFImage(SKImage img, ref IntPtr bitPtr, double dpiX = 96.0d, double dpiY = 96.0d, bool createOnApplicationThread = true)
+        {
+            if (createOnApplicationThread)
+            {
+                BitmapSource result = null;
+
+                var b = new IntPtr();
+
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    result = MakeWPFImage(img, ref b, dpiX, dpiY, false);
+                });
+
+                bitPtr = b;
+                return result;
+            }
+
+            if (img is null)
+                throw new ArgumentNullException(nameof(img));
+
+            if (img.Width == 0)
+                throw new ArgumentOutOfRangeException(nameof(img.Width));
+
+            if (img.Height == 0)
+                throw new ArgumentOutOfRangeException(nameof(img.Height));
+
+            SKData encoded = img.Encode(SKEncodedImageFormat.Png, 100);
+            Stream stream = encoded.AsStream();
+
+            var bitmap = new BitmapImage();
+
+            bitmap.BeginInit();
+
+            bitmap.StreamSource = stream;
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+
+            bitmap.EndInit();
+            bitmap.Freeze();
+
+            return bitmap;
+            //var ret = Image.FromStream(stream);
+
+            //return MakeWPFImage((Bitmap)ret);
         }
 
         /// <summary>
@@ -187,6 +245,5 @@ namespace DataTools.Desktop
 
             return bmp;
         }
-
     }
 }

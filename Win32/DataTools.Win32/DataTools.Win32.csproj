@@ -24,10 +24,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="TaskScheduler" Version="2.10.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.MathTools\DataTools.MathTools.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
   </ItemGroup>
 

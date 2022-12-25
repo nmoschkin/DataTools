@@ -1,18 +1,14 @@
-﻿using DataTools.Win32;
-using DataTools.Win32.Memory;
+﻿using DataTools.Memory;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Win32.Disk
 {
     internal static class DiskGeometry
     {
-
         /// <summary>
         /// Enumerates all the partitions on a physical device.
         /// </summary>
@@ -46,10 +42,9 @@ namespace DataTools.Win32.Disk
             int sbs = 32768;
 
             bool succeed = false;
-            
+
             if (hfile == IO.INVALID_HANDLE_VALUE)
             {
-
                 return succeed;
             }
 
@@ -64,10 +59,9 @@ namespace DataTools.Win32.Disk
 
                     if (xErr != NativeDisk.ERROR_MORE_DATA & xErr != NativeDisk.ERROR_INSUFFICIENT_BUFFER)
                     {
-                        
                         succeed = false;
                         break;
-                        
+
                         //throw new NativeException();
                     }
                 }
@@ -88,7 +82,5 @@ namespace DataTools.Win32.Disk
             pex.Free();
             return succeed;
         }
-
-
     }
 }

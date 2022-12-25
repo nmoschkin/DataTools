@@ -6,7 +6,8 @@ using System.Runtime.InteropServices;
 
 namespace DataTools.Win32.Memory
 {
-    public class SafePtr : SafePtrBase
+    [Obsolete("Use DataTools.Core.Memory.SafePtr, or one of the specific use-case alternatives.")]
+    public class SafePtr : WinPtrBase
     {
         private static nint procHeap = Native.GetProcessHeap();
 
@@ -22,16 +23,38 @@ namespace DataTools.Win32.Memory
             get => buffLen;
             set
             {
-                if (buffLen == value) return;
-
                 if (value == 0)
                 {
                     TFree();
-                    return;
                 }
-                else if (handle == nint.Zero || MemoryType == MemoryType.HGlobal)
+                else
                 {
-                    ReAlloc(value);
+                    switch (MemoryType)
+                    {
+                        case MemoryType.HGlobal:
+                            ReAlloc(value);
+                            break;
+
+                        case MemoryType.Aligned:
+                            AlignedAlloc(value);
+                            break;
+
+                        case MemoryType.Network:
+                            NetReAlloc((int)value);
+                            break;
+
+                        case MemoryType.CoTaskMem:
+                            handle = Marshal.ReAllocCoTaskMem(handle, (int)value);
+                            break;
+
+                        case MemoryType.Virtual:
+                            VirtualReAlloc((int)value);
+                            break;
+
+                        default:
+                            Alloc(value);
+                            break;
+                    }
                 }
             }
         }
@@ -159,7 +182,7 @@ namespace DataTools.Win32.Memory
                     return false;
             }
 
-            long l = buffLen;
+            long l = GetAllocatedSize();
             bool al;
 
             if (hHeap == null || (nint)hHeap == nint.Zero)
@@ -186,7 +209,7 @@ namespace DataTools.Win32.Memory
                 if (hHeap != null) currentHeap = (nint)hHeap;
                 memtype = MemoryType.HGlobal;
 
-                buffLen = (long)Native.HeapSize(currentHeap, 0, handle);
+                buffLen = GetAllocatedSize();
             }
 
             return al;
@@ -202,17 +225,6 @@ namespace DataTools.Win32.Memory
         public bool Alloc(long size, bool addPressure)
         {
             return Alloc(size, addPressure, null, true);
-        }
-
-        /// <summary>
-        /// Allocate a block of memory on the process heap.
-        /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public override bool Alloc(long size)
-        {
-            return Alloc(size, false, null, true);
         }
 
         /// <summary>
@@ -293,11 +305,11 @@ namespace DataTools.Win32.Memory
             return true;
         }
 
-        protected override SafePtrBase Clone()
+        protected override SafePtr Clone()
         {
             var p = new SafePtr();
             p.memtype = memtype;
-            p.Length = Length;
+            p.Length = GetAllocatedSize();
 
             CopyTo(p, 0, 0, Length);
             return p;
@@ -305,7 +317,27 @@ namespace DataTools.Win32.Memory
 
         public override long GetAllocatedSize()
         {
-            return Length;
+            if (handle == 0) return 0;
+
+            switch (MemoryType)
+            {
+                case MemoryType.HGlobal:
+                case MemoryType.CoTaskMem:
+                    return Native.HeapSize(currentHeap, 0, handle);
+
+                case MemoryType.Aligned:
+                    nint p = (nint)LongAt(-1);
+                    return Native.HeapSize(currentHeap, 0, p);
+
+                case MemoryType.Virtual:
+                    return GetVirtualLength();
+
+                case MemoryType.Network:
+                    return GetNetworkLength();
+
+                default:
+                    return 0;
+            }
         }
 
         /// <summary>
@@ -325,7 +357,7 @@ namespace DataTools.Win32.Memory
             if (MemoryType != MemoryType.HGlobal && MemoryType != MemoryType.Aligned) return false;
 
             nint p = (nint)LongAt(-1);
-            long l = Convert.ToInt64(Native.HeapSize(currentHeap, 0, p));
+            long l = Native.HeapSize(currentHeap, 0, p);
 
             if (Native.HeapFree(currentHeap, 0, p))
             {
@@ -354,38 +386,39 @@ namespace DataTools.Win32.Memory
         /// </param>
         /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
         /// <remarks></remarks>
-        public override bool ReAlloc(long size)
+        public new bool ReAlloc(long size)
         {
-            if (handle == nint.Zero) return Alloc(size);
+            if (MemoryType == MemoryType.HGlobal) return base.ReAlloc(size);
+            Length = size;
+            return handle != 0;
+        }
 
-            if (MemoryType != MemoryType.HGlobal) return false;
+        protected override void Deallocate(nint ptr)
+        {
+            Native.HeapFree(currentHeap, 0, ptr);
+            buffLen = 0;
+        }
 
-            long l = buffLen;
-            bool ra;
-
-            // While the function doesn't need to call HeapReAlloc, it hasn't necessarily failed, either.
-            if (size == l) return true;
-
-            if (l <= 0)
+        protected override nint Allocate(long size)
+        {
+            var ptr = Native.HeapAlloc((nint)currentHeap, 8u, (nint)size);
+            if (ptr != 0)
             {
-                // we don't have a pointer yet, so we have to call alloc instead.
-                return Alloc(size);
+                memtype = MemoryType.HGlobal;
+                buffLen = GetAllocatedSize();
             }
+            return ptr;
+        }
 
-            handle = Native.HeapReAlloc(currentHeap, 8, handle, new nint(size));
-            ra = handle != nint.Zero;
-
-            // see if we need to tell the garbage collector anything.
-            if (ra && HasGCPressure)
+        protected override nint Reallocate(nint oldptr, long newsize)
+        {
+            var ptr = Native.HeapReAlloc(currentHeap, 8, handle, (nint)newsize);
+            if (ptr != 0)
             {
-                if (size < l)
-                    GC.RemoveMemoryPressure(l - size);
-                else
-                    GC.AddMemoryPressure(size - l);
+                memtype = MemoryType.HGlobal;
+                buffLen = GetAllocatedSize();
             }
-
-            buffLen = size;
-            return ra;
+            return ptr;
         }
 
         /// <summary>
@@ -398,46 +431,14 @@ namespace DataTools.Win32.Memory
         /// The handle pointed to by the internal pointer must have been previously allocated with the same heap handle.
         /// </param>
         /// <remarks></remarks>
-        public override bool Free()
+        public new bool Free()
         {
-            long l = 0;
-
-            // While the function doesn't need to call HeapFree, it hasn't necessarily failed, either.
-            if (handle == nint.Zero)
-            {
-                return true;
-            }
-            else if (MemoryType != MemoryType.HGlobal)
+            if (MemoryType != MemoryType.HGlobal)
             {
                 return TFree();
             }
-            else
-            {
-                // see if we need to tell the garbage collector anything.
-                if (HasGCPressure) l = buffLen;
-
-                var res = Native.HeapFree(currentHeap, 0, handle);
-
-                // see if we need to tell the garbage collector anything.
-                if (res)
-                {
-                    handle = nint.Zero;
-                    memtype = MemoryType.Invalid;
-
-                    currentHeap = procHeap;
-
-                    if (HasGCPressure) GC.RemoveMemoryPressure(l);
-
-                    memtype = MemoryType.Invalid;
-                    HasGCPressure = false;
-
-                    buffLen = 0;
-
-                    currentHeap = procHeap;
-                }
-
-                return res;
-            }
+            base.Free();
+            return true;
         }
 
         /// <summary>
@@ -456,50 +457,7 @@ namespace DataTools.Win32.Memory
             return Native.HeapValidate(currentHeap, 0, handle);
         }
 
-        /// <summary>
-        /// Frees a previously allocated block of memory on the task heap with LocalFree()
-        /// </summary>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public bool LocalFree()
-        {
-            if (handle == nint.Zero)
-                return true;
-            else
-            {
-                Native.LocalFree(handle);
-
-                handle = nint.Zero;
-                memtype = MemoryType.Invalid;
-                HasGCPressure = false;
-                buffLen = 0;
-
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// Frees a previously allocated block of memory on the task heap with GlobalFree()
-        /// </summary>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public bool GlobalFree()
-        {
-            if (handle == nint.Zero)
-                return false;
-            else
-            {
-                Native.GlobalFree(handle);
-
-                handle = nint.Zero;
-                memtype = MemoryType.Invalid;
-                HasGCPressure = false;
-
-                buffLen = 0;
-
-                return true;
-            }
-        }
+        // NetApi Functions are deprecated
 
         // NetApi Memory functions should be used carefully and not within the context
         // of any scenario when you may accidentally call normal memory management functions
@@ -535,6 +493,17 @@ namespace DataTools.Win32.Memory
             }
         }
 
+        public bool NetReAlloc(int size)
+        {
+            var oldptr = handle;
+            var r = Native.NetApiBufferReallocate(oldptr, (int)size, out var nhandle);
+            handle = r;
+
+            if (r != 0) return true;
+
+            return false;
+        }
+
         /// <summary>
         /// Free a network API compatible memory buffer previously allocated with NetAlloc.
         /// </summary>
@@ -548,6 +517,12 @@ namespace DataTools.Win32.Memory
             memtype = MemoryType.Invalid;
             handle = nint.Zero;
             buffLen = 0;
+        }
+
+        public int GetNetworkLength()
+        {
+            Native.NetApiBufferSize(handle, out int size);
+            return size;
         }
 
         // Virtual Memory should be used carefully and not within the context
@@ -700,7 +675,15 @@ namespace DataTools.Win32.Memory
 
         public void AllocCoTaskMem(int size)
         {
-            handle = Marshal.AllocCoTaskMem(size);
+            if (handle != 0)
+            {
+                handle = Marshal.ReAllocCoTaskMem(handle, size);
+            }
+            else
+            {
+                handle = Marshal.AllocCoTaskMem(size);
+            }
+
             if (handle != nint.Zero)
             {
                 buffLen = size;
@@ -765,7 +748,7 @@ namespace DataTools.Win32.Memory
                     return true;
 
                 default:
-                    return Free();
+                    return true;
             }
         }
 

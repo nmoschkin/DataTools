@@ -3,23 +3,20 @@
 //
 // Module: MonitorInfo
 //         Display monitor information encapsulation.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.MathTools.Polar;
+using DataTools.Memory;
+
 using System;
-using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
-using DataTools.Win32;
 
 using static DataTools.Win32.Display.MultiMon;
-using System.Collections.Generic;
-using DataTools.Win32.Memory;
-using DataTools.MathTools.PolarMath;
-
 
 namespace DataTools.Win32.Display
 {
@@ -29,13 +26,12 @@ namespace DataTools.Win32.Display
         public const int PHYSICAL_MONITOR_DESCRIPTION_SIZE = 128;
         public const int EDD_GET_DEVICE_INTERFACE_NAME = 0x00000001;
 
-
         [DllImport("Dxva2.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "GetNumberOfPhysicalMonitorsFromHMONITOR")]
         public static extern bool GetNumberOfPhysicalMonitorsFromHMONITOR
         (
             nint hMonitor,
             out uint pdwNumberOfPhysicalMonitors
-   
+
         );
 
         public static string[] GetPhysicalMonitorNames(nint hMonitor)
@@ -43,7 +39,7 @@ namespace DataTools.Win32.Display
             var mm = new MemPtr();
             string[] sOut = null;
             PHYSICAL_MONITOR pm;
-            
+
             uint nmon = 0;
 
             if (!GetNumberOfPhysicalMonitorsFromHMONITOR(hMonitor, out nmon)) return null;
@@ -81,7 +77,6 @@ namespace DataTools.Win32.Display
             }
 
             return sOut;
-
         }
 
         //[DllImport("Dxva2.dll")]
@@ -98,7 +93,7 @@ namespace DataTools.Win32.Display
             nint hMonitor,
             int dwPhysicalMonitorArraySize,
             MemPtr pPhysicalMonitorArray
-        
+
             );
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "EnumDisplayDevicesW")]
@@ -117,7 +112,6 @@ namespace DataTools.Win32.Display
             MemPtr lpDisplayDevice,
             int dwFlags
             );
-
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "EnumDisplaySettingsExW")]
         public static extern bool EnumDisplaySettingsEx(
@@ -146,22 +140,13 @@ namespace DataTools.Win32.Display
         [DllImport("Dxva2.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool DestroyPhysicalMonitor(nint hMonitor);
 
-
         [DllImport("Dxva2.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool DestroyPhysicalMonitors
             (
                 uint dwPhysicalMonitorArraySize,
                 MemPtr pPhysicalMonitorArray
             );
-
-
-
-
     }
-
-
-
-
 
     /// <summary>
     /// Represents the internal structure for display monitor information.
@@ -174,12 +159,13 @@ namespace DataTools.Win32.Display
         public W32RECT rcMonitor;
         public W32RECT rcWork;
         public uint dwFlags;
+
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 32)]
         public string szDevice;
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    struct DISPLAY_DEVICE
+    internal struct DISPLAY_DEVICE
     {
         public uint cb;
 
@@ -233,16 +219,13 @@ namespace DataTools.Win32.Display
         public uint dwCPKey;
         public uint bCP_APSTriggerBits;
 
-
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
         public string bOEMCopyProtection;
     }
-
 }
 
 namespace DataTools.Win32.Display
 {
-
     /// <summary>
     /// Multi-monitor hit-test flags.
     /// </summary>
@@ -264,10 +247,13 @@ namespace DataTools.Win32.Display
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
         private static extern bool EnumDisplayMonitors(nint hdc, nint lprcClip, [MarshalAs(UnmanagedType.FunctionPtr)] MonitorEnumProc lpfnEnum, nint dwData);
+
         [DllImport("user32", CharSet = CharSet.Unicode)]
         private static extern nint MonitorFromPoint(W32POINT pt, MultiMonFlags dwFlags);
+
         [DllImport("user32", CharSet = CharSet.Unicode)]
         private static extern nint MonitorFromRect(W32RECT pt, MultiMonFlags dwFlags);
+
         [DllImport("user32", CharSet = CharSet.Unicode)]
         private static extern nint MonitorFromWindow(nint hWnd, MultiMonFlags dwFlags);
 
@@ -281,7 +267,6 @@ namespace DataTools.Win32.Display
             return true;
         }
 
-
         /// <summary>
         /// Retrieves the monitor at the given point.
         /// </summary>
@@ -291,7 +276,7 @@ namespace DataTools.Win32.Display
         {
             if (Count == 0)
                 Refresh();
-        
+
             var h = MonitorFromPoint((W32POINT)pt, flags);
             if (h == nint.Zero)
                 return null;
@@ -372,8 +357,7 @@ namespace DataTools.Win32.Display
 
         public static void TransformRect(ref LinearRect wndRect, MonitorInfo m1, MonitorInfo m2, bool resize = false)
         {
-
-            double wm, hm; 
+            double wm, hm;
 
             wm = (double)(wndRect.Left - m1.WorkBounds.Left) / m1.WorkBounds.Right;
             hm = (double)(wndRect.Top - m1.WorkBounds.Top) / m1.WorkBounds.Bottom;
@@ -400,7 +384,6 @@ namespace DataTools.Win32.Display
             }
 
             wndRect = newRect;
-
         }
 
         public Monitors()
@@ -413,7 +396,7 @@ namespace DataTools.Win32.Display
     /// Represents a monitor device.
     /// </summary>
     /// <remarks></remarks>
-    public class MonitorInfo 
+    public class MonitorInfo
     {
         private nint _hMonitor;
         private MONITORINFOEX _data;
@@ -421,7 +404,6 @@ namespace DataTools.Win32.Display
 
         [DllImport("user32", EntryPoint = "GetMonitorInfoW", CharSet = CharSet.Unicode)]
         internal static extern bool GetMonitorInfo(nint hMonitor, ref MONITORINFOEX info);
-
 
         /// <summary>
         /// Returns the monitor index, or the order in which this monitor was reported to the monitor collection.

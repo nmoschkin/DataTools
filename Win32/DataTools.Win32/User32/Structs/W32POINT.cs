@@ -1,4 +1,4 @@
-using DataTools.MathTools.PolarMath;
+using DataTools.MathTools.Polar;
 
 using System;
 using System.Runtime.InteropServices;

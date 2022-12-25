@@ -10,29 +10,22 @@
 // A whole bunch of pInvoke/Const/Declare/Struct and associated utility functions that have been collected over the years.
 
 // Some enum documentation copied from the MSDN (and in some cases, updated).
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
-
-
-
 
 // Some notes: The menu items are dynamic.  They are not statically maintained in any collection or structure.
 
 // When you fetch an item object from the virtual collection, that object is only alive in your program for as long as you reference it.
 // If the menu gets destroyed while you are still working with an item, it will fail.
 
+using DataTools.Memory;
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Threading;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Menu
 {
@@ -242,14 +235,14 @@ namespace DataTools.Win32.Menu
                 mm.Dispose();
                 return s;
             }
-            
+
             set
             {
                 var mii = new MENUITEMINFO();
                 mii.cbSize = Marshal.SizeOf(mii);
                 mii.fMask = User32.MIIM_STRING;
-                var mm = new SafePtr();
-                mm = (SafePtr)value;
+                var mm = new DataTools.Memory.SafePtr();
+                mm = (DataTools.Memory.SafePtr)value;
                 mm.Length += sizeof(char);
                 mii.cch = (int)mm.Length;
                 mii.dwTypeData = mm.DangerousGetHandle();

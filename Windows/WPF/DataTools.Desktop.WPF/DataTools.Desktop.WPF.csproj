@@ -4,6 +4,7 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <nullable>disable</nullable>
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	  <UseWindowsForms>true</UseWindowsForms>
 	  <UseWPF>true</UseWPF>
 	  <UseWindowsForms>true</UseWindowsForms>
@@ -21,8 +22,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Standard\DataTools.Graphics\DataTools.Graphics.csproj" />
-    <ProjectReference Include="..\..\..\Standard\DataTools\DataTools.csproj" />
+    <PackageReference Include="SkiaSharp" Version="2.88.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\..\Core\DataTools.Text\DataTools.Text.csproj" />
+<ProjectReference Include="..\..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
+<ProjectReference Include="..\..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
     <ProjectReference Include="..\..\..\Win32\DataTools.Win32\DataTools.Win32.csproj" />
   </ItemGroup>
 

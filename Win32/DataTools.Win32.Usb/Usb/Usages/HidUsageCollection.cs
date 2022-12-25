@@ -1,12 +1,9 @@
-﻿using DataTools.MathTools;
-
-using Newtonsoft.Json;
+﻿using DataTools.Essentials.Helpers;
 
 using System;
 using System.Collections;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Win32.Usb
 {
@@ -108,15 +105,14 @@ namespace DataTools.Win32.Usb
         public override HidUsageCollection Clone(HidReportType reportType, bool preserveList = false, HidUsageCollection? parent = null)
         {
             var b = (HidUsageCollection)MemberwiseClone();
-            
+
             b.usages = new List<HidUsageInfo>();
             b.ReportType = reportType;
-            b.Parent = parent;   
+            b.Parent = parent;
 
             if (preserveList) b.usages.AddRange(usages);
-            
+
             return b;
         }
-
     }
 }

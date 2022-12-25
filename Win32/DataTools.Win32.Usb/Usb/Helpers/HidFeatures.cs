@@ -11,13 +11,12 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-using System;
-
-using DataTools.Win32;
 using DataTools.Win32.Memory;
+
+using System;
 
 namespace DataTools.Win32.Usb
 {
@@ -57,7 +56,7 @@ namespace DataTools.Win32.Usb
         public static nint OpenHid(HidDeviceInfo device, bool write = false)
         {
             nint hhid;
-           
+
             try
             {
                 if (write)
@@ -127,11 +126,12 @@ namespace DataTools.Win32.Usb
         {
             HidFeatureValue? result;
 
-            using (var mm = new SafePtr())
+            using (var mm = new DataTools.Memory.SafePtr())
             {
                 try
                 {
-                    mm.AllocZero(datalen);
+                    mm.Alloc(datalen);
+                    mm.ZeroMemory();
                     mm.ByteAt(0L) = code;
                     if (UsbLibHelpers.HidD_GetFeature(hhid, mm, (int)mm.Length))
                     {
@@ -152,7 +152,6 @@ namespace DataTools.Win32.Usb
 
                 return result;
             }
-
         }
     }
 }

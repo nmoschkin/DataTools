@@ -1,13 +1,10 @@
-﻿using DataTools.Win32;
+﻿using DataTools.Memory;
 using DataTools.Win32.Disk.Partition;
-using DataTools.Win32.Memory;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 using static DataTools.Win32.DeviceEnum;
 
@@ -15,8 +12,6 @@ namespace DataTools.Win32.Disk
 {
     internal static class DiskEnum
     {
-
-
         /// <summary>
         /// Enumerate all local physical and virtual disk drives, including optical drives or volumes, depending on the class Id.
         /// </summary>
@@ -47,7 +42,6 @@ namespace DataTools.Win32.Disk
 
                 foreach (var inf in info)
                 {
-
                     object caps = GetDeviceProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32);
 
                     if (caps != null)
@@ -56,7 +50,6 @@ namespace DataTools.Win32.Disk
                     }
                     if (inf.Capabilities == DeviceCapabilities.None)
                     {
-
                         caps = (GetDeviceProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32, useClassId: true));
 
                         if (caps != null)
@@ -71,7 +64,6 @@ namespace DataTools.Win32.Disk
                     }
                     else if (inf.RemovalPolicy != DeviceRemovalPolicy.ExpectNoRemoval)
                     {
-
                         // this is a conundrum because these values are not predictable in some cases.
                         // we'll leave it this way, for now.
                         inf.Type = StorageType.Removable;
@@ -81,7 +73,6 @@ namespace DataTools.Win32.Disk
                         // Else
                         // inf.Type = StorageType.Removable
                         // End If
-
                     }
 
                     if (DiskClass == DevProp.GUID_DEVINTERFACE_VOLUME || DiskClass == DevProp.GUID_DEVCLASS_VOLUME)
@@ -99,7 +90,7 @@ namespace DataTools.Win32.Disk
 
                             bytesReturned = 0U;
 
-                            NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_STORAGE_GET_DEVICE_NUMBER, default, 0U, hHeap.handle, (uint)hHeap.Length, ref bytesReturned, default);
+                            NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_STORAGE_GET_DEVICE_NUMBER, default, 0U, hHeap.DangerousGetHandle(), (uint)hHeap.Length, ref bytesReturned, default);
 
                             if (bytesReturned > 0L)
                             {
@@ -127,7 +118,7 @@ namespace DataTools.Win32.Disk
                             hHeap.Length = 128L;
                             hHeap.ZeroMemory();
 
-                            NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_DISK_GET_LENGTH_INFO, default, 0U, hHeap.handle, (uint)hHeap.Length, ref bytesReturned, default);
+                            NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_DISK_GET_LENGTH_INFO, default, 0U, hHeap.DangerousGetHandle(), (uint)hHeap.Length, ref bytesReturned, default);
 
                             inf.DiskLayout = DiskLayoutInfo.CreateLayout(disk);
                             inf.Size = hHeap.LongAt(0L);
@@ -137,7 +128,7 @@ namespace DataTools.Win32.Disk
 
                             bytesReturned = 0U;
 
-                            NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_STORAGE_GET_DEVICE_NUMBER, default, 0U, hHeap.handle, (uint)hHeap.Length, ref bytesReturned, default);
+                            NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_STORAGE_GET_DEVICE_NUMBER, default, 0U, hHeap.DangerousGetHandle(), (uint)hHeap.Length, ref bytesReturned, default);
 
                             var res = DiskGeometry.GetDiskGeometry(null, disk, out DISK_GEOMETRY_EX? georet);
 
@@ -224,8 +215,6 @@ namespace DataTools.Win32.Disk
             }
         }
 
-
-
         /// <summary>
         /// Populates a DiskDeviceInfo object with extended volume information.
         /// </summary>
@@ -244,8 +233,8 @@ namespace DataTools.Win32.Disk
             mm1.Alloc(pLen);
             mm2.Alloc(pLen);
 
-            mm1.ZeroMemory();
-            mm2.ZeroMemory();
+            mm1.ZeroMemory(0, pLen);
+            mm2.ZeroMemory(0, pLen);
 
             string pp = new string('\0', 1024);
             IO.GetVolumeNameForVolumeMountPoint(disk.DevicePath + @"\", mm1, 1024U);
@@ -256,7 +245,7 @@ namespace DataTools.Win32.Disk
             disk.VolumeGuidPath = (string)mm1;
             disk.VolumePaths = NativeDisk.GetVolumePaths((string)mm1);
 
-            mm1.ZeroMemory();
+            mm1.ZeroMemory(0, pLen);
 
             if (handle == nint.Zero || handle == DevProp.INVALID_HANDLE_VALUE)
             {
@@ -300,6 +289,5 @@ namespace DataTools.Win32.Disk
             mm1.Free();
             mm2.Free();
         }
-
     }
 }

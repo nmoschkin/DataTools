@@ -9,6 +9,7 @@ using System.Text;
 namespace DataTools.Win32.Memory
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [Obsolete("This version of MemPtr is going away. Adapt to use the one in DataTools.Core.Memory.")]
     public struct MemPtr : ICloneable
     {
         internal nint handle;
@@ -23,7 +24,7 @@ namespace DataTools.Win32.Memory
         /// <remarks>
         /// This method only works for memory blocks allocated on the process heap.<br /><br />
         /// The structure contains only the memory pointer, and so is not aware of how it was allocated.<br /><br />
-        /// Consider using <see cref="SafePtr"/>.
+        /// Consider using <see cref="DataTools.Memory.SafePtr"/>.
         /// </remarks>
         public long Size
         {

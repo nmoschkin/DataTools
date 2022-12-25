@@ -19,6 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
     <ProjectReference Include="..\DataTools.Win32\DataTools.Win32.csproj" />
   </ItemGroup>

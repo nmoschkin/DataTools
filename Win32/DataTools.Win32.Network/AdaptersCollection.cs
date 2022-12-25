@@ -11,7 +11,7 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
-using DataTools.SortedLists;
+using DataTools.Essentials.SortedLists;
 using DataTools.Win32.Memory;
 
 using System.Collections;

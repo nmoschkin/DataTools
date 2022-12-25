@@ -7,22 +7,20 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
+
+using DataTools.Win32.Memory;
 
 using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-using DataTools.Win32.Memory;
-
 namespace DataTools.Win32.Usb
 {
-    
     internal static class LibUsb
     {
-
         /// <summary>
         /// Pack 1 structures for USB.
         /// </summary>
@@ -31,7 +29,6 @@ namespace DataTools.Win32.Usb
 
         [DllImport("kernel32.dll")]
         public static extern bool DeviceIoControl(nint hDevice, uint dwIoControlCode, nint lpInBuffer, uint nInBufferSize, nint lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, nint lpOverlapped);
-
 
         public enum USBRESULT : int
         {
@@ -318,12 +315,11 @@ namespace DataTools.Win32.Usb
             return null;
         }
 
-        
         public const int LIBUSB_PATH_MAX = 512;
 
         //
         // USB spec information
-        // 
+        //
         // This is all stuff grabbed from various USB specs and is pretty much
         // not subject to change
         //
@@ -332,6 +328,7 @@ namespace DataTools.Win32.Usb
         // Device and/or Interface Class codes
         //
         public const int USB_CLASS_PER_INTERFACE = 0;  // for DeviceClass ''
+
         public const int USB_CLASS_AUDIO = 1;
         public const int USB_CLASS_COMM = 2;
         public const int USB_CLASS_HID = 3;
@@ -345,6 +342,7 @@ namespace DataTools.Win32.Usb
         // Descriptor types
         //
         public const int USB_DT_DEVICE = 0x1;
+
         public const int USB_DT_CONFIG = 0x2;
         public const int USB_DT_STRING = 0x3;
         public const int USB_DT_INTERFACE = 0x4;
@@ -358,6 +356,7 @@ namespace DataTools.Win32.Usb
         // Descriptor sizes per descriptor type
         //
         public const int USB_DT_DEVICE_SIZE = 18;
+
         public const int USB_DT_CONFIG_SIZE = 9;
         public const int USB_DT_INTERFACE_SIZE = 9;
         public const int USB_DT_ENDPOINT_SIZE = 7;
@@ -380,6 +379,7 @@ namespace DataTools.Win32.Usb
         {
             public byte bLength;
             public byte bDescriptorType;
+
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]
             public ushort[] wData;
         }
@@ -502,7 +502,7 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    SafePtr mm = (SafePtr)extra_desc;
+                    DataTools.Memory.SafePtr mm = (DataTools.Memory.SafePtr)extra_desc;
                     return mm.ToStruct<UsbHidDescriptor>();
                 }
             }
@@ -606,6 +606,7 @@ namespace DataTools.Win32.Usb
             public byte iSerialNumber;
             public byte bNumConfigurations;
         }
+
         // Device descriptor ''
 
         [StructLayout(LayoutKind.Sequential, Pack = gPack)]
@@ -630,11 +631,15 @@ namespace DataTools.Win32.Usb
         // Standard requests
         //
         public const int USB_REQ_GET_STATUS = 0x0;
+
         public const int USB_REQ_CLEAR_FEATURE = 0x1;
+
         // = &h02 is reserved ''
         public const int USB_REQ_SET_FEATURE = 0x3;
+
         // = &h04 is reserved ''
         public const int USB_REQ_SET_ADDRESS = 0x5;
+
         public const int USB_REQ_GET_DESCRIPTOR = 0x6;
         public const int USB_REQ_SET_DESCRIPTOR = 0x7;
         public const int USB_REQ_GET_CONFIGURATION = 0x8;
@@ -676,6 +681,7 @@ namespace DataTools.Win32.Usb
         // http://msdn.microsoft.com/en-us/library/ff537243%28v=vs.85%29.aspx
         //
         public const int USB_RESET_TYPE_RESET_PORT = 1 << 0;
+
         public const int USB_RESET_TYPE_CYCLE_PORT = 1 << 1;
         public const int USB_RESET_TYPE_FULL_RESET = USB_RESET_TYPE_CYCLE_PORT | USB_RESET_TYPE_RESET_PORT;
 
@@ -688,8 +694,10 @@ namespace DataTools.Win32.Usb
         {
             public nint next; // usb_device
             public nint prev; // usb_device
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = LIBUSB_PATH_MAX)]
             public string filename;
+
             public nint bus; // usb_bus
             public usb_device_descriptor descriptor;  // usb_device_descriptor
             public nint config; // usb_config_descriptor 'config
@@ -902,8 +910,10 @@ namespace DataTools.Win32.Usb
         {
             public nint next; // usb_device
             public nint prev; // usb_device
+
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = LIBUSB_PATH_MAX)]
             public string filename;
+
             public nint devices; // usb_device 'devices
             public uint location;
             public nint root_dev; // usb_device 'root_dev
@@ -1263,7 +1273,5 @@ namespace DataTools.Win32.Usb
         // Public Declare Function usb_cancel_async Lib "libusb0.dll" (context As nint) As USBRESULT
 
         // Public Declare Function usb_free_async Lib "libusb0.dll" (context As nint) As USBRESULT
-
-
     }
 }

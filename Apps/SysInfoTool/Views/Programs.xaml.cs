@@ -1,21 +1,12 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Input;
-using System.Collections.Generic;
+﻿using DataTools.Desktop;
+using DataTools.Essentials.SortedLists;
+
+using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-using DataTools.Desktop;
-using System.Collections.ObjectModel;
-using DataTools.SortedLists;
+using System.Windows;
+using System.Windows.Input;
 
 namespace SysInfoTool
 {
@@ -36,7 +27,6 @@ namespace SysInfoTool
 
         public static readonly DependencyProperty FileTypesProperty = DependencyProperty.Register("FileTypes", typeof(AllSystemFileTypes), typeof(Programs), new PropertyMetadata(null));
 
-
         public ObservableCollection<UIHandler> Handlers
         {
             get
@@ -50,9 +40,7 @@ namespace SysInfoTool
             }
         }
 
-
         public static readonly DependencyProperty HandlersProperty = DependencyProperty.Register("Handlers", typeof(ObservableCollection<UIHandler>), typeof(Programs), new PropertyMetadata(null));
-
 
         public Programs()
         {
@@ -63,7 +51,6 @@ namespace SysInfoTool
             _Quit.Click += _Quit_Click;
             _Close.Click += _Close_Click;
             Loaded += Programs_Loaded;
-
         }
 
         private void _Quit_Click(object sender, RoutedEventArgs e)
@@ -78,15 +65,16 @@ namespace SysInfoTool
 
         private void TypeEnumerated(object sender, FileTypeEnumEventArgs e)
         {
-            this.Dispatcher.Invoke(() => {
+            this.Dispatcher.Invoke(() =>
+            {
                 this.Status.Text = "Enumerated " + e.Index + " of " + e.Count + " types.  " + e.Type.Extension + " - " + e.Type.Description;
             });
         }
 
         private void Programs_Loaded(object sender, RoutedEventArgs e)
         {
-            var th = new System.Threading.Thread(() => {
-
+            var th = new System.Threading.Thread(() =>
+            {
                 AllSystemFileTypes ft = null;
 
                 Dispatcher.Invoke(() =>
@@ -103,7 +91,7 @@ namespace SysInfoTool
                     ft.Populating += TypeEnumerated;
                 });
 
-                ft?.Populate();                
+                ft?.Populate();
 
                 Dispatcher.Invoke(() =>
                 {

@@ -1,11 +1,12 @@
-﻿using DataTools.Shell.Native;
+﻿using DataTools.Desktop;
+using DataTools.Memory;
+using DataTools.Shell.Native;
 using DataTools.Win32;
 
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using DataTools.Desktop;
 
 namespace DataTools.Desktop_Old
 {
@@ -21,7 +22,7 @@ namespace DataTools.Desktop_Old
         private Bitmap iconBmp;
         private StandardIcons iconSize = StandardIcons.Icon48;
         private IShellFolderObject parent;
-        
+
         private bool special;
 
         private IShellItemPS shellObjPS;
@@ -87,7 +88,7 @@ namespace DataTools.Desktop_Old
                         this.special = true;
 
                         if (initialize)
-                           Refresh();
+                            Refresh();
 
                         shellObj = shitem;
 

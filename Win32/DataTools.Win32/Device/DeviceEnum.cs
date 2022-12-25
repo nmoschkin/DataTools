@@ -3,27 +3,23 @@
 //
 // Module: DeviceEnum
 //         Native.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Desktop;
+using DataTools.Shell.Native;
+using DataTools.Win32.Memory;
+
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
 
-using DataTools.Desktop;
-using DataTools.Shell.Native;
 using static DataTools.Win32.DevProp;
-
-using DataTools.Text;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32
 {
@@ -59,7 +55,7 @@ namespace DataTools.Win32
             var devInfo = default(SP_DEVINFO_DATA);
             var devInterface = default(SP_DEVICE_INTERFACE_DATA);
             var lIcon = new Dictionary<Guid, System.Drawing.Icon>();
-            var mm = new SafePtr();
+            var mm = new DataTools.Memory.SafePtr();
             var hicon = nint.Zero;
             int picon = 0;
 
@@ -91,7 +87,7 @@ namespace DataTools.Win32
                 {
                     Array.Resize(ref devOut, c + 1);
 
-                    devOut[c] = PopulateDeviceInfo<DeviceInfo>(hDev, default, devInfo, devInterface, mm);
+                    devOut[c] = PopulateDeviceInfo<DeviceInfo>(hDev, default, devInfo, devInterface);
                     SetupDiEnumDeviceInterfaces(hDev, nint.Zero, devOut[c].DeviceClassGuid, (uint)c, ref devInterface);
 
                     if (devInterface.InterfaceClassGuid != Guid.Empty)
@@ -102,7 +98,6 @@ namespace DataTools.Win32
 
                     if (!lIcon.ContainsKey(devOut[c].DeviceClassGuid))
                     {
-
                         SetupDiLoadClassIcon(devOut[c].DeviceClassGuid, ref hicon, ref picon);
 
                         if (hicon != nint.Zero)
@@ -192,10 +187,10 @@ namespace DataTools.Win32
         /// <returns></returns>
         /// <remarks></remarks>
         public static object? GetDeviceProperty(
-            DeviceInfo info, 
-            DEVPROPKEY prop, 
-            DevPropTypes type, 
-            ClassDevFlags flags = ClassDevFlags.Present | ClassDevFlags.DeviceInterface, 
+            DeviceInfo info,
+            DEVPROPKEY prop,
+            DevPropTypes type,
+            ClassDevFlags flags = ClassDevFlags.Present | ClassDevFlags.DeviceInterface,
             bool useClassId = false
             )
         {
@@ -244,7 +239,6 @@ namespace DataTools.Win32
 
                 return ires;
             }
-                
         }
 
         /// <summary>
@@ -268,7 +262,7 @@ namespace DataTools.Win32
 
             var lIcon = new Dictionary<Guid, System.Drawing.Icon>();
 
-            var mm = new SafePtr();
+            var mm = new DataTools.Memory.SafePtr();
             var hicon = nint.Zero;
 
             int picon = 0;
@@ -302,7 +296,7 @@ namespace DataTools.Win32
                     Array.Resize(ref devOut, c + 1);
                     SetupDiEnumDeviceInfo(hDev, cu, out devInfo);
 
-                    devOut[c] = PopulateDeviceInfo<T>(hDev, ClassId, devInfo, devInterface, mm);
+                    devOut[c] = PopulateDeviceInfo<T>(hDev, ClassId, devInfo, devInterface);
                     devOut[c].DeviceClassIcon = icn;
 
                     cu += 1;
@@ -315,7 +309,7 @@ namespace DataTools.Win32
                     c = (int)cu;
                     Array.Resize(ref devOut, c + 1);
 
-                    devOut[c] = PopulateDeviceInfo<T>(hDev, default, devInfo, devInterface, mm);
+                    devOut[c] = PopulateDeviceInfo<T>(hDev, default, devInfo, devInterface);
 
                     SetupDiEnumDeviceInterfaces(hDev, nint.Zero, devOut[c].DeviceClassGuid, cu, ref devInterface);
 
@@ -332,7 +326,6 @@ namespace DataTools.Win32
                 // If c = 0 Then
                 // MsgBox("Internal error: " & FormatLastError(Marshal.GetLastWin32Error))
                 // End If
-
             }
 
             mm.Dispose();
@@ -367,9 +360,8 @@ namespace DataTools.Win32
             return icn;
         }
 
-
-        internal readonly static DeviceClassEnum[] StandardStagingClasses = new[] { DeviceClassEnum.Adapter, DeviceClassEnum.Battery, DeviceClassEnum.Biometric, DeviceClassEnum.Bluetooth, DeviceClassEnum.Infrared, DeviceClassEnum.HidClass, DeviceClassEnum.Infrared, DeviceClassEnum.Keyboard, DeviceClassEnum.Media, DeviceClassEnum.Monitor, DeviceClassEnum.Mouse, DeviceClassEnum.Multifunction, DeviceClassEnum.PnpPrinters, DeviceClassEnum.Printer, DeviceClassEnum.PrinterQueue, DeviceClassEnum.Sound, DeviceClassEnum.Usb };
-        internal readonly static DeviceClassEnum[] ExtraStagingClasses = new[] { DeviceClassEnum.Adapter, DeviceClassEnum.Battery, DeviceClassEnum.Biometric, DeviceClassEnum.Bluetooth, DeviceClassEnum.CdRom, DeviceClassEnum.DiskDrive, DeviceClassEnum.FloppyDisk, DeviceClassEnum.Infrared, DeviceClassEnum.HidClass, DeviceClassEnum.Infrared, DeviceClassEnum.Keyboard, DeviceClassEnum.Media, DeviceClassEnum.MediumChanger, DeviceClassEnum.Modem, DeviceClassEnum.Monitor, DeviceClassEnum.Mouse, DeviceClassEnum.Multifunction, DeviceClassEnum.Pcmcia, DeviceClassEnum.PnpPrinters, DeviceClassEnum.Printer, DeviceClassEnum.PrinterQueue, DeviceClassEnum.PrinterUpgrade, DeviceClassEnum.SmartCardReader, DeviceClassEnum.Sound, DeviceClassEnum.TapeDrive, DeviceClassEnum.Usb };
+        internal static readonly DeviceClassEnum[] StandardStagingClasses = new[] { DeviceClassEnum.Adapter, DeviceClassEnum.Battery, DeviceClassEnum.Biometric, DeviceClassEnum.Bluetooth, DeviceClassEnum.Infrared, DeviceClassEnum.HidClass, DeviceClassEnum.Infrared, DeviceClassEnum.Keyboard, DeviceClassEnum.Media, DeviceClassEnum.Monitor, DeviceClassEnum.Mouse, DeviceClassEnum.Multifunction, DeviceClassEnum.PnpPrinters, DeviceClassEnum.Printer, DeviceClassEnum.PrinterQueue, DeviceClassEnum.Sound, DeviceClassEnum.Usb };
+        internal static readonly DeviceClassEnum[] ExtraStagingClasses = new[] { DeviceClassEnum.Adapter, DeviceClassEnum.Battery, DeviceClassEnum.Biometric, DeviceClassEnum.Bluetooth, DeviceClassEnum.CdRom, DeviceClassEnum.DiskDrive, DeviceClassEnum.FloppyDisk, DeviceClassEnum.Infrared, DeviceClassEnum.HidClass, DeviceClassEnum.Infrared, DeviceClassEnum.Keyboard, DeviceClassEnum.Media, DeviceClassEnum.MediumChanger, DeviceClassEnum.Modem, DeviceClassEnum.Monitor, DeviceClassEnum.Mouse, DeviceClassEnum.Multifunction, DeviceClassEnum.Pcmcia, DeviceClassEnum.PnpPrinters, DeviceClassEnum.Printer, DeviceClassEnum.PrinterQueue, DeviceClassEnum.PrinterUpgrade, DeviceClassEnum.SmartCardReader, DeviceClassEnum.Sound, DeviceClassEnum.TapeDrive, DeviceClassEnum.Usb };
 
         /// <summary>
         /// Gets the device icon in some way, including looking at the device stage to get the photo-realistic icons from the Devices and Printers control panel folder.
@@ -437,13 +429,15 @@ namespace DataTools.Win32
         /// <param name="mm">An open memory object.</param>
         /// <returns>A new instance of T.</returns>
         /// <remarks></remarks>
-        public static T PopulateDeviceInfo<T>(nint hDev, Guid ClassId, SP_DEVINFO_DATA devInfo, SP_DEVICE_INTERFACE_DATA devInterface, SafePtr mm) where T : DeviceInfo, new()
+        public static T PopulateDeviceInfo<T>(nint hDev, Guid ClassId, SP_DEVINFO_DATA devInfo, SP_DEVICE_INTERFACE_DATA devInterface) where T : DeviceInfo, new()
         {
             var devOut = new T();
-
             uint cbSize;
             uint propVal;
 
+            //var mm = new DataTools.Memory.SafePtr();
+
+            var mm = new DataTools.Memory.SafePtr();
             var details = default(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
             MemPtr pt;
@@ -470,9 +464,8 @@ namespace DataTools.Win32
                     if (cbSize > 4L)
                     {
                         uint argRequiredSize = default;
-                        if (SetupDiGetDeviceInterfaceDetail(hDev, ref devInterface, mm.handle, cbSize, out argRequiredSize, default))
+                        if (SetupDiGetDeviceInterfaceDetail(hDev, ref devInterface, mm.Handle, cbSize, out argRequiredSize, default))
                         {
-
                             // mm.PullIn(0, 4)
                             devOut.DevicePath = mm.GetString(4L);
                         }
@@ -509,21 +502,21 @@ namespace DataTools.Win32
                 // InterfaceClassGuid
 
                 sb.AppendLine("Property InterfaceClassGuid");
-                
+
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_GUID;
-                
+
                 SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_DeviceInterface_ClassGuid), out propVal, nint.Zero, 0U, out cbSize, 0U);
-                
+
                 if (cbSize > 0L)
                 {
                     mm.Length = cbSize;
                     mm.ZeroMemory();
-                
+
                     propVal = DEVPROP_TYPE_GUID;
-                    
+
                     SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_DeviceInterface_ClassGuid), out propVal, mm, cbSize, out cbSize, 0U);
-                    
+
                     if (cbSize > 0L)
                     {
                         devOut.DeviceInterfaceClassGuid = new Guid(mm.ToByteArray(0L, 16));
@@ -537,18 +530,18 @@ namespace DataTools.Win32
 
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_FILETIME;
-                
+
                 SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_InstallDate), out propVal, nint.Zero, 0U, out cbSize, 0U);
-                
+
                 if (cbSize > 0L)
                 {
                     mm.Length = cbSize;
                     mm.ZeroMemory();
-                
+
                     propVal = DEVPROP_TYPE_FILETIME;
-                    
+
                     SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_InstallDate), out propVal, mm, cbSize, out cbSize, 0U);
-                    
+
                     if (cbSize > 0L)
                         devOut.InstallDate = (DateTime)DevPropToObject(DevPropTypes.FileTime, mm, (int)cbSize);
                 }
@@ -674,9 +667,9 @@ namespace DataTools.Win32
 
                     propVal = DEVPROP_TYPE_STRING_LIST;
 
-                    SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Children), out propVal, mm.handle, cbSize, out cbSize, 0U);
+                    SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Children), out propVal, mm.Handle, cbSize, out cbSize, 0U);
 
-                    pt = mm.handle;
+                    pt = mm.Handle;
 
                     if (cbSize > 0L)
                         devOut.Children = pt.GetStringArray(0L);
@@ -699,7 +692,7 @@ namespace DataTools.Win32
 
                     SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_HardwareIds), out propVal, mm, cbSize, out cbSize, 0U);
 
-                    pt = mm.handle;
+                    pt = mm.Handle;
 
                     if (cbSize > 0L)
                         devOut.HardwareIds = pt.GetStringArray(0L);
@@ -722,7 +715,7 @@ namespace DataTools.Win32
 
                     SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_LocationPaths), out propVal, mm, cbSize, out cbSize, 0U);
 
-                    pt = mm.handle;
+                    pt = mm.Handle;
 
                     if (cbSize > 0L)
                         devOut.LocationPaths = pt.GetStringArray(0L);
@@ -1062,7 +1055,6 @@ namespace DataTools.Win32
 
                 case DevPropTypes.Currency:
                     {
-
                         // I had to read the documentation on MSDN very carefully to understand why this needs to be.
                         return mm.DoubleAt(0L) * 10000.0d;
                     }
@@ -1074,11 +1066,10 @@ namespace DataTools.Win32
 
                 case DevPropTypes.Date:
                     {
-
                         // based on what the MSDN describes of this property format, this is what
                         // I believe needs to be done to make the value into an acceptable CLR DateTime object.
                         double d = mm.DoubleAt(0L);
-                    
+
                         var t = new TimeSpan((int)(d * 24d), 0, 0);
                         var dt = DateTime.Parse("1899-12-31");
 
@@ -1150,7 +1141,6 @@ namespace DataTools.Win32
             return null;
         }
 
-
         /// <summary>
         /// Enumerate devices of DeviceInfo T with the specified hardware class Id.
         /// </summary>
@@ -1174,7 +1164,6 @@ namespace DataTools.Win32
             return InternalGetComputer();
         }
 
-
         /// <summary>
         /// Enumerate COM Ports
         /// </summary>
@@ -1196,9 +1185,5 @@ namespace DataTools.Win32
             Array.Sort(p, new Comparison<DeviceInfo>((x, y) => { if (x.FriendlyName is object && y.FriendlyName is object) { return string.Compare(x.FriendlyName, y.FriendlyName); } else { return string.Compare(x.Description, y.Description); } }));
             return p;
         }
-
-
-
-
     }
 }

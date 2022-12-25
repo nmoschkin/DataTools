@@ -11,30 +11,22 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.ConstrainedExecution;
-using System.Runtime.InteropServices;
-using DataTools.Text;
-using DataTools.MathTools;
+using DataTools.Graphics;
+using DataTools.MathTools.Polar;
 using DataTools.Win32;
 using DataTools.Win32.Memory;
-using DataTools.Graphics;
-using DataTools.MathTools.PolarMath;
+
+using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 
 namespace DataTools.Hardware.Printers
 {
-    
-    
     /// <summary>
     /// Encapsulates a printer queue on the system.
     /// </summary>
@@ -47,9 +39,9 @@ namespace DataTools.Hardware.Printers
         // This is a scratch-pad memory pointer for various getting and setting functions
         // so that we don't have to keep allocating and deallocating resources.
         private MemPtr _mm = new MemPtr(16L);
+
         private DeviceMode _DevMode;
 
-        
         public bool Equals(PrinterObject other)
         {
             return (PrinterName ?? "") == (other.PrinterName ?? "");
@@ -92,7 +84,6 @@ namespace DataTools.Hardware.Printers
             internalPopulatePrinter(printerName, this);
         }
 
-
         ~PrinterObject()
         {
             if (_fOwn)
@@ -105,8 +96,6 @@ namespace DataTools.Hardware.Printers
             return PrinterName;
         }
 
-        
-        
         /// <summary>
         /// Get the printable area of the page
         /// </summary>
@@ -120,22 +109,22 @@ namespace DataTools.Hardware.Printers
             var rc = new UniRect();
             DeviceMode dev = (DeviceMode)printer._DevMode.Clone();
             dev.Fields = DeviceModeFields.Orientation | DeviceModeFields.PaperSize | DeviceModeFields.YResolution;
-            dev.YResolution = (short)resolution.cy;
-            dev.PrintQuality = (short)resolution.cx;
+            dev.YResolution = (short)resolution.CY;
+            dev.PrintQuality = (short)resolution.CX;
             dev.PaperSize = paper;
             dev.Orientation = (short)orientation;
             var hdc = User32.CreateDC(null, printer.PrinterName, nint.Zero, printer._DevMode._ptr);
             if (hdc != nint.Zero)
             {
-                int cx = PrinterModule.GetDeviceCaps(hdc, PrinterModule.PHYSICALWIDTH);
-                int cy = PrinterModule.GetDeviceCaps(hdc, PrinterModule.PHYSICALHEIGHT);
+                int CX = PrinterModule.GetDeviceCaps(hdc, PrinterModule.PHYSICALWIDTH);
+                int CY = PrinterModule.GetDeviceCaps(hdc, PrinterModule.PHYSICALHEIGHT);
                 int marginX = PrinterModule.GetDeviceCaps(hdc, PrinterModule.PHYSICALOFFSETX);
                 int marginY = PrinterModule.GetDeviceCaps(hdc, PrinterModule.PHYSICALOFFSETY);
                 User32.DeleteDC(hdc);
-                rc.Left = marginX / resolution.cx;
-                rc.Top = marginY / resolution.cy;
-                rc.Width = (cx - marginX * 2) / resolution.cx;
-                rc.Height = (cy - marginY * 2) / resolution.cy;
+                rc.Left = marginX / resolution.CX;
+                rc.Top = marginY / resolution.CY;
+                rc.Width = (CX - marginX * 2) / resolution.CX;
+                rc.Height = (CY - marginY * 2) / resolution.CY;
             }
 
             return rc;
@@ -203,7 +192,6 @@ namespace DataTools.Hardware.Printers
 
         private static void internalGetPrinter(string name, ref PrinterObject printer)
         {
-
             // MsgBox("We are in internalGetPrinter for " & name)
 
             var mm = new MemPtr();
@@ -428,7 +416,6 @@ namespace DataTools.Hardware.Printers
 
                     for (long i = 0L; i < l; i++)
                     {
-
                         // some p.o.s. printers make it hard.
                         srs = null;
                         srs = mm.GetString(i * 24L * 2L, 24);
@@ -467,8 +454,6 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        
-        
         /// <summary>
         /// Select a printer into this object by printer name.
         /// </summary>
@@ -494,8 +479,6 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        
-        
         private int _LandscapeRotation;
 
         /// <summary>
@@ -615,7 +598,6 @@ namespace DataTools.Hardware.Printers
         /// <remarks></remarks>
         public bool SupportsPaperSize(LinearSize size, bool sizeMetric = false, bool exactOrientation = false)
         {
-
             // two separate for-eaches for time-saving. We don't need to test for sizeMetric for every iteration.
             // we don't need to test exactOrientation every time, either, but that's only referenced once per iteration.
 
@@ -676,8 +658,6 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        
-        
         /// <summary>
         /// Gets the server name of this printer.  If this string is null, the printer is served locally.
         /// </summary>
@@ -1120,9 +1100,6 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        
-        
-
         /// <summary>
         /// Explicitly cast string to <see cref="PrinterObject"/>
         /// </summary>
@@ -1139,7 +1116,5 @@ namespace DataTools.Hardware.Printers
                 throw new KeyNotFoundException("That printer was not found on the system.", ex);
             }
         }
-
-        
     }
 }

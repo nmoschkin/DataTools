@@ -7,6 +7,7 @@
  * *************************************************/
 
 using DataTools.Desktop;
+using DataTools.Memory;
 using DataTools.Shell.Native;
 using DataTools.Win32;
 
@@ -202,8 +203,6 @@ namespace DataTools.FileSystem
             OnPropertyChanged(nameof(CreationTime));
         }
 
-
-
         internal static Resources.SystemIconSizes StandardToSystem(StandardIcons stdIcon)
         {
             Resources.SystemIconSizes st;
@@ -238,7 +237,6 @@ namespace DataTools.FileSystem
             return st;
         }
 
-
         public virtual FileAttributes Attributes
         {
             get
@@ -252,13 +250,11 @@ namespace DataTools.FileSystem
             }
         }
 
-        
         public string DisplayName
         {
             get => displayName;
             set => displayName = value;
         }
-        
 
         /// <summary>
         /// Returns an ICO for the shell object.
@@ -407,7 +403,6 @@ namespace DataTools.FileSystem
             }
         }
 
-
         public virtual void MoveObject(string value)
         {
             if (!CanMoveObject) throw new InvalidOperationException("This object cannot be moved.");
@@ -529,7 +524,7 @@ namespace DataTools.FileSystem
             // the command to send to the binder that tells it what to bind
             var g1 = ShellBHIDGuid.PropertyStoreUuid;
 
-            // the UUID of the interface that will be bound.            
+            // the UUID of the interface that will be bound.
             var g2 = ShellIIDGuid.IPropertyStoreUuid;
 
             IPropertyStore p;

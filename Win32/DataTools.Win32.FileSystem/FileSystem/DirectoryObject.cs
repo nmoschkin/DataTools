@@ -1,19 +1,14 @@
 ﻿using DataTools.Desktop_Old;
 using DataTools.FileSystem;
+using DataTools.Memory;
 using DataTools.Shell.Native;
 using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Desktop
 {
@@ -24,7 +19,7 @@ namespace DataTools.Desktop
 
         public bool IsLazyLoad
         {
-            get => lazy; 
+            get => lazy;
             set
             {
                 if (lazy != value)
@@ -69,6 +64,7 @@ namespace DataTools.Desktop
 
             return d;
         }
+
         /// <summary>
         /// Get a directory object from a file object.
         /// The <see cref="FileObject"/> instance passed is retained in the returned <see cref="DirectoryObject"/> object.
@@ -86,7 +82,7 @@ namespace DataTools.Desktop
             children = new List<IShellObject>();
         }
 
-        private DirectoryObject() : base("", false, false, StandardIcons.Icon48) 
+        private DirectoryObject() : base("", false, false, StandardIcons.Icon48)
         {
             DisplayName = "";
         }
@@ -120,6 +116,7 @@ namespace DataTools.Desktop
         {
             children.Clear();
         }
+
         /// <summary>
         /// Determine whether this folder contains an item
         /// </summary>
@@ -191,25 +188,25 @@ namespace DataTools.Desktop
         }
     }
 
-
     public class DirectoryObjectEnumerator : IEnumerator<IShellObject>
     {
-        DirectoryObject source;
+        private DirectoryObject source;
 
-        IShellObject current;
+        private IShellObject current;
 
-        IShellItem shitem;
-        IShellFolder shfld;
-        IEnumIDList enumer;
+        private IShellItem shitem;
+        private IShellFolder shfld;
+        private IEnumIDList enumer;
 
-        bool folders;
-        bool files;
+        private bool folders;
+        private bool files;
 
         public DirectoryObjectEnumerator(DirectoryObject source, bool folders, bool files)
         {
             this.source = source;
             this.folders = folders;
             this.files = files;
+            if (this.source.Children.Count == 0) source.Refresh();
             CreateEnumerator();
         }
 
@@ -228,6 +225,8 @@ namespace DataTools.Desktop
 
         public bool MoveNext()
         {
+            if (enumer == null) return false;
+
             current = NextObject();
 
             while (!folders && current != null && current.IsFolder)
@@ -253,20 +252,21 @@ namespace DataTools.Desktop
         {
             var shguid = ShellIIDGuid.IShellItemUuid;
             var res = NativeShell.SHCreateItemFromParsingName(source.ParsingName, nint.Zero, ref shguid, out shitem);
-            
+
             if (res == HResult.Ok)
             {
                 var fldbind = ShellBHIDGuid.ShellFolderObjectUuid;
                 var fld2guid = ShellIIDGuid.IShellFolder2Uuid;
 
-                shitem.BindToHandler(nint.Zero, ref fldbind, ref fld2guid, out shfld);                
-                shfld.EnumObjects(nint.Zero, 
-                    ShellFolderEnumerationOptions.Folders | 
-                    ShellFolderEnumerationOptions.IncludeHidden | 
-                    ShellFolderEnumerationOptions.NonFolders | 
-                    ShellFolderEnumerationOptions.InitializeOnFirstNext, 
-                    out enumer);
+                shitem.BindToHandler(nint.Zero, ref fldbind, ref fld2guid, out shfld);
+                if (shfld == null) return;
 
+                shfld.EnumObjects(nint.Zero,
+                    ShellFolderEnumerationOptions.Folders |
+                    ShellFolderEnumerationOptions.IncludeHidden |
+                    ShellFolderEnumerationOptions.NonFolders |
+                    ShellFolderEnumerationOptions.InitializeOnFirstNext,
+                    out enumer);
             }
         }
 
@@ -312,8 +312,8 @@ namespace DataTools.Desktop
                 {
                     inv = (nint)mm2.LongAt(1L);
                 }
-
-                if (inv.Handle != nint.Zero)
+                var invh = inv.DangerousGetHandle();
+                if (invh != nint.Zero)
                 {
                     if (inv.CharAt(0L) != '\0')
                     {
@@ -327,7 +327,7 @@ namespace DataTools.Desktop
 
                         lpInfo.dwAttributes = 0;
 
-                        User32.SHGetItemInfo(mm.Handle, 0, ref lpInfo, Marshal.SizeOf<SHFILEINFO>(), iFlags);
+                        User32.SHGetItemInfo(invh, 0, ref lpInfo, Marshal.SizeOf<SHFILEINFO>(), iFlags);
 
                         pout = Path.Combine(source.ParsingName, fp);
 
@@ -340,7 +340,7 @@ namespace DataTools.Desktop
 
                         if ((lpInfo.dwAttributes & (int)FileAttributes.Directory) == (int)FileAttributes.Directory && !File.Exists(pout))
                         {
-                            dobj = new DirectoryObject(pout, source.IsSpecial, false, source.IconSize);
+                            dobj = new DirectoryObject(pout, source.IsSpecial || pout.Contains("$RECYCLE"), false, source.IconSize);
                             dobj.Parent = source;
                             dobj.IconSize = source.IconSize;
 
@@ -351,7 +351,7 @@ namespace DataTools.Desktop
                             fobj = new FileObject(pout, source.IsSpecial, true, source.IconSize);
                             fobj.Parent = source;
                             fobj.IconSize = source.IconSize;
-                            
+
                             return fobj;
                         }
                     }

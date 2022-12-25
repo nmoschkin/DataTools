@@ -1,19 +1,18 @@
 ﻿using DataTools.FileSystem;
-using DataTools.Shell.Native;
+using DataTools.Streams;
 using DataTools.Win32;
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Desktop
 {
     public class FileObject : ShellObject
     {
         private SystemFileType fileType;
+
         public FileObject(string parsingName) : base(parsingName, parsingName.Contains("::"), true, StandardIcons.Icon48)
         {
         }
@@ -31,7 +30,6 @@ namespace DataTools.Desktop
         public override long Size => FileTools.GetFileSize(ParsingName);
 
         public string Directory => Path.GetDirectoryName(ParsingName);
-
 
         /// <summary>
         /// Get the full ParsingName of the file.
@@ -175,6 +173,30 @@ namespace DataTools.Desktop
             get
             {
                 return fileType;
+            }
+        }
+
+        public bool TryHashCrc32(out uint crc)
+        {
+            try
+            {
+                crc = HashCrc32();
+                return true;
+            }
+            catch
+            {
+                crc = 0xffffffffu;
+                return false;
+            }
+        }
+
+        public uint HashCrc32()
+        {
+            if (this.IsSpecial) throw new NotSupportedException("Cannot hash a virtual or special file; hash can only be performed on a real file.");
+
+            using (var fs = new FileStream(ParsingName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                return Crc32.Hash(fs, 1024 * 1024);
             }
         }
 

@@ -3,29 +3,26 @@
 //
 // Module: DiskApi
 //         Native Disk Serivces.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Memory;
+using DataTools.Text;
+using DataTools.Win32.Disk.Partition.Gpt;
 
 using System;
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Principal;
-using DataTools.Text;
-using DataTools.Win32.Disk.Partition.Mbr;
-using DataTools.Win32.Disk.Partition.Gpt;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Disk.Partition
 {
     [SecurityCritical()]
     internal static class Partitioning
     {
-
         /// <summary>
         /// Windows system MBR partition information structure.
         /// </summary>
@@ -34,10 +31,13 @@ namespace DataTools.Win32.Disk.Partition
         public struct PARTITION_INFORMATION_MBR
         {
             public byte PartitionType;
+
             [MarshalAs(UnmanagedType.Bool)]
             public bool BootIndicator;
+
             [MarshalAs(UnmanagedType.Bool)]
             public bool RecognizedPartition;
+
             public uint HiddenSectors;
 
             /// <summary>
@@ -96,6 +96,7 @@ namespace DataTools.Win32.Disk.Partition
             public Guid PartitionType;
             public Guid PartitionId;
             public GptPartitionAttributes Attributes;
+
             [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U2, SizeConst = 36)]
             private char[] _Name;
 
@@ -149,8 +150,10 @@ namespace DataTools.Win32.Disk.Partition
             public long StartingOffset;
             public long PartitionLength;
             public uint PartitionNumber;
+
             [MarshalAs(UnmanagedType.Bool)]
             public bool RewritePartition;
+
             [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U1, SizeConst = 112)]
             private byte[] _PartitionInfo;
 
@@ -239,6 +242,7 @@ namespace DataTools.Win32.Disk.Partition
         {
             public PartitionStyle PartitionStyle;
             public uint ParititionCount;
+
             [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U1, SizeConst = 40)]
             private byte[] _LayoutInfo;
 
@@ -281,8 +285,8 @@ namespace DataTools.Win32.Disk.Partition
                 hfile = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, 0, nint.Zero);
             }
 
-            var pex = new MemPtr();
-            var pexBegin = new MemPtr();
+            var pex = new DataTools.Win32.Memory.MemPtr();
+            var pexBegin = new DataTools.Win32.Memory.MemPtr();
             List<PARTITION_INFORMATION_EX> pOut = null;
             DRIVE_LAYOUT_INFORMATION_EX lay;
             int pexLen = Marshal.SizeOf<PARTITION_INFORMATION_EX>();
@@ -327,7 +331,7 @@ namespace DataTools.Win32.Disk.Partition
             for (i = 0; i < c; i++)
             {
                 var testPart = pexBegin.ToStruct<PARTITION_INFORMATION_EX>();
-                
+
                 if (lay.PartitionStyle == PartitionStyle.Mbr)
                 {
                     if (testPart.Mbr.PartitionType != 0 && testPart.Mbr.PartitionType != 0x5 && testPart.Mbr.PartitionType != 0x0f)
@@ -345,7 +349,7 @@ namespace DataTools.Win32.Disk.Partition
             pex.Free();
             if (!hf)
                 User32.CloseHandle(hfile);
-            
+
             lay.ParititionCount = (uint)pOut.Count;
 
             layInfo = lay;
