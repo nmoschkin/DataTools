@@ -1,17 +1,28 @@
-﻿using DataTools.Streams;
+﻿using DataTools.Memory;
+using DataTools.Streams;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace DataTools.Memory
+namespace DataTools.Win32.Memory
 {
     /// <summary>
     /// Represents a base class for memory buffers that are uniquely allocated for specific use cases (COM, networking, etc.)
     /// </summary>
+    ///
+    [Obsolete("This class is going away. Use DataTools.Memory.SafePtrBase, instead.")]
     public abstract class SafePtrBase : SafeHandle, ICloneable, IEquatable<SafePtrBase>
     {
+        /// <summary>
+        /// Gets the pointer to the process heap.
+        /// </summary>
+        public static readonly nint ProcessHeap = Native.GetProcessHeap();
+
+        private nint currentHeap = ProcessHeap;
+
         #region Constructors
 
         /// <summary>
@@ -55,16 +66,12 @@ namespace DataTools.Memory
         /// <remarks>
         /// If this object does not own the underlying pointer, then setting this value has an unknown effect.
         /// </remarks>
-        public long Length
+        public virtual long Length
         {
-            get => GetLogicalSize();
+            get => GetAllocatedSize();
             set
             {
-                var cs = GetLogicalSize();
-                if (value == cs) return;
-                else if (cs == 0) Alloc(value);
-                else if (value == 0) Free();
-                else ReAlloc(value);
+                ReAlloc(value);
             }
         }
 
@@ -82,6 +89,40 @@ namespace DataTools.Memory
         /// True if allocated memory is known to the garbage collector.
         /// </summary>
         public bool HasGCPressure { get; protected set; }
+
+        /// <summary>
+        /// The current heap.
+        /// </summary>
+        /// <remarks>
+        /// This is usually the process heap, but creating independent heaps are possible.
+        /// </remarks>
+        public virtual nint CurrentHeap
+        {
+            get
+            {
+                if (currentHeap == nint.Zero)
+                {
+                    currentHeap = ProcessHeap;
+                }
+
+                return currentHeap;
+            }
+            protected set
+            {
+                if (value == nint.Zero)
+                {
+                    currentHeap = ProcessHeap;
+                }
+                else if (currentHeap == value)
+                {
+                    return;
+                }
+                else
+                {
+                    currentHeap = value;
+                }
+            }
+        }
 
         /// <summary>
         /// This is a new handle value that can be reached by other members of this assembly.
@@ -643,7 +684,8 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual void FromStruct<T>(T val) where T : struct
         {
-            int cb = Marshal.SizeOf<T>();
+            int cb = Marshal.SizeOf(val);
+
             if (cb > Length) ReAlloc(cb);
 
             Marshal.StructureToPtr(val, handle, false);
@@ -1475,41 +1517,10 @@ namespace DataTools.Memory
         #region Memory Allocation
 
         /// <summary>
-        /// Returns the native size of the allocated buffer handled by this object, if available.
+        /// Returns the known size of the allocated buffer handled by this object.
         /// </summary>
         /// <returns></returns>
-        protected abstract long GetNativeSize();
-
-        /// <summary>
-        /// Returns true if there is a native implementation to retrieve the size or if the known logical size should be used instead.
-        /// </summary>
-        /// <returns></returns>
-        protected abstract bool CanGetNativeSize();
-
-        private long logSize;
-
-        /// <summary>
-        /// Gets the logical size of the buffer.
-        /// </summary>
-        /// <returns></returns>
-        protected long GetLogicalSize()
-        {
-            if (handle == 0) return 0;
-            return logSize;
-        }
-
-        /// <summary>
-        /// Set the logical size for the buffer. This updates the last known state of the object.
-        /// </summary>
-        /// <param name="logicalSize"></param>
-        /// <remarks>
-        /// This is usually managed by the base class. Only use if you really know what you're doing!
-        /// </remarks>
-        protected void DangerousSetLogicalSize(long logicalSize)
-        {
-            if (handle == 0) logSize = 0;
-            else logSize = logicalSize;
-        }
+        public abstract long GetAllocatedSize();
 
         /// <summary>
         /// Allocate a block of memory.
@@ -1517,99 +1528,14 @@ namespace DataTools.Memory
         /// <param name="size"></param>
         /// <returns></returns>
         /// <remarks>
-        /// If memory is already allocated, this method will forward the call to <see cref="ReAlloc(long)"/>, instead.
-        /// <br /><br />
-        /// If the requested size is the same as the current size, no action will be taken, and this method will return true.
+        /// If memory is already allocated, implementors should call <see cref="ReAlloc(long)"/> from this method.
         /// </remarks>
-        public bool Alloc(long size)
-        {
-            // TODO: Logical Size!
-            if (handle != 0) return ReAlloc(size);
-            if (size > int.MaxValue) throw new NotSupportedException("CoTaskMem only supports 32-bit integer buffer lengths.");
-
-            try
-            {
-                handle = Allocate(size);
-                if (handle != 0)
-                {
-                    if (CanGetNativeSize())
-                    {
-                        size = GetNativeSize();
-                    }
-
-                    DangerousSetLogicalSize(size);
-                    if (HasGCPressure) GC.AddMemoryPressure(size);
-                }
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Provide the low-level ability to allocate a new memory block.
-        /// </summary>
-        /// <param name="size"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Overrides of this method should provide only the functionality necessary<br />
-        /// to allocate a memory block and return the new pointer.
-        /// </remarks>
-        protected abstract nint Allocate(long size);
-
-        /// <summary>
-        /// Provide the low-level ability to re-allocate an existing memory block to change its size.
-        /// </summary>
-        /// <param name="size"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Overrides of this method should provide only the functionality necessary<br />
-        /// to reallocate a memory block and return the new pointer.
-        /// </remarks>
-        protected abstract nint Reallocate(nint oldptr, long newsize);
-
-        /// <summary>
-        /// Provide the low-level ability to free an allocated memory block.
-        /// </summary>
-        /// <param name="ptr"></param>
-        /// <remarks>
-        /// Overrides of this method should provide only the functionality necessary<br />
-        /// to free the memory block.
-        /// </remarks>
-        protected abstract void Deallocate(nint ptr);
+        public abstract bool Alloc(long size);
 
         /// <summary>
         /// Frees the block of memory.
         /// </summary>
-        /// <remarks>
-        /// Returns false only in the event of catastrophic failure.
-        /// </remarks>
-        public bool Free()
-        {
-            if (handle == 0) return true;
-            if (!IsOwner) return true;
-
-            try
-            {
-                var size = CanGetNativeSize() ? GetNativeSize() : GetLogicalSize();
-                Deallocate(handle);
-                if (HasGCPressure) GC.RemoveMemoryPressure(size);
-                DangerousSetLogicalSize(0);
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-            finally
-            {
-                handle = 0;
-            }
-        }
+        public abstract bool Free();
 
         /// <summary>
         /// Reallocates a block of memory in order to change its size. The old contents are copied to the new pointer.
@@ -1617,96 +1543,32 @@ namespace DataTools.Memory
         /// <param name="size"></param>
         /// <returns></returns>
         /// <remarks>
-        /// If the requested size is the same as the current size, no action will be taken, and this method will return true.
-        /// <br /><br />
         /// If there is no current allocated memory, then this call has the same effect as a call to <see cref="Alloc(long)"/>.
         /// <br /><br />
         /// Reallocation preserves the current block's contents.
         /// <br /><br />
         /// Old pointer references to this object's handle will be invalid after this call.
         /// </remarks>
-        public bool ReAlloc(long size)
-        {
-            if (handle == nint.Zero) return Alloc(size);
-            else if (size <= 0) return Free();
-
-            try
-            {
-                var oldsize = CanGetNativeSize() ? GetNativeSize() : GetLogicalSize();
-                var newptr = Reallocate(handle, (int)size);
-
-                if (newptr != 0)
-                {
-                    handle = newptr;
-
-                    // This may be the culprit
-                    //if (CanGetNativeSize()) size = GetNativeSize();
-
-                    if (HasGCPressure)
-                    {
-                        if (oldsize < size)
-                        {
-                            GC.AddMemoryPressure(size - oldsize);
-                        }
-                        else if (oldsize > size)
-                        {
-                            GC.RemoveMemoryPressure(oldsize - size);
-                        }
-                    }
-
-                    DangerousSetLogicalSize(size);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            catch
-            {
-                return false;
-            }
-        }
+        public abstract bool ReAlloc(long size);
 
         /// <summary>
         /// Set all bytes in the memory buffer to zero.
         /// </summary>
-        public void ZeroMemory(long index = -1, long length = -1)
+        public virtual void ZeroMemory()
         {
             unsafe
             {
-                var loglen = CanGetNativeSize() ? GetNativeSize() : GetLogicalSize();
+                void* p = (void*)handle;
+                if (p == null || Length == 0) return;
 
-                byte* p = (byte*)handle;
-                if (index != -1) p += index;
-
-                if (p == null || loglen == 0) return;
-                long len;
-
-                if (length < 0 || length > loglen)
-                {
-                    len = loglen;
-                }
-                else
-                {
-                    len = length;
-                }
-
-                if (index > 0)
-                {
-                    if (index + len > loglen)
-                    {
-                        len -= (index + len) - loglen;
-                    }
-                }
-
-                Native.ZeroMemory(p, len);
+                Native.ZeroMemory(p, Length);
             }
         }
 
         protected override bool ReleaseHandle()
         {
-            return Free();
+            Free();
+            return true;
         }
 
         #endregion Memory Allocation
@@ -1750,7 +1612,7 @@ namespace DataTools.Memory
                 if (dest.Length < (destidx + length)) return false;
 
                 void* ptr1 = (void*)(handle + srcidx);
-                void* ptr2 = (void*)(dest.handle + destidx);
+                void* ptr2 = (void*)(dest + destidx);
 
                 Buffer.MemoryCopy(ptr1, ptr2, length, length);
 
@@ -1808,7 +1670,7 @@ namespace DataTools.Memory
             {
                 return mp.handle == base.handle;
             }
-            else if (obj is SafePtrBase sp)
+            else if (obj is SafePtr sp)
             {
                 return sp.handle == base.handle;
             }
@@ -1842,7 +1704,9 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                if (handle == 0) return 0;
+                if (handle.IsInvalidHandle()) return 0;
+                if (Length == 0) return -1;
+
                 return (int)Crc32.Hash((byte*)handle, Length);
             }
         }

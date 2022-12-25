@@ -22,7 +22,7 @@
 // When you fetch an item object from the virtual collection, that object is only alive in your program for as long as you reference it.
 // If the menu gets destroyed while you are still working with an item, it will fail.
 
-using DataTools.Memory;
+using DataTools.Win32.Memory;
 
 using System;
 using System.Runtime.InteropServices;
@@ -241,8 +241,8 @@ namespace DataTools.Win32.Menu
                 var mii = new MENUITEMINFO();
                 mii.cbSize = Marshal.SizeOf(mii);
                 mii.fMask = User32.MIIM_STRING;
-                var mm = new DataTools.Memory.SafePtr();
-                mm = (DataTools.Memory.SafePtr)value;
+                var mm = new SafePtr();
+                mm = (SafePtr)value;
                 mm.Length += sizeof(char);
                 mii.cch = (int)mm.Length;
                 mii.dwTypeData = mm.DangerousGetHandle();

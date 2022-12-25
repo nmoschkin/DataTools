@@ -36,9 +36,14 @@ namespace DataTools.Memory
 
         public override MemoryType MemoryType => MemoryType.CoTaskMem;
 
-        public override long GetNativeSize()
+        protected override long GetNativeSize()
         {
-            return size;
+            throw new NotImplementedException();
+        }
+
+        protected override bool CanGetNativeSize()
+        {
+            return false;
         }
 
         protected override nint Allocate(long size)

@@ -154,7 +154,7 @@ namespace DataTools.Graphics
 
             lock (lockObj)
             {
-                using (var mm = new SafePtr())
+                using (var mm = new CoTaskMemPtr())
                 {
                     //var bmpinf = new SKImageInfo((int)Math.Ceiling(Bounds.Width), (int)Math.Ceiling(Bounds.Height), SKColorType.Rgba8888, SKAlphaType.Unknown);
 

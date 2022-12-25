@@ -259,7 +259,7 @@ namespace DataTools.Win32.Usb
                 return false;
             }
 
-            using (var mm = new DataTools.Memory.SafePtr())
+            using (var mm = new SafePtr())
             {
                 mm.Alloc(expectedSize + 1);
                 mm.ByteAt(0L) = reportId;
@@ -298,7 +298,7 @@ namespace DataTools.Win32.Usb
 
             if (hhid == nint.Zero) return false;
 
-            using (var mm = new DataTools.Memory.SafePtr())
+            using (var mm = new SafePtr())
             {
                 mm.Alloc(3L);
                 mm.ByteAt(0L) = reportId;
@@ -335,7 +335,7 @@ namespace DataTools.Win32.Usb
 
             if (hhid == nint.Zero) return false;
 
-            using (var mm = new DataTools.Memory.SafePtr())
+            using (var mm = new SafePtr())
             {
                 mm.Alloc(5L);
                 mm.ByteAt(0L) = reportId;
@@ -372,7 +372,7 @@ namespace DataTools.Win32.Usb
 
             if (hhid == nint.Zero) return false;
 
-            using (var mm = new DataTools.Memory.SafePtr())
+            using (var mm = new SafePtr())
             {
                 mm.Alloc(9L);
                 mm.ByteAt(0L) = reportId;
@@ -408,7 +408,7 @@ namespace DataTools.Win32.Usb
 
             if (hhid == nint.Zero) return false;
 
-            using (var mm = new DataTools.Memory.SafePtr())
+            using (var mm = new SafePtr())
             {
                 mm.Alloc(value.Length + 1);
                 mm.FromByteArray(value, 1L);
@@ -443,7 +443,7 @@ namespace DataTools.Win32.Usb
 
             if (hhid == nint.Zero) return false;
 
-            using (var mm = new DataTools.Memory.SafePtr())
+            using (var mm = new SafePtr())
             {
                 mm.Alloc(3L);
                 mm.ByteAt(0L) = reportId;
@@ -478,7 +478,7 @@ namespace DataTools.Win32.Usb
 
             if (hhid == nint.Zero) return false;
 
-            using (var mm = new DataTools.Memory.SafePtr())
+            using (var mm = new SafePtr())
             {
                 mm.Alloc(5L);
                 mm.ByteAt(0L) = reportId;
@@ -514,7 +514,7 @@ namespace DataTools.Win32.Usb
 
             if (hhid == nint.Zero) return false;
 
-            using (var mm = new DataTools.Memory.SafePtr())
+            using (var mm = new SafePtr())
             {
                 mm.Alloc(9L);
                 mm.ByteAt(0L) = reportId;
@@ -546,7 +546,7 @@ namespace DataTools.Win32.Usb
             {
                 if (string.IsNullOrEmpty(hidManufacturer))
                 {
-                    using (var mm = new DataTools.Memory.SafePtr())
+                    using (var mm = new SafePtr())
                     {
                         var dev = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
@@ -582,7 +582,7 @@ namespace DataTools.Win32.Usb
             {
                 if (string.IsNullOrEmpty(serialNumber))
                 {
-                    using (var mm = new DataTools.Memory.SafePtr())
+                    using (var mm = new SafePtr())
                     {
                         var dev = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
@@ -618,7 +618,7 @@ namespace DataTools.Win32.Usb
             {
                 if (string.IsNullOrEmpty(productString))
                 {
-                    using (var mm = new DataTools.Memory.SafePtr())
+                    using (var mm = new SafePtr())
                     {
                         var dev = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
@@ -675,7 +675,7 @@ namespace DataTools.Win32.Usb
             {
                 if (physicalDescriptor is null)
                 {
-                    using (var mm = new DataTools.Memory.SafePtr())
+                    using (var mm = new SafePtr())
                     {
                         var dev = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 

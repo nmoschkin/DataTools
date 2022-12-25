@@ -1,33 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using DataTools.Memory;
 
 namespace DataTools.Memory.StringBlob
 {
     public class LPWSTR
     {
-        private SafePtr mem = null;
+        private CoTaskMemPtr mem = null;
 
         internal nint _ptr
         {
-            get => (mem?.handle) ?? nint.Zero;
+            get => (mem?.DangerousGetHandle()) ?? nint.Zero;
             set
             {
-                if (value == (mem?.handle ?? nint.Zero)) return;
+                if (value == (mem?.DangerousGetHandle() ?? nint.Zero)) return;
 
                 if (mem != null)
                 {
                     mem.Dispose();
                 }
 
-                mem = new SafePtr(value);
+                mem = new CoTaskMemPtr(value);
             }
         }
 
         public LPWSTR()
         {
-            mem = new SafePtr();
+            mem = new CoTaskMemPtr();
         }
 
         public int Length
@@ -35,23 +33,21 @@ namespace DataTools.Memory.StringBlob
             get => (int)mem.Length - sizeof(char);
         }
 
-
         public LPWSTR(string s)
         {
-            mem = new SafePtr((s.Length + 1) * sizeof(char));
+            mem = new CoTaskMemPtr((s.Length + 1) * sizeof(char));
             mem.SetString(0, s);
         }
 
         public LPWSTR(nint m)
         {
-            mem = new SafePtr(m);
+            mem = new CoTaskMemPtr(m);
         }
 
         public unsafe LPWSTR(void* m)
         {
-            mem = new SafePtr(m);
+            mem = new CoTaskMemPtr((nint)m);
         }
-
 
         public override string ToString()
         {
@@ -63,13 +59,9 @@ namespace DataTools.Memory.StringBlob
             return val.mem.ToString();
         }
 
-
         public static explicit operator LPWSTR(string val)
         {
             return new LPWSTR(val);
         }
-
     }
-
-
 }

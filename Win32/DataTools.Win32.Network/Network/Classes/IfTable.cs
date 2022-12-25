@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataTools.Win32.Memory;
+
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -18,7 +20,7 @@ namespace DataTools.Win32.Network
 
         [DllImport("Iphlpapi.dll", CharSet = CharSet.Unicode)]
         public static extern int GetIfTable(
-         DataTools.Memory.SafePtr pIfTable,
+         SafePtr pIfTable,
          ref int pdwSize,
          bool bOrder
        );

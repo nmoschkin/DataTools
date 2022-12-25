@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataTools.Win32.Memory;
+
+using System;
 using System.Collections;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -9,7 +11,7 @@ namespace DataTools.Win32.Network
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct LPMIB_IFTABLE : IEnumerable<MIB_IFROW>, IReadOnlyCollection<MIB_IFROW>, IDisposable
     {
-        private DataTools.Memory.SafePtr ptr;
+        private SafePtr ptr;
         private static readonly int RowSize = Marshal.SizeOf<MIB_IFROW>();
 
         public int Count
@@ -31,7 +33,7 @@ namespace DataTools.Win32.Network
         {
             if (ptr != null) return false;
 
-            ptr = new DataTools.Memory.SafePtr();
+            ptr = new SafePtr();
 
             return ptr.Alloc(length);
         }

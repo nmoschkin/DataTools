@@ -1,6 +1,4 @@
-﻿using DataTools.Memory;
-
-using System;
+﻿using System;
 using System.Text;
 
 namespace DataTools.Win32.Memory
@@ -8,7 +6,7 @@ namespace DataTools.Win32.Memory
     /// <summary>
     /// Represents a base class for memory buffers that are uniquely allocated for specific use cases (COM, networking, etc.) in Windows
     /// </summary>
-    public abstract class WinPtrBase : SafePtrBase
+    public abstract class WinPtrBase : DataTools.Memory.SafePtrBase
     {
         /// <summary>
         /// Gets the pointer to the process heap.

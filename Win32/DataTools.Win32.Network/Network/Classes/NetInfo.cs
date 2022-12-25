@@ -76,7 +76,7 @@ namespace DataTools.Win32.Network
             string ret;
             int cb = 10240;
 
-            using (var lps = new DataTools.Memory.SafePtr(cb))
+            using (var lps = new SafePtr(cb))
             {
                 if (GetUserNameEx(type, lps, ref cb))
                 {
@@ -99,7 +99,7 @@ namespace DataTools.Win32.Network
         {
             int cb = 10240;
 
-            using (DataTools.Memory.SafePtr lps = new DataTools.Memory.SafePtr(cb))
+            using (SafePtr lps = new SafePtr(cb))
             {
                 if (GetUserName(lps, ref cb))
                 {

@@ -9,20 +9,14 @@ namespace DataTools.Win32.Memory
     {
         public static readonly nint ProcessHeap = Native.GetProcessHeap();
 
-        private long size = 0;
-
-        public override long GetNativeSize()
+        protected override long GetNativeSize()
         {
-            try
-            {
-                if (handle == 0) return 0;
-                size = Native.HeapSize(ProcessHeap, 0, handle);
-            }
-            catch
-            {
-            }
+            return (long)Native.HeapSize(ProcessHeap, 0, handle);
+        }
 
-            return size;
+        protected override bool CanGetNativeSize()
+        {
+            return true;
         }
     }
 }

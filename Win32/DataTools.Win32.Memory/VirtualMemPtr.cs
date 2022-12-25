@@ -45,7 +45,7 @@ namespace DataTools
             return nhandle;
         }
 
-        public override long GetNativeSize()
+        protected override long GetNativeSize()
         {
             if (handle == nint.Zero) return 0;
 
@@ -54,6 +54,11 @@ namespace DataTools
             if (Native.VirtualQuery(handle, ref m, (nint)Marshal.SizeOf(m)) != nint.Zero) return (long)m.RegionSize;
 
             return 0;
+        }
+
+        protected override bool CanGetNativeSize()
+        {
+            return true;
         }
 
         protected override DataTools.Win32.Memory.WinPtrBase Clone()

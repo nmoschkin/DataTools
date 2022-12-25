@@ -126,7 +126,7 @@ namespace DataTools.Win32.Usb
         {
             HidFeatureValue? result;
 
-            using (var mm = new DataTools.Memory.SafePtr())
+            using (var mm = new SafePtr())
             {
                 try
                 {

@@ -10,9 +10,9 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
-using DataTools.Memory;
 using DataTools.Text;
 using DataTools.Win32.Disk.Partition.Gpt;
+using DataTools.Win32.Memory;
 
 using System;
 using System.Runtime.InteropServices;

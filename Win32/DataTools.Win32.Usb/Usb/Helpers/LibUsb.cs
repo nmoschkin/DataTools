@@ -502,7 +502,7 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    DataTools.Memory.SafePtr mm = (DataTools.Memory.SafePtr)extra_desc;
+                    SafePtr mm = (SafePtr)extra_desc;
                     return mm.ToStruct<UsbHidDescriptor>();
                 }
             }

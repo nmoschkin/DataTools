@@ -1134,7 +1134,7 @@ namespace DataTools.Graphics
         /// </remarks>
         public static UniColor FromStruct<T>(T value) where T : struct
         {
-            using (var sp = new SafePtr())
+            using (var sp = new CoTaskMemPtr())
             {
                 var c = Marshal.SizeOf<T>();
                 sp.FromStruct(value);

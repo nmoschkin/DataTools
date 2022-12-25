@@ -55,7 +55,7 @@ namespace DataTools.Win32
             var devInfo = default(SP_DEVINFO_DATA);
             var devInterface = default(SP_DEVICE_INTERFACE_DATA);
             var lIcon = new Dictionary<Guid, System.Drawing.Icon>();
-            var mm = new DataTools.Memory.SafePtr();
+            var mm = new SafePtr();
             var hicon = nint.Zero;
             int picon = 0;
 
@@ -262,7 +262,7 @@ namespace DataTools.Win32
 
             var lIcon = new Dictionary<Guid, System.Drawing.Icon>();
 
-            var mm = new DataTools.Memory.SafePtr();
+            var mm = new SafePtr();
             var hicon = nint.Zero;
 
             int picon = 0;
@@ -435,9 +435,9 @@ namespace DataTools.Win32
             uint cbSize;
             uint propVal;
 
-            //var mm = new DataTools.Memory.SafePtr();
+            //var mm = new SafePtr();
 
-            var mm = new DataTools.Memory.SafePtr();
+            var mm = new SafePtr();
             var details = default(SP_DEVICE_INTERFACE_DETAIL_DATA);
 
             MemPtr pt;

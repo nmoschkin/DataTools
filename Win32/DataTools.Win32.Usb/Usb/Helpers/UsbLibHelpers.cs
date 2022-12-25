@@ -10,7 +10,7 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
-using DataTools.Memory;
+using DataTools.Win32.Memory;
 
 using System;
 using System.Runtime.CompilerServices;
@@ -166,9 +166,9 @@ namespace DataTools.Win32.Usb
 
             using (var ppd = new PreparsedData(hhid))
             {
-                using (var buffer = new DataTools.Memory.SafePtr())
+                using (var buffer = new SafePtr())
                 {
-                    using (var rptbuff = new DataTools.Memory.SafePtr())
+                    using (var rptbuff = new SafePtr())
                     {
                         foreach (var btn in buttonCaps)
                         {
@@ -243,7 +243,7 @@ namespace DataTools.Win32.Usb
 
             using (var ppd = new PreparsedData(hhid))
             {
-                using (var rptbuff = new DataTools.Memory.SafePtr())
+                using (var rptbuff = new SafePtr())
                 {
                     foreach (var val in valueCaps)
                     {

@@ -11,7 +11,7 @@
 // *************************************************
 
 using DataTools.MathTools.Polar;
-using DataTools.Memory;
+using DataTools.Win32.Memory;
 
 using System;
 using System.Runtime.InteropServices;

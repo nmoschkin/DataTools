@@ -45,10 +45,15 @@ namespace DataTools
             Native.NetApiBufferFree(ptr);
         }
 
-        public override long GetNativeSize()
+        protected override long GetNativeSize()
         {
             Native.NetApiBufferSize(handle, out int size);
             return size;
+        }
+
+        protected override bool CanGetNativeSize()
+        {
+            return true;
         }
 
         protected override nint Reallocate(nint oldptr, long newsize)

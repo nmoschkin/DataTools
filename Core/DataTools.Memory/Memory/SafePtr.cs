@@ -70,9 +70,7 @@ namespace DataTools.Memory
 
         protected override nint Allocate(long size)
         {
-            var r = Marshal.AllocHGlobal((int)size);
-            if (r != 0) this.size = size;
-            return r;
+            return Marshal.AllocHGlobal((int)size);
         }
 
         protected override void Deallocate(nint ptr)
@@ -83,17 +81,20 @@ namespace DataTools.Memory
 
         protected override nint Reallocate(nint oldptr, long newsize)
         {
-            var r = Marshal.ReAllocHGlobal(oldptr, (int)newsize);
-            if (r != 0) this.size = newsize;
-            return r;
+            return Marshal.ReAllocHGlobal(oldptr, (int)newsize);
         }
 
-        public override long GetNativeSize()
+        protected override long GetNativeSize()
         {
-            return size;
+            throw new NotImplementedException();
         }
 
-        protected override SafePtrBase Clone()
+        protected override bool CanGetNativeSize()
+        {
+            return false;
+        }
+
+        protected override SafePtr Clone()
         {
             unsafe
             {

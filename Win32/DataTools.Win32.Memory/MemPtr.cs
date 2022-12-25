@@ -24,7 +24,7 @@ namespace DataTools.Win32.Memory
         /// <remarks>
         /// This method only works for memory blocks allocated on the process heap.<br /><br />
         /// The structure contains only the memory pointer, and so is not aware of how it was allocated.<br /><br />
-        /// Consider using <see cref="DataTools.Memory.SafePtr"/>.
+        /// Consider using <see cref="SafePtr"/>.
         /// </remarks>
         public long Size
         {

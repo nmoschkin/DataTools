@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-
-using System.Collections;
-using System.Runtime.InteropServices;
-using DataTools.Memory;
 
 namespace DataTools.Memory.StringBlob
 {
@@ -70,14 +65,14 @@ namespace DataTools.Memory.StringBlob
         public static StringBlob FromNullTermPtr(nint ptr)
         {
             var sb = new StringBlob();
-            var b = new SafePtr(ptr);
+            var b = new CoTaskMemPtr(ptr);
             sb.AddRange(b.GetStringArray(0));
             return sb;
         }
 
-        public SafePtr ToNullTermPtr()
+        public CoTaskMemPtr ToNullTermPtr()
         {
-            var b = new SafePtr();
+            var b = new CoTaskMemPtr();
 
             int i = 0;
 
@@ -103,9 +98,10 @@ namespace DataTools.Memory.StringBlob
 
         public static StringBlob FromByteArray(byte[] val)
         {
-            var mm = (SafePtr)val;
+            var mm = new CoTaskMemPtr();
+            mm.FromByteArray(val);
 
-            var sb = FromNullTermPtr(mm.handle);
+            var sb = FromNullTermPtr(mm.Handle);
             mm.Free();
 
             return sb;
