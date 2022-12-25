@@ -1474,6 +1474,9 @@ namespace DataTools.Memory
 
         #region Memory Allocation
 
+        private long logSize;
+        private readonly object lockObj = new object();
+
         /// <summary>
         /// Returns the native size of the allocated buffer handled by this object, if available.
         /// </summary>
@@ -1485,8 +1488,6 @@ namespace DataTools.Memory
         /// </summary>
         /// <returns></returns>
         protected abstract bool CanGetNativeSize();
-
-        private long logSize;
 
         /// <summary>
         /// Gets the logical size of the buffer.
@@ -1523,29 +1524,27 @@ namespace DataTools.Memory
         /// </remarks>
         public bool Alloc(long size)
         {
-            // TODO: Logical Size!
-            if (handle != 0) return ReAlloc(size);
-            if (size > int.MaxValue) throw new NotSupportedException("CoTaskMem only supports 32-bit integer buffer lengths.");
-
-            try
+            lock (lockObj)
             {
-                handle = Allocate(size);
-                if (handle != 0)
+                // TODO: Logical Size!
+                if (handle != 0) return ReAlloc(size);
+                if (size > int.MaxValue) throw new NotSupportedException("CoTaskMem only supports 32-bit integer buffer lengths.");
+
+                try
                 {
-                    if (CanGetNativeSize())
+                    handle = Allocate(size);
+                    if (handle != 0)
                     {
-                        size = GetNativeSize();
+                        DangerousSetLogicalSize(size);
+                        if (HasGCPressure) GC.AddMemoryPressure(size);
                     }
 
-                    DangerousSetLogicalSize(size);
-                    if (HasGCPressure) GC.AddMemoryPressure(size);
+                    return true;
                 }
-
-                return true;
-            }
-            catch
-            {
-                return false;
+                catch
+                {
+                    return false;
+                }
             }
         }
 
@@ -1589,25 +1588,28 @@ namespace DataTools.Memory
         /// </remarks>
         public bool Free()
         {
-            if (handle == 0) return true;
-            if (!IsOwner) return true;
+            lock (lockObj)
+            {
+                if (handle == 0) return true;
+                if (!IsOwner) return true;
 
-            try
-            {
-                var size = CanGetNativeSize() ? GetNativeSize() : GetLogicalSize();
-                Deallocate(handle);
-                if (HasGCPressure) GC.RemoveMemoryPressure(size);
-                DangerousSetLogicalSize(0);
+                try
+                {
+                    var size = GetLogicalSize();
+                    Deallocate(handle);
+                    if (HasGCPressure) GC.RemoveMemoryPressure(size);
+                    DangerousSetLogicalSize(0);
 
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-            finally
-            {
-                handle = 0;
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+                finally
+                {
+                    handle = 0;
+                }
             }
         }
 
@@ -1627,44 +1629,47 @@ namespace DataTools.Memory
         /// </remarks>
         public bool ReAlloc(long size)
         {
-            if (handle == nint.Zero) return Alloc(size);
-            else if (size <= 0) return Free();
-
-            try
+            lock (lockObj)
             {
-                var oldsize = CanGetNativeSize() ? GetNativeSize() : GetLogicalSize();
-                var newptr = Reallocate(handle, (int)size);
+                if (handle == nint.Zero) return Alloc(size);
+                else if (size <= 0) return Free();
 
-                if (newptr != 0)
+                try
                 {
-                    handle = newptr;
+                    var oldsize = Length;
+                    var newptr = Reallocate(handle, (int)size);
 
-                    // This may be the culprit
-                    //if (CanGetNativeSize()) size = GetNativeSize();
-
-                    if (HasGCPressure)
+                    if (newptr != 0)
                     {
-                        if (oldsize < size)
-                        {
-                            GC.AddMemoryPressure(size - oldsize);
-                        }
-                        else if (oldsize > size)
-                        {
-                            GC.RemoveMemoryPressure(oldsize - size);
-                        }
-                    }
+                        handle = newptr;
 
-                    DangerousSetLogicalSize(size);
-                    return true;
+                        // This may be the culprit
+                        //if (CanGetNativeSize()) size = GetNativeSize();
+
+                        if (HasGCPressure)
+                        {
+                            if (oldsize < size)
+                            {
+                                GC.AddMemoryPressure(size - oldsize);
+                            }
+                            else if (oldsize > size)
+                            {
+                                GC.RemoveMemoryPressure(oldsize - size);
+                            }
+                        }
+
+                        DangerousSetLogicalSize(size);
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-                else
+                catch
                 {
                     return false;
                 }
-            }
-            catch
-            {
-                return false;
             }
         }
 
@@ -1673,35 +1678,51 @@ namespace DataTools.Memory
         /// </summary>
         public void ZeroMemory(long index = -1, long length = -1)
         {
-            unsafe
+            lock (lockObj)
             {
-                var loglen = CanGetNativeSize() ? GetNativeSize() : GetLogicalSize();
-
-                byte* p = (byte*)handle;
-                if (index != -1) p += index;
-
-                if (p == null || loglen == 0) return;
-                long len;
-
-                if (length < 0 || length > loglen)
+                unsafe
                 {
-                    len = loglen;
-                }
-                else
-                {
-                    len = length;
-                }
+                    var loglen = Length;
 
-                if (index > 0)
-                {
-                    if (index + len > loglen)
+                    byte* p = (byte*)handle;
+                    if (index != -1) p += index;
+
+                    if (p == null || loglen == 0) return;
+                    long len;
+
+                    if (length < 0 || length > loglen)
                     {
-                        len -= (index + len) - loglen;
+                        len = loglen;
                     }
-                }
+                    else
+                    {
+                        len = length;
+                    }
 
-                Native.ZeroMemory(p, len);
+                    if (index > 0)
+                    {
+                        if (index + len > loglen)
+                        {
+                            len -= (index + len) - loglen;
+                        }
+                    }
+
+                    Native.ZeroMemory(p, len);
+                }
             }
+        }
+
+        /// <summary>
+        /// Check the health of the current memory, and, if possible, update the current logical size from a native call.
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool HealthCheck()
+        {
+            if (CanGetNativeSize())
+            {
+                DangerousSetLogicalSize(GetNativeSize());
+            }
+            return true;
         }
 
         protected override bool ReleaseHandle()
@@ -1825,7 +1846,7 @@ namespace DataTools.Memory
         {
             if (obj is SafePtrBase other)
             {
-                return (Length == other.Length && CalculateCrc32() == other.CalculateCrc32());
+                return obj.handle == handle;
             }
 
             return false;
@@ -1840,11 +1861,7 @@ namespace DataTools.Memory
         /// </remarks>
         public override int GetHashCode()
         {
-            unsafe
-            {
-                if (handle == 0) return 0;
-                return (int)Crc32.Hash((byte*)handle, Length);
-            }
+            return handle.GetHashCode();
         }
 
         #endregion Object

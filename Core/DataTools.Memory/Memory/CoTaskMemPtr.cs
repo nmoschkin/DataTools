@@ -38,7 +38,7 @@ namespace DataTools.Memory
 
         protected override long GetNativeSize()
         {
-            throw new NotImplementedException();
+            return GetLogicalSize();
         }
 
         protected override bool CanGetNativeSize()
