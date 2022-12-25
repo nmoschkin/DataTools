@@ -1,5 +1,4 @@
-﻿using DataTools.Observable;
-
+﻿using DataTools.Essentials.Observable;
 
 using Newtonsoft.Json;
 
