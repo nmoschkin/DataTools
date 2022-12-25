@@ -1,12 +1,11 @@
-﻿using DataTools.Graphics;
-using DataTools.Observable;
+﻿using DataTools.Essentials.Observable;
+using DataTools.Graphics;
 
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
 
@@ -25,7 +24,6 @@ namespace DataTools.ColorControls
     /// </summary>
     public class NamedColorViewModel : ObservableBase
     {
-
         #region Private Fields
 
         private static object lockObj = new object();
@@ -64,6 +62,7 @@ namespace DataTools.ColorControls
 
         public static ReadOnlyCollection<NamedColorViewModel> GlobalCatalog { get; private set; }
         public static ReadOnlyCollection<NamedColorViewModel> WebCatalog { get; private set; }
+
         public ListCollectionView AllNamedColors
         {
             get => colors;
@@ -128,7 +127,6 @@ namespace DataTools.ColorControls
 
         public static void RefreshColorCatalog()
         {
-          
             lock (lockObj)
             {
                 var l = new List<NamedColorViewModel>();
@@ -150,6 +148,7 @@ namespace DataTools.ColorControls
                 WebCatalog = new ReadOnlyCollection<NamedColorViewModel>(l);
             }
         }
+
         public void ChangeCatalog(CatalogOptions catalog)
         {
             if (!isSourceList) return;
@@ -160,26 +159,21 @@ namespace DataTools.ColorControls
 
                 if ((catalog & CatalogOptions.Web) == CatalogOptions.Web)
                 {
-
                     foreach (var clr in GlobalCatalog)
                     {
                         l.Add(clr);
                     }
-
                 }
                 if ((catalog & CatalogOptions.Extended) == CatalogOptions.Extended)
                 {
-
                     foreach (var clr in GlobalCatalog)
                     {
                         l.Add(clr);
                     }
-
                 }
 
                 AllNamedColors = new ListCollectionView(l);
                 AllNamedColors.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
-
             }
 
             SetProperty(ref this.catalog, catalog);
@@ -220,11 +214,10 @@ namespace DataTools.ColorControls
             {
                 Category = "Blue";
             }
-            else 
+            else
             {
                 Category = "Purple";
             }
-
         }
 
         #endregion Private Methods

@@ -1,28 +1,21 @@
-﻿using System;
+﻿using DataTools.Graphics;
+using DataTools.MathTools.Polar;
+using DataTools.Windows.Extensions;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-
-using DataTools.Graphics;
-using DataTools.Windows.Extensions;
-using DataTools.MathTools.PolarMath;
 
 using static DataTools.Graphics.ColorMath;
-using System.Runtime.CompilerServices;
 
 namespace DataTools.ColorControls
 {
-    
     /// <summary>
     /// How to select color names.
     /// </summary>
@@ -44,17 +37,16 @@ namespace DataTools.ColorControls
     /// </summary>
     public partial class ColorElement : UserControl
     {
-        ColorPickerRenderer cpRender;
+        private ColorPickerRenderer cpRender;
 
         public delegate void ColorHitEvent(object sender, ColorHitEventArgs e);
+
         public event ColorHitEvent ColorHit;
+
         public event ColorHitEvent ColorOver;
 
-        ColorPickerElement? selectedElement;
-        bool updateForValueChange;
-
-
-
+        private ColorPickerElement? selectedElement;
+        private bool updateForValueChange;
 
         /// <summary>
         /// Gets or sets a value that indicates the hue box is rendered tetrachromatically
@@ -68,8 +60,6 @@ namespace DataTools.ColorControls
         // Using a DependencyProperty as the backing store for Tetrachromatic.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty TetrachromaticProperty =
             DependencyProperty.Register("Tetrachromatic", typeof(bool), typeof(ColorElement), new PropertyMetadata(false));
-
-
 
         public int HuePointerSize
         {
@@ -92,9 +82,6 @@ namespace DataTools.ColorControls
             }
         }
 
-
-
-
         public int HueWheelThickness
         {
             get { return (int)GetValue(HueWheelThicknessProperty); }
@@ -116,7 +103,6 @@ namespace DataTools.ColorControls
             }
         }
 
-
         public double HueOffset
         {
             get { return (double)GetValue(HueOffsetProperty); }
@@ -137,10 +123,6 @@ namespace DataTools.ColorControls
                 }
             }
         }
-
-
-
-
 
         public ColorNameResolution NameResolution
         {
@@ -214,7 +196,6 @@ namespace DataTools.ColorControls
             }
         }
 
-
         public IReadOnlyCollection<NamedColor> SelectedNamedColors
         {
             get { return (IReadOnlyCollection<NamedColor>)GetValue(SelectedNamedColorsProperty); }
@@ -231,11 +212,9 @@ namespace DataTools.ColorControls
                 if ((IReadOnlyCollection<NamedColor>)e.OldValue != (IReadOnlyCollection<NamedColor>)e.NewValue)
                 {
                     //p.RenderPicker();
-                    
                 }
             }
         }
-
 
         public bool InvertSaturation
         {
@@ -259,9 +238,6 @@ namespace DataTools.ColorControls
             }
         }
 
-
-
-
         public float ElementSize
         {
             get { return (float)GetValue(ElementSizeProperty); }
@@ -283,7 +259,6 @@ namespace DataTools.ColorControls
                 }
             }
         }
-
 
         public double ColorValue
         {
@@ -330,7 +305,6 @@ namespace DataTools.ColorControls
         public static readonly DependencyProperty ModeProperty =
             DependencyProperty.Register(nameof(Mode), typeof(ColorPickerMode), typeof(ColorElement), new PropertyMetadata(ColorPickerMode.Wheel, ModePropertyChanged));
 
-
         private static void ModePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is ColorElement p)
@@ -353,7 +327,6 @@ namespace DataTools.ColorControls
             CursorCanvas.MouseUp += PickerSite_MouseUp;
         }
 
-
         protected override void OnRender(DrawingContext drawingContext)
         {
             base.OnRender(drawingContext);
@@ -371,7 +344,7 @@ namespace DataTools.ColorControls
         {
             UniColor clr;
 
-            if (selc != null) 
+            if (selc != null)
             {
                 clr = (UniColor)selc;
                 SelectedColor = Color.FromArgb(clr.A, clr.R, clr.G, clr.B);
@@ -450,7 +423,7 @@ namespace DataTools.ColorControls
 
                     int rad;
                     int h = (int)ActualHeight, w = (int)ActualWidth;
-                     
+
                     if (h < w)
                     {
                         rad = h / 2;
@@ -481,7 +454,6 @@ namespace DataTools.ColorControls
 
                     HueAngle.Angle = pc.Arc;
                 }
-
             }
             else
             {
@@ -496,13 +468,10 @@ namespace DataTools.ColorControls
 
                 Surround.Stroke = Point.Stroke = new SolidColorBrush((Color)SelectedColor);
                 selectedElement = cel;
-
             }
-
-
         }
 
-        bool dragPick = false;
+        private bool dragPick = false;
 
         private void PickerSite_MouseMove(object sender, MouseEventArgs e)
         {
@@ -534,7 +503,6 @@ namespace DataTools.ColorControls
 
         private void PickerSite_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            
             if (e.MouseDevice.LeftButton == MouseButtonState.Pressed)
             {
                 if (Keyboard.Modifiers == ModifierKeys.Control)
@@ -544,7 +512,7 @@ namespace DataTools.ColorControls
                     dragPick = false;
 
                     return;
-                } 
+                }
 
                 var pt = e.GetPosition(PickerSite);
                 var c = cpRender.HitTest((int)pt.X, (int)pt.Y);
@@ -553,13 +521,13 @@ namespace DataTools.ColorControls
                 ColorHit?.Invoke(this, new ColorHitEventArgs(c));
                 dragPick = true;
             }
-
         }
 
         private void PickerSite_MouseUp(object sender, MouseButtonEventArgs e)
         {
             dragPick = false;
         }
+
         private void ColorPicker_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             //RenderPicker((int)e.NewSize.Width, (int)e.NewSize.Height);
@@ -629,30 +597,27 @@ namespace DataTools.ColorControls
                     {
                         cw = new ColorPickerRenderer(rad, colorVal, offset, invert);
                     }
-                    else if (mode == ColorPickerMode.HueWheel)
+                    else //if (mode == ColorPickerMode.HueWheel)
                     {
                         rad -= ((ps / 2) + (ps / 5));
                         cw = new ColorPickerRenderer(rad, colorVal, offset, invert, false, hwt);
                     }
-                    else
-                    {
-                        cw = new ColorPickerRenderer(rad, esize, colorVal, invert);
-                    }
-
+                    //else
+                    //{
+                    //    cw = new ColorPickerRenderer(rad, esize, colorVal, invert, 0d);
+                    //}
                 }
                 else
                 {
-
                     if (mode == ColorPickerMode.HueBoxHorizontal || mode == ColorPickerMode.HueBoxVertical)
                     {
-                        cw = new ColorPickerRenderer(w, h, true, invert, mode == ColorPickerMode.HueBoxVertical, tetra);
+                        cw = new ColorPickerRenderer(w, h, huebox: true, invert: invert, vertical: mode == ColorPickerMode.HueBoxVertical, tetrachromatic: tetra, false);
                     }
                     else
                     {
                         cw = new ColorPickerRenderer(w, h, colorVal, offset, invert, mode == ColorPickerMode.LinearVertical || mode == ColorPickerMode.HueBarVertical, false, mode == ColorPickerMode.HueBarHorizontal || mode == ColorPickerMode.HueBarVertical);
                     }
                 }
-
 
                 disp.Invoke(() =>
                 {
@@ -662,8 +627,6 @@ namespace DataTools.ColorControls
                     //CursorCanvas.RenderSize = new Size(w, h);
                     cpRender = cw;
                     PickerSite.Source = DataTools.Desktop.BitmapTools.MakeWPFImage(cpRender.Bitmap);
-
-
 
                     UniColor? selc = null;
 
@@ -675,7 +638,6 @@ namespace DataTools.ColorControls
                     //    {
                     //        if (testelem.Bounds.Contains(pp))
                     //        {
-
                     //            SetSelectedColor(new UniColor(testelem.Color.ToArgb()));
                     //            break;
                     //        }
@@ -688,12 +650,8 @@ namespace DataTools.ColorControls
                     {
                         SetSelectedColor();
                     }
-
                 });
-
             });
         }
-
-
     }
 }

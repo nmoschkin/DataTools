@@ -1,18 +1,14 @@
-﻿using DataTools.Graphics;
-using DataTools.Observable;
-using DataTools.Win32;
+﻿using DataTools.Essentials.Observable;
+using DataTools.Graphics;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.ColorControls
 {
     public class ColorViewModel : ObservableBase
     {
-
         private UniColor source;
         private NamedColorViewModel namedColor;
         private double colorValue = 1d;
@@ -28,12 +24,12 @@ namespace DataTools.ColorControls
 
         public ColorViewModel(UniColor source)
         {
-               this.source = source;
+            this.source = source;
         }
 
         public UniColor Source
         {
-            get {  return source; }
+            get { return source; }
         }
 
         public System.Windows.Media.Color SelectedColor
@@ -61,11 +57,10 @@ namespace DataTools.ColorControls
                             }
                         }
                     }
-
                 }
             }
         }
-      
+
         private void RaiseARGBChange(bool raiseSource = true, bool raiseSelColor = true)
         {
             OnPropertyChanged(nameof(A));
@@ -78,8 +73,6 @@ namespace DataTools.ColorControls
             {
                 OnPropertyChanged(nameof(SelectedColor));
                 OnPropertyChanged(nameof(WebHexColor));
-
-             
             }
         }
 
@@ -94,7 +87,6 @@ namespace DataTools.ColorControls
             {
                 OnPropertyChanged(nameof(SelectedColor));
                 OnPropertyChanged(nameof(WebHexColor));
-
             }
         }
 
@@ -151,7 +143,6 @@ namespace DataTools.ColorControls
                     var f = NamedColorViewModel.GlobalCatalog.Where((a) => a.Name == value).FirstOrDefault();
                     SelectedNamedColor = f;
                 }
-
             }
         }
 
@@ -168,6 +159,7 @@ namespace DataTools.ColorControls
                 }
             }
         }
+
         public byte R
         {
             get => source.R;
@@ -181,6 +173,7 @@ namespace DataTools.ColorControls
                 }
             }
         }
+
         public byte G
         {
             get => source.G;
@@ -194,6 +187,7 @@ namespace DataTools.ColorControls
                 }
             }
         }
+
         public byte B
         {
             get => source.B;
@@ -221,6 +215,7 @@ namespace DataTools.ColorControls
                 }
             }
         }
+
         public double S
         {
             get => source.S;
@@ -234,6 +229,7 @@ namespace DataTools.ColorControls
                 }
             }
         }
+
         public double V
         {
             get => source.V;
@@ -248,7 +244,6 @@ namespace DataTools.ColorControls
             }
         }
 
-
         private bool _ShowNamedColors = true;
 
         public bool ShowNamedColors
@@ -259,7 +254,6 @@ namespace DataTools.ColorControls
                 SetProperty(ref _ShowNamedColors, value);
             }
         }
-
 
         private bool _ShowWebHexValue = true;
 
@@ -272,8 +266,6 @@ namespace DataTools.ColorControls
             }
         }
 
-
-
         private bool _ShowRGB = true;
 
         public bool ShowRGB
@@ -284,8 +276,6 @@ namespace DataTools.ColorControls
                 SetProperty(ref _ShowRGB, value);
             }
         }
-
-
 
         private bool _ShowHSV = true;
 
@@ -298,8 +288,6 @@ namespace DataTools.ColorControls
             }
         }
 
-
-
         private bool _ShowAlpha = true;
 
         public bool ShowAlpha
@@ -311,8 +299,6 @@ namespace DataTools.ColorControls
             }
         }
 
-
-
         private bool _ShowAlphaOption = true;
 
         public bool ShowAlphaOption
@@ -323,8 +309,5 @@ namespace DataTools.ColorControls
                 SetProperty(ref _ShowAlphaOption, value);
             }
         }
-
-
-
     }
 }

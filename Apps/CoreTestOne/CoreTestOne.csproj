@@ -2,8 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+	  <UseWPF>true</UseWPF>
+	  <UseWindowsForms>true</UseWindowsForms>
     <Nullable>disable</Nullable>
 	  <AssemblyVersion>8.0.0.1000</AssemblyVersion>
 	  <FileVersion>8.0.0.1000</FileVersion>
@@ -23,6 +25,9 @@
     <ProjectReference Include="..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
     <ProjectReference Include="..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
     <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
+    <ProjectReference Include="..\..\Win32\DataTools.Win32.FileSystem\DataTools.Win32.FileSystem.csproj" />
+    <ProjectReference Include="..\..\Win32\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
+    <ProjectReference Include="..\..\Win32\DataTools.Win32\DataTools.Win32.csproj" />
   </ItemGroup>
 
 </Project>
