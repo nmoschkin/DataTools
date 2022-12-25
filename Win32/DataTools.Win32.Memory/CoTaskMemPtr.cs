@@ -11,7 +11,7 @@ namespace DataTools.Win32.Memory
 
         private long size = 0;
 
-        public override long GetAllocatedSize()
+        public override long GetNativeSize()
         {
             try
             {

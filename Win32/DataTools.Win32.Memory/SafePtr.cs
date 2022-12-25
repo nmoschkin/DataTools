@@ -182,7 +182,7 @@ namespace DataTools.Win32.Memory
                     return false;
             }
 
-            long l = GetAllocatedSize();
+            long l = GetNativeSize();
             bool al;
 
             if (hHeap == null || (nint)hHeap == nint.Zero)
@@ -209,7 +209,7 @@ namespace DataTools.Win32.Memory
                 if (hHeap != null) currentHeap = (nint)hHeap;
                 memtype = MemoryType.HGlobal;
 
-                buffLen = GetAllocatedSize();
+                buffLen = GetNativeSize();
             }
 
             return al;
@@ -309,13 +309,13 @@ namespace DataTools.Win32.Memory
         {
             var p = new SafePtr();
             p.memtype = memtype;
-            p.Length = GetAllocatedSize();
+            p.Length = GetNativeSize();
 
             CopyTo(p, 0, 0, Length);
             return p;
         }
 
-        public override long GetAllocatedSize()
+        public override long GetNativeSize()
         {
             if (handle == 0) return 0;
 
@@ -405,7 +405,7 @@ namespace DataTools.Win32.Memory
             if (ptr != 0)
             {
                 memtype = MemoryType.HGlobal;
-                buffLen = GetAllocatedSize();
+                buffLen = GetNativeSize();
             }
             return ptr;
         }
@@ -416,7 +416,7 @@ namespace DataTools.Win32.Memory
             if (ptr != 0)
             {
                 memtype = MemoryType.HGlobal;
-                buffLen = GetAllocatedSize();
+                buffLen = GetNativeSize();
             }
             return ptr;
         }

@@ -21,22 +21,22 @@ namespace DataTools.Memory
 
         public CoTaskMemPtr(nint ptr) : base(ptr, true, false)
         {
-            GetAllocatedSize();
+            GetNativeSize();
         }
 
         public CoTaskMemPtr(nint ptr, bool fOwn) : base(ptr, fOwn, false)
         {
-            GetAllocatedSize();
+            GetNativeSize();
         }
 
         public CoTaskMemPtr(nint ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
-            GetAllocatedSize();
+            GetNativeSize();
         }
 
         public override MemoryType MemoryType => MemoryType.CoTaskMem;
 
-        public override long GetAllocatedSize()
+        public override long GetNativeSize()
         {
             return size;
         }
@@ -67,7 +67,7 @@ namespace DataTools.Memory
 
             unsafe
             {
-                var size = GetAllocatedSize();
+                var size = GetNativeSize();
                 cm.Alloc(size);
 
                 void* ptr1 = (void*)handle;

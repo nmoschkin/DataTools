@@ -31,7 +31,7 @@ namespace DataTools
 
         protected override nint Reallocate(nint oldptr, long newsize)
         {
-            var olds = GetAllocatedSize();
+            var olds = GetNativeSize();
 
             var cpysize = olds > newsize ? newsize : olds;
 
@@ -45,7 +45,7 @@ namespace DataTools
             return nhandle;
         }
 
-        public override long GetAllocatedSize()
+        public override long GetNativeSize()
         {
             if (handle == nint.Zero) return 0;
 
@@ -63,7 +63,7 @@ namespace DataTools
 
             unsafe
             {
-                var size = GetAllocatedSize();
+                var size = GetNativeSize();
                 cm.Alloc(size);
 
                 void* ptr1 = (void*)handle;

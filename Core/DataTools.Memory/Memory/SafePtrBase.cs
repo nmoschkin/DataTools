@@ -57,7 +57,7 @@ namespace DataTools.Memory
         /// </remarks>
         public virtual long Length
         {
-            get => GetAllocatedSize();
+            get => GetLogicalSize();
             set
             {
                 ReAlloc(value);
@@ -1471,10 +1471,41 @@ namespace DataTools.Memory
         #region Memory Allocation
 
         /// <summary>
-        /// Returns the known size of the allocated buffer handled by this object.
+        /// Returns the native size of the allocated buffer handled by this object, if available.
         /// </summary>
         /// <returns></returns>
-        public abstract long GetAllocatedSize();
+        protected abstract long GetNativeSize();
+
+        /// <summary>
+        /// Returns true if there is a native implementation to retrieve the size or if the known logical size should be used instead.
+        /// </summary>
+        /// <returns></returns>
+        protected abstract bool CanGetNativeSize();
+
+        private long logSize;
+
+        /// <summary>
+        /// Gets the logical size of the buffer.
+        /// </summary>
+        /// <returns></returns>
+        protected long GetLogicalSize()
+        {
+            if (handle == 0) return 0;
+            return logSize;
+        }
+
+        /// <summary>
+        /// Set the logical size for the buffer. This updates the last known state of the object.
+        /// </summary>
+        /// <param name="logicalSize"></param>
+        /// <remarks>
+        /// This is usually managed by the base class. Only use if you really know what you're doing!
+        /// </remarks>
+        protected void DangerousSetLogicalSize(long logicalSize)
+        {
+            if (handle == 0) logSize = 0;
+            else logSize = logicalSize;
+        }
 
         /// <summary>
         /// Allocate a block of memory.
@@ -1488,13 +1519,25 @@ namespace DataTools.Memory
         /// </remarks>
         public bool Alloc(long size)
         {
+            // TODO: Logical Size!
+
             if (handle != 0) return ReAlloc(size);
             if (size > int.MaxValue) throw new NotSupportedException("CoTaskMem only supports 32-bit integer buffer lengths.");
 
             try
             {
-                Handle = Allocate(size);
-                if (HasGCPressure) GC.AddMemoryPressure(GetAllocatedSize());
+                handle = Allocate(size);
+                if (handle != 0)
+                {
+                    if (CanGetNativeSize())
+                    {
+                        size = GetNativeSize();
+                    }
+
+                    DangerousSetLogicalSize(size);
+                    if (HasGCPressure) GC.AddMemoryPressure(size);
+                }
+
                 return true;
             }
             catch
@@ -1548,9 +1591,10 @@ namespace DataTools.Memory
 
             try
             {
-                var size = GetAllocatedSize();
+                var size = CanGetNativeSize() ? GetNativeSize() : GetLogicalSize();
                 Deallocate(handle);
                 if (HasGCPressure) GC.RemoveMemoryPressure(size);
+                DangerousSetLogicalSize(0);
 
                 return true;
             }
@@ -1585,13 +1629,15 @@ namespace DataTools.Memory
 
             try
             {
-                var oldsize = GetAllocatedSize();
+                var oldsize = CanGetNativeSize() ? GetNativeSize() : GetLogicalSize();
                 var newptr = Reallocate(handle, (int)size);
 
                 if (newptr != 0)
                 {
                     handle = newptr;
-                    size = GetAllocatedSize();
+
+                    // This may be the culprit
+                    //if (CanGetNativeSize()) size = GetNativeSize();
 
                     if (HasGCPressure)
                     {
@@ -1605,6 +1651,7 @@ namespace DataTools.Memory
                         }
                     }
 
+                    DangerousSetLogicalSize(size);
                     return true;
                 }
                 else
@@ -1625,19 +1672,29 @@ namespace DataTools.Memory
         {
             unsafe
             {
+                var loglen = CanGetNativeSize() ? GetNativeSize() : GetLogicalSize();
+
                 byte* p = (byte*)handle;
                 if (index != -1) p += index;
 
-                if (p == null || Length == 0) return;
+                if (p == null || loglen == 0) return;
                 long len;
 
-                if (length < 0 || length > Length)
+                if (length < 0 || length > loglen)
                 {
-                    len = Length;
+                    len = loglen;
                 }
                 else
                 {
                     len = length;
+                }
+
+                if (index > 0)
+                {
+                    if (index + len > loglen)
+                    {
+                        len -= (index + len) - loglen;
+                    }
                 }
 
                 Native.ZeroMemory(p, len);

@@ -18,17 +18,17 @@ namespace DataTools
 
         public NetworkMemPtr(nint ptr) : base(ptr, true, false)
         {
-            GetAllocatedSize();
+            GetNativeSize();
         }
 
         public NetworkMemPtr(nint ptr, bool fOwn) : base(ptr, fOwn, false)
         {
-            GetAllocatedSize();
+            GetNativeSize();
         }
 
         public NetworkMemPtr(nint ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
-            GetAllocatedSize();
+            GetNativeSize();
         }
 
         public override MemoryType MemoryType { get; }
@@ -45,7 +45,7 @@ namespace DataTools
             Native.NetApiBufferFree(ptr);
         }
 
-        public override long GetAllocatedSize()
+        public override long GetNativeSize()
         {
             Native.NetApiBufferSize(handle, out int size);
             return size;
@@ -66,7 +66,7 @@ namespace DataTools
 
             unsafe
             {
-                var size = GetAllocatedSize();
+                var size = GetNativeSize();
                 cm.Alloc(size);
 
                 void* ptr1 = (void*)handle;

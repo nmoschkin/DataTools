@@ -88,7 +88,7 @@ namespace DataTools.Memory
             return r;
         }
 
-        public override long GetAllocatedSize()
+        public override long GetNativeSize()
         {
             return size;
         }
