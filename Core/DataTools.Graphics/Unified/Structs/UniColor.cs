@@ -1,3 +1,4 @@
+using DataTools.Memory;
 using DataTools.Text;
 
 using Newtonsoft.Json;
@@ -1117,6 +1118,52 @@ namespace DataTools.Graphics
             unsafe
             {
                 return FromPointer((void*)ptr);
+            }
+        }
+
+        /// <summary>
+        /// Attempt to copy color values from known and unknown structures.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Strategy is for color structures such as System.Windows.Media.Color, and System.Drawing.Color,<br />
+        /// those are non-standard (they are not 32-bit ARGB or BGRA values), but their structures are known<br />
+        /// and are dealt with.  With othe structures, they are treated as standard BGRA.<br />
+        /// </remarks>
+        public static UniColor FromStruct<T>(T value) where T : struct
+        {
+            using (var sp = new SafePtr())
+            {
+                var c = Marshal.SizeOf<T>();
+                sp.FromStruct(value);
+
+                if (c == 24) // System.Drawing.Color
+                {
+                    var cr = new UniColor(sp.UIntAt(2));
+                    return cr;
+                }
+                else if (c == 48) // System.Windows.Media.Color
+                {
+                    unsafe
+                    {
+                        var cr = new UniColor();
+                        byte* h = (byte*)(nint)sp;
+
+                        cr.A = h[24];
+                        cr.R = h[25];
+                        cr.G = h[26];
+                        cr.B = h[27];
+
+                        return cr;
+                    }
+                }
+                else
+                {
+                    var cr = new UniColor(sp.UIntAt(0));
+                    return cr;
+                }
             }
         }
 

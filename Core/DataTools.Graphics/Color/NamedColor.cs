@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 using DataTools.Text;
 
-using static DataTools.SortedLists.BinarySearch;
-using static DataTools.SortedLists.QuickSort;
+using static DataTools.Essentials.SortedLists.BinarySearch;
+using static DataTools.Essentials.SortedLists.QuickSort;
 
 namespace DataTools.Graphics
 {

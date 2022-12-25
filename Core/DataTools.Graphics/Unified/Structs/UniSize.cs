@@ -21,28 +21,26 @@ namespace DataTools.Graphics
 
         public double Width
         {
-            get
-            {
-                return width;
-            }
-
-            set
-            {
-                width = value;
-            }
+            get => width;
+            set => width = value;
         }
 
         public double Height
         {
-            get
-            {
-                return height;
-            }
+            get => height;
+            set => height = value;
+        }
 
-            set
-            {
-                height = value;
-            }
+        public double CX
+        {
+            get => width;
+            set => width = value;
+        }
+
+        public double CY
+        {
+            get => height;
+            set => height = value;
         }
 
         public UniSize(Size p)

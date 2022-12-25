@@ -6,10 +6,10 @@ namespace DataTools.Graphics
     [StructLayout(LayoutKind.Sequential, Size = 4)]
     public struct BGRADATA
     {
-        public byte Alpha;
-        public byte Red;
-        public byte Green;
         public byte Blue;
+        public byte Green;
+        public byte Red;
+        public byte Alpha;
 
         public override string ToString()
         {

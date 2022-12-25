@@ -1,17 +1,11 @@
 ﻿using DataTools.MathTools.Polar;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataTools.Graphics;
-using System.Runtime.InteropServices;
-using DataTools.MathTools;
 using DataTools.Memory;
-using DataTools.Graphics.Extensions;
+
 using SkiaSharp;
+
+using System;
+using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace DataTools.Graphics
 {
@@ -145,7 +139,7 @@ namespace DataTools.Graphics
         /// </summary>
         /// <remarks>
         /// This image should never be resized, stretched or transformed in any way.</remarks>
-        public SKBitmap Bitmap { get; private set; }
+        public SKImage Bitmap { get; private set; }
 
         public async Task Render()
         {
@@ -160,18 +154,27 @@ namespace DataTools.Graphics
 
             lock (lockObj)
             {
-                var mm = new MemPtr();
-                var bmpinf = new SKImageInfo((int)Math.Ceiling(Bounds.Width), (int)Math.Ceiling(Bounds.Height), SKColorType.Rgba8888, SKAlphaType.Unknown);
-                var bmp = new SKBitmap(bmpinf);
+                using (var mm = new SafePtr())
+                {
+                    //var bmpinf = new SKImageInfo((int)Math.Ceiling(Bounds.Width), (int)Math.Ceiling(Bounds.Height), SKColorType.Rgba8888, SKAlphaType.Unknown);
 
-                mm.Alloc(bmp.Width * bmp.Height * 4 * 2);
+                    var opt = new SKImageInfo()
+                    {
+                        AlphaType = SKAlphaType.Premul,
+                        ColorType = SKColorType.Bgra8888,
+                        Height = (int)Math.Ceiling(Bounds.Height),
+                        Width = (int)Math.Ceiling(Bounds.Width)
+                    };
 
-                mm.FromByteArray(ImageBytes);
-                bmp.SetPixels(mm);
+                    var bmp = new SKBitmap(opt);
 
-                mm.Free();
+                    mm.FromByteArray(ImageBytes);
+                    bmp.Pixels = mm.ToArray<SKColor>();
+                    bmp.SetImmutable();
+                    var img = SKImage.FromBitmap(bmp);
 
-                Bitmap = bmp;
+                    Bitmap = img;
+                }
             }
         }
 
@@ -344,7 +347,7 @@ namespace DataTools.Graphics
             return HitTest(pt.X, pt.Y, false, out _, out _);
         }
 
-        public ColorPickerRenderer(int width, int height, bool huebox, bool invert, bool vertical, bool tetrachromatic = false, bool suppressCreateBitmap = false)
+        public ColorPickerRenderer(int width, int height, bool huebox, bool invert, bool vertical, bool tetrachromatic, bool suppressCreateBitmap)
         {
             if (huebox == false) throw new ArgumentException();
 
@@ -503,9 +506,9 @@ namespace DataTools.Graphics
 
             unsafe
             {
-                fixed (int* g1 = arrColors)
+                fixed (void* g1 = arrColors)
                 {
-                    fixed (byte* g2 = imageBytes)
+                    fixed (void* g2 = imageBytes)
                     {
                         Buffer.MemoryCopy(g1, g2, imageBytes.Length, imageBytes.Length);
                     }
@@ -625,196 +628,196 @@ namespace DataTools.Graphics
 
             unsafe
             {
-                var gch1 = GCHandle.Alloc(arrColors, GCHandleType.Pinned);
-                var gch2 = GCHandle.Alloc(imageBytes, GCHandleType.Pinned);
-
-                Buffer.MemoryCopy((void*)gch1.AddrOfPinnedObject(), (void*)gch2.AddrOfPinnedObject(), imageBytes.Length, imageBytes.Length);
-
-                gch1.Free();
-                gch2.Free();
+                fixed (void* g1 = arrColors)
+                {
+                    fixed (void* g2 = imageBytes)
+                    {
+                        Buffer.MemoryCopy(g1, g2, imageBytes.Length, imageBytes.Length);
+                    }
+                }
             }
 
             if (!suppressCreateBitmap) ToBitmap();
         }
 
-        /// <summary>
-        /// Instantiate a hexagonal chunk color picker.
-        /// </summary>
-        /// <param name="pixelRadius">Radius of the circle in pixels.</param>
-        /// <param name="elementSize">Size of each element in partial pixels.</param>
-        /// <param name="value">Brightness value in percentage.</param>
-        /// <param name="invert">True to invert saturation.</param>
-        public ColorPickerRenderer(int pixelRadius, double elementSize, double value = 1d, bool invert = false, double rotation = 0, bool suppressCreateBitmap = false)
-        {
-            if (Bitmap != null)
-            {
-                Bitmap = null;
-            }
+        ///// <summary>
+        ///// Instantiate a hexagonal chunk color picker.
+        ///// </summary>
+        ///// <param name="pixelRadius">Radius of the circle in pixels.</param>
+        ///// <param name="elementSize">Size of each element in partial pixels.</param>
+        ///// <param name="value">Brightness value in percentage.</param>
+        ///// <param name="invert">True to invert saturation.</param>
+        //public ColorPickerRenderer(int pixelRadius, double elementSize, double value = 1d, bool invert = false, double rotation = 0)
+        //{
+        //    if (Bitmap != null)
+        //    {
+        //        Bitmap = null;
+        //    }
 
-            double x1 = elementSize / 2;
-            double y1 = x1;
+        //    double x1 = elementSize / 2;
+        //    double y1 = x1;
 
-            double cor = 0f;
+        //    double cor = 0f;
 
-            double x2 = pixelRadius * 2;
-            double y2 = x2;
+        //    double x2 = pixelRadius * 2;
+        //    double y2 = x2;
 
-            double stepX = elementSize + (elementSize / 2f);
-            double stepY = (elementSize / 2f);
+        //    double stepX = elementSize + (elementSize / 2f);
+        //    double stepY = (elementSize / 2f);
 
-            UniPoint[] masterPoly = new UniPoint[6];
+        //    UniPoint[] masterPoly = new UniPoint[6];
 
-            var pc = new PolarCoordinates();
-            HSVDATA hsv;
+        //    var pc = new PolarCoordinates();
+        //    HSVDATA hsv;
 
-            int color = 0;
-            int z;
+        //    int color = 0;
+        //    int z;
 
-            Value = value;
-            HueOffset = rotation;
+        //    Value = value;
+        //    HueOffset = rotation;
 
-            Bounds = new UniRect(0, 0, pixelRadius * 2, pixelRadius * 2);
-            InvertSaturation = invert;
-            Mode = ColorPickerMode.HexagonWheel;
+        //    Bounds = new UniRect(0, 0, pixelRadius * 2, pixelRadius * 2);
+        //    InvertSaturation = invert;
+        //    Mode = ColorPickerMode.HexagonWheel;
 
-            Value = value;
+        //    Value = value;
 
-            var bmpinf = new SKImageInfo((int)Math.Ceiling(Bounds.Width), (int)Math.Ceiling(Bounds.Height), SKColorType.Rgba8888, SKAlphaType.Unknown);
-            var bmp = new SKBitmap(bmpinf);
+        //    //            var bmpinf = new SKImageInfo((int)Math.Ceiling(Bounds.Width), (int)Math.Ceiling(Bounds.Height), SKColorType.Rgba8888, SKAlphaType.Unknown);
 
-            var canvas = new SKCanvas(bmp);
+        //    var bmp = new SKBitmap((int)Math.Ceiling(Bounds.Width), (int)Math.Ceiling(Bounds.Height), false);
+        //    var canvas = new SKCanvas(bmp);
 
-            var br = new SKPaint();
-            br.Color = SKColors.Transparent;
+        //    var br = new SKPaint();
+        //    br.Color = (SKColor)0xffffffffu;
 
-            canvas.DrawPaint(br);
+        //    canvas.DrawPaint(br);
 
-            bool alt = false;
+        //    bool alt = false;
 
-            pc.Arc = -30;
-            pc.Radius = pixelRadius;
+        //    pc.Arc = -30;
+        //    pc.Radius = pixelRadius;
 
-            masterPoly[0] = pc.ToScreenCoordinates(Bounds);
+        //    masterPoly[0] = pc.ToScreenCoordinates(Bounds);
 
-            cor = masterPoly[0].Y;
+        //    cor = masterPoly[0].Y;
 
-            pc.Arc = 60 - 30;
-            masterPoly[1] = pc.ToScreenCoordinates(Bounds);
+        //    pc.Arc = 60 - 30;
+        //    masterPoly[1] = pc.ToScreenCoordinates(Bounds);
 
-            pc.Arc = 120 - 30;
-            masterPoly[2] = pc.ToScreenCoordinates(Bounds);
+        //    pc.Arc = 120 - 30;
+        //    masterPoly[2] = pc.ToScreenCoordinates(Bounds);
 
-            pc.Arc = 180 - 30;
-            masterPoly[3] = pc.ToScreenCoordinates(Bounds);
+        //    pc.Arc = 180 - 30;
+        //    masterPoly[3] = pc.ToScreenCoordinates(Bounds);
 
-            pc.Arc = 240 - 30;
-            masterPoly[4] = pc.ToScreenCoordinates(Bounds);
+        //    pc.Arc = 240 - 30;
+        //    masterPoly[4] = pc.ToScreenCoordinates(Bounds);
 
-            pc.Arc = 300 - 30;
-            masterPoly[5] = pc.ToScreenCoordinates(Bounds);
+        //    pc.Arc = 300 - 30;
+        //    masterPoly[5] = pc.ToScreenCoordinates(Bounds);
 
-            for (z = 0; z < 6; z++)
-            {
-                masterPoly[z].Y -= cor;
-            }
+        //    for (z = 0; z < 6; z++)
+        //    {
+        //        masterPoly[z].Y -= cor;
+        //    }
 
-            cor = 0f;
+        //    cor = 0f;
 
-            for (double j = y1; j < y2; j += stepY)
-            {
-                if (alt)
-                {
-                    x1 = (elementSize) + (elementSize / 4f);
-                }
-                else
-                {
-                    x1 = (elementSize / 2f);
-                }
+        //    for (double j = y1; j < y2; j += stepY)
+        //    {
+        //        if (alt)
+        //        {
+        //            x1 = (elementSize) + (elementSize / 4f);
+        //        }
+        //        else
+        //        {
+        //            x1 = (elementSize / 2f);
+        //        }
 
-                alt = !alt;
+        //        alt = !alt;
 
-                for (double i = x1; i < x2; i += stepX)
-                {
-                    if (!PointInPolygon(masterPoly, i, j)) continue;
+        //        for (double i = x1; i < x2; i += stepX)
+        //        {
+        //            if (!PointInPolygon(masterPoly, i, j)) continue;
 
-                    pc = PolarCoordinates.ToPolarCoordinates(i - pixelRadius, j - pixelRadius);
+        //            pc = PolarCoordinates.ToPolarCoordinates(i - pixelRadius, j - pixelRadius);
 
-                    if (pc.Radius > pixelRadius)
-                    {
-                        pc.Radius = pixelRadius;
-                    }
-                    if (double.IsNaN(pc.Arc))
-                    {
-                        color = -1;
-                    }
-                    else
-                    {
-                        double arc = pc.Arc - rotation;
-                        if (arc < 0) arc += 360;
+        //            if (pc.Radius > pixelRadius)
+        //            {
+        //                pc.Radius = pixelRadius;
+        //            }
+        //            if (double.IsNaN(pc.Arc))
+        //            {
+        //                color = -1;
+        //            }
+        //            else
+        //            {
+        //                double arc = pc.Arc - rotation;
+        //                if (arc < 0) arc += 360;
 
-                        hsv = new HSVDATA()
-                        {
-                            Hue = arc,
-                            Saturation = invert ? 1 - (pc.Radius / pixelRadius) : (pc.Radius / pixelRadius),
-                            Value = value
-                        };
+        //                hsv = new HSVDATA()
+        //                {
+        //                    Hue = arc,
+        //                    Saturation = invert ? 1 - (pc.Radius / pixelRadius) : (pc.Radius / pixelRadius),
+        //                    Value = value
+        //                };
 
-                        ColorMath.HSVToColorRaw(hsv, ref color);
-                    }
+        //                ColorMath.HSVToColorRaw(hsv, ref color);
+        //            }
 
-                    var el = new ColorPickerElement();
+        //            var el = new ColorPickerElement();
 
-                    el.PolyPoints = new UniPoint[6];
-                    el.Center = new UniPoint(i, j);
-                    el.Color = Color.FromArgb(color);
-                    el.Polar = pc;
-                    el.Shape = ColorWheelShapes.Hexagon;
-                    el.Bounds = new UniRect(i - (elementSize / 2f), j - (elementSize / 2f), (double)elementSize, (double)elementSize);
-                    el.Center = el.PolyPoints[0];
+        //            el.PolyPoints = new UniPoint[6];
+        //            el.Center = new UniPoint(i, j);
+        //            el.Color = Color.FromArgb(color);
+        //            el.Polar = pc;
+        //            el.Shape = ColorWheelShapes.Hexagon;
+        //            el.Bounds = new UniRect(i - (elementSize / 2f), j - (elementSize / 2f), (double)elementSize, (double)elementSize);
+        //            el.Center = el.PolyPoints[0];
 
-                    pc.Arc = -30;
-                    pc.Radius = (double)elementSize / 2;
+        //            pc.Arc = -30;
+        //            pc.Radius = (double)elementSize / 2;
 
-                    el.PolyPoints[0] = pc.ToScreenCoordinates(el.Bounds);
+        //            el.PolyPoints[0] = pc.ToScreenCoordinates(el.Bounds);
 
-                    if (cor == 0f)
-                    {
-                        cor = el.PolyPoints[0].Y;
-                        stepY -= cor;
-                    }
+        //            if (cor == 0f)
+        //            {
+        //                cor = el.PolyPoints[0].Y;
+        //                stepY -= cor;
+        //            }
 
-                    pc.Arc = 60 - 30;
-                    el.PolyPoints[1] = pc.ToScreenCoordinates(el.Bounds);
+        //            pc.Arc = 60 - 30;
+        //            el.PolyPoints[1] = pc.ToScreenCoordinates(el.Bounds);
 
-                    pc.Arc = 120 - 30;
-                    el.PolyPoints[2] = pc.ToScreenCoordinates(el.Bounds);
+        //            pc.Arc = 120 - 30;
+        //            el.PolyPoints[2] = pc.ToScreenCoordinates(el.Bounds);
 
-                    pc.Arc = 180 - 30;
-                    el.PolyPoints[3] = pc.ToScreenCoordinates(el.Bounds);
+        //            pc.Arc = 180 - 30;
+        //            el.PolyPoints[3] = pc.ToScreenCoordinates(el.Bounds);
 
-                    pc.Arc = 240 - 30;
-                    el.PolyPoints[4] = pc.ToScreenCoordinates(el.Bounds);
+        //            pc.Arc = 240 - 30;
+        //            el.PolyPoints[4] = pc.ToScreenCoordinates(el.Bounds);
 
-                    pc.Arc = 300 - 30;
-                    el.PolyPoints[5] = pc.ToScreenCoordinates(el.Bounds);
+        //            pc.Arc = 300 - 30;
+        //            el.PolyPoints[5] = pc.ToScreenCoordinates(el.Bounds);
 
-                    for (z = 0; z < 6; z++)
-                    {
-                        el.PolyPoints[z].Y -= cor;
-                    }
+        //            for (z = 0; z < 6; z++)
+        //            {
+        //                el.PolyPoints[z].Y -= cor;
+        //            }
 
-                    Elements.Add(el);
+        //            Elements.Add(el);
 
-                    br.Color = new SKColor((uint)el.Color.ToArgb());
-                    var pth = new SKPath();
+        //            br.Color = el.Color;
+        //            var pth = new SKPath();
 
-                    pth.AddPoly(el.PolyPoints.Select(x => new SKPoint((float)x.X, (float)x.Y)).ToArray());
-                    canvas.DrawPath(pth, br);
-                }
-            }
+        //            pth.AddPoly(el.PolyPoints.Select(x => new SKPoint((float)x.X, (float)x.Y)).ToArray());
+        //            canvas.DrawPath(pth, br);
+        //        }
+        //    }
 
-            Bitmap = bmp;
-        }
+        //    Bitmap = bmp;
+        //}
 
         /// <summary>
         /// Instantiate a smooth color wheel.

@@ -1,7 +1,6 @@
 using DataTools.MathTools.Polar;
 
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -13,225 +12,240 @@ namespace DataTools.Graphics
     /// </summary>
     /// <remarks>
     /// Platform-specific libraries within this library family will implement extensions to convert to platform-specific objects.
+    /// <br /><br />
+    /// The internal structure of this object is 4 sequential <see cref="double"/> values.
     /// </remarks>
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct UniRect : INotifyPropertyChanged
+    public struct UniRect
     {
-        private double _Left;
+        private double left;
+        private double top;
+        private double width;
+        private double height;
 
-        private void OnPropertyChanged(string name)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-
+        /// <summary>
+        /// The leftmost extent of the rectangle (reckoned from 0)
+        /// </summary>
         public double Left
         {
-            get
-            {
-                return _Left;
-            }
-
-            set
-            {
-                _Left = value;
-                OnPropertyChanged("Left");
-                OnPropertyChanged("X");
-            }
+            get => left;
+            set => left = value;
         }
 
-        private double _Top;
-
+        /// <summary>
+        /// The topmost extent of the rectangle (reckoned from 0)
+        /// </summary>
         public double Top
         {
-            get
-            {
-                return _Top;
-            }
-
-            set
-            {
-                _Top = value;
-                OnPropertyChanged("Top");
-                OnPropertyChanged("Y");
-            }
+            get => top;
+            set => top = value;
         }
 
-        private double _Width;
-
+        /// <summary>
+        /// The width of the rectangle
+        /// </summary>
         public double Width
         {
-            get
-            {
-                return _Width;
-            }
-
-            set
-            {
-                _Width = value;
-                OnPropertyChanged("Width");
-                OnPropertyChanged("Right");
-                OnPropertyChanged("CX");
-            }
+            get => width;
+            set => width = value;
         }
 
-        private double _Height;
-
+        /// <summary>
+        /// The height of the rectangle
+        /// </summary>
         public double Height
         {
-            get
-            {
-                return _Height;
-            }
-
-            set
-            {
-                _Height = value;
-                OnPropertyChanged("Height");
-                OnPropertyChanged("Bottom");
-                OnPropertyChanged("CY");
-            }
+            get => height;
+            set => height = value;
         }
 
+        /// <summary>
+        /// The rightmost extent of the rectangle (reckoned from 0)
+        /// </summary>
         public double Right
         {
-            get
-            {
-                return _Width - _Left - 1d;
-            }
-
-            set
-            {
-                _Width = value - _Left + 1d;
-                OnPropertyChanged("Height");
-                OnPropertyChanged("Bottom");
-                OnPropertyChanged("CY");
-            }
+            get => width - left - 1d;
+            set => width = value - left + 1d;
         }
 
+        /// <summary>
+        /// The bottommost extent of the rectangle (reckoned from 0)
+        /// </summary>
         public double Bottom
         {
-            get
-            {
-                return _Height - _Top - 1d;
-            }
-
-            set
-            {
-                _Height = value - _Top + 1d;
-                OnPropertyChanged("Width");
-                OnPropertyChanged("Right");
-                OnPropertyChanged("CX");
-            }
+            get => height - top - 1d;
+            set => height = value - top + 1d;
         }
 
-        public double X
-        {
-            get
-            {
-                return _Left;
-            }
-        }
+        /// <summary>
+        /// Synonym for <see cref="Left"/>
+        /// </summary>
+        public double X => left;
 
-        public double Y
-        {
-            get
-            {
-                return _Top;
-            }
-        }
+        /// <summary>
+        /// Synonym for <see cref="Top"/>
+        /// </summary>
+        public double Y => top;
 
-        public double CX
-        {
-            get
-            {
-                return _Width;
-            }
-        }
+        /// <summary>
+        /// Synonym for <see cref="Width"/>
+        /// </summary>
+        public double CX => width;
 
-        public double CY
-        {
-            get
-            {
-                return _Height;
-            }
-        }
+        /// <summary>
+        /// Synonym for <see cref="Height"/>
+        /// </summary>
+        public double CY => height;
 
+        /// <summary>
+        /// Create a new rectangle with the specified geometry
+        /// </summary>
+        /// <param name="x">The top-left X coordinate in pixels reckoned from zero</param>
+        /// <param name="x">The top-left Y coordinate in pixels reckoned from zero</param>
+        /// <param name="width">The width in pixels</param>
+        /// <param name="width">The height in pixels</param>
         public UniRect(double x, double y, double width, double height)
         {
-            _Left = x;
-            _Top = y;
-            _Width = width;
-            _Height = height;
-
-            PropertyChanged = null;
+            left = x;
+            top = y;
+            this.width = width;
+            this.height = height;
         }
 
+        /// <summary>
+        /// Create a new rectangle from the specified location and size.
+        /// </summary>
+        /// <param name="location">The location point</param>
+        /// <param name="size">The size structure</param>
         public UniRect(Point location, Size size)
         {
-            _Left = location.X;
-            _Top = location.Y;
-            _Width = size.Width;
-            _Height = size.Height;
-            PropertyChanged = null;
+            left = location.X;
+            top = location.Y;
+            width = size.Width;
+            height = size.Height;
         }
 
+        /// <summary>
+        /// Create a new rectangle from the specified location and size.
+        /// </summary>
+        /// <param name="location">The location point</param>
+        /// <param name="size">The size structure</param>
         public UniRect(PointF location, SizeF size)
         {
-            _Left = location.X;
-            _Top = location.Y;
-            _Width = size.Width;
-            _Height = size.Height;
-            PropertyChanged = null;
+            left = location.X;
+            top = location.Y;
+            width = size.Width;
+            height = size.Height;
         }
 
-        public UniRect(Rectangle rectStruct)
+        /// <summary>
+        /// Create a new rectangle based on another rectangle
+        /// </summary>
+        /// <param name="rc">The rectangle to duplicate</param>
+        public UniRect(Rectangle rc)
         {
-            _Left = rectStruct.Left;
-            _Top = rectStruct.Top;
-            _Width = rectStruct.Width;
-            _Height = rectStruct.Height;
-            PropertyChanged = null;
+            left = rc.Left;
+            top = rc.Top;
+            width = rc.Width;
+            height = rc.Height;
         }
 
-        public UniRect(RectangleF rectStruct)
+        /// <summary>
+        /// Create a new rectangle based on another rectangle
+        /// </summary>
+        /// <param name="rc">The rectangle to duplicate</param>
+        public UniRect(RectangleF rc)
         {
-            _Left = rectStruct.Left;
-            _Top = rectStruct.Top;
-            _Width = rectStruct.Width;
-            _Height = rectStruct.Height;
-            PropertyChanged = null;
+            left = rc.Left;
+            top = rc.Top;
+            width = rc.Width;
+            height = rc.Height;
         }
 
+        /// <summary>
+        /// Create a new rectangle based on another rectangle
+        /// </summary>
+        /// <param name="rc">The rectangle to duplicate</param>
         public UniRect(LinearRect rc)
         {
-            _Left = rc.Left;
-            _Top = rc.Top;
-            _Width = rc.Width;
-            _Height = rc.Height;
-            PropertyChanged = null;
+            left = rc.Left;
+            top = rc.Top;
+            width = rc.Width;
+            height = rc.Height;
         }
 
-        event System.ComponentModel.PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+        public static UniRect FromInts(int[] ints)
         {
-            add
-            {
-                throw new NotImplementedException();
-            }
+            return new UniRect(ints[0], ints[1], ints[2], ints[3]);
+        }
 
-            remove
+        public static unsafe UniRect FromIntsPointer(void* ptr)
+        {
+            int* ints = (int*)ptr;
+            return new UniRect(ints[0], ints[1], ints[2], ints[3]);
+        }
+
+        public static UniRect FromIntsPointer(nint ptr)
+        {
+            unsafe
             {
-                throw new NotImplementedException();
+                int* ints = (int*)ptr;
+                return new UniRect(ints[0], ints[1], ints[2], ints[3]);
             }
         }
 
+        public static UniRect FromDoubles(double[] doubles)
+        {
+            return new UniRect(doubles[0], doubles[1], doubles[2], doubles[3]);
+        }
+
+        public static UniRect FromDoublesPointer(nint ptr)
+        {
+            unsafe
+            {
+                double* doubles = (double*)ptr;
+                return new UniRect(doubles[0], doubles[1], doubles[2], doubles[3]);
+            }
+        }
+
+        public static unsafe UniRect FromDoublesPointer(void* ptr)
+        {
+            double* doubles = (double*)ptr;
+            return new UniRect(doubles[0], doubles[1], doubles[2], doubles[3]);
+        }
+
+        public static UniRect FromFloats(float[] floats)
+        {
+            return new UniRect(floats[0], floats[1], floats[2], floats[3]);
+        }
+
+        public static UniRect FromFloatsPointer(nint ptr)
+        {
+            unsafe
+            {
+                float* floats = (float*)ptr;
+                return new UniRect(floats[0], floats[1], floats[2], floats[3]);
+            }
+        }
+
+        public static unsafe UniRect FromFloatsPointer(void* ptr)
+        {
+            float* floats = (float*)ptr;
+            return new UniRect(floats[0], floats[1], floats[2], floats[3]);
+        }
+
+        /// <summary>
+        /// Reports the position and dimensions of the rectangle as a human-readable string expression
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("{0}, {1}; {2}x{3}", _Left, _Top, _Width, _Height);
+            return string.Format("{0}, {1}; {2}x{3}", left, top, width, height);
         }
 
         public static explicit operator RectangleF(UniRect operand)
         {
-            return new RectangleF((float)operand._Left, (float)operand._Top, (float)operand._Width, (float)operand._Height);
+            return new RectangleF((float)operand.left, (float)operand.top, (float)operand.width, (float)operand.height);
         }
 
         public static implicit operator UniRect(RectangleF operand)
@@ -241,7 +255,7 @@ namespace DataTools.Graphics
 
         public static explicit operator Rectangle(UniRect operand)
         {
-            return new Rectangle((int)operand._Left, (int)operand._Top, (int)operand._Width, (int)operand._Height);
+            return new Rectangle((int)operand.left, (int)operand.top, (int)operand.width, (int)operand.height);
         }
 
         public static implicit operator UniRect(Rectangle operand)
@@ -263,9 +277,5 @@ namespace DataTools.Graphics
         {
             return new UniRect(operand);
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public delegate void PropertyChangedEventHandler(object sender, PropertyChangedEventArgs e);
     }
 }
