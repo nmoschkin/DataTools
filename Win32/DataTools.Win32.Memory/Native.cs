@@ -300,22 +300,41 @@ namespace DataTools.Win32.Memory
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         internal static extern nint n_memcpy(nint dest, nint src, UIntPtr count);
 
+        [StructLayout(LayoutKind.Sequential, Size = 16)]
+        internal struct MemChunkStruct
+        {
+        }
+
         internal static unsafe void ZeroMemory(void* handle, long len)
         {
             unsafe
             {
-                //if (len >= 2048)
-                //{
-                //    n_memset(handle, 0, (nint)len);
-                //    return;
-                //}
-
                 byte* bp1 = (byte*)handle;
                 byte* bep = (byte*)handle + len;
 
-                if (len >= IntPtr.Size)
+                var mc = new MemChunkStruct();
+
+                ((long*)&mc)[0] = 0L;
+                ((long*)&mc)[1] = 0L;
+
+                if (len >= nint.Size)
                 {
-                    if (IntPtr.Size == 8)
+                    if (len >= 16 && nint.Size == 8)
+                    {
+                        MemChunkStruct* lp1 = (MemChunkStruct*)bp1;
+                        MemChunkStruct* lep = (MemChunkStruct*)bep;
+
+                        do
+                        {
+                            *lp1++ = mc;
+                        } while (lp1 < lep);
+
+                        if (lp1 == lep) return;
+
+                        lp1--;
+                        bp1 = (byte*)lp1;
+                    }
+                    else if (nint.Size == 8)
                     {
                         long* lp1 = (long*)bp1;
                         long* lep = (long*)bep;
@@ -346,6 +365,7 @@ namespace DataTools.Win32.Memory
                         bp1 = (byte*)ip1;
                     }
                 }
+
                 do
                 {
                     *bp1++ = 0;

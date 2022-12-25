@@ -279,11 +279,11 @@ namespace DataTools.Win32.Disk
             var c = default(int);
             var d = default(int);
 
-            string arglpRootPathName1 = disk.VolumeGuidPath;
+            string guidpath = disk.VolumeGuidPath;
 
-            IO.GetDiskFreeSpace(arglpRootPathName1, ref a, ref b, ref c, ref d);
+            IO.GetDiskFreeSpace(guidpath, ref a, ref b, ref c, ref d);
 
-            disk.VolumeGuidPath = arglpRootPathName1;
+            disk.VolumeGuidPath = guidpath;
             disk.SectorSize = b;
 
             mm1.Free();
