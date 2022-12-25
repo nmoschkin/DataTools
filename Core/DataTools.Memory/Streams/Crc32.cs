@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Streams
 {
@@ -127,6 +125,32 @@ namespace DataTools.Streams
             for (j = 0; j < c; j++)
             {
                 crc = Crc32Table[(crc ^ data[j]) & 0xff] ^ crc >> 8;
+            }
+
+            return crc ^ 0xffffffffu;
+        }
+
+        /// <summary>
+        /// Hash a stream with the ISO-3309 CRC-32 algorithm.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Hash(Stream stream, int bufferlen = 10240)
+        {
+            if (bufferlen < 128) throw new ArgumentOutOfRangeException("Buffer length must be at least 128 bytes");
+
+            uint crc = 0xffffffffu;
+            int j, c = (int)stream.Length;
+            byte[] data = new byte[bufferlen];
+
+            for (j = 0; j < c; j += bufferlen)
+            {
+                var r = stream.Read(data, 0, bufferlen);
+                if (r <= 0) break;
+
+                for (int q = 0; q < r; q++)
+                {
+                    crc = Crc32Table[(crc ^ data[q]) & 0xff] ^ crc >> 8;
+                }
             }
 
             return crc ^ 0xffffffffu;

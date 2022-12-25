@@ -1,7 +1,4 @@
-﻿using DataTools.Streams;
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -71,173 +68,29 @@ namespace DataTools.Memory
         {
         }
 
-        /// <summary>
-        /// Allocate a block of memory on a heap (typically the process heap).
-        /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <param name="addPressure">Whether or not to call GC.AddMemoryPressure</param>
-        /// <param name="hHeap">
-        /// Optional handle to an alternate heap.  The process heap is used if this is set to null.
-        /// If you use an alternate heap handle, you will need to free the memory using the same heap handle or an error will occur.
-        /// </param>
-        /// <param name="zeroMem">Whether or not to zero the contents of the memory on allocation.</param>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public virtual bool Alloc(long size, bool? addPressure = null, bool zeroMem = true)
+        protected override nint Allocate(long size)
         {
-            var ap = addPressure ?? HasGCPressure;
-
-            bool al;
-
-            handle = Marshal.AllocHGlobal((nint)size);
-            al = handle != nint.Zero;
-
-            // see if we need to tell the garbage collector anything.
-            if (al && ap) GC.AddMemoryPressure(size);
-            this.size = size;
-
-            if (zeroMem)
-            {
-                ZeroMemory(0, size);
-            }
-
-            return al;
+            var r = Marshal.AllocHGlobal((int)size);
+            if (r != 0) this.size = size;
+            return r;
         }
 
-        /// <summary>
-        /// Allocate a block of memory on the process heap.
-        /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <param name="addPressure">Whether or not to call GC.AddMemoryPressure</param>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public virtual bool Alloc(long size, bool addPressure)
+        protected override void Deallocate(nint ptr)
         {
-            return Alloc(size, addPressure, true);
+            Marshal.FreeHGlobal(ptr);
+            this.size = 0;
         }
 
-        /// <summary>
-        /// Allocate a block of memory on the process heap.
-        /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public override bool Alloc(long size)
+        protected override nint Reallocate(nint oldptr, long newsize)
         {
-            return Alloc(size, false, true);
-        }
-
-        public override bool ReAlloc(long size)
-        {
-            return ReAlloc(size, HasGCPressure);
-        }
-
-        /// <summary>
-        /// Reallocate a block of memory to a different size on the task heap.
-        /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <param name="modifyPressure">Whether or not to call GC.AddMemoryPressure or GC.RemoveMemoryPressure.</param>
-        /// <param name="hHeap">
-        /// Optional handle to an alternate heap.  The process heap is used if this is set to null.
-        /// </param>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public virtual bool ReAlloc(long size, bool? modifyPressure = null)
-        {
-            var ap = modifyPressure ?? HasGCPressure;
-
-            if (handle == nint.Zero) return Alloc(size, modifyPressure);
-            long oldsize = this.size;
-
-            bool ra;
-
-            // While the function doesn't need to call HeapReAlloc, it hasn't necessarily failed, either.
-
-            handle = Marshal.ReAllocHGlobal(handle, new nint(size));
-
-            ra = handle != nint.Zero;
-
-            // see if we need to tell the garbage collector anything.
-            if (ra && ap && oldsize > 0)
-            {
-                if (size < oldsize)
-                    GC.RemoveMemoryPressure(oldsize - size);
-                else
-                    GC.AddMemoryPressure(size - oldsize);
-            }
-
-            this.size = size;
-            return ra;
-        }
-
-        public override bool Free()
-        {
-            return Free(HasGCPressure);
-        }
-
-        /// <summary>
-        /// Frees a previously allocated block of memory on the task heap.
-        /// </summary>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <param name="removePressure">Whether or not to call GC.RemoveMemoryPressure</param>
-        /// <param name="hHeap">
-        /// Optional handle to an alternate heap.  The process heap is used if this is set to null.
-        /// The handle pointed to by the internal pointer must have been previously allocated with the same heap handle.
-        /// </param>
-        /// <remarks></remarks>
-        public virtual bool Free(bool? removePressure = null)
-        {
-            var ap = removePressure ?? HasGCPressure;
-
-            long oldsize = size;
-            // While the function doesn't need to call HeapFree, it hasn't necessarily failed, either.
-            if (handle == nint.Zero)
-                return true;
-            else
-            {
-                // see if we need to tell the garbage collector anything.
-                long l = oldsize;
-                Marshal.FreeHGlobal(handle);
-
-                // see if we need to tell the garbage collector anything.
-                handle = nint.Zero;
-                if (ap && oldsize > 0) GC.RemoveMemoryPressure(oldsize);
-                size = 0;
-            }
-            return true;
+            var r = Marshal.ReAllocHGlobal(oldptr, (int)newsize);
+            if (r != 0) this.size = newsize;
+            return r;
         }
 
         public override long GetAllocatedSize()
         {
             return size;
-        }
-
-        protected virtual void TAlloc(long size)
-        {
-            switch (MemoryType)
-            {
-                case MemoryType.HGlobal:
-                    Alloc(size, size > 1024);
-                    return;
-
-                default:
-                    Alloc(size, size > 1024);
-                    return;
-            }
-        }
-
-        protected virtual void TFree()
-        {
-            switch (MemoryType)
-            {
-                case MemoryType.HGlobal:
-                    Free();
-                    return;
-
-                default:
-                    Free();
-                    return;
-            }
         }
 
         protected override SafePtrBase Clone()
@@ -251,12 +104,6 @@ namespace DataTools.Memory
                 Buffer.MemoryCopy((void*)handle, (void*)sp, l, l);
                 return sp;
             }
-        }
-
-        protected override bool ReleaseHandle()
-        {
-            TFree();
-            return true;
         }
 
         public override string ToString()

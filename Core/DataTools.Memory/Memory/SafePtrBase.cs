@@ -1,8 +1,6 @@
-﻿using DataTools.Memory;
-using DataTools.Streams;
+﻿using DataTools.Streams;
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -641,8 +639,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual void FromStruct<T>(T val) where T : struct
         {
-            int cb = Marshal.SizeOf(val);
-
+            int cb = Marshal.SizeOf<T>();
             if (cb > Length) ReAlloc(cb);
 
             Marshal.StructureToPtr(val, handle, false);
@@ -1485,14 +1482,87 @@ namespace DataTools.Memory
         /// <param name="size"></param>
         /// <returns></returns>
         /// <remarks>
-        /// If memory is already allocated, implementors should call <see cref="ReAlloc(long)"/> from this method.
+        /// If memory is already allocated, this method will forward the call to <see cref="ReAlloc(long)"/>, instead.
+        /// <br /><br />
+        /// If the requested size is the same as the current size, no action will be taken, and this method will return true.
         /// </remarks>
-        public abstract bool Alloc(long size);
+        public bool Alloc(long size)
+        {
+            if (handle != 0) return ReAlloc(size);
+            if (size > int.MaxValue) throw new NotSupportedException("CoTaskMem only supports 32-bit integer buffer lengths.");
+
+            try
+            {
+                Handle = Allocate(size);
+                if (HasGCPressure) GC.AddMemoryPressure(GetAllocatedSize());
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Provide the low-level ability to allocate a new memory block.
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Overrides of this method should provide only the functionality necessary<br />
+        /// to allocate a memory block and return the new pointer.
+        /// </remarks>
+        protected abstract nint Allocate(long size);
+
+        /// <summary>
+        /// Provide the low-level ability to re-allocate an existing memory block to change its size.
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Overrides of this method should provide only the functionality necessary<br />
+        /// to reallocate a memory block and return the new pointer.
+        /// </remarks>
+        protected abstract nint Reallocate(nint oldptr, long newsize);
+
+        /// <summary>
+        /// Provide the low-level ability to free an allocated memory block.
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <remarks>
+        /// Overrides of this method should provide only the functionality necessary<br />
+        /// to free the memory block.
+        /// </remarks>
+        protected abstract void Deallocate(nint ptr);
 
         /// <summary>
         /// Frees the block of memory.
         /// </summary>
-        public abstract bool Free();
+        /// <remarks>
+        /// Returns false only in the event of catastrophic failure.
+        /// </remarks>
+        public bool Free()
+        {
+            if (handle == 0) return true;
+            if (!IsOwner) return true;
+
+            try
+            {
+                var size = GetAllocatedSize();
+                Deallocate(handle);
+                if (HasGCPressure) GC.RemoveMemoryPressure(size);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                handle = 0;
+            }
+        }
 
         /// <summary>
         /// Reallocates a block of memory in order to change its size. The old contents are copied to the new pointer.
@@ -1500,18 +1570,58 @@ namespace DataTools.Memory
         /// <param name="size"></param>
         /// <returns></returns>
         /// <remarks>
+        /// If the requested size is the same as the current size, no action will be taken, and this method will return true.
+        /// <br /><br />
         /// If there is no current allocated memory, then this call has the same effect as a call to <see cref="Alloc(long)"/>.
         /// <br /><br />
         /// Reallocation preserves the current block's contents.
         /// <br /><br />
         /// Old pointer references to this object's handle will be invalid after this call.
         /// </remarks>
-        public abstract bool ReAlloc(long size);
+        public bool ReAlloc(long size)
+        {
+            if (handle == nint.Zero) return Alloc(size);
+            else if (size <= 0) return Free();
+
+            try
+            {
+                var oldsize = GetAllocatedSize();
+                var newptr = Reallocate(handle, (int)size);
+
+                if (newptr != 0)
+                {
+                    handle = newptr;
+                    size = GetAllocatedSize();
+
+                    if (HasGCPressure)
+                    {
+                        if (oldsize < size)
+                        {
+                            GC.AddMemoryPressure(size - oldsize);
+                        }
+                        else if (oldsize > size)
+                        {
+                            GC.RemoveMemoryPressure(oldsize - size);
+                        }
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         /// <summary>
         /// Set all bytes in the memory buffer to zero.
         /// </summary>
-        public virtual void ZeroMemory(long index = -1, long length = -1)
+        public void ZeroMemory(long index = -1, long length = -1)
         {
             unsafe
             {
@@ -1536,8 +1646,7 @@ namespace DataTools.Memory
 
         protected override bool ReleaseHandle()
         {
-            Free();
-            return true;
+            return Free();
         }
 
         #endregion Memory Allocation
