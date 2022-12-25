@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 
-namespace DataTools.SortedLists
+namespace DataTools.Essentials.SortedLists
 {
     /// <summary>
     /// Implementation of quick sort.
@@ -55,7 +54,7 @@ namespace DataTools.SortedLists
             int lo = 0;
             int hi = values.Length - 1;
 
-            Sort<T>(ref values, comp, lo, hi);
+            Sort(ref values, comp, lo, hi);
         }
 
         /// <summary>
@@ -84,7 +83,7 @@ namespace DataTools.SortedLists
             int lo = 0;
             int hi = values.Length - 1;
 
-            Sort<T>(ref values, comparer.Compare, lo, hi);
+            Sort(ref values, comparer.Compare, lo, hi);
         }
 
         /// <summary>
@@ -114,7 +113,7 @@ namespace DataTools.SortedLists
                 return comparison(vA, vB);
             });
 
-            Sort<T>(ref values, dynComp, lo, hi);
+            Sort(ref values, dynComp, lo, hi);
         }
 
         /// <summary>
@@ -130,7 +129,7 @@ namespace DataTools.SortedLists
             int lo = 0;
             int hi = values.Length - 1;
 
-            Sort<T>(ref values, comparison, lo, hi);
+            Sort(ref values, comparison, lo, hi);
         }
 
         public static void Sort<T>(ref T[] values, Func<T, T, int> comparison, int lo, int hi)
@@ -203,7 +202,7 @@ namespace DataTools.SortedLists
             int lo = 0;
             int hi = values.Count - 1;
 
-            Sort<T>(values, comparison, sortOrder, lo, hi, out didChange);
+            Sort(values, comparison, sortOrder, lo, hi, out didChange);
         }
 
         public static void Sort<T>(IList<T> values, Func<T, T, int> comparison, SortOrder sortOrder, int lo, int hi, out bool didChange)

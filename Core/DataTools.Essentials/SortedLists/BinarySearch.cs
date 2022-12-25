@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 
-namespace DataTools.SortedLists
+namespace DataTools.Essentials.SortedLists
 {
     /// <summary>
     /// Implementation of binary search.
@@ -109,7 +108,7 @@ namespace DataTools.SortedLists
             {
                 if (lo > hi) break;
 
-                int p = ((hi + lo) / 2);
+                int p = (hi + lo) / 2;
                 T elem = values[p];
 
                 int c = comparison(value, values[p]);
@@ -297,7 +296,7 @@ namespace DataTools.SortedLists
             {
                 if (lo > hi) break;
 
-                int p = ((hi + lo) / 2);
+                int p = (hi + lo) / 2;
 
                 T elem = values[p];
 

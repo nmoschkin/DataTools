@@ -1,14 +1,11 @@
-﻿
+﻿using System;
+
 // ' The INotifyStatusProgress framework.
 // ' Copyright (C) 2015 Nathan Moschkin
 // ' All Rights Reserved.
 
-
-using System;
-
-namespace DataTools.Observable
+namespace DataTools.Essentials.Observable
 {
-
     public delegate void ProgressEventHandler(object sender, StatusProgressEventArgs e);
 
     public delegate void FinishedEventHandler(object sender, StatusProgressEventArgs e);
@@ -44,7 +41,6 @@ namespace DataTools.Observable
     /// </summary>
     public interface INotifyStatusProgress
     {
-
         /// <summary>
         /// Raised while the work is progressing.
         /// </summary>
@@ -93,7 +89,6 @@ namespace DataTools.Observable
         /// </summary>
         /// <param name="func">The delegate function to invoke.</param>
         void Invoke(Delegate func);
-
 
         /// <summary>
         /// Call this to begin the process of invoking a method on another thread or the Dispatcher thread.
@@ -264,7 +259,7 @@ namespace DataTools.Observable
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="mode">A StatusModes value indicating the desired display characteristics.</param>
         /// <param name="msg">The textual status message.</param>

@@ -1,25 +1,16 @@
-﻿
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace DataTools.Observable
+namespace DataTools.Essentials.Observable
 {
-
     /// <summary>
     /// Identify a property inside of a class as a default value for the key of an <see cref="ObservableDictionary{TKey, TValue}"/>.
     /// </summary>
@@ -64,8 +55,6 @@ namespace DataTools.Observable
         }
     }
 
-
-
     /// <summary>
     /// A dictionary class that implements <see cref="INotifyCollectionChanged"/>.
     /// </summary>
@@ -97,11 +86,11 @@ namespace DataTools.Observable
         /// Create a new observable dictionary.
         /// </summary>
         public ObservableDictionary() : base()
-        {                
+        {
             var attr = typeof(TValue).GetCustomAttribute<KeyPropertyAttribute>();
 
             if (attr == null || typeof(TValue).GetProperty(attr.PropertyName) == null)
-            { 
+            {
                 var v = typeof(TValue).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
                 foreach (var p in v)
@@ -113,7 +102,7 @@ namespace DataTools.Observable
                     }
                 }
             }
-            
+
             if (attr != null)
             {
                 var pi = typeof(TValue).GetProperty(attr.PropertyName);
@@ -129,7 +118,7 @@ namespace DataTools.Observable
             }
 
             // default comparer
-            if (typeof(IComparable<TKey>).IsAssignableFrom(typeof(TKey))) 
+            if (typeof(IComparable<TKey>).IsAssignableFrom(typeof(TKey)))
             {
                 comparer = new Comparison<TValue>((obja, objb) =>
                 {
@@ -160,9 +149,8 @@ namespace DataTools.Observable
                 direction = ListSortDirection.Ascending;
                 comparer = MakeComparison();
 
-                sorted = (comparer != null);
+                sorted = comparer != null;
             }
-
         }
 
         /// <summary>
@@ -273,6 +261,7 @@ namespace DataTools.Observable
         {
             ChangeSort(valueComparison, direction);
         }
+
         public ObservableDictionary(string keyPropertyName, string sortPropertyName, ListSortDirection direction, IEnumerable<TValue> values) : this(keyPropertyName)
         {
             ChangeSort(sortPropertyName, direction);
@@ -290,7 +279,6 @@ namespace DataTools.Observable
             ChangeSort(valueComparison, direction);
             AddRange(values);
         }
-
 
         /// <summary>
         /// Gets a value indicating whether this collection sorted.
@@ -365,6 +353,7 @@ namespace DataTools.Observable
 #if DOTNETSTD
         public bool TryGetValue(TKey key, out TValue value)
 #else
+
         public bool TryGetValue(TKey key, out TValue value)
 #endif
         {
@@ -378,7 +367,6 @@ namespace DataTools.Observable
                 value = ((IDictionary<TKey, TValue>)this)[key];
                 return true;
             }
-
         }
 
         /// <summary>
@@ -407,7 +395,7 @@ namespace DataTools.Observable
             return GetInsertIndex(value, true);
         }
 
-#region KeyedCollection overrides
+        #region KeyedCollection overrides
 
         protected override TKey GetKeyForItem(TValue item)
         {
@@ -416,38 +404,35 @@ namespace DataTools.Observable
 
         protected override void ClearItems()
         {
-            lock(lockObject)
+            lock (lockObject)
             {
                 base.ClearItems();
                 if (!noevent) OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             }
-
         }
 
         protected override void InsertItem(int index, TValue item)
         {
-            lock(lockObject)
+            lock (lockObject)
             {
                 if (sorted) index = GetInsertIndex(item);
                 base.InsertItem(index, item);
 
                 if (!noevent) OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
             }
-
         }
 
         protected override void RemoveItem(int index)
         {
             TValue oldItem;
 
-            lock(lockObject)
+            lock (lockObject)
             {
                 oldItem = ((IList<TValue>)this)[index];
                 base.RemoveItem(index);
 
                 if (!noevent) OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldItem, index));
             }
-
         }
 
         protected override void SetItem(int index, TValue item)
@@ -455,7 +440,7 @@ namespace DataTools.Observable
             TValue oldItem;
             TKey keyVal;
 
-            lock(lockObject)
+            lock (lockObject)
             {
                 if (index >= Count)
                 {
@@ -478,22 +463,20 @@ namespace DataTools.Observable
 
                 if (!noevent) OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem, index));
             }
-
         }
 
-#endregion
+        #endregion KeyedCollection overrides
 
-#region INotifyCollectionChanged
+        #region INotifyCollectionChanged
 
         protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             if (!noevent) CollectionChanged?.Invoke(this, e);
         }
 
-#endregion
+        #endregion INotifyCollectionChanged
 
-
-#region INotifyPropertyChanged
+        #region INotifyPropertyChanged
 
         /// <summary>
         /// Set a property value if the current value is not equal to the new value and raise the <see cref="INotifyPropertyChanged.PropertyChanged"/> event.
@@ -548,12 +531,9 @@ namespace DataTools.Observable
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-#endregion
+        #endregion INotifyPropertyChanged
 
-
-
-#region Sorting
-
+        #region Sorting
 
         /// <summary>
         /// Change the way items are sorted in this collection
@@ -640,9 +620,9 @@ namespace DataTools.Observable
             }
         }
 
-#endregion
+        #endregion Sorting
 
-#region Comparison 
+        #region Comparison
 
         protected virtual Comparison<TValue> MakeComparison()
         {
@@ -691,7 +671,6 @@ namespace DataTools.Observable
             }
             else if (typeof(IComparable).IsAssignableFrom(typeof(TValue)))
             {
-
                 if (direction == ListSortDirection.Ascending)
                 {
                     return new Comparison<TValue>((a, b) =>
@@ -711,7 +690,6 @@ namespace DataTools.Observable
 
                         return ((IComparable)a).CompareTo(b);
                     });
-
                 }
                 else
                 {
@@ -732,7 +710,6 @@ namespace DataTools.Observable
 
                         return -((IComparable)a).CompareTo(b);
                     });
-
                 }
             }
             else
@@ -770,7 +747,6 @@ namespace DataTools.Observable
                         }
 
                         return a.CompareTo(b);
-
                     });
                 }
                 else
@@ -796,7 +772,6 @@ namespace DataTools.Observable
                         }
 
                         return -a.CompareTo(b);
-
                     });
                 }
             }
@@ -804,7 +779,6 @@ namespace DataTools.Observable
             {
                 return null;
             }
-
         }
 
         protected virtual Comparison<TValue> MakeComparison(IComparer<TValue> comp)
@@ -815,7 +789,6 @@ namespace DataTools.Observable
                 {
                     return comp.Compare(a, b);
                 });
-
             }
             else
             {
@@ -823,9 +796,7 @@ namespace DataTools.Observable
                 {
                     return -comp.Compare(a, b);
                 });
-
             }
-            
         }
 
         protected virtual int GetInsertIndex(TValue item, bool mustExist = false)
@@ -891,15 +862,10 @@ namespace DataTools.Observable
                     {
                         return mid;
                     }
-
                 }
-
             }
-
         }
 
-#endregion
+        #endregion Comparison
     }
-
-
 }

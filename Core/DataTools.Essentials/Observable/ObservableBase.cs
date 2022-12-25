@@ -1,17 +1,11 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
-using System.Runtime.ConstrainedExecution;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace DataTools.Observable
+namespace DataTools.Essentials.Observable
 {
-
     /// <summary>
     /// Provide data for the <see cref="ObservableBase.PropertyChanging"/> event.
     /// </summary>
@@ -47,7 +41,7 @@ namespace DataTools.Observable
     /// Base class for observable classes.
     /// </summary>
     public abstract class ObservableBase : INotifyPropertyChanged, INotifyPropertyChanging, IObservablePropertyChanging
-    { 
+    {
         public event PropertyChangedEventHandler PropertyChanged;
 
         private List<ObservablePropertyChangingEventHandler> invokerList1 = new List<ObservablePropertyChangingEventHandler>();
@@ -164,7 +158,5 @@ namespace DataTools.Observable
 
             return e.Cancel;
         }
-
     }
-
 }

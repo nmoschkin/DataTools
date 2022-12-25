@@ -1,12 +1,11 @@
 ﻿using Newtonsoft.Json;
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.Serialization;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text;
 
-namespace DataTools.Converters
+namespace DataTools.Essentials.Converters
 {
     public class EnumToStringConverter<T> : JsonConverter<T> where T : struct, Enum
     {
@@ -26,12 +25,10 @@ namespace DataTools.Converters
 
             foreach (var fi in fis)
             {
-
                 var sampleValue = fi.GetValue(null);
 
                 if (sampleValue.Equals(obj))
                 {
-
                     var ema = fi.GetCustomAttribute<EnumMemberAttribute>();
                     if (ema != null)
                     {
@@ -47,16 +44,13 @@ namespace DataTools.Converters
 
                     return fi.Name;
                 }
-
             }
 
             return null;
         }
 
-
         public static U GetEnumValue<U>(string obj) where U : struct, Enum
         {
-
             var fis = typeof(U).GetFields(BindingFlags.Public | BindingFlags.Static);
 
             if (Enum.TryParse<U>(obj, out var answer))
@@ -88,9 +82,6 @@ namespace DataTools.Converters
             }
 
             return default;
-
-
         }
-
     }
 }
