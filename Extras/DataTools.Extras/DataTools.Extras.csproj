@@ -17,7 +17,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Standard\DataTools\DataTools.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.MathTools\DataTools.MathTools.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
   </ItemGroup>
 
   <ItemGroup>
