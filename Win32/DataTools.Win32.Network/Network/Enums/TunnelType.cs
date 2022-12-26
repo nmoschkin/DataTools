@@ -1,3 +1,5 @@
+using System;
+
 // *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
@@ -10,60 +12,50 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
-
-
-using System;
-using System.ComponentModel;
-using System.Net;
-using System.Runtime.InteropServices;
-
-using DataTools.Win32;
 
 namespace DataTools.Win32.Network
 {
     /// <summary>
-    /// Interface operational status.
+    /// Interface tunnel type.
     /// </summary>
     /// <remarks></remarks>
-    public enum IF_OPER_STATUS
+    public enum TunnelType
     {
         /// <summary>
-        /// The network device is up
+        /// None
         /// </summary>
-        /// <remarks></remarks>
-        IfOperStatusUp = 1,
+        None = 0,
 
         /// <summary>
-        /// The network device is down
+        /// Other
         /// </summary>
-        /// <remarks></remarks>
-        IfOperStatusDown,
+        Other = 1,
 
         /// <summary>
-        /// The network device is performing a self-test
+        /// Direct
         /// </summary>
-        IfOperStatusTesting,
+        Direct = 2,
 
         /// <summary>
-        /// The state of the network device is unknown
+        /// Ipv6 to Ipv4 tunnel
         /// </summary>
-        IfOperStatusUnknown,
+        IPv6ToIPv4 = 11,
 
         /// <summary>
-        /// The network device is asleep
+        /// ISATAP tunnel
         /// </summary>
-        IfOperStatusDormant,
+        ISATAP = 13,
 
         /// <summary>
-        /// The network device is not present
+        /// Teredo Ipv6 tunnel
         /// </summary>
-        IfOperStatusNotPresent,
+        Teredo = 14,
 
         /// <summary>
-        /// Network device lower-layer is down
+        /// IPHTTPS tunnel
         /// </summary>
-        IfOperStatusLowerLayerDown
+        IPHTTPS = 15
     }
 }

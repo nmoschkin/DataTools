@@ -2,18 +2,16 @@
 using DataTools.Hardware;
 using DataTools.Hardware.Printers;
 using DataTools.Hardware.Processor;
-using DataTools.Win32.Usb;
 using DataTools.Win32;
 using DataTools.Win32.Disk;
 using DataTools.Win32.Display;
 using DataTools.Win32.Network;
+using DataTools.Win32.Usb;
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 using static DataTools.Win32.DeviceEnum;
 
@@ -21,7 +19,6 @@ namespace DataTools.Computer
 {
     public static class Info
     {
-
         /// <summary>
         /// Returns an exhaustive hardware tree of the entire computer with as much information as can be obtained. Each object descends from DeviceInfo.
         /// </summary>
@@ -37,6 +34,9 @@ namespace DataTools.Computer
             var hid = DeviceEnum.EnumerateDevices<HidDeviceInfo>(DevProp.GUID_DEVINTERFACE_HID);
             var prt = PrinterDeviceInfo.EnumPrinters();
             var bth = BluetoothDeviceInfo.EnumBluetoothDevices();
+
+            var bth2 = BluetoothDeviceInfo.EnumBluetoothRadios();
+
             var procs = ProcessorDeviceInfo.EnumProcessors();
             var mons = MonitorDeviceInfo.EnumMonitors();
             var adpt = new AdaptersCollection();
@@ -172,6 +172,17 @@ namespace DataTools.Computer
                                     break;
                                 }
                             }
+                            if (!(comp[i] is BluetoothDeviceInfo))
+                            {
+                                foreach (var bt in bth2)
+                                {
+                                    if ((comp[i].InstanceId ?? "") == (bt.InstanceId ?? ""))
+                                    {
+                                        comp[i] = bt;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         else if (comp[i].DeviceClass == DeviceClassEnum.Processor)
                         {
@@ -184,7 +195,6 @@ namespace DataTools.Computer
                                 }
                             }
                         }
-
                     }
                 }
             }
@@ -198,7 +208,6 @@ namespace DataTools.Computer
                 col.Add(dad);
             return col;
         }
-
 
         /// <summary>
         /// Returns an exhaustive hardware tree of the entire computer with as much information as can be obtained. Each object descends from DeviceInfo.

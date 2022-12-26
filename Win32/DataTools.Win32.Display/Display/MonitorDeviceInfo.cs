@@ -165,7 +165,7 @@ namespace DataTools.Win32.Display
                             var b = MultiMon.EnumDisplaySettingsEx(y.DevicePath, 0xffffffff, ref dev, 0);
                             if (!b)
                             {
-                                var s = NativeErrorMethods.FormatLastError();
+                                var s = NativeError.FormatLastError();
                             }
 
                             mm2.Free();

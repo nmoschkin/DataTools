@@ -1,3 +1,5 @@
+using System;
+
 // *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
@@ -10,16 +12,12 @@
 // A whole bunch of pInvoke/Const/Declare/Struct and associated utility functions that have been collected over the years.
 
 // Some enum documentation copied from the MSDN (and in some cases, updated).
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
-
-
-using System;
-
 
 namespace DataTools.Win32
 {
@@ -60,7 +58,7 @@ namespace DataTools.Win32
         {
             get
             {
-                return "p/Invoke Error: " + _Err + ": " + NativeErrorMethods.FormatLastError((uint)_Err);
+                return "p/Invoke Error: " + _Err + ": " + NativeError.FormatLastError((uint)_Err);
             }
         }
     }

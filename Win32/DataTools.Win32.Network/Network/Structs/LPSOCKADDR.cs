@@ -10,17 +10,15 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32.Memory;
 
 using System;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Network
 {
@@ -45,8 +43,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Data is null)
-                    return null;
+                if (Data is null) return null;
                 return new IPAddress(Data);
             }
         }
@@ -55,11 +52,8 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                SOCKADDR IPAddrV4Ret = default;
-                if (AddressFamily == AddressFamily.AfInet6)
-                    return default;
-                IPAddrV4Ret = ToSockAddr();
-                return IPAddrV4Ret;
+                if (AddressFamily == AddressFamily.AfInet6) return default;
+                return ToSockAddr();
             }
         }
 
@@ -67,30 +61,21 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                SOCKADDRV6 IPAddrV6Ret = default;
-                if (AddressFamily == AddressFamily.AfInet)
-                    return new SOCKADDRV6();
-                IPAddrV6Ret = ToSockAddr6();
-                return IPAddrV6Ret;
+                if (AddressFamily == AddressFamily.AfInet) return default;
+                return ToSockAddr6();
             }
         }
 
         public SOCKADDR ToSockAddr()
         {
-            SOCKADDR ToSockAddrRet = default;
-            if (Handle == nint.Zero)
-                return new SOCKADDR();
-            ToSockAddrRet = Handle.ToStruct<SOCKADDR>();
-            return ToSockAddrRet;
+            if (Handle == nint.Zero) return default;
+            return Handle.ToStruct<SOCKADDR>();
         }
 
         public SOCKADDRV6 ToSockAddr6()
         {
-            SOCKADDRV6 ToSockAddr6Ret = default;
-            if (Handle == nint.Zero)
-                return default;
-            ToSockAddr6Ret = Handle.ToStruct<SOCKADDRV6>();
-            return ToSockAddr6Ret;
+            if (Handle == nint.Zero) return default;
+            return Handle.ToStruct<SOCKADDRV6>();
         }
 
         public void Dispose()
@@ -114,67 +99,67 @@ namespace DataTools.Win32.Network
             {
                 switch (AddressFamily)
                 {
-                    case AddressFamily.AfInet:
+                    case AddressFamily.AfInet6:
                         {
-                            return IPAddrV4.Data;
+                            return IPAddrV6.Data;
                         }
 
                     default:
                         {
-                            return IPAddrV6.Data;
+                            return IPAddrV4.Data;
                         }
                 }
             }
         }
 
-        public static implicit operator LPSOCKADDR(nint operand)
-        {
-            var a = new LPSOCKADDR();
-            a.Handle = operand;
-            return a;
-        }
+        //public static implicit operator LPSOCKADDR(nint operand)
+        //{
+        //    var a = new LPSOCKADDR();
+        //    a.Handle = operand;
+        //    return a;
+        //}
 
-        public static implicit operator nint(LPSOCKADDR operand)
-        {
-            return operand.Handle.Handle;
-        }
+        //public static implicit operator nint(LPSOCKADDR operand)
+        //{
+        //    return operand.Handle.Handle;
+        //}
 
-        public static implicit operator LPSOCKADDR(MemPtr operand)
-        {
-            var a = new LPSOCKADDR();
-            a.Handle = operand;
-            return a;
-        }
+        //public static implicit operator LPSOCKADDR(MemPtr operand)
+        //{
+        //    var a = new LPSOCKADDR();
+        //    a.Handle = operand;
+        //    return a;
+        //}
 
-        public static implicit operator MemPtr(LPSOCKADDR operand)
-        {
-            return operand.Handle;
-        }
+        //public static implicit operator MemPtr(LPSOCKADDR operand)
+        //{
+        //    return operand.Handle;
+        //}
 
-        public static implicit operator LPSOCKADDR(SOCKADDR operand)
-        {
-            var a = new LPSOCKADDR();
-            a.Handle.Alloc(Marshal.SizeOf(operand));
-            Marshal.StructureToPtr(operand, a.Handle.Handle, true);
-            return a;
-        }
+        //public static implicit operator LPSOCKADDR(SOCKADDR operand)
+        //{
+        //    var a = new LPSOCKADDR();
+        //    a.Handle.Alloc(Marshal.SizeOf(operand));
+        //    Marshal.StructureToPtr(operand, a.Handle.Handle, true);
+        //    return a;
+        //}
 
-        public static implicit operator SOCKADDR(LPSOCKADDR operand)
-        {
-            return operand.ToSockAddr();
-        }
+        //public static implicit operator SOCKADDR(LPSOCKADDR operand)
+        //{
+        //    return operand.ToSockAddr();
+        //}
 
-        public static implicit operator LPSOCKADDR(SOCKADDRV6 operand)
-        {
-            var a = new LPSOCKADDR();
-            a.Handle.Alloc(Marshal.SizeOf(operand));
-            Marshal.StructureToPtr(operand, a.Handle.Handle, true);
-            return a;
-        }
+        //public static implicit operator LPSOCKADDR(SOCKADDRV6 operand)
+        //{
+        //    var a = new LPSOCKADDR();
+        //    a.Handle.Alloc(Marshal.SizeOf(operand));
+        //    Marshal.StructureToPtr(operand, a.Handle.Handle, true);
+        //    return a;
+        //}
 
-        public static implicit operator SOCKADDRV6(LPSOCKADDR operand)
-        {
-            return operand.ToSockAddr6();
-        }
+        //public static implicit operator SOCKADDRV6(LPSOCKADDR operand)
+        //{
+        //    return operand.ToSockAddr6();
+        //}
     }
 }

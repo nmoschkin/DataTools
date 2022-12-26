@@ -66,7 +66,7 @@ namespace DataTools.Win32.Display
                 }
                 else
                 {
-                    sOut = new string[] { NativeErrorMethods.FormatLastError() };
+                    sOut = new string[] { NativeError.FormatLastError() };
                 }
 
                 mm.Free();

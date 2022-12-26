@@ -1090,7 +1090,7 @@ namespace DataTools.Desktop_Old
 
                 if (h != HResult.Ok)
                 {
-                    var str = NativeErrorMethods.FormatLastError((uint)h);
+                    var str = NativeError.FormatLastError((uint)h);
 
                     h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
 

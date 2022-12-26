@@ -78,7 +78,7 @@ namespace DataTools.Win32.Network
 
                     // string library = @"%systemroot%\system32\shell32.dll"
 
-                    if (OperStatus == IF_OPER_STATUS.IfOperStatusUp)
+                    if (OperStatus == IfOperStatus.IfOperStatusUp)
                     {
                         //if (HasInternet == InternetStatus.HasInternet)
                         //{
@@ -200,19 +200,20 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         public void ShowConnectionPropertiesDialog(nint hwnd = default)
         {
-            if (deviceInfo is null)
-                return;
-            var shex = new SHELLEXECUTEINFO();
-            shex.cbSize = Marshal.SizeOf(shex);
-            shex.nShow = User32.SW_SHOW;
-            shex.hInstApp = Process.GetCurrentProcess().Handle;
-            shex.hWnd = hwnd;
-            shex.lpVerb = "properties";
+            if (deviceInfo is null) return;
 
-            // Set the parsing name exactly this way.
-            shex.lpDirectory = "::{7007ACC7-3202-11D1-AAD2-00805FC1270E}";
-            shex.lpFile = @"::{7007ACC7-3202-11D1-AAD2-00805FC1270E}\" + AdapterName;
-            shex.fMask = User32.SEE_MASK_ASYNCOK | User32.SEE_MASK_FLAG_DDEWAIT | User32.SEE_MASK_UNICODE;
+            var shex = new SHELLEXECUTEINFO()
+            {
+                cbSize = Marshal.SizeOf<SHELLEXECUTEINFO>(),
+                nShow = User32.SW_SHOW,
+                hInstApp = Process.GetCurrentProcess().Handle,
+                hWnd = hwnd,
+                lpVerb = "properties",
+                lpDirectory = "::{7007ACC7-3202-11D1-AAD2-00805FC1270E}",
+                lpFile = @"::{7007ACC7-3202-11D1-AAD2-00805FC1270E}\" + AdapterName,
+                fMask = User32.SEE_MASK_ASYNCOK | User32.SEE_MASK_FLAG_DDEWAIT | User32.SEE_MASK_UNICODE
+            };
+
             User32.ShellExecuteEx(ref shex);
         }
 
@@ -223,16 +224,17 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         public void ShowNetworkStatusDialog(nint hwnd = default)
         {
-            var shex = new SHELLEXECUTEINFO();
-
-            shex.cbSize = Marshal.SizeOf(shex);
-            shex.hWnd = hwnd;
-            shex.nShow = User32.SW_SHOW;
-            shex.lpVerb = "";
-            shex.hInstApp = Process.GetCurrentProcess().Handle;
-            shex.lpDirectory = "::{7007ACC7-3202-11D1-AAD2-00805FC1270E}";
-            shex.lpFile = @"::{7007ACC7-3202-11D1-AAD2-00805FC1270E}\" + AdapterName;
-            shex.fMask = User32.SEE_MASK_ASYNCOK | User32.SEE_MASK_FLAG_DDEWAIT | User32.SEE_MASK_UNICODE;
+            var shex = new SHELLEXECUTEINFO
+            {
+                cbSize = Marshal.SizeOf<SHELLEXECUTEINFO>(),
+                hWnd = hwnd,
+                nShow = User32.SW_SHOW,
+                lpVerb = "",
+                hInstApp = Process.GetCurrentProcess().Handle,
+                lpDirectory = "::{7007ACC7-3202-11D1-AAD2-00805FC1270E}",
+                lpFile = @"::{7007ACC7-3202-11D1-AAD2-00805FC1270E}\" + AdapterName,
+                fMask = User32.SEE_MASK_ASYNCOK | User32.SEE_MASK_FLAG_DDEWAIT | User32.SEE_MASK_UNICODE
+            };
 
             User32.ShellExecuteEx(ref shex);
         }
@@ -510,6 +512,20 @@ namespace DataTools.Win32.Network
             }
         }
 
+        [Browsable(true)]
+        public string IfTypeDescription
+        {
+            get
+            {
+                var fi = typeof(IFTYPE).GetField(Source.IfType.ToString());
+                if (fi.GetCustomAttribute<DescriptionAttribute>() is DescriptionAttribute da)
+                {
+                    return da.Description;
+                }
+                return Source.IfType.ToString();
+            }
+        }
+
         /// <summary>
         /// Operational status.
         /// </summary>
@@ -517,7 +533,7 @@ namespace DataTools.Win32.Network
         /// <returns></returns>
         /// <remarks></remarks>
         [Browsable(true)]
-        public IF_OPER_STATUS OperStatus
+        public IfOperStatus OperStatus
         {
             get
             {
@@ -702,9 +718,9 @@ namespace DataTools.Win32.Network
         /// <summary>
         /// Network connection type
         /// </summary>
-        /// <returns>A <see cref="NET_IF_CONNECTION_TYPE"/> structure</returns>
+        /// <returns>A <see cref="NetIfConnectionType"/> structure</returns>
         [Browsable(true)]
-        public NET_IF_CONNECTION_TYPE ConnectionType
+        public NetIfConnectionType ConnectionType
         {
             get
             {
@@ -715,9 +731,9 @@ namespace DataTools.Win32.Network
         /// <summary>
         /// Tunnel type
         /// </summary>
-        /// <returns>A <see cref="TUNNEL_TYPE"/> value.</returns>
+        /// <returns>A <see cref="Network.TunnelType"/> value.</returns>
         [Browsable(true)]
-        public TUNNEL_TYPE TunnelType
+        public TunnelType TunnelType
         {
             get
             {

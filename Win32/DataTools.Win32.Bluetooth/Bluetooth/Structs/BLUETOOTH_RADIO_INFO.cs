@@ -24,7 +24,7 @@ namespace DataTools.Win32
     {
         public ulong dwSize; // Size, In bytes, Of this entire data Structure
         public BLUETOOTH_ADDRESS address; // Address Of the local radio
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = Bluetooth.BLUETOOTH_MAX_NAME_SIZE)]
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = BluetoothInternals.BLUETOOTH_MAX_NAME_SIZE)]
         public string szName;
         public uint ulClassofDevice; // Class of device for the local radio
         public ushort lmpSubVersion;                    // lmpSubversion, manufacturer specifc.

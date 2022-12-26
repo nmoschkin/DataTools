@@ -1,3 +1,5 @@
+using System;
+
 // *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
@@ -10,59 +12,52 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
-
-
-using System;
-using System.ComponentModel;
-using System.Net;
-using System.Runtime.InteropServices;
-
-using DataTools.Win32;
 
 namespace DataTools.Win32.Network
 {
     /// <summary>
-    /// Interface tunnel type.
+    /// Interface operational status.
     /// </summary>
     /// <remarks></remarks>
-    public enum TUNNEL_TYPE
+    public enum IfOperStatus
     {
+        /// <summary>
+        /// The network device is up
+        /// </summary>
+        /// <remarks></remarks>
+        IfOperStatusUp = 1,
 
         /// <summary>
-        /// None
+        /// The network device is down
         /// </summary>
-        None = 0,
+        /// <remarks></remarks>
+        IfOperStatusDown,
 
         /// <summary>
-        /// Other
+        /// The network device is performing a self-test
         /// </summary>
-        Other = 1,
+        IfOperStatusTesting,
 
         /// <summary>
-        /// Direct
+        /// The state of the network device is unknown
         /// </summary>
-        Direct = 2,
+        IfOperStatusUnknown,
 
         /// <summary>
-        /// Ipv6 to Ipv4 tunnel
+        /// The network device is asleep
         /// </summary>
-        IPv6ToIPv4 = 11,
+        IfOperStatusDormant,
 
         /// <summary>
-        /// ISATAP tunnel
+        /// The network device is not present
         /// </summary>
-        ISATAP = 13,
+        IfOperStatusNotPresent,
 
         /// <summary>
-        /// Teredo Ipv6 tunnel
+        /// Network device lower-layer is down
         /// </summary>
-        Teredo = 14,
-
-        /// <summary>
-        /// IPHTTPS tunnel
-        /// </summary>
-        IPHTTPS = 15
+        IfOperStatusLowerLayerDown
     }
 }

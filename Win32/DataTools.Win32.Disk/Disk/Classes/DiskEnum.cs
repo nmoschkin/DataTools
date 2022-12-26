@@ -172,7 +172,7 @@ namespace DataTools.Win32.Disk
 
                         if (r != 0L)
                         {
-                            //Interaction.MsgBox(NativeErrorMethods.FormatLastError(), Constants.vbExclamation);
+                            //Interaction.MsgBox(NativeError.FormatLastError(), Constants.vbExclamation);
                         }
                         else
                         {

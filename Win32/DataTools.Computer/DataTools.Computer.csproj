@@ -22,7 +22,6 @@
     <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
 <ProjectReference Include="..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
 <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
-    <ProjectReference Include="..\DataTools.Win32.Bluetooth\DataTools.Win32.Bluetooth.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Disk\DataTools.Win32.Disk.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Display\DataTools.Win32.Display.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />

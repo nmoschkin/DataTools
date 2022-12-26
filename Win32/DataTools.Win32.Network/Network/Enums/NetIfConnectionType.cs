@@ -1,3 +1,5 @@
+using System;
+
 // *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
@@ -10,28 +12,17 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
-
-
-using System;
-using System.ComponentModel;
-using System.Net;
-using System.Runtime.InteropServices;
-
-using DataTools.Win32;
 
 namespace DataTools.Win32.Network
 {
-    
-    
     /// <summary>
     /// Interface connection type.
     /// </summary>
     /// <remarks></remarks>
-    public enum NET_IF_CONNECTION_TYPE
+    public enum NetIfConnectionType
     {
-
         /// <summary>
         /// Undefined
         /// </summary>

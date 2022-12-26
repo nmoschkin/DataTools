@@ -195,7 +195,7 @@ namespace DataTools.Win32.Network
         /// </summary>
         /// <remarks></remarks>
         [Browsable(true)]
-        public IF_OPER_STATUS OperStatus;
+        public IfOperStatus OperStatus;
 
         /// <summary>
         /// Ipv6 Interface Index
@@ -281,13 +281,13 @@ namespace DataTools.Win32.Network
         /// Connection type
         /// </summary>
         [Browsable(true)]
-        public NET_IF_CONNECTION_TYPE ConnectionType;
+        public NetIfConnectionType ConnectionType;
 
         /// <summary>
         /// Tunnel type
         /// </summary>
         [Browsable(true)]
-        public TUNNEL_TYPE TunnelType;
+        public TunnelType TunnelType;
 
         /// <summary>
         /// DHCP v6 server

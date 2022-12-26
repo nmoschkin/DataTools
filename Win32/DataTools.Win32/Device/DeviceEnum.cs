@@ -984,9 +984,9 @@ namespace DataTools.Win32
             catch (Exception ex)
             {
                 sb.AppendLine(ex.Message);
-                sb.AppendLine(NativeErrorMethods.FormatLastError((uint)Marshal.GetLastWin32Error()));
+                sb.AppendLine(NativeError.FormatLastError((uint)Marshal.GetLastWin32Error()));
 
-                //Interaction.MsgBox(ex.Message + " : See " + dumpFile + " for more clues." + "\r\n" + NativeErrorMethods.FormatLastError((uint)Marshal.GetLastWin32Error()));
+                //Interaction.MsgBox(ex.Message + " : See " + dumpFile + " for more clues." + "\r\n" + NativeError.FormatLastError((uint)Marshal.GetLastWin32Error()));
 
                 return devOut;
             }

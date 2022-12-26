@@ -1,3 +1,5 @@
+using System;
+
 // *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
@@ -10,16 +12,12 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-
-using System;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
 
 namespace DataTools.Win32.Network
 {
@@ -31,7 +29,6 @@ namespace DataTools.Win32.Network
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public struct SOCKADDRV6
     {
-
         /// <summary>
         /// Address family.
         /// </summary>
@@ -74,8 +71,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Data is null)
-                return "NULL";
+            if (Data is null) return "NULL";
             return "" + new IPAddress(Data).ToString() + " (" + AddressFamily.ToString() + ")";
         }
     }

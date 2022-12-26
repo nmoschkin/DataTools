@@ -10,22 +10,21 @@
 // A whole bunch of pInvoke/Const/Declare/Struct and associated utility functions that have been collected over the years.
 
 // Some enum documentation copied from the MSDN (and in some cases, updated).
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32.Memory;
 
 using System;
-
 
 namespace DataTools.Win32
 {
     public sealed class NativeError
     {
-
         /// <summary>
         /// Returns the current last native error.
         /// </summary>
@@ -50,8 +49,27 @@ namespace DataTools.Win32
         {
             get
             {
-                return NativeErrorMethods.FormatLastError();
+                return NativeError.FormatLastError();
             }
+        }
+
+        /// <summary>
+        /// Format a given system error, or the last system error by default.
+        /// </summary>
+        /// <param name="syserror">Format code to pass. GetLastError is used as by default.</param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public static string FormatLastError(uint syserror = 0U)
+        {
+            uint err = syserror == 0L ? (uint)User32.GetLastError() : syserror;
+            var mm = new SafePtr();
+            string s;
+            mm.Length = 1026L;
+            mm.ZeroMemory();
+            User32.FormatMessage(0x1000, nint.Zero, err, 0U, mm.handle, 512U, nint.Zero);
+            s = "Error &H" + err.ToString("X8") + ": " + mm.ToString();
+            mm.Dispose();
+            return s;
         }
     }
 }

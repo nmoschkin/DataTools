@@ -207,7 +207,7 @@ namespace DataTools.Hardware.Printers
 
             if (!PrinterModule.OpenPrinter(name, ref hprinter, nint.Zero))
             {
-                // Interaction.MsgBox("OpenPrinter failed, last Win32 Error: " + NativeErrorMethods.FormatLastError((uint)Marshal.GetLastWin32Error()));
+                // Interaction.MsgBox("OpenPrinter failed, last Win32 Error: " + NativeError.FormatLastError((uint)Marshal.GetLastWin32Error()));
                 return;
             }
 
