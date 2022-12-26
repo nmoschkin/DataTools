@@ -86,5 +86,15 @@ namespace DataTools
             => new NetworkMemPtr(handle, true, false);
 
         public static implicit operator nint(NetworkMemPtr ptr) => ptr.handle;
+
+        public static explicit operator NetworkMemPtr(DataTools.Memory.MemPtr handle)
+            => new NetworkMemPtr(handle, true, false);
+
+        public static explicit operator NetworkMemPtr(DataTools.Win32.Memory.MemPtr handle)
+            => new NetworkMemPtr(handle, true, false);
+
+        public static explicit operator DataTools.Memory.MemPtr(NetworkMemPtr ptr) => new DataTools.Memory.MemPtr(ptr.handle);
+
+        public static explicit operator DataTools.Win32.Memory.MemPtr(NetworkMemPtr ptr) => new DataTools.Win32.Memory.MemPtr(ptr.handle);
     }
 }

@@ -51,6 +51,9 @@ namespace DataTools.Win32.Network
         [DllImport("netapi32.dll", EntryPoint = "NetUserEnum", CharSet = CharSet.Unicode)]
         private static extern NET_API_STATUS NetUserEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, int filter, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
 
+        [DllImport("netapi32.dll", EntryPoint = "NetUserEnum", CharSet = CharSet.Unicode)]
+        private static extern NET_API_STATUS NetUserEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, int filter, out NetworkMemPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, ref nint resume_handle);
+
         [DllImport("netapi32.dll")]
         private static extern NET_API_STATUS NetApiBufferFree(nint buffer);
 
@@ -420,29 +423,26 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         public static string GrabJoin(ref NetworkJoinStatus joinStatus, string Computer = null)
         {
-            var mm = new MemPtr();
-
-            try
+            using (var mm = new NetworkMemPtr())
             {
-                mm.NetAlloc(1024);
-
-                var result = NetGetJoinInformation(Computer, ref mm.handle, ref joinStatus);
-                if (result == NET_API_STATUS.NERR_Success)
+                try
                 {
-                    string s = (string)mm;
-                    return s;
+                    mm.Alloc(1024);
+                    var nn = mm.DangerousGetHandle();
+                    var result = NetGetJoinInformation(Computer, ref nn, ref joinStatus);
+                    if (result == NET_API_STATUS.NERR_Success)
+                    {
+                        string s = (string)mm;
+                        return s;
+                    }
                 }
-            }
-            catch
-            {
-                throw new NativeException();
-            }
-            finally
-            {
-                mm.NetFree();
-            }
+                catch
+                {
+                    throw new NativeException();
+                }
 
-            return null;
+                return null;
+            }
         }
 
         /// <summary>
@@ -453,8 +453,6 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         public static UserInfo11[] EnumUsers11(string machine = null)
         {
-            MemPtr rh = nint.Zero;
-
             try
             {
                 int cb = 0;
@@ -462,7 +460,7 @@ namespace DataTools.Win32.Network
 
                 int te = 0;
 
-                MemPtr buff = new MemPtr();
+                //MemPtr buff = new MemPtr();
                 UserInfo11[] usas;
 
                 try
@@ -475,11 +473,12 @@ namespace DataTools.Win32.Network
                 }
 
                 var inul = new nint();
-                var err = NetUserEnum(machine, 11, 0, ref buff, -1, ref er, ref te, ref inul);
+                var err = NetUserEnum(machine, 11, 0, out NetworkMemPtr rh, -1, out er, out te, ref inul);
 
                 if (err == NET_API_STATUS.NERR_Success)
                 {
-                    rh = buff;
+                    MemPtr buff = (MemPtr)rh;
+
                     usas = new UserInfo11[te];
 
                     for (int i = 0; i < te; i++)
@@ -487,7 +486,7 @@ namespace DataTools.Win32.Network
                         usas[i] = buff.ToStruct<UserInfo11>();
                         usas[i].LogonHours = nint.Zero;
 
-                        buff = buff + cb;
+                        buff += cb;
                     }
 
                     return usas;
@@ -496,10 +495,6 @@ namespace DataTools.Win32.Network
             catch
             {
                 throw new NativeException();
-            }
-            finally
-            {
-                rh.NetFree();
             }
 
             return null;

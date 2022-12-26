@@ -1,6 +1,7 @@
 ﻿using DataTools.Desktop;
 using DataTools.Graphics;
 using DataTools.Streams;
+using DataTools.Win32.Memory;
 
 using Newtonsoft.Json;
 
@@ -257,6 +258,46 @@ namespace CoreTestOne
         }
 
         public static void Main(string[] args)
+        {
+            Console.WriteLine("Creating heap");
+            var h = new Heap(0, 1024 * 1024 * 8);
+
+            var obj = h.CreatePtr<SafePtr>();
+
+            Console.WriteLine("Making heap data");
+            obj += "This is some text on a very frigid day at the end of december, on christmas, in fact.";
+
+            Console.WriteLine();
+            Console.WriteLine($"Process Heap Address: {SafePtr.ProcessHeap:X16}");
+            Console.WriteLine($"Heap Address:         {h.DangerousGetHandle():X16}");
+            Console.WriteLine($"Data Heap Address:    {obj.CurrentHeap:X16}");
+            Console.WriteLine($"Data Address:         {obj.DangerousGetHandle():X16}");
+
+            Console.WriteLine();
+            Console.WriteLine(obj.ToString());
+            Console.WriteLine();
+
+            Console.WriteLine("Getting heap size...");
+            Console.WriteLine($"Data Size:   {obj.Length} bytes");
+
+            var cb = h.GetHeapSize(out var all, out var unall);
+
+            Console.WriteLine($"Total Size:  {cb:#,##0} bytes");
+            Console.WriteLine($"Allocated:   {all:#,##0} bytes");
+            Console.WriteLine($"Unallocated: {unall:#,##0} bytes");
+
+            Console.WriteLine("Deleting the heap...");
+
+            h.Dispose();
+
+            Console.WriteLine("After deleting...");
+
+            Console.WriteLine($"Data Heap Address:    {obj.CurrentHeap:X16}");
+            Console.WriteLine($"Data Address:         {obj.DangerousGetHandle():X16}");
+            Console.WriteLine(obj.ToString());
+        }
+
+        public static void ColorInvestigation()
         {
             byte a = 139;
             byte r = 246;

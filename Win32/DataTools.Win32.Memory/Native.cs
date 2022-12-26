@@ -9,6 +9,45 @@ using System.Runtime.InteropServices;
 namespace DataTools.Win32.Memory
 {
     [Flags]
+    public enum HeapWalkFlags : short
+    {
+        /// <summary>
+        /// The heap element is an allocated block.
+        /// <br /><br />
+        /// If PROCESS_HEAP_ENTRY_MOVEABLE is also specified, the Block structure becomes valid. The hMem member of the Block structure contains a handle to the allocated, moveable memory block.
+        /// </summary>
+        PROCESS_HEAP_ENTRY_BUSY = 0x0004,
+
+        /// <summary>
+        /// This value must be used with PROCESS_HEAP_ENTRY_BUSY, indicating that the heap element is an allocated block.
+        /// </summary>
+        PROCESS_HEAP_ENTRY_DDESHARE = 0x0020,
+
+        /// <summary>
+        /// This value must be used with PROCESS_HEAP_ENTRY_BUSY, indicating that the heap element is an allocated block.
+        /// <br /><br />
+        /// The block was allocated with LMEM_MOVEABLE or GMEM_MOVEABLE, and the Block structure becomes valid. The hMem member of the Block structure contains a handle to the allocated, moveable memory block.
+        /// </summary>
+        PROCESS_HEAP_ENTRY_MOVEABLE = 0x0010,
+
+        /// <summary>
+        /// The heap element is located at the beginning of a region of contiguous virtual memory in use by the heap.
+        /// <br /><br />
+        /// The lpData member of the structure points to the first virtual address used by the region; the cbData member specifies the total size, in bytes, of the address space that is reserved for this region; and the cbOverhead member specifies the size, in bytes, of the heap control structures that describe the region.
+        /// <br /><br />
+        /// The Region structure becomes valid. The dwCommittedSize, dwUnCommittedSize, lpFirstBlock, and lpLastBlock members of the structure contain additional information about the region.
+        /// </summary>
+        PROCESS_HEAP_REGION = 0x0001,
+
+        /// <summary>
+        /// The heap element is located in a range of uncommitted memory within the heap region.
+        /// <br /><br />
+        /// The lpData member points to the beginning of the range of uncommitted memory; the cbData member specifies the size, in bytes, of the range of uncommitted memory; and the cbOverhead member specifies the size, in bytes, of the control structures that describe this uncommitted range.
+        /// </summary>
+        PROCESS_HEAP_UNCOMMITTED_RANGE = 0x0002,
+    }
+
+    [Flags]
     public enum MemoryTypes
     {
         /// <summary>
@@ -207,6 +246,34 @@ namespace DataTools.Win32.Memory
         public MemoryTypes Type;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PROCESS_HEAP_ENTRY_BLOCK
+    {
+        public nint lpData;
+        public uint cbData;
+        public byte cbOverhead;
+        public byte iRegionIndex;
+        public HeapWalkFlags wFlags;
+        public nint hMem;
+        public uint dwReserved1;
+        public uint dwReserved2;
+        public uint dwReserved3;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct PROCESS_HEAP_ENTRY_REGION
+    {
+        public nint lpData;
+        public uint cbData;
+        public byte cbOverhead;
+        public byte iRegionIndex;
+        public HeapWalkFlags wFlags;
+        public uint dwCommittedSize;
+        public uint dwUnCommittedSize;
+        public nint lpFirstBlock;
+        public nint lpLastBlock;
+    }
+
     public static class Native
     {
         [DllImport("netapi32.dll")]
@@ -245,6 +312,12 @@ namespace DataTools.Win32.Memory
         [DllImport("kernel32")]
         internal static extern nint GetLargePageMinimum();
 
+        [DllImport("kernel32", EntryPoint = "HeapWalk", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
+        internal static extern bool HeapWalk(
+          nint hHeap,
+          WinPtrBase lpEntry
+        );
+
         [DllImport("kernel32", EntryPoint = "HeapCreate", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
         internal static extern nint HeapCreate(int dwOptions, nint initSize, nint maxSize);
 
@@ -280,6 +353,11 @@ namespace DataTools.Win32.Memory
         [DllImport("kernel32", EntryPoint = "HeapValidate", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
         internal static extern bool HeapValidate(nint hHeap, uint dwOptions, nint lpMem);
 
+        internal static unsafe void PlatformZeroMemory(void* dest, nint byteCount)
+        {
+            n_memset(dest, 0, byteCount);
+        }
+
         // used for specific operating system functions.
         [DllImport("kernel32.dll")]
         public static extern nint LocalFree(nint hMem);
@@ -300,41 +378,26 @@ namespace DataTools.Win32.Memory
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         internal static extern nint n_memcpy(nint dest, nint src, UIntPtr count);
 
-        [StructLayout(LayoutKind.Sequential, Size = 16)]
-        internal struct MemChunkStruct
+        internal static unsafe void ZeroMemory(void* handle, nint len)
         {
-        }
+            if (len > 1024)
+            {
+                PlatformZeroMemory(handle, len);
+                return;
+            }
 
-        internal static unsafe void ZeroMemory(void* handle, long len)
-        {
             unsafe
             {
                 byte* bp1 = (byte*)handle;
                 byte* bep = (byte*)handle + len;
 
-                var mc = new MemChunkStruct();
+                var mc = 0M;
 
-                ((long*)&mc)[0] = 0L;
                 ((long*)&mc)[1] = 0L;
 
                 if (len >= nint.Size)
                 {
-                    if (len >= 16 && nint.Size == 8)
-                    {
-                        MemChunkStruct* lp1 = (MemChunkStruct*)bp1;
-                        MemChunkStruct* lep = (MemChunkStruct*)bep;
-
-                        do
-                        {
-                            *lp1++ = mc;
-                        } while (lp1 < lep);
-
-                        if (lp1 == lep) return;
-
-                        lp1--;
-                        bp1 = (byte*)lp1;
-                    }
-                    else if (nint.Size == 8)
+                    if (nint.Size == 8)
                     {
                         long* lp1 = (long*)bp1;
                         long* lep = (long*)bep;

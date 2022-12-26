@@ -17,8 +17,4 @@
 	  <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Memory\SafePtr.cs" />
-  </ItemGroup>
-
 </Project>

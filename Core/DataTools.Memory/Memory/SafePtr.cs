@@ -68,6 +68,14 @@ namespace DataTools.Memory
         {
         }
 
+        protected override void InternalDoZeroMem(nint startptr, long length)
+        {
+            unsafe
+            {
+                Native.ZeroMemory((void*)startptr, length);
+            }
+        }
+
         protected override nint Allocate(long size)
         {
             return Marshal.AllocHGlobal((int)size);

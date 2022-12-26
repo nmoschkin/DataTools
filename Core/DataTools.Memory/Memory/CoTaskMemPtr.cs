@@ -34,6 +34,14 @@ namespace DataTools.Memory
             GetNativeSize();
         }
 
+        protected override void InternalDoZeroMem(nint startptr, long length)
+        {
+            unsafe
+            {
+                Native.ZeroMemory((void*)startptr, length);
+            }
+        }
+
         public override MemoryType MemoryType => MemoryType.CoTaskMem;
 
         protected override long GetNativeSize()

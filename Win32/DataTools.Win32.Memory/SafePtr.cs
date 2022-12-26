@@ -1,16 +1,365 @@
 ﻿using DataTools.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace DataTools.Win32.Memory
 {
-    public class SafePtr : DataTools.Win32.Memory.SafePtrBase
+    /// <summary>
+    /// Wraps a native Win32 custom heap
+    /// </summary>
+    public sealed class Heap : SafeHandle
     {
-        private static readonly nint procHeap = Native.GetProcessHeap();
+        /// <summary>
+        /// Gets the process heap.
+        /// </summary>
+        public static readonly Heap ProcessHeap = new Heap(Native.GetProcessHeap());
 
-        private nint currentHeap = procHeap;
+        private readonly List<WeakReference<IHeapAssignable>> createdObjecs = new List<WeakReference<IHeapAssignable>>();
+
+        private nint maxsize = 0;
+        private nint currsize = 0;
+
+        public bool IsProcessHeap => ProcessHeap.handle == handle;
+
+        public long MaxSize
+        {
+            get
+            {
+                GetHeapSize();
+                return maxsize;
+            }
+        }
+
+        public long CurrentSize
+        {
+            get
+            {
+                GetHeapSize();
+                return currsize;
+            }
+        }
+
+        public long UsedSpace
+        {
+            get
+            {
+                return GetHeapSize();
+            }
+        }
+
+        public long UnusedSpace
+        {
+            get
+            {
+                var sv = GetHeapSize(out var a, out var b);
+                return (a + b) - sv;
+            }
+        }
+
+        public Heap(nint heapPtr, bool fOwn) : base(0, fOwn)
+        {
+            handle = heapPtr;
+            GetHeapSize();
+        }
+
+        private Heap(nint ptr) : base(0, false)
+        {
+            handle = ptr;
+            GetHeapSize();
+        }
+
+        public Heap(long size) : base(0, true)
+        {
+            CreateHeap((nint)size, (nint)size);
+        }
+
+        public Heap(int size) : base(0, true)
+        {
+            CreateHeap((nint)size, (nint)size);
+        }
+
+        public Heap(long size, long maxsize) : base(0, true)
+        {
+            CreateHeap((nint)size, (nint)maxsize);
+        }
+
+        public Heap(int size, int maxsize) : base(0, true)
+        {
+            CreateHeap((nint)size, (nint)maxsize);
+        }
+
+        /// <summary>
+        /// Gets the size of the heap.
+        /// </summary>
+        /// <returns></returns>
+        public long GetHeapSize()
+        {
+            return GetHeapSize(out _, out _);
+        }
+
+        /// <summary>
+        /// Gets the size of the heap, and the allocated and unallocated sizes.
+        /// </summary>
+        /// <param name="committed">The current size of the heap.</param>
+        /// <param name="uncommitted">The size of the heap remaining.</param>
+        /// <returns>The total amount of memory allocated on the heap.</returns>
+        public long GetHeapSize(out long committed, out long uncommitted)
+        {
+            committed = uncommitted = 0;
+
+            if (handle == 0) return 0;
+            using (var sp = new SafePtr())
+            {
+                int cbsize = Marshal.SizeOf<PROCESS_HEAP_ENTRY_REGION>();
+
+                PROCESS_HEAP_ENTRY_REGION rgn = new PROCESS_HEAP_ENTRY_REGION();
+
+                sp.Alloc(cbsize);
+
+                while (Native.HeapWalk(handle, sp))
+                {
+                    try
+                    {
+                        rgn = sp.ToStruct<PROCESS_HEAP_ENTRY_REGION>();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                        return 0;
+                    }
+
+                    if ((rgn.wFlags & HeapWalkFlags.PROCESS_HEAP_REGION) != 0)
+                    {
+                        var reg = sp.ToStruct<PROCESS_HEAP_ENTRY_REGION>();
+
+                        maxsize = (nint)(reg.dwCommittedSize + reg.dwUnCommittedSize);
+                        this.currsize = (nint)(reg.dwCommittedSize);
+
+                        committed = (long)(nint)reg.dwCommittedSize;
+                        uncommitted = (long)(nint)reg.dwUnCommittedSize;
+
+                        return (long)(nint)reg.cbData;
+                    }
+                }
+            }
+
+            return 0;
+        }
+
+        private void CreateHeap(nint size, nint maxsize)
+        {
+            handle = Native.HeapCreate(0, size, maxsize);
+            if (handle == 0)
+            {
+                this.maxsize = this.currsize = 0;
+            }
+            else
+            {
+                GC.AddMemoryPressure(maxsize);
+
+                this.maxsize = maxsize;
+                this.currsize = size;
+
+                GetHeapSize();
+            }
+        }
+
+        private bool DestroyHeap()
+        {
+            bool b = true;
+
+            if (handle != 0)
+            {
+                b = Native.HeapDestroy(handle);
+                if (b) handle = 0;
+            }
+
+            return b;
+        }
+
+        /// <summary>
+        /// Create a new <see cref="WinPtrBase"/> <see cref="IHeapAssignable"/> object on the current heap.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T CreatePtr<T>() where T : WinPtrBase, IHeapAssignable, new()
+        {
+            var ptr = new T();
+            ptr.AssignHeap(this);
+            createdObjecs.Add(new WeakReference<IHeapAssignable>(ptr));
+            return ptr;
+        }
+
+        /// <summary>
+        /// Create a new <see cref="WinPtrBase"/> <see cref="IHeapAssignable"/> object on the current heap.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">Copy the contents of the source buffer to the new object.</param>
+        /// <returns></returns>
+        public T CreatePtr<T>(SafePtrBase source) where T : WinPtrBase, IHeapAssignable, new()
+        {
+            var ptr = new T();
+            ptr.AssignHeap(this);
+            createdObjecs.Add(new WeakReference<IHeapAssignable>(ptr));
+
+            if (source != null && source.Length > 0)
+            {
+                ptr.Alloc(source.Length);
+                source.CopyTo(ptr, 0L, 0L, source.Length);
+            }
+
+            return ptr;
+        }
+
+        public override bool IsInvalid => handle == 0;
+
+        protected override bool ReleaseHandle()
+        {
+            foreach (var wr in createdObjecs)
+            {
+                if (wr.TryGetTarget(out var ptr))
+                {
+                    ptr.HeapIsClosing(this);
+                }
+            }
+
+            return DestroyHeap();
+        }
+
+        public override string ToString()
+        {
+            var b = 2 * nint.Size;
+            var xb = "x" + b.ToString();
+            return $"0x{handle.ToString(xb)} [{UsedSpace:#,##0} Used; {UnusedSpace:#,##0} Free]";
+        }
+    }
+
+    /// <summary>
+    /// Actions to be taken by an object created by a <see cref="Heap"/> when it is being destroyed.
+    /// </summary>
+    public enum HeapDestroyBehavior
+    {
+        /// <summary>
+        /// The contents of the object are destroyed with the heap.
+        /// </summary>
+        Cascade,
+
+        /// <summary>
+        /// The buffer is transferred to the process heap.
+        /// </summary>
+        TransferOut
+    }
+
+    public interface IHeapAssignable
+    {
+        /// <summary>
+        /// The current heap.
+        /// </summary>
+        /// <remarks>
+        /// This is usually the process heap, but creating independent heaps are possible.
+        /// </remarks>
+        nint CurrentHeap { get; }
+
+        HeapDestroyBehavior HeapDestroyBehavior { get; }
+
+        /// <summary>
+        /// Set the heap for the object
+        /// </summary>
+        /// <param name="heap"></param>
+        protected internal void AssignHeap(Heap heap);
+
+        protected internal void HeapIsClosing(Heap heap);
+    }
+
+    public class SafePtr : WinPtrBase, IHeapAssignable
+    {
+        /// <summary>
+        /// Gets the pointer to the process heap.
+        /// </summary>
+        public static readonly nint ProcessHeap = Native.GetProcessHeap();
+
+        private nint currentHeap = ProcessHeap;
+
+        public virtual HeapDestroyBehavior HeapDestroyBehavior { get; protected set; } = HeapDestroyBehavior.TransferOut;
+
+        void IHeapAssignable.AssignHeap(Heap heap)
+        {
+            CurrentHeap = heap.DangerousGetHandle();
+        }
+
+        void IHeapAssignable.HeapIsClosing(DataTools.Win32.Memory.Heap heap)
+        {
+            if (heap.DangerousGetHandle() == currentHeap)
+            {
+                if (HeapDestroyBehavior == HeapDestroyBehavior.Cascade)
+                {
+                    Free();
+                    return;
+                }
+
+                if (handle != 0)
+                {
+                    try
+                    {
+                        unsafe
+                        {
+                            var l = (nint)Length;
+                            void* ptr = (void*)Native.HeapAlloc(ProcessHeap, 0, l);
+
+                            if (ptr != null)
+                            {
+                                Buffer.MemoryCopy((void*)handle, ptr, l, l);
+                            }
+
+                            Native.HeapFree(currentHeap, 0, handle);
+                            currentHeap = ProcessHeap;
+                            handle = (nint)ptr;
+                        }
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            Free();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The current heap.
+        /// </summary>
+        /// <remarks>
+        /// This is usually the process heap, but creating independent heaps are possible.
+        /// </remarks>
+        public virtual nint CurrentHeap
+        {
+            get => currentHeap;
+            protected set
+            {
+                if (handle != 0) throw new InvalidOperationException("Can't change heap when the buffer is allocated!");
+
+                if (currentHeap == value)
+                {
+                    return;
+                }
+                else if (value == 0)
+                {
+                    currentHeap = ProcessHeap;
+                }
+                else
+                {
+                    currentHeap = value;
+                }
+            }
+        }
 
         protected internal new nint handle
         {
@@ -47,7 +396,7 @@ namespace DataTools.Win32.Memory
 
         protected override nint Allocate(long size)
         {
-            return Native.HeapAlloc(currentHeap, 8, (nint)size);
+            return Native.HeapAlloc(CurrentHeap, 8, (nint)size);
         }
 
         protected override bool CanGetNativeSize()
@@ -65,18 +414,18 @@ namespace DataTools.Win32.Memory
 
         protected override void Deallocate(nint ptr)
         {
-            Native.HeapFree(currentHeap, 0, ptr);
+            Native.HeapFree(CurrentHeap, 0, ptr);
         }
 
         protected override long GetNativeSize()
         {
             if (handle == 0) return 0;
-            return (long)Native.HeapSize(currentHeap, 0, handle);
+            return (long)Native.HeapSize(CurrentHeap, 0, handle);
         }
 
         protected override nint Reallocate(nint oldptr, long newsize)
         {
-            return Native.HeapReAlloc(currentHeap, 0, handle, (nint)newsize);
+            return Native.HeapReAlloc(CurrentHeap, 0, handle, (nint)newsize);
         }
 
         #region Cast Operators
@@ -551,6 +900,20 @@ namespace DataTools.Win32.Memory
                     handle = (nint)(void*)val
                 };
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is SafePtr b)
+            {
+                return b.handle == handle;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return handle.GetHashCode();
         }
 
         #endregion Cast Operators

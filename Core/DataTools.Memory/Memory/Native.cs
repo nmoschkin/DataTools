@@ -1,7 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("DataTools.Memory")]
 [assembly: InternalsVisibleTo("DataTools.Win32")]
@@ -11,11 +9,6 @@ namespace DataTools.Memory
 {
     internal static class Native
     {
-        [StructLayout(LayoutKind.Sequential, Size = 16)]
-        internal struct MemChunkStruct
-        {
-        }
-
         internal static unsafe void ZeroMemory(void* handle, long len)
         {
             unsafe
@@ -23,40 +16,22 @@ namespace DataTools.Memory
                 byte* bp1 = (byte*)handle;
                 byte* bep = (byte*)handle + len;
 
-                var mc = new MemChunkStruct();
-
-                ((long*)&mc)[0] = 0L;
-                ((long*)&mc)[1] = 0L;
-
-                if (len >= 16)
+                if (len >= nint.Size)
                 {
                     if (nint.Size == 8)
                     {
-                        MemChunkStruct* lp1 = (MemChunkStruct*)bp1;
-                        MemChunkStruct* lep = (MemChunkStruct*)bep;
+                        long* lp1 = (long*)bp1;
+                        long* lep = (long*)bep;
 
                         do
                         {
-                            *lp1++ = mc;
+                            *lp1++ = 0L;
                         } while (lp1 < lep);
 
                         if (lp1 == lep) return;
 
                         lp1--;
                         bp1 = (byte*)lp1;
-
-                        //long* lp1 = (long*)bp1;
-                        //long* lep = (long*)bep;
-
-                        //do
-                        //{
-                        //    *lp1++ = 0L;
-                        //} while (lp1 < lep);
-
-                        //if (lp1 == lep) return;
-
-                        //lp1--;
-                        //bp1 = (byte*)lp1;
                     }
                     else
                     {
@@ -74,6 +49,7 @@ namespace DataTools.Memory
                         bp1 = (byte*)ip1;
                     }
                 }
+
                 do
                 {
                     *bp1++ = 0;

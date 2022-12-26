@@ -18,5 +18,13 @@ namespace DataTools.Win32.Memory
         {
             return true;
         }
+
+        protected override void InternalDoZeroMem(nint startptr, long length)
+        {
+            unsafe
+            {
+                Native.ZeroMemory((void*)startptr, (nint)length);
+            }
+        }
     }
 }

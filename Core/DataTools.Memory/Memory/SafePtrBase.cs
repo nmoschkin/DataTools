@@ -1674,9 +1674,27 @@ namespace DataTools.Memory
         }
 
         /// <summary>
+        /// Zero out the memory at the specific pointer, and running for the specified number of bytes.
+        /// </summary>
+        /// <param name="startptr"></param>
+        /// <param name="length"></param>
+        /// <remarks>
+        /// This function does the actual work of zeroing memory, which can vary between platforms.<br /><br />
+        /// <see cref="ZeroMemory(long, long)"/> depends on this function.
+        /// </remarks>
+        protected abstract void InternalDoZeroMem(nint startptr, long length);
+
+        /// <summary>
         /// Set all bytes in the memory buffer to zero.
         /// </summary>
-        public void ZeroMemory(long index = -1, long length = -1)
+        public void ZeroMemory() => ZeroMemory(-1, -1);
+
+        /// <summary>
+        /// Sets the specified bytes in the buffer to zero.
+        /// </summary>
+        /// <param name="index">The logical index at which to begin zeroing out bytes.</param>
+        /// <param name="length">The number of bytes to zero out.</param>
+        public void ZeroMemory(long index, long length)
         {
             lock (lockObj)
             {
@@ -1707,7 +1725,7 @@ namespace DataTools.Memory
                         }
                     }
 
-                    Native.ZeroMemory(p, len);
+                    InternalDoZeroMem((nint)p, len);
                 }
             }
         }
