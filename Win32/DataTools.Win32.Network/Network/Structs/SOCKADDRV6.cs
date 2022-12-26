@@ -27,33 +27,38 @@ namespace DataTools.Win32.Network
     /// <remarks></remarks>
     [StructLayout(LayoutKind.Sequential)]
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public struct SOCKADDRV6
+    public struct Inet6Socket
     {
         /// <summary>
         /// Address family.
         /// </summary>
         /// <remarks></remarks>
-        public AddressFamily AddressFamily;
+        public readonly AddressFamily AddressFamily;
 
         /// <summary>
         /// Address port.
         /// </summary>
         /// <remarks></remarks>
-        public ushort Port;
+        public readonly ushort Port;
+
+        /// <summary>
+        /// Flow Info
+        /// </summary>
+        public readonly int FlowInfo;
 
         /// <summary>
         /// Address data.
         /// </summary>
         /// <remarks></remarks>
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U1, SizeConst = 16)]
-        public byte[] Data;
+        private byte[] Data;
 
         /// <summary>
         /// Reserved, must be zero.
         /// </summary>
         /// <remarks></remarks>
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U1, SizeConst = 8)]
-        public byte[] Zero;
+        private byte[] Zero;
 
         /// <summary>
         /// Gets the IP address for this structure from the Data buffer.

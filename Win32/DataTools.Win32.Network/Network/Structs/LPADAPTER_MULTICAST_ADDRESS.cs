@@ -105,16 +105,6 @@ namespace DataTools.Win32.Network
             }
         }
 
-        public byte[] Data
-        {
-            get
-            {
-                if (Handle == nint.Zero)
-                    return null;
-                return Struct.Address.lpSockaddr.Data;
-            }
-        }
-
         public static implicit operator LPADAPTER_MULTICAST_ADDRESS(nint operand)
         {
             var a = new LPADAPTER_MULTICAST_ADDRESS();

@@ -25,7 +25,7 @@ namespace DataTools.Win32.Network
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public struct SOCKET_ADDRESS
     {
-        public LPSOCKADDR lpSockaddr;
+        public InetSocketPtr lpSockaddr;
         public int iSockaddrLength;
 
         public override string ToString()
