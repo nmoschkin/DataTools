@@ -17,6 +17,7 @@
 	  <NeutralLanguage>en-US</NeutralLanguage>
 	  <Platforms>AnyCPU;x64;x86</Platforms>
 	  <ApplicationManifest>app.manifest</ApplicationManifest>
+	  <Configurations>Debug;Release;NuGet</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

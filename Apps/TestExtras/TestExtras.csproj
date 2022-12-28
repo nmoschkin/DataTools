@@ -16,6 +16,8 @@
 	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
 	  <RepositoryType>GitHub</RepositoryType>
 	  <NeutralLanguage>en-US</NeutralLanguage>
+	  <Platforms>AnyCPU;x64</Platforms>
+	  <Configurations>Debug;Release;NuGet</Configurations>
 
   </PropertyGroup>
 

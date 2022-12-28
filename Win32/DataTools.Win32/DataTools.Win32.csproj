@@ -10,13 +10,14 @@
 	  <FileVersion>8.0.0.1000</FileVersion>
 	  <Authors>Nathaniel Moschkin</Authors>
 	  <Version>8.0.0</Version>
-	  <Product>DataTools Win32 Library</Product>
-	  <Description>DataTools Utility Library</Description>
+	  <Product>DataTools Hardware Library</Product>
+	  <Description>DataTools Hardware Library - Base Hardware Information Library</Description>
 	  <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
 	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
 	  <RepositoryType>GitHub</RepositoryType>
 	  <NeutralLanguage>en-US</NeutralLanguage>
 	  <Platforms>AnyCPU;x64</Platforms>
+	  <Configurations>Debug;Release;NuGet</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -64,5 +65,17 @@
     <Folder Include="Device\Classes\" />
     <Folder Include="Device\Structs\" />
   </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
+		<Optimize>True</Optimize>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|x64'">
+		<Optimize>True</Optimize>
+	</PropertyGroup>
+	<Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
+		<Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
+		<Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+		<Exec Command="post-build-tool /d ." />
+	</Target>
 
 </Project>
