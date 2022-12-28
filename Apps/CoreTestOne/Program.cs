@@ -156,7 +156,7 @@ namespace CoreTestOne
 
         public override string ToString()
         {
-            return $"{ReturnType} {FunctionName} ({DLLName}.{EntryPoint}) [{FileName}] [{Project}]";
+            return $"{ReturnType} {FunctionName} ({DLLName}.{EntryPoint}) [{FileName}] [Project: {Project}] [References: {ReferenceFiles?.Count ?? 0}]";
         }
     }
 
@@ -794,7 +794,11 @@ namespace CoreTestOne
 
         public static void Main(string[] args)
         {
-            var root = @"E:\Projects\Personal Projects\Repos";
+        }
+
+        public static List<ExternInfo> ScanForExterns(string path)
+        {
+            var root = path ?? @"E:\Projects\Personal Projects\Repos";
             var results = ScanDir(root);
             results = results.Distinct().ToList();
 
@@ -877,7 +881,7 @@ namespace CoreTestOne
 
                 return r;
             });
-
+            var orgres = results;
             var dict = new Dictionary<string, List<ExternInfo>>();
 
             foreach (var res in results)
@@ -907,6 +911,8 @@ namespace CoreTestOne
             json = JsonConvert.SerializeObject(results, opt);
 
             File.WriteAllText(@"E:\no_known_refs.json", json);
+
+            return orgres;
         }
 
         public static void TestHeap()
