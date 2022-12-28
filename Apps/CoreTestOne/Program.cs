@@ -1,4 +1,12 @@
-﻿using DataTools.Desktop;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Text.RegularExpressions;
+
+using DataTools.Desktop;
 using DataTools.Graphics;
 using DataTools.Streams;
 using DataTools.Win32.Memory;
@@ -7,17 +15,162 @@ using Newtonsoft.Json;
 
 using SkiaSharp;
 
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using System.Text;
-
 namespace CoreTestOne
 {
+    public class ExternInfo : IEquatable<ExternInfo>
+    {
+        private static readonly PropertyInfo[] props = typeof(ExternInfo).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        public bool Equals(ExternInfo other)
+        {
+            var res = true;
+
+            foreach (var prop in props)
+            {
+                var a = prop.GetValue(this);
+                var b = prop.GetValue(other);
+
+                if (a is object && b is object)
+                {
+                    res = a.Equals(b);
+                }
+                else if (a is object || b is object)
+                {
+                    res = false;
+                }
+            }
+
+            return res;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ExternInfo other) return Equals(other);
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            var finalhash = -1;
+
+            foreach (var prop in props)
+            {
+                finalhash ^= prop.GetValue(this)?.GetHashCode() ?? 0;
+            }
+
+            return finalhash;
+        }
+
+        public string Project
+        {
+            get; set;
+        }
+
+        public string DLLName
+        {
+            get; set;
+        }
+
+        public string EntryPoint
+        {
+            get; set;
+        }
+
+        public string FileName
+        {
+            get; set;
+        }
+
+        public string Namespace
+        {
+            get; set;
+        }
+
+        public string ClassName
+        {
+            get; set;
+        }
+
+        public string FunctionName
+        {
+            get; set;
+        }
+
+        public string Params
+        {
+            get; set;
+        }
+
+        public string ReturnType
+        {
+            get; set;
+        }
+
+        public string FilePath
+        {
+            get; set;
+        }
+
+        public string FullyQualifiedClassName
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Namespace))
+                {
+                    return $"{Namespace}.{ClassName}";
+                }
+                else
+                {
+                    return $"{ClassName}";
+                }
+            }
+            set
+            {
+                if (value == null) { return; }
+            }
+        }
+
+        public string FullyQualifiedName
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Namespace))
+                {
+                    return $"{Namespace}.{ClassName}.{FunctionName}";
+                }
+                else
+                {
+                    return $"{ClassName}.{FunctionName}";
+                }
+            }
+            set
+            {
+                if (value == null) { return; }
+            }
+        }
+
+        public List<string> ReferenceFiles
+        {
+            get; set;
+        }
+
+        public override string ToString()
+        {
+            return $"{ReturnType} {FunctionName} ({DLLName}.{EntryPoint}) [{FileName}] [{Project}]";
+        }
+    }
+
     public class MySampleThing : IEquatable<MySampleThing>
     {
-        public string ValueA { get; set; }
+        public string ValueA
+        {
+            get; set;
+        }
 
-        public int ValueI { get; set; }
+        public int ValueI
+        {
+            get; set;
+        }
 
         public MySampleThing(string valueA, int valueI)
         {
@@ -84,7 +237,10 @@ namespace CoreTestOne
             return Crc32.Hash(b.ToArray());
         }
 
-        public RGBDATA TheBless { get; set; }
+        public RGBDATA TheBless
+        {
+            get; set;
+        }
 
         public static implicit operator string(MySampleThing obj)
         {
@@ -257,7 +413,503 @@ namespace CoreTestOne
             }
         }
 
+        public static int Search<TList, TItem>(
+           Func<TItem, int> compare,
+           TList source,
+           out TItem retobj,
+           bool first = false,
+           CompareOptions options = CompareOptions.None,
+           bool insertIndex = false)
+
+           where TList : IList<TItem>
+        {
+            if (source == null || source.Count == 0)
+            {
+                retobj = default;
+                return insertIndex ? 0 : -1;
+            }
+
+            int lo = 0, hi = source.Count - 1;
+
+            TItem comp;
+            TItem elem = default;
+
+            while (true)
+            {
+                if (lo > hi) break;
+
+                int p = (hi + lo) / 2;
+
+                comp = source[p];
+
+                int c = compare(comp);
+                if (c == 0)
+                {
+                    if (first && p > 0)
+                    {
+                        p--;
+
+                        do
+                        {
+                            comp = source[p];
+
+                            c = compare(comp);
+
+                            if (c != 0)
+                            {
+                                break;
+                            }
+
+                            p--;
+                        } while (p >= 0);
+
+                        ++p;
+                        comp = source[p];
+                    }
+
+                    retobj = comp;
+                    return p;
+                }
+                else if (c < 0)
+                {
+                    hi = p - 1;
+                }
+                else
+                {
+                    lo = p + 1;
+                }
+            }
+
+            retobj = default;
+            return insertIndex ? lo : -1;
+        }
+
+        private static List<string> MakeNS(string ns)
+        {
+            var sp = ns.Split('.');
+
+            int i, j;
+            int c = sp.Length;
+            var sb = new StringBuilder();
+            var l = new List<string>();
+
+            for (i = 0; i < c; i++)
+            {
+                sb.Clear();
+
+                for (j = 0; j <= i; j++)
+                {
+                    if (j > 0) sb.Append('.');
+                    sb.Append(sp[j]);
+                }
+
+                l.Add(sb.ToString());
+            }
+
+            return l;
+        }
+
+        private static void ScanFileForExternReferences(string file, List<ExternInfo> nsexterns, List<ExternInfo> fqnexterns)
+        {
+            Console.Write($"Scanning for references {Path.GetFileName(file)} ... ".PadRight(80) + "\r");
+
+            List<ExternInfo> wex;
+
+            var lines = File.ReadAllLines(file);
+            var txt = string.Join("\r\n", lines);
+
+            var usings = new List<string>();
+            var statics = new List<string>();
+
+            var rusing = new Regex(@"using ([A-Za-z0-9_.]+);");
+            var rstatic = new Regex(@"using static ([A-Za-z0-9_.]+);");
+            var rns = new Regex(@"\s*namespace\s+([A-Za-z0-9_.]+).*");
+            var rcls = new Regex(@".* class (\w+).*");
+
+            string currNamespace = null;
+
+            int i, c = lines.Length;
+
+            for (i = 0; i < c; i++)
+            {
+                var line = lines[i];
+
+                var mns = rns.Match(line);
+
+                if (mns.Success)
+                {
+                    currNamespace = mns.Groups[1].Value;
+                    usings.AddRange(MakeNS(currNamespace));
+                }
+                else
+                {
+                    var mcls = rcls.Match(line);
+
+                    if (mcls.Success)
+                    {
+                        var currClass = mcls.Groups[1].Value;
+
+                        if (currNamespace != null)
+                        {
+                            statics.Add($"{currNamespace}.{currClass}");
+                        }
+                    }
+                    else
+                    {
+                        var musing = rusing.Match(line);
+
+                        if (!musing.Success)
+                        {
+                            var mstatic = rstatic.Match(line);
+                            if (mstatic.Success)
+                            {
+                                statics.Add(mstatic.Groups[1].Value);
+                            }
+                        }
+                        else
+                        {
+                            usings.Add(musing.Groups[1].Value);
+                        }
+                    }
+                }
+            }
+
+            usings = usings.Distinct().ToList();
+            usings.Sort();
+            statics = statics.Distinct().ToList();
+            statics.Sort();
+            var fnonly = Path.GetFileName(file);
+
+            wex = nsexterns;
+            int wc = wex.Count;
+
+            foreach (var u in usings)
+            {
+                var idx = Search<List<ExternInfo>, ExternInfo>((b) =>
+                {
+                    return string.Compare(u, b.Namespace);
+                }, wex, out var ei, first: true);
+
+                if (idx == -1)
+                {
+                    continue;
+                }
+
+                while (idx < wc && wex[idx].Namespace == u)
+                {
+                    var witem = wex[idx];
+
+                    var funcname = $"{witem.ClassName}.{witem.FunctionName}";
+
+                    if (txt.Contains(funcname))
+                    {
+                        witem.ReferenceFiles ??= new List<string>();
+                        witem.ReferenceFiles.Add(file);
+                    }
+
+                    idx++;
+                }
+            }
+
+            wex = fqnexterns;
+            wc = wex.Count;
+
+            foreach (var u in statics)
+            {
+                var idx = Search<List<ExternInfo>, ExternInfo>((b) =>
+                {
+                    return string.Compare(u, b.FullyQualifiedClassName);
+                }, wex, out var ei, first: true);
+
+                if (idx == -1)
+                {
+                    continue;
+                }
+                while (idx < wc && wex[idx].Namespace == u)
+                {
+                    var witem = wex[idx];
+
+                    var funcname = $"{witem.FunctionName}";
+
+                    if (txt.Contains(funcname))
+                    {
+                        witem.ReferenceFiles ??= new List<string>();
+                        witem.ReferenceFiles.Add(file);
+                    }
+
+                    idx++;
+                }
+            }
+        }
+
+        private static List<ExternInfo> ScanFileForExterns(string file, string project = null)
+        {
+            if (!File.Exists(file)) throw new FileNotFoundException(file);
+            Console.Write($"Scanning file {Path.GetFileName(file)} ... ".PadRight(80) + "\r");
+            var lines = File.ReadAllLines(file);
+
+            var l = new List<ExternInfo>();
+
+            int i, c = lines.Length;
+            string classname = null;
+            string nns = null;
+
+            var rcls = new Regex(@".* class (\w+).*");
+            var rext = new Regex(@"\s*\[DllImport\(""([a-zA-Z0-9.]+)"".*\].*");
+            var rdecl = new Regex(@"\s*\S*\s+static\s+extern\s+([A-Za-z0-9_]+)\s+([A-Za-z0-9_]+)(.+)");
+            var rtypes = new Regex(@"\((.+)\)\s*(;)?$");
+            var rentry = new Regex(@".*EntryPoint\s*\=\s*""(\w+)"".*");
+            var rns = new Regex(@"\s*namespace\s+([A-Za-z0-9_.]+).*");
+
+            for (i = 0; i < c; i++)
+            {
+                if (lines[i].Contains("namespace"))
+                {
+                    var m = rns.Match(lines[i]);
+
+                    if (m.Success)
+                    {
+                        nns = m.Groups[1].Value;
+                    }
+                }
+                else if (lines[i].Contains("class "))
+                {
+                    var m = rcls.Match(lines[i]);
+
+                    if (m.Success)
+                    {
+                        classname = m.Groups[1].Value;
+                    }
+                }
+                else
+                {
+                    var m = rext.Match(lines[i]);
+
+                    if (m.Success)
+                    {
+                        var me = rentry.Match(lines[i]);
+                        var ep = me.Success ? me.Groups[1].Value : null;
+
+                        string dname;
+                        string dtype;
+                        string paramsig = null;
+
+                        Match dm = null;
+
+                        while (i < c - 1)
+                        {
+                            i++;
+                            dm = rdecl.Match(lines[i]);
+                            if (dm.Success) break;
+                        }
+
+                        if (dm == null || i == c - 1) break;
+
+                        dtype = dm.Groups[1].Value;
+                        dname = dm.Groups[2].Value;
+
+                        var mtypes = rtypes.Match(lines[i]);
+
+                        if (mtypes.Success)
+                        {
+                            paramsig = mtypes.Groups[1].Value;
+                        }
+
+                        ep ??= dname;
+
+                        var cn = new ExternInfo()
+                        {
+                            Namespace = nns,
+                            Params = paramsig,
+                            ClassName = classname,
+                            EntryPoint = ep,
+                            DLLName = m.Groups[1].Value?.ToLower(),
+                            FunctionName = dname,
+                            ReturnType = dtype,
+                            FilePath = file,
+                            FileName = Path.GetFileName(file),
+                            Project = project,
+                        };
+
+                        if (!cn.DLLName.EndsWith(".dll")) cn.DLLName += ".dll";
+
+                        Console.WriteLine($"\r\nFound Method: {cn}");
+                        l.Add(cn);
+                    }
+                }
+            }
+
+            return l;
+        }
+
+        private static List<ExternInfo> ScanDir(string dir, bool refscan = false, List<ExternInfo> nsextern = null, List<ExternInfo> fqnextern = null, string project = null)
+        {
+            if (!Directory.Exists(dir)) throw new FileNotFoundException(dir);
+
+            var files = Directory.GetFiles(dir, "*.cs");
+            var dirs = Directory.GetDirectories(dir);
+            List<string> modules = null;
+            string[] mods = null;
+
+            project = GetProjectName(dir, out mods) ?? project;
+
+            if (mods != null && mods.Length > 0)
+            {
+                modules = new List<string>(mods);
+            }
+
+            List<ExternInfo> results = refscan ? null : new List<ExternInfo>();
+
+            foreach (var file in files)
+            {
+                if (refscan)
+                {
+                    ScanFileForExternReferences(file, nsextern, fqnextern);
+                }
+                else
+                {
+                    results.AddRange(ScanFileForExterns(file, project));
+                }
+            }
+
+            foreach (var d in dirs)
+            {
+                var dname = Path.GetFileName(d);
+
+                if (modules != null && modules.Contains(dname)) continue;
+                if (dname == "bin" || dname == "obj" || dname == "nmdt" || dname == "DataTools5" || dname == "DataTools Suite" || dname.StartsWith(".")) continue;
+
+                if (refscan)
+                {
+                    ScanDir(d, true, nsextern, fqnextern);
+                }
+                else
+                {
+                    results.AddRange(ScanDir(d, project: project));
+                }
+            }
+
+            return results ?? nsextern;
+        }
+
         public static void Main(string[] args)
+        {
+            var root = @"E:\Projects\Personal Projects\Repos";
+            var results = ScanDir(root);
+            results = results.Distinct().ToList();
+
+            var nsexterns = new List<ExternInfo>(results);
+            var fqnexterns = new List<ExternInfo>(results);
+
+            nsexterns.Sort((a, b) => string.Compare(a.Namespace, b.Namespace));
+            fqnexterns.Sort((a, b) => string.Compare(a.FullyQualifiedClassName, b.FullyQualifiedClassName));
+
+            ScanDir(root, true, nsexterns, fqnexterns);
+
+            var groups = results.GroupBy(x => x.DLLName + "_" + x.EntryPoint).ToList();
+
+            var grp = new Dictionary<string, List<ExternInfo>>();
+
+            foreach (var group in groups)
+            {
+                var l = group.ToList();
+                if (l.Count < 2) continue;
+                grp.Add(group.Key, l);
+            }
+
+            results.Sort((a, b) =>
+            {
+                int r = 0;
+
+                if (a.ReferenceFiles == null && b.ReferenceFiles != null)
+                {
+                    return 1;
+                }
+                else if (a.ReferenceFiles != null && b.ReferenceFiles == null)
+                {
+                    return -1;
+                }
+                else if ((a.ReferenceFiles == null && b.ReferenceFiles == null) ||
+                    (a.ReferenceFiles != null && b.ReferenceFiles != null && a.ReferenceFiles.Count == b.ReferenceFiles.Count))
+                {
+                    r = string.Compare(a.DLLName, b.DLLName);
+
+                    if (r == 0)
+                    {
+                        r = string.Compare(a.FilePath, b.FilePath);
+
+                        if (r == 0)
+                        {
+                            r = string.Compare(a.EntryPoint, b.EntryPoint);
+
+                            if (r == 0)
+                            {
+                                r = string.Compare(a.FunctionName, b.FunctionName);
+
+                                if (r == 0)
+                                {
+                                    r = string.Compare(a.ClassName, b.ClassName);
+
+                                    if (r == 0)
+                                    {
+                                        r = string.Compare(a.ReturnType, b.ReturnType);
+                                        if (r == 0)
+                                        {
+                                            r = string.Compare(a.Params, b.Params);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (a.ReferenceFiles != null && b.ReferenceFiles != null)
+                {
+                    if (a.ReferenceFiles.Count > b.ReferenceFiles.Count)
+                    {
+                        return -1;
+                    }
+                    else if (a.ReferenceFiles.Count < b.ReferenceFiles.Count)
+                    {
+                        return 1;
+                    }
+                }
+
+                return r;
+            });
+
+            var dict = new Dictionary<string, List<ExternInfo>>();
+
+            foreach (var res in results)
+            {
+                if (!dict.TryGetValue(res.DLLName, out var dll))
+                {
+                    dll = new List<ExternInfo>();
+                    dict.Add(res.DLLName, dll);
+                }
+
+                dll.Add(res);
+            }
+            var opt = new JsonSerializerSettings()
+            {
+                Formatting = Formatting.Indented,
+            };
+            var json = JsonConvert.SerializeObject(dict, opt);
+
+            File.WriteAllText(@"E:\extern_res.json", json);
+
+            json = JsonConvert.SerializeObject(grp, opt);
+
+            File.WriteAllText(@"E:\extern_duplicates.json", json);
+
+            results = results.Where(x => x.ReferenceFiles == null || x.ReferenceFiles.Count == 0).ToList();
+
+            json = JsonConvert.SerializeObject(results, opt);
+
+            File.WriteAllText(@"E:\no_known_refs.json", json);
+        }
+
+        public static void TestHeap()
         {
             Console.WriteLine("Creating heap");
             var h = new Heap(0, 1024 * 1024 * 8);
@@ -377,6 +1029,36 @@ namespace CoreTestOne
             Console.WriteLine("Test 3: " + test3.ToString());
 
             Console.WriteLine($"Original: A: {a}, R: {r}, G: {g}, B: {b}");
+        }
+
+        private static string GetProjectName(string dir, out string[] modules)
+        {
+            var fi = Directory.GetFiles(dir, "*.csproj");
+            var projname = default(string);
+            var regex = new Regex(@"\s*path\s*\=\s*(.+)");
+            var modout = new List<string>();
+
+            if (fi != null && fi.Length > 0)
+            {
+                projname = Path.GetFileNameWithoutExtension(fi[0]);
+            }
+            else if (File.Exists(Path.Join(dir, ".gitmodules")))
+            {
+                var modfile = Path.Join(dir, ".gitmodules");
+                var lines = File.ReadAllLines(modfile);
+
+                foreach (var line in lines)
+                {
+                    var m = regex.Match(line);
+                    if (m.Success)
+                    {
+                        modout.Add(m.Groups[1].Value);
+                    }
+                }
+            }
+
+            modules = modout.ToArray();
+            return projname;
         }
 
         public static void HuntForDuplicateFiles()
