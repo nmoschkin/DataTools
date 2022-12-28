@@ -311,6 +311,8 @@ namespace DataTools.FileSystem
             }
         }
 
+        public virtual bool IsBound => shellObj != null;
+
         public abstract bool IsFolder { get; }
 
         public bool IsSpecial => special;

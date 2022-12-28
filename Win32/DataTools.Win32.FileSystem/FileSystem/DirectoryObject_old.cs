@@ -41,6 +41,8 @@ namespace DataTools.Desktop_Old
         private List<IShellObject> children = new List<IShellObject>();
         private List<IShellFolderObject> folders = new List<IShellFolderObject>();
 
+        public bool IsBound => shellFld != null;
+
         public DirectoryObject(string parsingName) : this(parsingName, true, StandardIcons.Icon48)
         {
         }

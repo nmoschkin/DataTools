@@ -31,6 +31,8 @@ namespace DataTools.Desktop_Old
 
         private SystemFileType fileType;
 
+        public bool IsBound => shellObj != null;
+
         /// <summary>
         /// Advanced initialization of FileObject.  Use this for items in special folders.
         /// </summary>

@@ -82,6 +82,14 @@ namespace DataTools.Desktop
             children = new List<IShellObject>();
         }
 
+        public DirectoryObject(string parsingName, bool isSpecial) : base(parsingName, isSpecial, true, StandardIcons.Icon48)
+        {
+        }
+
+        public DirectoryObject(string parsingName) : base(parsingName, false, true, StandardIcons.Icon48)
+        {
+        }
+
         private DirectoryObject() : base("", false, false, StandardIcons.Icon48)
         {
             DisplayName = "";
