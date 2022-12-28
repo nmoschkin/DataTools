@@ -45,14 +45,10 @@ namespace DataTools.FileSystem
         /// <param name="iconSize">Default icon size. This can be changed with the <see cref="IconSize"/> property.</param>
         protected ShellObject(string parsingName, bool special, bool initialize, StandardIcons iconSize)
         {
-            if (string.IsNullOrEmpty(parsingName))
-            {
-                throw new ArgumentNullException(nameof(parsingName));
-            }
-
             this.special = special;
             this.iconSize = iconSize;
             this.parsingName = parsingName;
+            if (string.IsNullOrEmpty(parsingName)) return;
 
             BindToShell();
             if (initialize) Refresh();

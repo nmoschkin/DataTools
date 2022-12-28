@@ -1,5 +1,4 @@
-﻿using DataTools.Desktop_Old;
-using DataTools.FileSystem;
+﻿using DataTools.FileSystem;
 using DataTools.Memory;
 using DataTools.Shell.Native;
 using DataTools.Win32;
@@ -12,9 +11,19 @@ using System.Text;
 
 namespace DataTools.Desktop
 {
+    [Flags]
+    public enum RootFolderTypes
+    {
+        QuickAccess = 1,
+        NetworkPlaces = 2,
+        MyComputer = 4,
+        ControlPanel = 8,
+        All = 0xf
+    }
+
     public class DirectoryObject : ShellObject, IShellFolderObject
     {
-        private List<IShellObject> children;
+        private List<IShellObject> children = new List<IShellObject>() { null };
         private bool lazy;
 
         public bool IsLazyLoad
@@ -44,22 +53,26 @@ namespace DataTools.Desktop
 
             if ((folderTypes & RootFolderTypes.QuickAccess) == RootFolderTypes.QuickAccess)
             {
-                d.Add(new DirectoryObject("QuickAccessFolder", true, true, iconSize));
+                var nd = new DirectoryObject("QuickAccessFolder", true, true, iconSize);
+                if (nd != null) d.Add(nd);
             }
 
             if ((folderTypes & RootFolderTypes.MyComputer) == RootFolderTypes.MyComputer)
             {
-                d.Add(new DirectoryObject("MyComputerFolder", true, true, iconSize));
+                var nd = new DirectoryObject("MyComputerFolder", true, true, iconSize);
+                if (nd != null) d.Add(nd);
             }
 
             if ((folderTypes & RootFolderTypes.NetworkPlaces) == RootFolderTypes.NetworkPlaces)
             {
-                d.Add(new DirectoryObject("NetworkPlacesFolder", true, false, iconSize));
+                var nd = new DirectoryObject("NetworkPlacesFolder", true, true, iconSize);
+                if (nd != null) d.Add(nd);
             }
 
             if ((folderTypes & RootFolderTypes.ControlPanel) == RootFolderTypes.ControlPanel)
             {
-                d.Add(new DirectoryObject("ControlPanelFolder", true, true, iconSize));
+                var nd = new DirectoryObject("ControlPanelFolder", true, true, iconSize);
+                if (nd != null) d.Add(nd);
             }
 
             return d;
@@ -309,7 +322,7 @@ namespace DataTools.Desktop
 
                 mm2.IntAt(0L) = 2;
 
-                shfld.GetDisplayNameOf(mm, (uint)ShellItemDesignNameOptions.ParentRelativeParsing, mm2);
+                shfld.GetDisplayNameOf(mm, (uint)ShellItemDesignNameOptions.DesktopAbsoluteParsing, mm2);
                 CoTaskMemPtr inv;
 
                 if (IntPtr.Size == 4)
@@ -335,7 +348,14 @@ namespace DataTools.Desktop
 
                         lpInfo.dwAttributes = 0;
 
-                        User32.SHGetItemInfo(invh, 0, ref lpInfo, Marshal.SizeOf<SHFILEINFO>(), iFlags);
+                        try
+                        {
+                            User32.SHGetItemInfo(invh, 0, ref lpInfo, Marshal.SizeOf<SHFILEINFO>(), iFlags);
+                        }
+                        catch
+                        {
+                            return null;
+                        }
 
                         pout = Path.Combine(source.ParsingName, fp);
 

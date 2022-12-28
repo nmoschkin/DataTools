@@ -11,16 +11,6 @@ using System.Runtime.InteropServices;
 
 namespace DataTools.Desktop_Old
 {
-    [Flags]
-    public enum RootFolderTypes
-    {
-        QuickAccess = 1,
-        NetworkPlaces = 2,
-        MyComputer = 4,
-        ControlPanel = 8,
-        All = 0xf
-    }
-
     /// <summary>
     /// Provides a file-system-locked object to represent the contents of a directory.
     /// </summary>
