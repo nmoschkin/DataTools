@@ -1,3 +1,5 @@
+using System;
+
 // *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
@@ -10,16 +12,12 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-
-using System;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
 
 namespace DataTools.Win32.Network
 {
@@ -29,34 +27,38 @@ namespace DataTools.Win32.Network
     /// <remarks></remarks>
     [StructLayout(LayoutKind.Sequential)]
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public struct SOCKADDRV6
+    public struct Inet6Socket
     {
-
         /// <summary>
         /// Address family.
         /// </summary>
         /// <remarks></remarks>
-        public AddressFamily AddressFamily;
+        public readonly AddressFamily AddressFamily;
 
         /// <summary>
         /// Address port.
         /// </summary>
         /// <remarks></remarks>
-        public ushort Port;
+        public readonly ushort Port;
+
+        /// <summary>
+        /// Flow Info
+        /// </summary>
+        public readonly int FlowInfo;
 
         /// <summary>
         /// Address data.
         /// </summary>
         /// <remarks></remarks>
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U1, SizeConst = 16)]
-        public byte[] Data;
+        private byte[] Data;
 
         /// <summary>
         /// Reserved, must be zero.
         /// </summary>
         /// <remarks></remarks>
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U1, SizeConst = 8)]
-        public byte[] Zero;
+        private byte[] Zero;
 
         /// <summary>
         /// Gets the IP address for this structure from the Data buffer.
@@ -74,8 +76,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Data is null)
-                return "NULL";
+            if (Data is null) return "NULL";
             return "" + new IPAddress(Data).ToString() + " (" + AddressFamily.ToString() + ")";
         }
     }

@@ -11,7 +11,7 @@
  * Copyright(C) 2022 Nathaniel N. Moschkin
  * All Rights Reserved
  * 
- * Licensed under the MIT License
+ * Licensed under the Apache 2.0 License
  ********************************************/
 
 

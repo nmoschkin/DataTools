@@ -1,30 +1,28 @@
+using System;
+using System.Linq;
+
 // *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: DevProp
 //         Native Device Properites.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using DataTools.Text;
 
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    internal struct DEVPROPKEY
+    internal struct DEVPROPKEY : IEquatable<DEVPROPKEY>
     {
         [MarshalAs(UnmanagedType.Struct)]
         public Guid fmtid;
+
         public uint pid;
 
         public DEVPROPKEY(uint ui1, ushort s1, short s2, byte b1, byte b2, byte b3, byte b4, byte b5, byte b6, byte b7, byte b8, uint pid)
@@ -40,7 +38,7 @@ namespace DataTools.Win32
 
         public bool Equals(DEVPROPKEY obj)
         {
-            return obj.fmtid.ToString() == fmtid.ToString() && obj.pid == pid;
+            return obj.fmtid == fmtid && obj.pid == pid;
         }
 
         public static bool operator ==(DEVPROPKEY operand1, DEVPROPKEY operand2)
@@ -55,13 +53,13 @@ namespace DataTools.Win32
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            if (obj is DEVPROPKEY d) return Equals(d);
+            return false;
         }
 
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
-
     }
 }

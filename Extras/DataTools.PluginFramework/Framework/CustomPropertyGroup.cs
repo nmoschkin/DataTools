@@ -1,4 +1,4 @@
-﻿using DataTools.Observable;
+﻿using DataTools.Essentials.Observable;
 
 using System;
 using System.Collections.Generic;

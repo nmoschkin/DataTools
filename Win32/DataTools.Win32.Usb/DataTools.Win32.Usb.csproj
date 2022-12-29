@@ -1,23 +1,29 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-	  <AssemblyVersion>7.0.2.2022</AssemblyVersion>
-	  <FileVersion>7.0.2.2022</FileVersion>
-	  <Authors>Nathaniel Moschkin</Authors>
-	  <Version>7.0.0</Version>
-	  <Product>DataTools Win32 USB HID Library</Product>
-	  <Description>DataTools Utility Library</Description>
-	  <Copyright>Copyright (C) 2022 Nathaniel Moschkin</Copyright>
-	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
-	  <RepositoryType>GitHub</RepositoryType>
-	  <NeutralLanguage>en-US</NeutralLanguage>
-	  <Platforms>AnyCPU;x64</Platforms>
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <nullable>disable</nullable>
+    <AssemblyVersion>8.0.0.1005</AssemblyVersion>
+    <FileVersion>8.0.0.1005</FileVersion>
+    <Authors>Nathaniel Moschkin</Authors>
+    <Version>8.0.0.1005</Version>
+    <Product>DataTools Hardware Library</Product>
+    <Description>DataTools Hardware Library - USB and USB HID Library</Description>
+    <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
+    <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Platforms>AnyCPU;x64</Platforms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <SignAssembly>False</SignAssembly>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DataTools.Win32.Usb</Title>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Configurations>Debug;Release;NuGet</Configurations>
+    <Nullable>disable</Nullable>
+    <PreviousVersion>8.0.0.1004</PreviousVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Resources\_01.dat" />
     <None Remove="Resources\_02.dat" />
@@ -42,7 +48,6 @@
     <None Remove="Resources\_90.dat" />
     <None Remove="Resources\_91.dat" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Resources\_01.dat" />
     <EmbeddedResource Include="Resources\_02.dat" />
@@ -67,11 +72,10 @@
     <EmbeddedResource Include="Resources\_90.dat" />
     <EmbeddedResource Include="Resources\_91.dat" />
   </ItemGroup>
-
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
     <ProjectReference Include="..\DataTools.Win32\DataTools.Win32.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Globalization\AppResources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -79,12 +83,21 @@
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Globalization\AppResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|x64'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
+    <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
+    <Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <Exec Command="post-build-tool /d ." />
+  </Target>
 </Project>

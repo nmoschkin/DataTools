@@ -46,6 +46,11 @@ namespace DataTools.Desktop
         StandardIcons IconSize { get; set; }
 
         /// <summary>
+        /// Return true if the object has been successfully bound to a Windows shell item.
+        /// </summary>
+        bool IsBound { get; }
+
+        /// <summary>
         /// Return true if the object is a special folder.
         /// </summary>
         bool IsFolder { get; }
@@ -110,7 +115,6 @@ namespace DataTools.Desktop
         /// <param name="iconSize"></param>
         void Refresh(StandardIcons? iconSize = default);
     }
-
 
     /// <summary>
     /// Represents a Windows Shell/Windows Explorer folder object

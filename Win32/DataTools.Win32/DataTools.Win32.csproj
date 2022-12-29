@@ -3,20 +3,21 @@
   <PropertyGroup>
     <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <nullable>disable</nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RootNamespace>DataTools</RootNamespace>
-	  <AssemblyVersion>7.0.2.2022</AssemblyVersion>
-	  <FileVersion>7.0.2.2022</FileVersion>
+	  <AssemblyVersion>8.0.0.1000</AssemblyVersion>
+	  <FileVersion>8.0.0.1000</FileVersion>
 	  <Authors>Nathaniel Moschkin</Authors>
-	  <Version>7.0.0</Version>
-	  <Product>DataTools Win32 Library</Product>
-	  <Description>DataTools Utility Library</Description>
-	  <Copyright>Copyright (C) 2022 Nathaniel Moschkin</Copyright>
+	  <Version>8.0.0</Version>
+	  <Product>DataTools Hardware Library</Product>
+	  <Description>DataTools Hardware Library - Base Hardware Information Library</Description>
+	  <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
 	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
 	  <RepositoryType>GitHub</RepositoryType>
 	  <NeutralLanguage>en-US</NeutralLanguage>
 	  <Platforms>AnyCPU;x64</Platforms>
+	  <Configurations>Debug;Release;NuGet</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,10 +25,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="TaskScheduler" Version="2.10.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.MathTools\DataTools.MathTools.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
   </ItemGroup>
 
@@ -54,5 +60,22 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Device\Classes\" />
+    <Folder Include="Device\Structs\" />
+  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
+		<Optimize>True</Optimize>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|x64'">
+		<Optimize>True</Optimize>
+	</PropertyGroup>
+	<Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
+		<Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
+		<Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+		<Exec Command="post-build-tool /d ." />
+	</Target>
 
 </Project>

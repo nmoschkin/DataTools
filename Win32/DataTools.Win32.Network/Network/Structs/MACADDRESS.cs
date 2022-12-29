@@ -129,7 +129,7 @@ namespace DataTools.Win32.Network
 
         public override int GetHashCode()
         {
-            return (int)Crc32.Calculate(Data);
+            return (int)Crc32.Hash(Data);
         }
 
         public override string ToString()

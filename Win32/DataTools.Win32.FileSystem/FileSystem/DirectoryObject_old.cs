@@ -1,26 +1,16 @@
-﻿using DataTools.Shell.Native;
+﻿using DataTools.Desktop;
+using DataTools.Memory;
+using DataTools.Shell.Native;
 using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using DataTools.Desktop;
 
 namespace DataTools.Desktop_Old
 {
-    [Flags]
-    public enum RootFolderTypes
-    {
-        QuickAccess = 1,
-        NetworkPlaces = 2,
-        MyComputer = 4,
-        ControlPanel = 8,
-        All = 0xf
-    }
-
     /// <summary>
     /// Provides a file-system-locked object to represent the contents of a directory.
     /// </summary>
@@ -33,13 +23,15 @@ namespace DataTools.Desktop_Old
         private Bitmap iconBmp;
         private StandardIcons iconSize = StandardIcons.Icon48;
         private IShellFolderObject parent;
-        
+
         private bool special;
 
         private IShellFolder shellFld;
 
         private List<IShellObject> children = new List<IShellObject>();
         private List<IShellFolderObject> folders = new List<IShellFolderObject>();
+
+        public bool IsBound => shellFld != null;
 
         public DirectoryObject(string parsingName) : this(parsingName, true, StandardIcons.Icon48)
         {
@@ -611,8 +603,8 @@ namespace DataTools.Desktop_Old
             IShellFolder shfld;
             IEnumIDList enumer;
 
-            MemPtr mm;
-            var mm2 = new MemPtr();
+            DataTools.Win32.Memory.MemPtr mm;
+            var mm2 = new DataTools.Win32.Memory.MemPtr();
 
             string fp;
 
@@ -681,7 +673,7 @@ namespace DataTools.Desktop_Old
                         mm2.IntAt(0L) = 2;
 
                         shfld.GetDisplayNameOf(mm, (uint)ShellItemDesignNameOptions.ParentRelativeParsing, mm2.handle);
-                        MemPtr inv;
+                        DataTools.Win32.Memory.MemPtr inv;
 
                         if (IntPtr.Size == 4)
                         {
@@ -1090,7 +1082,7 @@ namespace DataTools.Desktop_Old
 
                 if (h != HResult.Ok)
                 {
-                    var str = NativeErrorMethods.FormatLastError((uint)h);
+                    var str = NativeError.FormatLastError((uint)h);
 
                     h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
 

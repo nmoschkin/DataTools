@@ -10,17 +10,15 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32.Memory;
 
 using System;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Network
 {
@@ -30,67 +28,62 @@ namespace DataTools.Win32.Network
     /// <remarks></remarks>
     [StructLayout(LayoutKind.Sequential)]
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public struct LPSOCKADDR
+    public struct InetSocketPtr : IDisposable
     {
-        public MemPtr Handle;
+        internal MemPtr Handle;
 
         public override string ToString()
         {
-            if (Handle.Handle == nint.Zero)
-                return "NULL";
-            return "" + IPAddress.ToString() + " (" + AddressFamily.ToString() + ")";
+            if (Handle == MemPtr.Empty) return "NULL";
+            return $"{IPAddress} ({AddressFamily})";
         }
 
+        /// <summary>
+        /// Gets the resolved <see cref="System.Net.IPAddress"/> for this socket, based on the <see cref="AddressFamily"/>.
+        /// </summary>
         public IPAddress IPAddress
         {
             get
             {
-                if (Data is null)
-                    return null;
-                return new IPAddress(Data);
-            }
-        }
-
-        public SOCKADDR IPAddrV4
-        {
-            get
-            {
-                SOCKADDR IPAddrV4Ret = default;
                 if (AddressFamily == AddressFamily.AfInet6)
-                    return default;
-                IPAddrV4Ret = ToSockAddr();
-                return IPAddrV4Ret;
+                {
+                    return IPAddrV6.Address;
+                }
+                else
+                {
+                    return IPAddrV4.Address;
+                }
             }
         }
 
-        public SOCKADDRV6 IPAddrV6
+        public Inet4Socket IPAddrV4
         {
             get
             {
-                SOCKADDRV6 IPAddrV6Ret = default;
-                if (AddressFamily == AddressFamily.AfInet)
-                    return new SOCKADDRV6();
-                IPAddrV6Ret = ToSockAddr6();
-                return IPAddrV6Ret;
+                if (AddressFamily == AddressFamily.AfInet6) return default;
+                return ToSockAddr();
             }
         }
 
-        public SOCKADDR ToSockAddr()
+        public Inet6Socket IPAddrV6
         {
-            SOCKADDR ToSockAddrRet = default;
-            if (Handle == nint.Zero)
-                return new SOCKADDR();
-            ToSockAddrRet = Handle.ToStruct<SOCKADDR>();
-            return ToSockAddrRet;
+            get
+            {
+                if (AddressFamily == AddressFamily.AfInet) return default;
+                return ToSockAddr6();
+            }
         }
 
-        public SOCKADDRV6 ToSockAddr6()
+        private Inet4Socket ToSockAddr()
         {
-            SOCKADDRV6 ToSockAddr6Ret = default;
-            if (Handle == nint.Zero)
-                return default;
-            ToSockAddr6Ret = Handle.ToStruct<SOCKADDRV6>();
-            return ToSockAddr6Ret;
+            if (Handle == nint.Zero) return default;
+            return Handle.ToStruct<Inet4Socket>();
+        }
+
+        private Inet6Socket ToSockAddr6()
+        {
+            if (Handle == nint.Zero) return default;
+            return Handle.ToStruct<Inet6Socket>();
         }
 
         public void Dispose()
@@ -102,79 +95,9 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle.Handle == nint.Zero)
-                    return AddressFamily.AfUnspecified;
+                if (Handle == MemPtr.Empty) return AddressFamily.AfUnspecified;
                 return ToSockAddr().AddressFamily;
             }
-        }
-
-        public byte[] Data
-        {
-            get
-            {
-                switch (AddressFamily)
-                {
-                    case AddressFamily.AfInet:
-                        {
-                            return IPAddrV4.Data;
-                        }
-
-                    default:
-                        {
-                            return IPAddrV6.Data;
-                        }
-                }
-            }
-        }
-
-        public static implicit operator LPSOCKADDR(nint operand)
-        {
-            var a = new LPSOCKADDR();
-            a.Handle = operand;
-            return a;
-        }
-
-        public static implicit operator nint(LPSOCKADDR operand)
-        {
-            return operand.Handle.Handle;
-        }
-
-        public static implicit operator LPSOCKADDR(MemPtr operand)
-        {
-            var a = new LPSOCKADDR();
-            a.Handle = operand;
-            return a;
-        }
-
-        public static implicit operator MemPtr(LPSOCKADDR operand)
-        {
-            return operand.Handle;
-        }
-
-        public static implicit operator LPSOCKADDR(SOCKADDR operand)
-        {
-            var a = new LPSOCKADDR();
-            a.Handle.Alloc(Marshal.SizeOf(operand));
-            Marshal.StructureToPtr(operand, a.Handle.Handle, true);
-            return a;
-        }
-
-        public static implicit operator SOCKADDR(LPSOCKADDR operand)
-        {
-            return operand.ToSockAddr();
-        }
-
-        public static implicit operator LPSOCKADDR(SOCKADDRV6 operand)
-        {
-            var a = new LPSOCKADDR();
-            a.Handle.Alloc(Marshal.SizeOf(operand));
-            Marshal.StructureToPtr(operand, a.Handle.Handle, true);
-            return a;
-        }
-
-        public static implicit operator SOCKADDRV6(LPSOCKADDR operand)
-        {
-            return operand.ToSockAddr6();
         }
     }
 }

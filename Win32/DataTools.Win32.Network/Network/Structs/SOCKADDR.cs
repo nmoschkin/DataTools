@@ -31,7 +31,7 @@ namespace DataTools.Win32.Network
     /// <remarks></remarks>
     [StructLayout(LayoutKind.Sequential)]
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public struct SOCKADDR
+    public struct Inet4Socket
     {
         /// <summary>
         /// Address family.

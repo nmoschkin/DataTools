@@ -1,3 +1,5 @@
+using System;
+
 // *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
@@ -9,15 +11,8 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
-
-
-using System;
-using System.Runtime.InteropServices;
-
-using DataTools.Text;
-using DataTools.Win32;
 
 namespace DataTools.Win32.Network
 {
@@ -25,9 +20,8 @@ namespace DataTools.Win32.Network
     /// Network API status result enum
     /// </summary>
     [Flags]
-    public enum NET_API_STATUS : uint
+    internal enum NET_API_STATUS : uint
     {
-
         /// <summary>
         /// Success
         /// </summary>
@@ -37,7 +31,6 @@ namespace DataTools.Win32.Network
         /// Invalid computer
         /// </summary>
         NERR_InvalidComputer = 2351U,
-
 
         /// <summary>
         /// Not primary user

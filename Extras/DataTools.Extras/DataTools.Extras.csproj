@@ -1,13 +1,33 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <AssemblyVersion>8.0.0.1005</AssemblyVersion>
+    <FileVersion>8.0.0.1005</FileVersion>
+    <Authors>Nathaniel Moschkin</Authors>
+    <Version>8.0.0.1005</Version>
+    <Product>DataTools Extras</Product>
+    <Description>DataTools Extras</Description>
+    <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
+    <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DataTools.Extras</Title>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Platforms>AnyCPU;x64</Platforms>
+    <Configurations>Debug;Release;NuGet</Configurations>
+    <PreviousVersion>8.0.0.1004</PreviousVersion>
   </PropertyGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\..\Standard\DataTools\DataTools.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.MathTools\DataTools.MathTools.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Update="AppResources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -15,12 +35,21 @@
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="AppResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|x64'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
+    <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
+    <Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <Exec Command="post-build-tool /d ." />
+  </Target>
 </Project>

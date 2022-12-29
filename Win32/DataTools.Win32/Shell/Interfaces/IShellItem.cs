@@ -13,6 +13,8 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Memory;
+
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

@@ -7,6 +7,7 @@
  * *************************************************/
 
 using DataTools.Desktop;
+using DataTools.Memory;
 using DataTools.Shell.Native;
 using DataTools.Win32;
 
@@ -44,14 +45,10 @@ namespace DataTools.FileSystem
         /// <param name="iconSize">Default icon size. This can be changed with the <see cref="IconSize"/> property.</param>
         protected ShellObject(string parsingName, bool special, bool initialize, StandardIcons iconSize)
         {
-            if (string.IsNullOrEmpty(parsingName))
-            {
-                throw new ArgumentNullException(nameof(parsingName));
-            }
-
             this.special = special;
             this.iconSize = iconSize;
             this.parsingName = parsingName;
+            if (string.IsNullOrEmpty(parsingName)) return;
 
             BindToShell();
             if (initialize) Refresh();
@@ -202,8 +199,6 @@ namespace DataTools.FileSystem
             OnPropertyChanged(nameof(CreationTime));
         }
 
-
-
         internal static Resources.SystemIconSizes StandardToSystem(StandardIcons stdIcon)
         {
             Resources.SystemIconSizes st;
@@ -238,7 +233,6 @@ namespace DataTools.FileSystem
             return st;
         }
 
-
         public virtual FileAttributes Attributes
         {
             get
@@ -252,13 +246,11 @@ namespace DataTools.FileSystem
             }
         }
 
-        
         public string DisplayName
         {
             get => displayName;
             set => displayName = value;
         }
-        
 
         /// <summary>
         /// Returns an ICO for the shell object.
@@ -314,6 +306,8 @@ namespace DataTools.FileSystem
                 Refresh(iconSize);
             }
         }
+
+        public virtual bool IsBound => shellObj != null;
 
         public abstract bool IsFolder { get; }
 
@@ -406,7 +400,6 @@ namespace DataTools.FileSystem
                 return ((Attributes & FileAttributes.ReadOnly) == 0) && !IsSpecial;
             }
         }
-
 
         public virtual void MoveObject(string value)
         {
@@ -529,7 +522,7 @@ namespace DataTools.FileSystem
             // the command to send to the binder that tells it what to bind
             var g1 = ShellBHIDGuid.PropertyStoreUuid;
 
-            // the UUID of the interface that will be bound.            
+            // the UUID of the interface that will be bound.
             var g2 = ShellIIDGuid.IPropertyStoreUuid;
 
             IPropertyStore p;
@@ -702,7 +695,7 @@ namespace DataTools.FileSystem
 
                 if (h != HResult.Ok)
                 {
-                    var str = NativeErrorMethods.FormatLastError((uint)h);
+                    var str = NativeError.FormatLastError((uint)h);
 
                     h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
 

@@ -1,4 +1,4 @@
-﻿using DataTools.Observable;
+﻿using DataTools.Essentials.Observable;
 
 using System;
 using System.Collections;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DataTools.PluginFramework.Framework
 {
-  
+
     public class CustomPropertyCollection : ObservableDictionary<string, ICustomProperty>, ICustomPropertyCollection
     {
         public CustomPropertyCollection() : base("Name")

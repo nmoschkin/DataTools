@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>disable</Nullable>
+    <AssemblyVersion>8.0.0.1008</AssemblyVersion>
+    <FileVersion>8.0.0.1008</FileVersion>
+    <Authors>Nathaniel Moschkin</Authors>
+    <Version>8.0.0.1008</Version>
+    <Product>DataTools Graphics Library</Product>
+    <Description>DataTools Graphics Library</Description>
+    <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
+    <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <SignAssembly>False</SignAssembly>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>DataTools.Graphics</Title>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Configurations>Debug;Release;NuGet</Configurations>
+    <PreviousVersion>8.0.0.1007</PreviousVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="SkiaSharp" Version="2.88.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataTools.Essentials\DataTools.Essentials.csproj" />
+    <ProjectReference Include="..\DataTools.MathTools\DataTools.MathTools.csproj" />
+    <ProjectReference Include="..\DataTools.Memory\DataTools.Memory.csproj" />
+    <ProjectReference Include="..\DataTools.Text\DataTools.Text.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="AppResources.Designer.cs">
+      <DependentUpon>AppResources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="AppResources.resx">
+      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
+    <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
+    <Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <Exec Command="post-build-tool /d ." />
+  </Target>
+</Project>

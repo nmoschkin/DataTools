@@ -1,11 +1,12 @@
-﻿using DataTools.Shell.Native;
+﻿using DataTools.Desktop;
+using DataTools.Memory;
+using DataTools.Shell.Native;
 using DataTools.Win32;
 
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using DataTools.Desktop;
 
 namespace DataTools.Desktop_Old
 {
@@ -21,7 +22,7 @@ namespace DataTools.Desktop_Old
         private Bitmap iconBmp;
         private StandardIcons iconSize = StandardIcons.Icon48;
         private IShellFolderObject parent;
-        
+
         private bool special;
 
         private IShellItemPS shellObjPS;
@@ -29,6 +30,8 @@ namespace DataTools.Desktop_Old
         private IShellItem shellObj;
 
         private SystemFileType fileType;
+
+        public bool IsBound => shellObj != null;
 
         /// <summary>
         /// Advanced initialization of FileObject.  Use this for items in special folders.
@@ -87,7 +90,7 @@ namespace DataTools.Desktop_Old
                         this.special = true;
 
                         if (initialize)
-                           Refresh();
+                            Refresh();
 
                         shellObj = shitem;
 
@@ -887,7 +890,7 @@ namespace DataTools.Desktop_Old
 
                 if (h != HResult.Ok)
                 {
-                    var str = NativeErrorMethods.FormatLastError((uint)h);
+                    var str = NativeError.FormatLastError((uint)h);
 
                     h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
 

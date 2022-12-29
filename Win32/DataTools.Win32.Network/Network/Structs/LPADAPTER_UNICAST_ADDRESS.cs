@@ -10,18 +10,15 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32.Memory;
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Network
 {
@@ -35,17 +32,17 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                var mx = this;                
+                var mx = this;
 
                 List<ADAPTER_UNICAST_ADDRESS> ac = new List<ADAPTER_UNICAST_ADDRESS>();
 
-                while(true)
+                while (true)
                 {
                     if (mx.Handle == MemPtr.Empty) break;
 
                     ac.Add(mx.Struct);
                     mx = mx.Next;
-                }               
+                }
 
                 return ac.ToArray();
             }
@@ -103,14 +100,6 @@ namespace DataTools.Win32.Network
             get
             {
                 return Struct.Address.lpSockaddr.AddressFamily;
-            }
-        }
-
-        public byte[] Data
-        {
-            get
-            {
-                return Struct.Address.lpSockaddr.Data;
             }
         }
 

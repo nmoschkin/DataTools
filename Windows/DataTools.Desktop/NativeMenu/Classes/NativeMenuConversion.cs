@@ -10,34 +10,25 @@
 // A whole bunch of pInvoke/Const/Declare/Struct and associated utility functions that have been collected over the years.
 
 // Some enum documentation copied from the MSDN (and in some cases, updated).
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
-
-
-
 
 // Some notes: The menu items are dynamic.  They are not statically maintained in any collection or structure.
 
 // When you fetch an item object from the virtual collection, that object is only alive in your program for as long as you reference it.
 // If the menu gets destroyed while you are still working with an item, it will fail.
 
+using DataTools.Win32.Memory;
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Threading;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Menu
 {
-    
-    
     public static class NativeMenuConversion
     {
         public const int MenuTypeMask = 0x4764;
@@ -46,9 +37,9 @@ namespace DataTools.Win32.Menu
         {
             int i;
             int c = User32.GetMenuItemCount(hMenu);
-            
+
             var mi = default(MENUITEMINFO);
-            
+
             mi.cbSize = Marshal.SizeOf(mi);
             mi.fMask = User32.MIIM_STATE + User32.MIIM_ID;
 
@@ -112,7 +103,6 @@ namespace DataTools.Win32.Menu
             return true;
         }
 
-
         /// <summary>
         /// Copy a native hMenu and all its contents into a managed Menu object
         /// </summary>
@@ -158,7 +148,6 @@ namespace DataTools.Win32.Menu
             return true;
         }
 
-
         /// <summary>
         /// Copy a native hMenu and all its contents into a managed DropDownItemsCollection object
         /// </summary>
@@ -172,7 +161,7 @@ namespace DataTools.Win32.Menu
             int i;
             ToolStripMenuItem min = null;
             c = User32.GetMenuItemCount(hMenu);
-            
+
             for (i = 0; i < c; i++)
             {
                 if (MenuItemCopyToManaged(hMenu, i, ref min) == false)
@@ -189,17 +178,17 @@ namespace DataTools.Win32.Menu
         {
             var mii = new MENUITEMINFO();
             var mm = new SafePtr();
-            
+
             mii.cbSize = Marshal.SizeOf(mii);
             mii.cch = 0;
             mii.fMask = User32.MIIM_TYPE;
-            
+
             User32.GetMenuItemInfo(hMenu, itemId, byPos, ref mii);
-            
+
             mm.Length = (mii.cch + 1) * sizeof(char);
-            
+
             mii.cch += 1;
-            mii.dwTypeData = mm.handle;
+            mii.dwTypeData = mm.DangerousGetHandle();
 
             if (User32.GetMenuItemInfo(hMenu, itemId, byPos, ref mii) == 0)
             {
@@ -208,7 +197,7 @@ namespace DataTools.Win32.Menu
                 mm.Length = 1026L;
                 mm.ZeroMemory();
 
-                User32.FormatMessage(0x1000U, IntPtr.Zero, (uint)err, 0U, mm.handle, 512U, IntPtr.Zero);
+                User32.FormatMessage(0x1000U, IntPtr.Zero, (uint)err, 0U, mm.DangerousGetHandle(), 512U, IntPtr.Zero);
 
                 mm.Dispose();
 
@@ -241,7 +230,7 @@ namespace DataTools.Win32.Menu
 
             Bitmap bmp;
 
-            var mm = new SafePtr();
+            var mm = new CoTaskMemPtr();
 
             if (destItem is null)
             {
@@ -256,7 +245,7 @@ namespace DataTools.Win32.Menu
 
             mm.Length = (mii.cch + 1) * sizeof(char);
             mii.cch += 1;
-            mii.dwTypeData = mm.handle;
+            mii.dwTypeData = mm.DangerousGetHandle();
 
             if (User32.GetMenuItemInfo(hMenu, itemId, byPos, ref mii) == 0)
             {
@@ -265,7 +254,7 @@ namespace DataTools.Win32.Menu
                 mm.Length = 1026L;
                 mm.ZeroMemory();
 
-                User32.FormatMessage(0x1000U, IntPtr.Zero, (uint)err, 0U, mm.handle, 512U, IntPtr.Zero);
+                User32.FormatMessage(0x1000U, IntPtr.Zero, (uint)err, 0U, mm.DangerousGetHandle(), 512U, IntPtr.Zero);
 
                 mm.Dispose();
 

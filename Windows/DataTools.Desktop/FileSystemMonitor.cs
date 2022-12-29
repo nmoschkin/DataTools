@@ -1160,7 +1160,7 @@ namespace DataTools.Desktop
                         _isWatching = false;
                         if (m.LParam.ToInt32() >= 1)
                         {
-                            MonitorClosed?.Invoke(this, new MonitorClosedEventArgs(MonitorClosedState.ClosedOnError, m.LParam.ToInt32(), NativeErrorMethods.FormatLastError((uint)m.LParam.ToInt32())));
+                            MonitorClosed?.Invoke(this, new MonitorClosedEventArgs(MonitorClosedState.ClosedOnError, m.LParam.ToInt32(), NativeError.FormatLastError((uint)m.LParam.ToInt32())));
                         }
                         else
                         {

@@ -7,17 +7,13 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-
-using DataTools.MathTools;
+using DataTools.Essentials.Helpers;
 using DataTools.Text;
 
 using Newtonsoft.Json;
-
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace DataTools.Win32.Usb
 {
@@ -34,13 +30,13 @@ namespace DataTools.Win32.Usb
         {
             get
             {
-                if (wfparent != null && wfparent.TryGetTarget(out HidUsageCollection? target) && target is HidUsageCollection)  
+                if (wfparent != null && wfparent.TryGetTarget(out HidUsageCollection? target) && target is HidUsageCollection)
                 {
                     return target;
                 }
                 else
                 {
-                    wfparent = null;                    
+                    wfparent = null;
                 }
 
                 return null;
@@ -106,11 +102,9 @@ namespace DataTools.Win32.Usb
                     puc = UnitInfoCode.BatteryCapacity;
                 }
 
-
                 HidUnit = puc;
             }
         }
-
 
         /// <summary>
         /// The Usage Type
@@ -156,11 +150,13 @@ namespace DataTools.Win32.Usb
         /// </summary>
         [JsonProperty("standard")]
         public virtual string? Standard { get; set; }
+
         /// <summary>
         /// Can Read
         /// </summary>
         [JsonProperty("accessRead")]
         public virtual bool AccessRead { get; set; }
+
         /// <summary>
         /// Can Write
         /// </summary>
@@ -277,7 +273,6 @@ namespace DataTools.Win32.Usb
             if (rw != "") text += " - " + rw;
 
             return text;
-
         }
 
         /// <summary>
@@ -300,7 +295,7 @@ namespace DataTools.Win32.Usb
             Parent = parent;
         }
 
-        public T CloneInto<T>() where T: HidUsageInfo, new()
+        public T CloneInto<T>() where T : HidUsageInfo, new()
         {
             T ret = new T();
 
@@ -312,7 +307,7 @@ namespace DataTools.Win32.Usb
         {
             var ret = MemberwiseClone();
             HidUsageInfo? rpt = (HidUsageInfo)ret;
-            
+
             if (rpt != null)
             {
                 rpt.IsButton = isButton;

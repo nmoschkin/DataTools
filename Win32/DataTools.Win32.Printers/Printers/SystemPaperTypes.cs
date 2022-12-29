@@ -29,7 +29,7 @@ using DataTools.MathTools;
 using DataTools.Win32;
 using DataTools.Win32.Memory;
 using DataTools.Graphics;
-using DataTools.MathTools.PolarMath;
+using DataTools.MathTools.Polar;
 
 namespace DataTools.Hardware.Printers
 {

@@ -964,7 +964,7 @@ namespace DataTools.Text.ByteOrderMark
 
         public override int GetHashCode()
         {
-            return (int)Crc32.Calculate(_BOM);
+            return (int)Crc32.Hash(_BOM);
         }
     }
 

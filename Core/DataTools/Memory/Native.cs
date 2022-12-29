@@ -11,31 +11,52 @@ namespace DataTools.Memory
 {
     internal static class Native
     {
+        [StructLayout(LayoutKind.Sequential, Size = 16)]
+        internal struct MemChunkStruct
+        {
+        }
 
         internal static unsafe void ZeroMemory(void* handle, long len)
         {
             unsafe
             {
-
                 byte* bp1 = (byte*)handle;
                 byte* bep = (byte*)handle + len;
 
-                if (len >= IntPtr.Size)
+                var mc = new MemChunkStruct();
+
+                ((long*)&mc)[0] = 0L;
+                ((long*)&mc)[1] = 0L;
+
+                if (len >= 16)
                 {
-                    if (IntPtr.Size == 8)
+                    if (nint.Size == 8)
                     {
-                        long* lp1 = (long*)bp1;
-                        long* lep = (long*)bep;
+                        MemChunkStruct* lp1 = (MemChunkStruct*)bp1;
+                        MemChunkStruct* lep = (MemChunkStruct*)bep;
 
                         do
                         {
-                            *lp1++ = 0L;
+                            *lp1++ = mc;
                         } while (lp1 < lep);
 
                         if (lp1 == lep) return;
 
                         lp1--;
                         bp1 = (byte*)lp1;
+
+                        //long* lp1 = (long*)bp1;
+                        //long* lep = (long*)bep;
+
+                        //do
+                        //{
+                        //    *lp1++ = 0L;
+                        //} while (lp1 < lep);
+
+                        //if (lp1 == lep) return;
+
+                        //lp1--;
+                        //bp1 = (byte*)lp1;
                     }
                     else
                     {
@@ -60,15 +81,13 @@ namespace DataTools.Memory
             }
         }
 
-        public static void MemCpy(IntPtr src, IntPtr dest, long len)
+        public static void MemCpy(nint src, nint dest, long len)
         {
             unsafe
             {
                 Buffer.MemoryCopy((void*)src, (void*)dest, len, len);
             }
         }
-
-
 
         //        internal static unsafe void MemCpy(void* src, void* dest, long len)
         //        {
@@ -125,7 +144,6 @@ namespace DataTools.Memory
         //                } while (bp1 < bep);
         //            }
         //        }
-
     }
 
     //[StructLayout(LayoutKind.Sequential, Size = 16, Pack = 1)]
@@ -147,5 +165,4 @@ namespace DataTools.Memory
     //    public ulong val7;
     //    public ulong val8;
     //}
-
 }

@@ -7,21 +7,15 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
 using DataTools.Win32.Memory;
-using DataTools.Win32.Usb;
 
 using System;
-using System.ComponentModel;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text;
-
-using static DataTools.Win32.User32;
 
 [assembly: InternalsVisibleTo("TLModel")]
 
@@ -32,7 +26,6 @@ namespace DataTools.Win32.Usb
     /// </summary>
     public static class UsbLibHelpers
     {
-
         [DllImport("hid.dll")]
         internal static extern bool HidD_GetProductString(nint HidDeviceObject, nint Buffer, int BufferLength);
 
@@ -59,14 +52,15 @@ namespace DataTools.Win32.Usb
 
         [DllImport("hid.dll")]
         internal static extern bool HidD_GetSerialNumberString(nint HidDeviceObject, nint Buffer, int BufferLength);
+
         [DllImport("hid.dll")]
         internal static extern bool HidD_GetPhysicalDescriptor(nint HidDeviceObject, nint Buffer, int BufferLength);
+
         [DllImport("hid.dll")]
         internal static extern bool HidD_GetPreparsedData(nint HidDeviceObject, ref nint PreparsedData);
 
         [DllImport("hid.dll")]
         internal static extern bool HidD_FreePreparsedData(nint PreparsedData);
-
 
         [DllImport("hid.dll", CharSet = CharSet.Unicode)]
         internal static extern bool HidD_GetIndexedString(
@@ -86,7 +80,6 @@ namespace DataTools.Win32.Usb
           [In] int BufferLength
         );
 
-
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetValueCaps(
           HidReportType ReportType,
@@ -94,7 +87,6 @@ namespace DataTools.Win32.Usb
           ref ushort ValueCapsLength,
           nint PreparsedData
         );
-
 
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetValueCaps(
@@ -104,7 +96,6 @@ namespace DataTools.Win32.Usb
           nint PreparsedData
         );
 
-
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetButtonCaps(
           HidReportType ReportType,
@@ -112,7 +103,6 @@ namespace DataTools.Win32.Usb
           ref ushort ValueCapsLength,
           nint PreparsedData
         );
-
 
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetButtonCaps(
@@ -146,7 +136,6 @@ namespace DataTools.Win32.Usb
           uint ReportLength
         );
 
-
         public static (ushort, ushort)[] GetButtonStatesRaw(HidDeviceInfo device, HidReportType reportType, HidPButtonCaps buttonCaps)
         {
             return GetButtonStatesRaw(device, reportType, new[] { buttonCaps });
@@ -170,11 +159,11 @@ namespace DataTools.Win32.Usb
 
             hhid = device.DangerousGetHidDeviceHandle();
 
-            if (hhid.IsInvalidHandle())
+            if (hhid == 0)
             {
                 return new (ushort, ushort)[0];
             }
-            
+
             using (var ppd = new PreparsedData(hhid))
             {
                 using (var buffer = new SafePtr())
@@ -183,7 +172,6 @@ namespace DataTools.Win32.Usb
                     {
                         foreach (var btn in buttonCaps)
                         {
-
                             if (reportType == HidReportType.Feature)
                             {
                                 buffer.Alloc(sizeof(ushort) * caps.NumberFeatureButtonCaps);
@@ -222,7 +210,6 @@ namespace DataTools.Win32.Usb
 
             if (ch) device.CloseHid();
             return output.ToArray();
-
         }
 
         public static HidFeatureValue? GetScaledValue(HidDeviceInfo device, HidReportType reportType, HidPValueCaps valueCaps)
@@ -232,13 +219,12 @@ namespace DataTools.Win32.Usb
             return result[0].Item3;
         }
 
-
         public static (ushort, ushort, HidFeatureValue)[] GetScaledValues(HidDeviceInfo device, HidReportType reportType, IEnumerable<HidPValueCaps> valueCaps)
         {
             var output = new List<(ushort, ushort, HidFeatureValue)>();
 
             nint hhid;
-            
+
             var caps = device.HidCaps;
             var ch = false;
 
@@ -250,7 +236,7 @@ namespace DataTools.Win32.Usb
 
             hhid = device.DangerousGetHidDeviceHandle();
 
-            if (hhid.IsInvalidHandle())
+            if (hhid == 0)
             {
                 return new (ushort, ushort, HidFeatureValue)[0];
             }
@@ -293,7 +279,6 @@ namespace DataTools.Win32.Usb
             return output.ToArray();
         }
 
-
         /// <summary>
         /// Get the button caps for the specified report type.
         /// </summary>
@@ -323,10 +308,7 @@ namespace DataTools.Win32.Usb
 
                 return result;
             }
-
         }
-
-
 
         /// <summary>
         /// Get the value caps for the specified report type.
@@ -358,7 +340,6 @@ namespace DataTools.Win32.Usb
 
                 return result;
             }
-
         }
 
         /// <summary>
@@ -372,11 +353,10 @@ namespace DataTools.Win32.Usb
         /// </remarks>
         public static bool PopulateDeviceCaps(HidDeviceInfo device, nint? hHid = null)
         {
-
             try
             {
                 var hhid = hHid ?? HidFeatures.OpenHid(device);
-                if (hhid.IsInvalidHandle()) return false;
+                if (hhid == 0) return false;
 
                 HidAttributes attr;
 
@@ -386,8 +366,6 @@ namespace DataTools.Win32.Usb
 
                 using (var ppd = new PreparsedData(hhid))
                 {
-
-
                     HidD_GetAttributes(hhid, out attr);
                     HidP_GetCaps(ppd, out caps);
 
@@ -425,7 +403,6 @@ namespace DataTools.Win32.Usb
                             fbmap = LinkButtonCollections(featBtn);
                             device.FeatureButtonCaps = featBtn;
                             device.LinkedFeatureButtons = fbmap;
-
                         }
                     }
 
@@ -440,7 +417,6 @@ namespace DataTools.Win32.Usb
                             device.LinkedInputButtons = ibmap;
                         }
                     }
-
 
                     if (outBtn != null)
                     {
@@ -492,7 +468,6 @@ namespace DataTools.Win32.Usb
                 }
 
                 if (hHid == null) HidFeatures.CloseHid(hhid);
-
             }
             catch
             {
@@ -604,7 +579,6 @@ namespace DataTools.Win32.Usb
                     var test = list.Where(x => x.Usage == item.Usage).FirstOrDefault();
                     if (test.Usage == 0) list.Add(item);
                 }
-
             }
 
             return result;
@@ -660,6 +634,5 @@ namespace DataTools.Win32.Usb
 
             return result;
         }
-
     }
 }

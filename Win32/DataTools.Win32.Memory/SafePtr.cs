@@ -1,789 +1,434 @@
 ﻿using DataTools.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace DataTools.Win32.Memory
 {
-    public class SafePtr : SafePtrBase
+    /// <summary>
+    /// Wraps a native Win32 custom heap
+    /// </summary>
+    public sealed class Heap : SafeHandle
     {
-        private static nint procHeap = Native.GetProcessHeap();
+        /// <summary>
+        /// Gets the process heap.
+        /// </summary>
+        public static readonly Heap ProcessHeap = new Heap(Native.GetProcessHeap());
 
-        private nint currentHeap = procHeap;
+        private readonly List<WeakReference<IHeapAssignable>> createdObjecs = new List<WeakReference<IHeapAssignable>>();
 
-        public override bool IsInvalid => handle == (nint)0;
+        private nint maxsize = 0;
+        private nint currsize = 0;
 
-        private long buffLen;
-        private MemoryType memtype = MemoryType.HGlobal;
+        public bool IsProcessHeap => ProcessHeap.handle == handle;
 
-        public override long Length
+        public long MaxSize
         {
-            get => buffLen;
-            set
+            get
             {
-                if (buffLen == value) return;
-
-                if (value == 0)
-                {
-                    TFree();
-                    return;
-                }
-                else if (handle == nint.Zero || MemoryType == MemoryType.HGlobal)
-                {
-                    ReAlloc(value);
-                }
+                GetHeapSize();
+                return maxsize;
             }
         }
 
-        public override MemoryType MemoryType => memtype;
-
-        internal new nint handle
+        public long CurrentSize
         {
-            get => base.handle;
-            set
+            get
             {
-                if (base.handle == value) return;
-                base.handle = value;
+                GetHeapSize();
+                return currsize;
             }
         }
 
-        public SafePtr(nint ptr, int size, MemoryType t, bool fOwn) : base((nint)0, fOwn, false)
+        public long UsedSpace
         {
-            base.handle = ptr;
-            buffLen = size;
-            memtype = t;
+            get
+            {
+                return GetHeapSize();
+            }
         }
 
-        public SafePtr(nint ptr, long size) : base(ptr, false, false)
+        public long UnusedSpace
         {
-            buffLen = size;
+            get
+            {
+                var sv = GetHeapSize(out var a, out var b);
+                return (a + b) - sv;
+            }
         }
 
-        public SafePtr(nint ptr, int size) : this(ptr, (long)size)
+        public Heap(nint heapPtr, bool fOwn) : base(0, fOwn)
         {
+            handle = heapPtr;
+            GetHeapSize();
         }
 
-        public SafePtr(nint ptr) : this(ptr, 0)
+        private Heap(nint ptr) : base(0, false)
         {
+            handle = ptr;
+            GetHeapSize();
         }
 
-        public SafePtr(nint ptr, bool fOwn) : base(ptr, fOwn, false)
+        public Heap(long size) : base(0, true)
         {
+            CreateHeap((nint)size, (nint)size);
         }
 
-        public SafePtr(nint ptr, long size, bool fOwn) : base(ptr, fOwn, false)
+        public Heap(int size) : base(0, true)
         {
-            buffLen = size;
+            CreateHeap((nint)size, (nint)size);
         }
 
-        public SafePtr(nint ptr, int size, bool fOwn) : this(ptr, (long)size, fOwn)
+        public Heap(long size, long maxsize) : base(0, true)
         {
+            CreateHeap((nint)size, (nint)maxsize);
         }
 
-        public unsafe SafePtr(void* ptr, int size) : this((nint)ptr, (long)size, false)
+        public Heap(int size, int maxsize) : base(0, true)
         {
-        }
-
-        public unsafe SafePtr(void* ptr, long size) : this((nint)ptr, size, false)
-        {
-        }
-
-        public unsafe SafePtr(void* ptr) : this((nint)ptr, 0)
-        {
-        }
-
-        public unsafe SafePtr(void* ptr, bool fOwn) : this((nint)ptr, fOwn)
-        {
-        }
-
-        public unsafe SafePtr(void* ptr, long size, bool fOwn) : this((nint)ptr, size, fOwn)
-        {
-        }
-
-        public unsafe SafePtr(void* ptr, int size, bool fOwn) : this((nint)ptr, size, fOwn)
-        {
-        }
-
-        public SafePtr() : base((nint)0, true, true)
-        {
-        }
-
-        public SafePtr(long size) : this()
-        {
-            if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
-            Alloc(size);
-        }
-
-        public SafePtr(int size) : this()
-        {
-            if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
-            Alloc(size);
-        }
-
-        public SafePtr(long size, MemoryType t) : this()
-        {
-            if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
-
-            memtype = t;
-            TAlloc(size);
-        }
-
-        public SafePtr(int size, MemoryType t) : this()
-        {
-            if (size < 0) throw new ArgumentOutOfRangeException(nameof(size));
-
-            memtype = t;
-            if (size > 0) TAlloc(size);
+            CreateHeap((nint)size, (nint)maxsize);
         }
 
         /// <summary>
-        /// Allocate a block of memory on a heap (typically the process heap).
+        /// Gets the size of the heap.
         /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <param name="addPressure">Whether or not to call GC.AddMemoryPressure</param>
-        /// <param name="hHeap">
-        /// Optional handle to an alternate heap.  The process heap is used if this is set to null.
-        /// If you use an alternate heap handle, you will need to free the memory using the same heap handle or an error will occur.
-        /// </param>
-        /// <param name="zeroMem">Whether or not to zero the contents of the memory on allocation.</param>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public bool Alloc(long size, bool addPressure = false, nint? hHeap = null, bool zeroMem = true)
-        {
-            if (handle != nint.Zero)
-            {
-                if (MemoryType == MemoryType.HGlobal)
-                    return ReAlloc(size);
-                else
-                    return false;
-            }
-
-            long l = buffLen;
-            bool al;
-
-            if (hHeap == null || (nint)hHeap == nint.Zero)
-                hHeap = currentHeap;
-
-            // While the function doesn't need to call HeapAlloc, it hasn't necessarily failed, either.
-            if (size == l) return true;
-
-            if (l > 0)
-            {
-                // we already have a pointer, so we will call realloc, instead.
-                return ReAlloc(size);
-            }
-
-            handle = Native.HeapAlloc((nint)hHeap, zeroMem ? 8u : 0, (nint)size);
-            al = handle != nint.Zero;
-
-            // see if we need to tell the garbage collector anything.
-            if (al)
-            {
-                if (addPressure) GC.AddMemoryPressure(size);
-                HasGCPressure = addPressure;
-
-                if (hHeap != null) currentHeap = (nint)hHeap;
-                memtype = MemoryType.HGlobal;
-
-                buffLen = (long)Native.HeapSize(currentHeap, 0, handle);
-            }
-
-            return al;
-        }
-
-        /// <summary>
-        /// Allocate a block of memory on the process heap.
-        /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <param name="addPressure">Whether or not to call GC.AddMemoryPressure</param>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public bool Alloc(long size, bool addPressure)
-        {
-            return Alloc(size, addPressure, null, true);
-        }
-
-        /// <summary>
-        /// Allocate a block of memory on the process heap.
-        /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public override bool Alloc(long size)
-        {
-            return Alloc(size, false, null, true);
-        }
-
-        /// <summary>
-        /// (Deprecated) Allocate a block of memory and set its contents to zero.
-        /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <param name="addPressure">Whether or not to call GC.AddMemoryPressure</param>
-        /// <param name="hHeap">
-        /// Optional handle to an alternate heap.  The process heap is used if this is set to null.
-        /// If you use an alternate heap handle, you will need to free the memory using the same heap handle or an error will occur.
-        /// </param>
         /// <returns></returns>
-        /// <remarks></remarks>
-        public bool AllocZero(long size, bool addPressure = false, nint? hHeap = null)
+        public long GetHeapSize()
         {
-            return Alloc(size, addPressure, hHeap, true);
+            return GetHeapSize(out _, out _);
         }
 
         /// <summary>
-        /// Allocates memory aligned to a particular byte boundary.
-        /// Memory allocated in this way must be freed with AlignedFree()
+        /// Gets the size of the heap, and the allocated and unallocated sizes.
         /// </summary>
-        /// <param name="size">Size of the memory to allocate.</param>
-        /// <param name="alignment">The byte alignment of the memory.</param>
-        /// <param name="addPressure">Specify whether or not to add memory pressure to the garbage collector.</param>
-        /// <param name="hHeap">
-        /// Optional handle to an alternate heap.  The process heap is used if this is set to null.
-        /// If you use an alternate heap handle, you will need to free the memory using the same heap handle or an error will occur.
-        /// </param>
-        /// <returns></returns>
-        public bool AlignedAlloc(long size, long alignment = 512, bool addPressure = false, nint? hHeap = null)
+        /// <param name="committed">The current size of the heap.</param>
+        /// <param name="uncommitted">The size of the heap remaining.</param>
+        /// <returns>The total amount of memory allocated on the heap.</returns>
+        public long GetHeapSize(out long committed, out long uncommitted)
         {
-            if (handle != nint.Zero) return false;
+            committed = uncommitted = 0;
 
-            if (alignment == 0 || (alignment & 1) != 0)
-                return false;
-
-            if (handle != nint.Zero)
+            if (handle == 0) return 0;
+            using (var sp = new SafePtr())
             {
-                if (!Free())
-                    return false;
-            }
+                int cbsize = Marshal.SizeOf<PROCESS_HEAP_ENTRY_REGION>();
 
-            long l = size + (alignment - 1) + 8;
+                PROCESS_HEAP_ENTRY_REGION rgn = new PROCESS_HEAP_ENTRY_REGION();
 
-            if (hHeap == null || (nint)hHeap == nint.Zero)
-                hHeap = currentHeap;
+                sp.Alloc(cbsize);
 
-            if (l < 1)
-                return false;
-
-            nint p = Native.HeapAlloc((nint)hHeap, 8, (nint)l);
-
-            if (p == nint.Zero) return false;
-
-            nint p2 = (nint)((long)p + (alignment - 1) + 8);
-
-            if (p == nint.Zero)
-                return false;
-
-            p2 = (nint)((long)p2 - p2.ToInt64() % alignment);
-
-            MemPtr mm = p2;
-
-            mm.LongAt(-1) = p.ToInt64();
-            handle = p2;
-
-            if (addPressure)
-                GC.AddMemoryPressure(l);
-
-            HasGCPressure = addPressure;
-
-            memtype = MemoryType.Aligned;
-            if (hHeap != null) currentHeap = (nint)hHeap;
-
-            buffLen = size;
-
-            return true;
-        }
-
-        protected override SafePtrBase Clone()
-        {
-            var p = new SafePtr();
-            p.memtype = memtype;
-            p.Length = Length;
-
-            CopyTo(p, 0, 0, Length);
-            return p;
-        }
-
-        public override long GetAllocatedSize()
-        {
-            return Length;
-        }
-
-        /// <summary>
-        /// Frees a previously allocated block of aligned memory.
-        /// </summary>
-        /// <param name="removePressure">Specify whether or not to remove memory pressure from the garbage collector.</param>
-        /// <param name="hHeap">
-        /// Optional handle to an alternate heap.  The process heap is used if this is set to null.
-        /// If you use an alternate heap handle, you will need to free the memory using the same heap handle or an error will occur.
-        /// </param>
-        /// <returns></returns>
-        public bool AlignedFree()
-        {
-            if (handle == nint.Zero)
-                return true;
-
-            if (MemoryType != MemoryType.HGlobal && MemoryType != MemoryType.Aligned) return false;
-
-            nint p = (nint)LongAt(-1);
-            long l = Convert.ToInt64(Native.HeapSize(currentHeap, 0, p));
-
-            if (Native.HeapFree(currentHeap, 0, p))
-            {
-                if (HasGCPressure) GC.RemoveMemoryPressure(l);
-
-                handle = nint.Zero;
-
-                HasGCPressure = false;
-                currentHeap = procHeap;
-                memtype = MemoryType.Invalid;
-                buffLen = 0;
-
-                return true;
-            }
-            else
-                return false;
-        }
-
-        /// <summary>
-        /// Reallocate a block of memory to a different size on the task heap.
-        /// </summary>
-        /// <param name="size">The size to attempt to allocate</param>
-        /// <param name="modifyPressure">Whether or not to call GC.AddMemoryPressure or GC.RemoveMemoryPressure.</param>
-        /// <param name="hHeap">
-        /// Optional handle to an alternate heap.  The process heap is used if this is set to null.
-        /// </param>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public override bool ReAlloc(long size)
-        {
-            if (handle == nint.Zero) return Alloc(size);
-
-            if (MemoryType != MemoryType.HGlobal) return false;
-
-            long l = buffLen;
-            bool ra;
-
-            // While the function doesn't need to call HeapReAlloc, it hasn't necessarily failed, either.
-            if (size == l) return true;
-
-            if (l <= 0)
-            {
-                // we don't have a pointer yet, so we have to call alloc instead.
-                return Alloc(size);
-            }
-
-            handle = Native.HeapReAlloc(currentHeap, 8, handle, new nint(size));
-            ra = handle != nint.Zero;
-
-            // see if we need to tell the garbage collector anything.
-            if (ra && HasGCPressure)
-            {
-                if (size < l)
-                    GC.RemoveMemoryPressure(l - size);
-                else
-                    GC.AddMemoryPressure(size - l);
-            }
-
-            buffLen = size;
-            return ra;
-        }
-
-        /// <summary>
-        /// Frees a previously allocated block of memory on the task heap.
-        /// </summary>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <param name="removePressure">Whether or not to call GC.RemoveMemoryPressure</param>
-        /// <param name="hHeap">
-        /// Optional handle to an alternate heap.  The process heap is used if this is set to null.
-        /// The handle pointed to by the internal pointer must have been previously allocated with the same heap handle.
-        /// </param>
-        /// <remarks></remarks>
-        public override bool Free()
-        {
-            long l = 0;
-
-            // While the function doesn't need to call HeapFree, it hasn't necessarily failed, either.
-            if (handle == nint.Zero)
-            {
-                return true;
-            }
-            else if (MemoryType != MemoryType.HGlobal)
-            {
-                return TFree();
-            }
-            else
-            {
-                // see if we need to tell the garbage collector anything.
-                if (HasGCPressure) l = buffLen;
-
-                var res = Native.HeapFree(currentHeap, 0, handle);
-
-                // see if we need to tell the garbage collector anything.
-                if (res)
+                while (Native.HeapWalk(handle, sp))
                 {
-                    handle = nint.Zero;
-                    memtype = MemoryType.Invalid;
+                    try
+                    {
+                        rgn = sp.ToStruct<PROCESS_HEAP_ENTRY_REGION>();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                        return 0;
+                    }
 
-                    currentHeap = procHeap;
+                    if ((rgn.wFlags & HeapWalkFlags.PROCESS_HEAP_REGION) != 0)
+                    {
+                        var reg = sp.ToStruct<PROCESS_HEAP_ENTRY_REGION>();
 
-                    if (HasGCPressure) GC.RemoveMemoryPressure(l);
+                        maxsize = (nint)(reg.dwCommittedSize + reg.dwUnCommittedSize);
+                        this.currsize = (nint)(reg.dwCommittedSize);
 
-                    memtype = MemoryType.Invalid;
-                    HasGCPressure = false;
+                        committed = (long)(nint)reg.dwCommittedSize;
+                        uncommitted = (long)(nint)reg.dwUnCommittedSize;
 
-                    buffLen = 0;
-
-                    currentHeap = procHeap;
-                }
-
-                return res;
-            }
-        }
-
-        /// <summary>
-        /// Validates whether the pointer referenced by this structure
-        /// points to a valid and accessible block of memory.
-        /// </summary>
-        /// <returns>True if the memory block is valid, or False if the pointer is invalid or zero.</returns>
-        /// <remarks></remarks>
-        public bool Validate()
-        {
-            if (handle == nint.Zero || MemoryType != MemoryType.HGlobal && MemoryType != MemoryType.Aligned)
-            {
-                return false;
-            }
-
-            return Native.HeapValidate(currentHeap, 0, handle);
-        }
-
-        /// <summary>
-        /// Frees a previously allocated block of memory on the task heap with LocalFree()
-        /// </summary>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public bool LocalFree()
-        {
-            if (handle == nint.Zero)
-                return true;
-            else
-            {
-                Native.LocalFree(handle);
-
-                handle = nint.Zero;
-                memtype = MemoryType.Invalid;
-                HasGCPressure = false;
-                buffLen = 0;
-
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// Frees a previously allocated block of memory on the task heap with GlobalFree()
-        /// </summary>
-        /// <returns>True if successful. If False, call GetLastError or FormatLastError to find out more information.</returns>
-        /// <remarks></remarks>
-        public bool GlobalFree()
-        {
-            if (handle == nint.Zero)
-                return false;
-            else
-            {
-                Native.GlobalFree(handle);
-
-                handle = nint.Zero;
-                memtype = MemoryType.Invalid;
-                HasGCPressure = false;
-
-                buffLen = 0;
-
-                return true;
-            }
-        }
-
-        // NetApi Memory functions should be used carefully and not within the context
-        // of any scenario when you may accidentally call normal memory management functions
-        // on any region of memory allocated with the network memory functions.
-        // Be mindful of usage.
-        // Some normal functions such as Length and SetLength cannot be used.
-        // Normal allocation and deallocation functions cannot be used, at all.
-        // NetApi memory is not reallocatable.
-        // The size of a NetApi memory buffer cannot be retrieved.
-
-        /// <summary>
-        /// Allocate a network API compatible memory buffer.
-        /// </summary>
-        /// <param name="size">Size of the buffer to allocate, in bytes.</param>
-        /// <remarks></remarks>
-        public bool NetAlloc(int size)
-        {
-            // just ignore an allocated buffer.
-            if (handle != nint.Zero)
-                return true;
-
-            int r = Native.NetApiBufferAllocate(size, out base.handle);
-
-            if (r == 0)
-            {
-                memtype = MemoryType.Network;
-                buffLen = size;
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Free a network API compatible memory buffer previously allocated with NetAlloc.
-        /// </summary>
-        /// <remarks></remarks>
-        public void NetFree()
-        {
-            if (handle == nint.Zero)
-                return;
-
-            Native.NetApiBufferFree(handle);
-            memtype = MemoryType.Invalid;
-            handle = nint.Zero;
-            buffLen = 0;
-        }
-
-        // Virtual Memory should be used carefully and not within the context
-        // of any scenario when you may accidentally call normal memory management functions
-        // on any region of memory allocated with the Virtual functions.
-        // Be mindful of usage.
-        // Some normal functions such as Length and SetLength cannot be used (use VirtualLength).
-        // Normal allocation and deallocation functions cannot be used, at all.
-        // Virtual memory is not reallocatable.
-
-        /// <summary>
-        /// Allocates a region of virtual memory.
-        /// </summary>
-        /// <param name="size">The size of the region of memory to allocate.</param>
-        /// <param name="addPressure">Whether to call GC.AddMemoryPressure</param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool VirtualAlloc(long size, bool addPressure = true)
-        {
-            long l = 0;
-            bool va;
-
-            // While the function doesn't need to call VirtualAlloc, it hasn't necessarily failed, either.
-            if (size == l && handle != nint.Zero) return true;
-
-            handle = Native.VirtualAlloc(nint.Zero, (nint)size, VMemAllocFlags.MEM_COMMIT | VMemAllocFlags.MEM_RESERVE, MemoryProtectionFlags.PAGE_READWRITE);
-
-            va = handle != nint.Zero;
-
-            buffLen = GetVirtualLength();
-
-            if (va && addPressure)
-                GC.AddMemoryPressure(buffLen);
-
-            HasGCPressure = addPressure;
-
-            return va;
-        }
-
-        public bool VirtualReAlloc(long size)
-        {
-            if (buffLen == size)
-            {
-                return true;
-            }
-            else if (buffLen == 0)
-            {
-                return VirtualAlloc(size, HasGCPressure);
-            }
-            else if (size <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(size));
-            }
-
-            var olds = buffLen;
-
-            var cpysize = olds > size ? size : olds;
-
-            var nhandle = Native.VirtualAlloc(nint.Zero, (nint)size, VMemAllocFlags.MEM_COMMIT | VMemAllocFlags.MEM_RESERVE, MemoryProtectionFlags.PAGE_READWRITE);
-
-            if (nhandle == nint.Zero) return false;
-
-            Native.MemCpy(handle, nhandle, cpysize);
-            Native.VirtualFree(handle);
-
-            handle = nhandle;
-
-            if (HasGCPressure)
-            {
-                if (olds > size)
-                {
-                    GC.RemoveMemoryPressure(olds - size);
-                }
-                else
-                {
-                    GC.AddMemoryPressure(size - olds);
+                        return (long)(nint)reg.cbData;
+                    }
                 }
             }
-
-            buffLen = size;
-            return true;
-        }
-
-        /// <summary>
-        /// Frees a region of memory previously allocated with VirtualAlloc.
-        /// </summary>
-        /// <param name="removePressure">Whether to call GC.RemoveMemoryPressure</param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool VirtualFree()
-        {
-            long l = 0;
-            bool vf;
-
-            // While the function doesn't need to call vf, it hasn't necessarily failed, either.
-            if (handle == nint.Zero)
-                vf = true;
-            else
-            {
-                // see if we need to tell the garbage collector anything.
-                if (HasGCPressure)
-                    l = GetVirtualLength();
-
-                vf = Native.VirtualFree(handle);
-
-                // see if we need to tell the garbage collector anything.
-                if (vf)
-                {
-                    handle = nint.Zero;
-                    if (HasGCPressure)
-                        GC.RemoveMemoryPressure(l);
-
-                    HasGCPressure = false;
-                    memtype = MemoryType.Invalid;
-
-                    currentHeap = procHeap;
-                    buffLen = 0;
-                }
-            }
-
-            return vf;
-        }
-
-        /// <summary>
-        /// Returns the size of a region of virtual memory previously allocated with VirtualAlloc.
-        /// </summary>
-        /// <returns>The size of a virtual memory region or zero.</returns>
-        /// <remarks></remarks>
-        private long GetVirtualLength()
-        {
-            if (handle == nint.Zero)
-                return 0;
-
-            MEMORY_BASIC_INFORMATION m = new MEMORY_BASIC_INFORMATION();
-
-            if (Native.VirtualQuery(handle, ref m, (nint)Marshal.SizeOf(m)) != nint.Zero)
-                return (long)m.RegionSize;
 
             return 0;
         }
 
-        public void FreeCoTaskMem()
+        private void CreateHeap(nint size, nint maxsize)
         {
-            buffLen = 0;
-            currentHeap = procHeap;
-            HasGCPressure = false;
-            Marshal.FreeCoTaskMem(handle);
-            handle = nint.Zero;
-        }
-
-        public void AllocCoTaskMem(int size)
-        {
-            handle = Marshal.AllocCoTaskMem(size);
-            if (handle != nint.Zero)
+            handle = Native.HeapCreate(0, size, maxsize);
+            if (handle == 0)
             {
-                buffLen = size;
-                memtype = MemoryType.CoTaskMem;
-                currentHeap = procHeap;
-                HasGCPressure = false;
+                this.maxsize = this.currsize = 0;
+            }
+            else
+            {
+                GC.AddMemoryPressure(maxsize);
+
+                this.maxsize = maxsize;
+                this.currsize = size;
+
+                GetHeapSize();
             }
         }
 
-        private void TAlloc(long size)
+        private bool DestroyHeap()
         {
-            switch (MemoryType)
+            bool b = true;
+
+            if (handle != 0)
             {
-                case MemoryType.HGlobal:
-                    Alloc(size, size > 1024);
-                    return;
-
-                case MemoryType.Aligned:
-                    AlignedAlloc(size, default, size > 1024);
-                    return;
-
-                case MemoryType.CoTaskMem:
-
-                    if ((size & 0x7fff_ffff_0000_0000L) != 0L) throw new ArgumentOutOfRangeException(nameof(size), "Size is too big for memory type.");
-                    AllocCoTaskMem((int)size);
-                    return;
-
-                case MemoryType.Virtual:
-                    VirtualAlloc(size, size > 1024);
-                    return;
-
-                case MemoryType.Network:
-                    if ((size & 0x7fff_ffff_0000_0000L) != 0L) throw new ArgumentOutOfRangeException(nameof(size), "Size is too big for memory type.");
-                    NetAlloc((int)size);
-                    return;
-
-                default:
-                    Alloc(size, size > 1024);
-                    return;
+                b = Native.HeapDestroy(handle);
+                if (b) handle = 0;
             }
+
+            return b;
         }
 
-        private bool TFree()
+        /// <summary>
+        /// Create a new <see cref="WinPtrBase"/> <see cref="IHeapAssignable"/> object on the current heap.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T CreatePtr<T>() where T : WinPtrBase, IHeapAssignable, new()
         {
-            switch (MemoryType)
-            {
-                case MemoryType.HGlobal:
-                    return Free();
-
-                case MemoryType.Aligned:
-                    return AlignedFree();
-
-                case MemoryType.CoTaskMem:
-                    FreeCoTaskMem();
-                    return true;
-
-                case MemoryType.Virtual:
-                    return VirtualFree();
-
-                case MemoryType.Network:
-                    NetFree();
-                    return true;
-
-                default:
-                    return Free();
-            }
+            var ptr = new T();
+            ptr.AssignHeap(this);
+            createdObjecs.Add(new WeakReference<IHeapAssignable>(ptr));
+            return ptr;
         }
+
+        /// <summary>
+        /// Create a new <see cref="WinPtrBase"/> <see cref="IHeapAssignable"/> object on the current heap.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">Copy the contents of the source buffer to the new object.</param>
+        /// <returns></returns>
+        public T CreatePtr<T>(SafePtrBase source) where T : WinPtrBase, IHeapAssignable, new()
+        {
+            var ptr = new T();
+            ptr.AssignHeap(this);
+            createdObjecs.Add(new WeakReference<IHeapAssignable>(ptr));
+
+            if (source != null && source.Length > 0)
+            {
+                ptr.Alloc(source.Length);
+                source.CopyTo(ptr, 0L, 0L, source.Length);
+            }
+
+            return ptr;
+        }
+
+        public override bool IsInvalid => handle == 0;
 
         protected override bool ReleaseHandle()
         {
-            TFree();
+            foreach (var wr in createdObjecs)
+            {
+                if (wr.TryGetTarget(out var ptr))
+                {
+                    ptr.HeapIsClosing(this);
+                }
+            }
+
+            return DestroyHeap();
+        }
+
+        public override string ToString()
+        {
+            var b = 2 * nint.Size;
+            var xb = "x" + b.ToString();
+            return $"0x{handle.ToString(xb)} [{UsedSpace:#,##0} Used; {UnusedSpace:#,##0} Free]";
+        }
+    }
+
+    /// <summary>
+    /// Actions to be taken by an object created by a <see cref="Heap"/> when it is being destroyed.
+    /// </summary>
+    public enum HeapDestroyBehavior
+    {
+        /// <summary>
+        /// The contents of the object are destroyed with the heap.
+        /// </summary>
+        Cascade,
+
+        /// <summary>
+        /// The buffer is transferred to the process heap.
+        /// </summary>
+        TransferOut
+    }
+
+    public interface IHeapAssignable
+    {
+        /// <summary>
+        /// The current heap.
+        /// </summary>
+        /// <remarks>
+        /// This is usually the process heap, but creating independent heaps are possible.
+        /// </remarks>
+        nint CurrentHeap { get; }
+
+        HeapDestroyBehavior HeapDestroyBehavior { get; }
+
+        /// <summary>
+        /// Set the heap for the object
+        /// </summary>
+        /// <param name="heap"></param>
+        protected internal void AssignHeap(Heap heap);
+
+        protected internal void HeapIsClosing(Heap heap);
+    }
+
+    public class SafePtr : WinPtrBase, IHeapAssignable
+    {
+        /// <summary>
+        /// Gets the pointer to the process heap.
+        /// </summary>
+        public static readonly nint ProcessHeap = Native.GetProcessHeap();
+
+        private nint currentHeap = ProcessHeap;
+
+        public virtual HeapDestroyBehavior HeapDestroyBehavior { get; protected set; } = HeapDestroyBehavior.TransferOut;
+
+        void IHeapAssignable.AssignHeap(Heap heap)
+        {
+            CurrentHeap = heap.DangerousGetHandle();
+        }
+
+        void IHeapAssignable.HeapIsClosing(DataTools.Win32.Memory.Heap heap)
+        {
+            if (heap.DangerousGetHandle() == currentHeap)
+            {
+                if (HeapDestroyBehavior == HeapDestroyBehavior.Cascade)
+                {
+                    Free();
+                    return;
+                }
+
+                if (handle != 0)
+                {
+                    try
+                    {
+                        unsafe
+                        {
+                            var l = (nint)Length;
+                            void* ptr = (void*)Native.HeapAlloc(ProcessHeap, 0, l);
+
+                            if (ptr != null)
+                            {
+                                Buffer.MemoryCopy((void*)handle, ptr, l, l);
+                            }
+
+                            Native.HeapFree(currentHeap, 0, handle);
+                            currentHeap = ProcessHeap;
+                            handle = (nint)ptr;
+                        }
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            Free();
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The current heap.
+        /// </summary>
+        /// <remarks>
+        /// This is usually the process heap, but creating independent heaps are possible.
+        /// </remarks>
+        public virtual nint CurrentHeap
+        {
+            get => currentHeap;
+            protected set
+            {
+                if (handle != 0) throw new InvalidOperationException("Can't change heap when the buffer is allocated!");
+
+                if (currentHeap == value)
+                {
+                    return;
+                }
+                else if (value == 0)
+                {
+                    currentHeap = ProcessHeap;
+                }
+                else
+                {
+                    currentHeap = value;
+                }
+            }
+        }
+
+        protected internal new nint handle
+        {
+            get => (nint)base.handle;
+            protected set => base.handle = value;
+        }
+
+        public SafePtr(nint ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
+        {
+        }
+
+        public SafePtr() : this(0, true, true)
+        {
+        }
+
+        public SafePtr(long size) : this(0, true, true)
+        {
+            Alloc(size);
+        }
+
+        public SafePtr(int size) : this(0, true, true)
+        {
+            Alloc(size);
+        }
+
+        public bool AllocZero(long size)
+        {
+            var b = Alloc(size);
+            if (b) ZeroMemory();
+            return b;
+        }
+
+        public override MemoryType MemoryType { get; }
+
+        protected override nint Allocate(long size)
+        {
+            return Native.HeapAlloc(CurrentHeap, 8, (nint)size);
+        }
+
+        protected override bool CanGetNativeSize()
+        {
             return true;
         }
 
-        public override bool Equals(object obj)
+        protected override SafePtr Clone()
         {
-            return base.Equals(obj);
+            var b = new SafePtr();
+            var by = this.ToByteArray();
+            b.FromByteArray(by);
+            return b;
         }
 
-        public override int GetHashCode()
+        protected override void Deallocate(nint ptr)
         {
-            return base.GetHashCode();
+            Native.HeapFree(CurrentHeap, 0, ptr);
         }
+
+        protected override long GetNativeSize()
+        {
+            if (handle == 0) return 0;
+            return (long)Native.HeapSize(CurrentHeap, 0, handle);
+        }
+
+        protected override nint Reallocate(nint oldptr, long newsize)
+        {
+            return Native.HeapReAlloc(CurrentHeap, 0, handle, (nint)newsize);
+        }
+
+        #region Cast Operators
 
         public static explicit operator byte[](SafePtr val)
         {
@@ -970,9 +615,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, byte[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length);
+            val1.Alloc(val1.Length + val2.Length);
             val1.FromByteArray(val2, c);
 
             return val1;
@@ -980,9 +625,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, char[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(char));
+            val1.Alloc(val1.Length + val2.Length * sizeof(char));
             val1.FromCharArray(val2, c);
 
             return val1;
@@ -990,9 +635,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, string val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(char));
+            val1.Alloc(val1.Length + val2.Length * sizeof(char));
             val1.FromCharArray(val2.ToCharArray(), c);
 
             return val1;
@@ -1000,9 +645,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, sbyte[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length);
+            val1.Alloc(val1.Length + val2.Length);
             val1.FromArray(val2, c);
 
             return val1;
@@ -1010,9 +655,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, short[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(short));
+            val1.Alloc(val1.Length + val2.Length * sizeof(short));
             val1.FromArray(val2, c);
 
             return val1;
@@ -1020,9 +665,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, ushort[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(ushort));
+            val1.Alloc(val1.Length + val2.Length * sizeof(ushort));
             val1.FromArray(val2, c);
 
             return val1;
@@ -1030,9 +675,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, int[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(int));
+            val1.Alloc(val1.Length + val2.Length * sizeof(int));
             val1.FromArray(val2, c);
 
             return val1;
@@ -1040,9 +685,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, uint[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(uint));
+            val1.Alloc(val1.Length + val2.Length * sizeof(uint));
             val1.FromArray(val2, c);
 
             return val1;
@@ -1050,9 +695,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, long[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(long));
+            val1.Alloc(val1.Length + val2.Length * sizeof(long));
             val1.FromArray(val2, c);
 
             return val1;
@@ -1060,9 +705,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, ulong[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(ulong));
+            val1.Alloc(val1.Length + val2.Length * sizeof(ulong));
             val1.FromArray(val2, c);
 
             return val1;
@@ -1070,9 +715,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, float[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(float));
+            val1.Alloc(val1.Length + val2.Length * sizeof(float));
             val1.FromArray(val2, c);
 
             return val1;
@@ -1080,9 +725,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, double[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(double));
+            val1.Alloc(val1.Length + val2.Length * sizeof(double));
             val1.FromArray(val2, c);
 
             return val1;
@@ -1090,9 +735,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, decimal[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * sizeof(decimal));
+            val1.Alloc(val1.Length + val2.Length * sizeof(decimal));
             val1.FromArray(val2, c);
 
             return val1;
@@ -1100,9 +745,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, DateTime[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * Marshal.SizeOf<DateTime>());
+            val1.Alloc(val1.Length + val2.Length * Marshal.SizeOf<DateTime>());
             val1.FromArray(val2, c);
 
             return val1;
@@ -1110,9 +755,9 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, Guid[] val2)
         {
-            var c = val1.buffLen;
+            var c = val1.Length;
 
-            val1.Alloc(val1.buffLen + val2.Length * Marshal.SizeOf<Guid>());
+            val1.Alloc(val1.Length + val2.Length * Marshal.SizeOf<Guid>());
             val1.FromArray(val2, c);
 
             return val1;
@@ -1256,5 +901,21 @@ namespace DataTools.Win32.Memory
                 };
             }
         }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is SafePtr b)
+            {
+                return b.handle == handle;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return handle.GetHashCode();
+        }
+
+        #endregion Cast Operators
     }
 }

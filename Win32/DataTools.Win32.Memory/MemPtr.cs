@@ -9,6 +9,7 @@ using System.Text;
 namespace DataTools.Win32.Memory
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [Obsolete("This version of MemPtr is going away. Adapt to use the one in DataTools.Core.Memory.")]
     public struct MemPtr : ICloneable
     {
         internal nint handle;
@@ -114,7 +115,7 @@ namespace DataTools.Win32.Memory
 
             unsafe
             {
-                return Crc32.Calculate((byte*)handle, c);
+                return Crc32.Hash((byte*)handle, c);
             }
         }
 
@@ -1092,7 +1093,7 @@ namespace DataTools.Win32.Memory
             {
                 unsafe
                 {
-                    Native.ZeroMemory((void*)((long)handle + index), amount);
+                    Native.ZeroMemory((void*)((long)handle + index), (nint)amount);
                 }
             }
 
@@ -1681,7 +1682,7 @@ namespace DataTools.Win32.Memory
                 void* p = (void*)handle;
                 if (p == null || Size == 0) return;
 
-                Native.ZeroMemory(p, Size);
+                Native.ZeroMemory(p, (nint)Size);
             }
         }
 
@@ -1703,7 +1704,7 @@ namespace DataTools.Win32.Memory
             }
             else if (obj is byte[] buffer)
             {
-                return Crc32.Calculate(buffer) == CalculateCrc32();
+                return Crc32.Hash(buffer) == CalculateCrc32();
             }
 
             return false;
@@ -1714,7 +1715,7 @@ namespace DataTools.Win32.Memory
             unsafe
             {
                 if (handle.IsInvalidHandle()) return 0;
-                return (int)Crc32.Calculate((byte*)handle, Length);
+                return (int)Crc32.Hash((byte*)handle, Length);
             }
         }
 

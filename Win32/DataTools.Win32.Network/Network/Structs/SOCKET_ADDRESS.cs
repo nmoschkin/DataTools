@@ -1,3 +1,5 @@
+using System;
+
 // *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
@@ -10,16 +12,12 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-
-using System;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
 
 namespace DataTools.Win32.Network
 {
@@ -27,16 +25,46 @@ namespace DataTools.Win32.Network
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public struct SOCKET_ADDRESS
     {
-        public LPSOCKADDR lpSockaddr;
+        public InetSocketPtr lpSockaddr;
         public int iSockaddrLength;
 
         public override string ToString()
         {
-            string ToStringRet = default;
-            if (lpSockaddr.Handle.Handle == nint.Zero)
-                return "NULL";
-            ToStringRet = lpSockaddr.ToString();
-            return ToStringRet;
+            if (lpSockaddr.Handle.Handle == nint.Zero) return "NULL";
+            return lpSockaddr.ToString();
+        }
+    }
+
+    public class SocketAddress
+    {
+        protected SOCKET_ADDRESS sockaddr;
+
+        public AddressFamily AddressFamily => sockaddr.lpSockaddr.AddressFamily;
+
+        public uint Port { get; }
+
+        public IPAddress IPAddress { get; }
+
+        internal SocketAddress(SOCKET_ADDRESS sockaddr)
+        {
+            this.sockaddr = sockaddr;
+            if (AddressFamily == AddressFamily.AfInet6)
+            {
+                var v6 = sockaddr.lpSockaddr.IPAddrV6;
+                Port = v6.Port;
+                IPAddress = v6.Address;
+            }
+            else
+            {
+                var v4 = sockaddr.lpSockaddr.IPAddrV4;
+                Port = v4.Port;
+                IPAddress = v4.Address;
+            }
+        }
+
+        public override string ToString()
+        {
+            return sockaddr.lpSockaddr.ToString();
         }
     }
 }

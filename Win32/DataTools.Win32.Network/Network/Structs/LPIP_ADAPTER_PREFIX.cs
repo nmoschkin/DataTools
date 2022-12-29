@@ -10,17 +10,15 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32.Memory;
 
 using System;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Network
 {
@@ -72,8 +70,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
-                    return null;
+                if (Handle == nint.Zero) return null;
                 return Struct.Address.lpSockaddr.IPAddress;
             }
         }
@@ -82,21 +79,15 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                IP_ADAPTER_PREFIX StructRet = default;
-                if (Handle == nint.Zero)
-                    return default;
-                StructRet = ToAddress();
-                return StructRet;
+                if (Handle == nint.Zero) return default;
+                return ToAddress();
             }
         }
 
         public IP_ADAPTER_PREFIX ToAddress()
         {
-            IP_ADAPTER_PREFIX ToAddressRet = default;
-            if (Handle == nint.Zero)
-                return default;
-            ToAddressRet = Handle.ToStruct<IP_ADAPTER_PREFIX>();
-            return ToAddressRet;
+            if (Handle == nint.Zero) return default;
+            return Handle.ToStruct<IP_ADAPTER_PREFIX>();
         }
 
         public void Dispose()
@@ -108,27 +99,17 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
-                    return default;
+                if (Handle == nint.Zero) return default;
                 return Struct.Address.lpSockaddr.AddressFamily;
-            }
-        }
-
-        public byte[] Data
-        {
-            get
-            {
-                if (Handle == nint.Zero)
-                    return null;
-                return Struct.Address.lpSockaddr.Data;
             }
         }
 
         public static implicit operator LPIP_ADAPTER_PREFIX(nint operand)
         {
-            var a = new LPIP_ADAPTER_PREFIX();
-            a.Handle = operand;
-            return a;
+            return new LPIP_ADAPTER_PREFIX
+            {
+                Handle = operand
+            };
         }
 
         public static implicit operator nint(LPIP_ADAPTER_PREFIX operand)
@@ -138,9 +119,10 @@ namespace DataTools.Win32.Network
 
         public static implicit operator LPIP_ADAPTER_PREFIX(MemPtr operand)
         {
-            var a = new LPIP_ADAPTER_PREFIX();
-            a.Handle = operand;
-            return a;
+            return new LPIP_ADAPTER_PREFIX
+            {
+                Handle = operand
+            };
         }
 
         public static implicit operator MemPtr(LPIP_ADAPTER_PREFIX operand)
@@ -151,8 +133,7 @@ namespace DataTools.Win32.Network
         public static implicit operator LPIP_ADAPTER_PREFIX(IP_ADAPTER_PREFIX operand)
         {
             var a = new LPIP_ADAPTER_PREFIX();
-            a.Handle.Alloc(Marshal.SizeOf(operand));
-            Marshal.StructureToPtr(operand, a.Handle.Handle, true);
+            a.Handle.FromStruct(operand);
             return a;
         }
 

@@ -9,17 +9,13 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32.Memory;
 
 using System;
-using System.Linq.Expressions;
 using System.Runtime.InteropServices;
-
-using DataTools.Text;
-using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Network
 {
@@ -29,35 +25,49 @@ namespace DataTools.Win32.Network
     public static class NetInfo
     {
         [DllImport("Secur32.dll", EntryPoint = "GetUserNameExW", CharSet = CharSet.Unicode)]
-        static extern bool GetUserNameEx(ExtendedNameFormat NameFormat, [MarshalAs(UnmanagedType.LPWStr)] string lpNameBuffer, ref int lpnSize);
+        private static extern bool GetUserNameEx(ExtendedNameFormat NameFormat, [MarshalAs(UnmanagedType.LPWStr)] string lpNameBuffer, ref int lpnSize);
+
         [DllImport("Secur32.dll", EntryPoint = "GetUserNameExW", CharSet = CharSet.Unicode)]
-        static extern bool GetUserNameEx(ExtendedNameFormat NameFormat, nint lpNameBuffer, ref int lpnSize);
+        private static extern bool GetUserNameEx(ExtendedNameFormat NameFormat, nint lpNameBuffer, ref int lpnSize);
+
         [DllImport("advapi32.dll", EntryPoint = "GetUserNameW", CharSet = CharSet.Unicode)]
-        static extern bool GetUserName(nint lpNameBuffer, ref int lpnSize);
+        private static extern bool GetUserName(nint lpNameBuffer, ref int lpnSize);
+
         [DllImport("netapi32.dll")]
-        public static extern NET_API_STATUS NetUserGetInfo([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string username, int level, ref MemPtr bufptr);
+        private static extern NET_API_STATUS NetUserGetInfo([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string username, int level, ref MemPtr bufptr);
+
         [DllImport("netapi32.dll", EntryPoint = "NetServerEnum", CharSet = CharSet.Unicode)]
-        static extern NET_API_STATUS NetServerEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ServerTypes serverType, [MarshalAs(UnmanagedType.LPWStr)] string domain, ref nint resume_handle);
+        private static extern NET_API_STATUS NetServerEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ServerTypes serverType, [MarshalAs(UnmanagedType.LPWStr)] string domain, ref nint resume_handle);
+
         [DllImport("netapi32.dll", EntryPoint = "NetServerGetInfo", CharSet = CharSet.Unicode)]
-        static extern NET_API_STATUS NetServerGetInfo([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr);
+        private static extern NET_API_STATUS NetServerGetInfo([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr);
+
         [DllImport("netapi32.dll", EntryPoint = "NetLocalGroupEnum", CharSet = CharSet.Unicode)]
-        static extern NET_API_STATUS NetLocalGroupEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
+        private static extern NET_API_STATUS NetLocalGroupEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
+
         [DllImport("netapi32.dll", EntryPoint = "NetGroupEnum", CharSet = CharSet.Unicode)]
-        static extern NET_API_STATUS NetGroupEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
+        private static extern NET_API_STATUS NetGroupEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
+
         [DllImport("netapi32.dll", EntryPoint = "NetUserEnum", CharSet = CharSet.Unicode)]
-        static extern NET_API_STATUS NetUserEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, int filter, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
+        private static extern NET_API_STATUS NetUserEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, int filter, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
+
+        [DllImport("netapi32.dll", EntryPoint = "NetUserEnum", CharSet = CharSet.Unicode)]
+        private static extern NET_API_STATUS NetUserEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, int filter, out NetworkMemPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, ref nint resume_handle);
+
         [DllImport("netapi32.dll")]
-        static extern NET_API_STATUS NetApiBufferFree(nint buffer);
+        private static extern NET_API_STATUS NetApiBufferFree(nint buffer);
+
         [DllImport("netapi32.dll")]
-        static extern NET_API_STATUS NetApiBufferAllocate(int bytecount, ref nint buffer);
+        private static extern NET_API_STATUS NetApiBufferAllocate(int bytecount, ref nint buffer);
+
         [DllImport("Netapi32.dll", CharSet = CharSet.Unicode)]
-        static extern NET_API_STATUS NetGetJoinInformation(string lpServer, ref nint lpNameBuffer, ref NetworkJoinStatus bufferType);
-        [DllImport("netapi32.dll")]
-        static extern NET_API_STATUS NetGroupGetUsers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string groupname, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint ResumeHandle);
-        [DllImport("netapi32.dll")]
-        static extern NET_API_STATUS NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string groupname, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint ResumeHandle);
+        private static extern NET_API_STATUS NetGetJoinInformation(string lpServer, ref nint lpNameBuffer, ref NetworkJoinStatus bufferType);
 
+        [DllImport("netapi32.dll")]
+        private static extern NET_API_STATUS NetGroupGetUsers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string groupname, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint ResumeHandle);
 
+        [DllImport("netapi32.dll")]
+        private static extern NET_API_STATUS NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string groupname, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint ResumeHandle);
 
         /// <summary>
         /// Return the current user's full display name
@@ -105,7 +115,6 @@ namespace DataTools.Win32.Network
             }
         }
 
-
         /// <summary>
         /// Enumerates all computers visible to the specified computer on the specified domain.
         /// </summary>
@@ -116,13 +125,13 @@ namespace DataTools.Win32.Network
         public static ServerInfo101[] EnumServers()
         {
             MemPtr adv;
-            
+
             var mm = new MemPtr();
             int en = 0;
             int ten = 0;
-            
+
             ServerInfo101[] servers = null;
-            
+
             int i;
             int c;
 
@@ -149,7 +158,6 @@ namespace DataTools.Win32.Network
             }
             catch
             {
-
             }
             finally
             {
@@ -180,7 +188,6 @@ namespace DataTools.Win32.Network
             }
             catch
             {
-
             }
             finally
             {
@@ -201,7 +208,7 @@ namespace DataTools.Win32.Network
             var mm = new MemPtr();
             int en = 0;
             int ten = 0;
-            
+
             MemPtr adv;
             GroupInfo2[] grp;
 
@@ -227,11 +234,9 @@ namespace DataTools.Win32.Network
 
                     return grp;
                 }
-
             }
             catch
             {
-
             }
             finally
             {
@@ -277,17 +282,14 @@ namespace DataTools.Win32.Network
                     }
 
                     return grp;
-
                 }
             }
             catch
             {
-
             }
             finally
             {
                 mm.NetFree();
-
             }
 
             return null;
@@ -364,9 +366,9 @@ namespace DataTools.Win32.Network
             int x = 0;
             int cbt = 0;
             int cb = 0;
-            
+
             string[] s = null;
-            
+
             try
             {
                 var inul = new nint();
@@ -384,7 +386,7 @@ namespace DataTools.Win32.Network
                     int i;
 
                     s = new string[cb];
-                    
+
                     for (i = 0; i < cb; i++)
                     {
                         z = mm.ToStruct<UserLocalGroup1>();
@@ -398,7 +400,6 @@ namespace DataTools.Win32.Network
 
                     Array.Resize(ref s, x);
                     return s;
-
                 }
             }
             catch
@@ -422,30 +423,26 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         public static string GrabJoin(ref NetworkJoinStatus joinStatus, string Computer = null)
         {
-            var mm = new MemPtr();
-        
-            try
+            using (var mm = new NetworkMemPtr())
             {
-                mm.NetAlloc(1024);
-
-                var result = NetGetJoinInformation(Computer, ref mm.handle, ref joinStatus);
-                if (result == NET_API_STATUS.NERR_Success)
+                try
                 {
-                    string s = (string)mm;
-                    return s;
+                    mm.Alloc(1024);
+                    var nn = mm.DangerousGetHandle();
+                    var result = NetGetJoinInformation(Computer, ref nn, ref joinStatus);
+                    if (result == NET_API_STATUS.NERR_Success)
+                    {
+                        string s = (string)mm;
+                        return s;
+                    }
+                }
+                catch
+                {
+                    throw new NativeException();
                 }
 
+                return null;
             }
-            catch
-            {
-                throw new NativeException();
-            }
-            finally
-            {
-                mm.NetFree();
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -456,18 +453,14 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         public static UserInfo11[] EnumUsers11(string machine = null)
         {
-
-            MemPtr rh = nint.Zero;
-
             try
             {
                 int cb = 0;
                 int er = 0;
 
-
                 int te = 0;
 
-                MemPtr buff = new MemPtr();
+                //MemPtr buff = new MemPtr();
                 UserInfo11[] usas;
 
                 try
@@ -480,38 +473,32 @@ namespace DataTools.Win32.Network
                 }
 
                 var inul = new nint();
-                var err = NetUserEnum(machine, 11, 0, ref buff, -1, ref er, ref te, ref inul);
+                var err = NetUserEnum(machine, 11, 0, out NetworkMemPtr rh, -1, out er, out te, ref inul);
 
                 if (err == NET_API_STATUS.NERR_Success)
                 {
-                    rh = buff;
+                    MemPtr buff = (MemPtr)rh;
+
                     usas = new UserInfo11[te];
 
                     for (int i = 0; i < te; i++)
                     {
-
                         usas[i] = buff.ToStruct<UserInfo11>();
                         usas[i].LogonHours = nint.Zero;
 
-                        buff = buff + cb;
+                        buff += cb;
                     }
 
                     return usas;
                 }
-
             }
             catch
             {
                 throw new NativeException();
             }
-            finally
-            {
-                rh.NetFree();
-            }
 
             return null;
         }
-
 
         /// <summary>
         /// For Windows 8, retrieves the user's Microsoft login account information.
@@ -525,7 +512,6 @@ namespace DataTools.Win32.Network
 
             try
             {
-
                 int i = 0;
                 var uorig = EnumUsers11();
                 if (uorig == null) return null;
@@ -558,7 +544,6 @@ namespace DataTools.Win32.Network
             }
 
             return null;
-
         }
     }
 }

@@ -1,16 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <nullable>disable</nullable>
 	  <UseWindowsForms>true</UseWindowsForms>
+	  <AssemblyVersion>8.0.0.1000</AssemblyVersion>
+	  <FileVersion>8.0.0.1000</FileVersion>
+	  <Authors>Nathaniel Moschkin</Authors>
+	  <Version>8.0.0</Version>
+	  <Product>DataTools Extras Test</Product>
+	  <Description>DataTools Utility Library</Description>
+	  <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
+	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
+	  <RepositoryType>GitHub</RepositoryType>
+	  <NeutralLanguage>en-US</NeutralLanguage>
+	  <Platforms>AnyCPU;x64</Platforms>
+	  <Configurations>Debug;Release;NuGet</Configurations>
+
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Extras\DataTools.Extras\DataTools.Extras.csproj" />
-    <ProjectReference Include="..\..\Standard\DataTools\DataTools.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
+<ProjectReference Include="..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
+<ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
   </ItemGroup>
 
 

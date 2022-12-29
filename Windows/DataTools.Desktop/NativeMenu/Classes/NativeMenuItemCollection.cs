@@ -202,7 +202,7 @@ namespace DataTools.Win32.Menu
             }
             else
             {
-                //Interaction.MsgBox(NativeErrorMethods.FormatLastError());
+                //Interaction.MsgBox(NativeError.FormatLastError());
             }
 
             mm.Free();

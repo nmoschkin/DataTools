@@ -1,4 +1,4 @@
-using DataTools.MathTools.PolarMath;
+using DataTools.MathTools.Polar;
 
 using System;
 using System.Runtime.InteropServices;
@@ -24,7 +24,6 @@ namespace DataTools.Win32
         public override string ToString()
         {
             return $"{left}, {top}, {right}, {bottom}";
-
         }
 
         public static implicit operator LinearRect(W32RECT source)

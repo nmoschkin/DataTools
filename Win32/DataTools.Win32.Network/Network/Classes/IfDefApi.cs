@@ -10,32 +10,25 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32.Memory;
 
 using System;
-using System.ComponentModel;
-using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Network
 {
-    
     public static class IfDefApi
     {
-
         // A lot of creative marshaling is used here.
 
         public const int MAX_ADAPTER_ADDRESS_LENGTH = 8;
         public const int MAX_DHCPV6_DUID_LENGTH = 130;
 
-        
         [DllImport("Iphlpapi.dll")]
-        static extern ADAPTER_ENUM_RESULT GetAdaptersAddresses(AfENUM Family, GAA_FLAGS Flags, nint Reserved, LPIP_ADAPTER_ADDRESSES Addresses, ref uint SizePointer);
+        private static extern ADAPTER_ENUM_RESULT GetAdaptersAddresses(AfENUM Family, GAA_FLAGS Flags, nint Reserved, LPIP_ADAPTER_ADDRESSES Addresses, ref uint SizePointer);
 
         /// <summary>
         /// Retrieves a linked, unmanaged structure array of IP_ADAPTER_ADDRESSES, enumerating all network interfaces on the system.
@@ -61,48 +54,44 @@ namespace DataTools.Win32.Network
                 lpadapt.Handle.Alloc(cblen, noRelease);
                 res = GetAdaptersAddresses(AfENUM.AfUnspecified, GAA_FLAGS.GAA_FLAG_INCLUDE_GATEWAYS | GAA_FLAGS.GAA_FLAG_INCLUDE_WINS_INFO, nint.Zero, lpadapt, ref cblen);
             }
-            
+
             if (res != ADAPTER_ENUM_RESULT.NO_ERROR)
             {
-                lpadapt.Dispose();
                 throw new NativeException();
             }
 
             origPtr = lpadapt.Handle;
-            IP_ADAPTER_ADDRESSES[] adapters = null;
-            
-            int c = 0;
-            int cc = 0;
-            
+            var adapters = new List<IP_ADAPTER_ADDRESSES>();
+
             adapt = lpadapt;
 
             do
             {
-                if (string.IsNullOrEmpty(adapt.Description) | adapt.FirstDnsServerAddress.Handle == nint.Zero)
+                if (string.IsNullOrEmpty(adapt.Description) || adapt.FirstDnsServerAddress.Handle == MemPtr.Empty)
                 {
-                    c += 1;
                     adapt = adapt.Next;
+
                     if (adapt.Next.Handle == MemPtr.Empty)
+                    {
                         break;
-                    continue;
+                    }
+                    else
+                    {
+                        continue;
+                    }
                 }
 
-                Array.Resize(ref adapters, cc + 1);
-                adapters[cc] = adapt;
+                adapters.Add(adapt);
                 adapt = adapt.Next;
-                cc += 1;
-                c += 1;
             }
-            while (adapt.Next.Handle != MemPtr.Empty);
+            while (adapt.NetworkGuid != Guid.Empty);
 
             // there is currently no reason for this function to free this pointer,
             // but we reserve the right to do so, in the future.
             if (!noRelease)
                 origPtr.Free();
 
-            return adapters;
+            return adapters.ToArray();
         }
-
-        
     }
 }

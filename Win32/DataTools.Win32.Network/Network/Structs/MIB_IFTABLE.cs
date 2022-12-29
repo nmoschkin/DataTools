@@ -1,17 +1,13 @@
 ﻿using DataTools.Win32.Memory;
-using DataTools.Win32.Network;
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Win32.Network
 {
-
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct LPMIB_IFTABLE : IEnumerable<MIB_IFROW>, IReadOnlyCollection<MIB_IFROW>, IDisposable
     {
@@ -60,10 +56,10 @@ namespace DataTools.Win32.Network
 
         private class Enumerator : IEnumerator<MIB_IFROW>
         {
-            LPMIB_IFTABLE src;
+            private LPMIB_IFTABLE src;
 
-            int count = 0;
-            int cIdx = -1;
+            private int count = 0;
+            private int cIdx = -1;
 
             public MIB_IFROW Current => src[cIdx];
 
@@ -88,11 +84,5 @@ namespace DataTools.Win32.Network
                 count = src.Count;
             }
         }
-
-
     }
-
-
-
-
 }

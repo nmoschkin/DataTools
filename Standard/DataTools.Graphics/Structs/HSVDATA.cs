@@ -36,7 +36,7 @@ namespace DataTools.Graphics
             bl.AddRange(BitConverter.GetBytes(Saturation));
             bl.AddRange(BitConverter.GetBytes(Value));
 
-            return (int)Streams.Crc32.Calculate(bl.ToArray());
+            return (int)Streams.Crc32.Hash(bl.ToArray());
         }
 
         public override bool Equals(object obj)

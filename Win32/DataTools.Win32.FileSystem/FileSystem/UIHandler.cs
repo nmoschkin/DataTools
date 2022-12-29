@@ -19,13 +19,13 @@ using System.Runtime.CompilerServices;
 using DataTools.Win32;
 using DataTools.Shell.Native;
 using Microsoft.Win32;
-using DataTools.SortedLists;
+using DataTools.Essentials.SortedLists;
 
 namespace DataTools.Desktop
 {
 
-    
-    
+
+
     /// <summary>
     /// Represents a registered file-type handler program.
     /// </summary>

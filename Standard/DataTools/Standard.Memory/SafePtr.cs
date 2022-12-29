@@ -172,7 +172,7 @@ namespace DataTools.Standard.Memory
 
             unsafe
             {
-                return Crc32.Calculate((byte*)handle, c);
+                return Crc32.Hash((byte*)handle, c);
             }
         }
 

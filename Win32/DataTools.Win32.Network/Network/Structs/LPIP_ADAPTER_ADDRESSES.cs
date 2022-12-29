@@ -10,17 +10,14 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32.Memory;
 
 using System;
 using System.ComponentModel;
-using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Network
 {
@@ -36,80 +33,27 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Handle.Handle == nint.Zero)
-                return "NULL";
+            if (Handle.Handle == nint.Zero) return "NULL";
             return Struct.FriendlyName;
         }
 
-        public LPIP_ADAPTER_ADDRESSES Next
-        {
-            get
-            {
-                return Struct.Next;
-            }
-        }
+        public LPIP_ADAPTER_ADDRESSES Next => Struct.Next;
 
-        public IP_ADAPTER_ADDRESSES Struct
-        {
-            get
-            {
-                IP_ADAPTER_ADDRESSES StructRet = default;
-                StructRet = ToAdapterStruct();
-                return StructRet;
-            }
-        }
+        public IP_ADAPTER_ADDRESSES Struct => ToAdapterStruct();
 
         public IP_ADAPTER_ADDRESSES ToAdapterStruct()
         {
-            IP_ADAPTER_ADDRESSES ToAdapterStructRet = default;
-            if (Handle == nint.Zero)
-                return default;
-            ToAdapterStructRet = Handle.ToStruct<IP_ADAPTER_ADDRESSES>();
-            return ToAdapterStructRet;
-        }
-
-        public void Dispose()
-        {
-            Handle.Free();
+            if (Handle == nint.Zero) return default;
+            return Handle.ToStruct<IP_ADAPTER_ADDRESSES>();
         }
 
         public static implicit operator LPIP_ADAPTER_ADDRESSES(IP_ADAPTER_ADDRESSES operand)
         {
             var a = new LPIP_ADAPTER_ADDRESSES();
-            int cb = Marshal.SizeOf(a);
-            a.Handle.Alloc(cb);
-            Marshal.StructureToPtr(operand, a.Handle, true);
+            a.Handle.FromStruct(operand);
             return a;
         }
 
-        public static implicit operator IP_ADAPTER_ADDRESSES(LPIP_ADAPTER_ADDRESSES operand)
-        {
-            var a = operand.Handle.ToStruct<IP_ADAPTER_ADDRESSES>();
-            return a;
-        }
-
-        //public static implicit operator LPIP_ADAPTER_ADDRESSES(nint operand)
-        //{
-        
-    }//    var a = new LPIP_ADAPTER_ADDRESSES();
-        //    a.Handle = operand;
-        //    return a;
-        //}
-
-        //public static implicit operator nint(LPIP_ADAPTER_ADDRESSES operand)
-        //{
-        //    return operand.Handle.Handle;
-        //}
-
-        //public static implicit operator LPIP_ADAPTER_ADDRESSES(MemPtr operand)
-        //{
-        //    var a = new LPIP_ADAPTER_ADDRESSES();
-        //    a.Handle = operand;
-        //    return a;
-        //}
-
-        //public static implicit operator MemPtr(LPIP_ADAPTER_ADDRESSES operand)
-        //{
-        //    return operand.Handle;
-        //}
+        public static implicit operator IP_ADAPTER_ADDRESSES(LPIP_ADAPTER_ADDRESSES operand) => operand.Struct;
+    }
 }

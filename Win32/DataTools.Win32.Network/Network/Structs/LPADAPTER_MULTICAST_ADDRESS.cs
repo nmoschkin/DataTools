@@ -10,17 +10,15 @@
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32.Memory;
 
 using System;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
-
-using DataTools.Win32;
-using DataTools.Win32.Memory;
 
 namespace DataTools.Win32.Network
 {
@@ -28,7 +26,7 @@ namespace DataTools.Win32.Network
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public struct LPADAPTER_MULTICAST_ADDRESS
     {
-        public MemPtr Handle;
+        internal MemPtr Handle;
 
         public LPADAPTER_MULTICAST_ADDRESS[] AddressChain
         {
@@ -82,21 +80,15 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                ADAPTER_MULTICAST_ADDRESS StructRet = default;
-                if (Handle == nint.Zero)
-                    return default;
-                StructRet = ToAddress();
-                return StructRet;
+                if (Handle == nint.Zero) return default;
+                return ToAddress();
             }
         }
 
         public ADAPTER_MULTICAST_ADDRESS ToAddress()
         {
-            ADAPTER_MULTICAST_ADDRESS ToAddressRet = default;
-            if (Handle == nint.Zero)
-                return default;
-            ToAddressRet = Handle.ToStruct<ADAPTER_MULTICAST_ADDRESS>();
-            return ToAddressRet;
+            if (Handle == nint.Zero) return default;
+            return Handle.ToStruct<ADAPTER_MULTICAST_ADDRESS>();
         }
 
         public void Dispose()
@@ -108,19 +100,8 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
-                    return AddressFamily.AfUnspecified;
+                if (Handle == nint.Zero) return AddressFamily.AfUnspecified;
                 return Struct.Address.lpSockaddr.AddressFamily;
-            }
-        }
-
-        public byte[] Data
-        {
-            get
-            {
-                if (Handle == nint.Zero)
-                    return null;
-                return Struct.Address.lpSockaddr.Data;
             }
         }
 

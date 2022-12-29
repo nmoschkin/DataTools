@@ -1,16 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DataTools.Streams
 {
     /// <summary>
-    /// ISO 3309 CRC-32 Calculator.
+    /// ISO 3309 CRC-32 Hash Calculator.
     /// </summary>
     /// <remarks></remarks>
-    public static class Crc32
+    public sealed class Crc32
     {
-        private static readonly uint CRC32Poly = 0xedb88320u;
+        /// <summary>
+        /// The ISO-3309 CRC-32 Polynomial.
+        /// </summary>
+        public const uint CRC32Poly = 0xedb88320u;
 
-        private static uint[] Crc32Table = new uint[256];
+        /// <summary>
+        /// The ISO-3309 CRC-32 Hash Lookup Table.
+        /// </summary>
+        private static readonly uint[] Crc32Table;
 
         /// <summary>
         /// Initialize the CRC table from the polynomial.
@@ -18,9 +29,19 @@ namespace DataTools.Streams
         /// <remarks></remarks>
         static Crc32()
         {
-            uint i = 0;
-            uint j = 0;
-            uint l = 0;
+            Crc32Table = CreateCrc32HashTable();
+        }
+
+        /// <summary>
+        /// Create an ISO-3309 CRC-32 Hash Lookup Table.
+        /// </summary>
+        public static uint[] CreateCrc32HashTable()
+        {
+            uint i;
+            uint j;
+            uint l;
+
+            uint[] table = new uint[256];
 
             for (i = 0; i <= 255; i++)
             {
@@ -36,70 +57,74 @@ namespace DataTools.Streams
                         j >>= 1;
                     }
                 }
-                Crc32Table[i] = j;
+                table[i] = j;
             }
+
+            return table;
         }
 
         /// <summary>
-        /// Validates a byte array against an input CRC.
+        /// Consistently Hash a string using .NET default 2 byte Unicode enoding.
         /// </summary>
-        /// <param name="data">The byte array to validate.</param>
-        /// <param name="inputCrc">The CRC value against which the validation should occur.</param>
-        /// <returns>True if the input CRC matches the calculated CRC of the data.</returns>
-        /// <remarks></remarks>
-        public static bool Validate(byte[] data, uint inputCrc)
+        /// <remarks>
+        /// In order to conform to ISO-3309 the text is hashed as a byte array.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Hash(string text)
         {
-            return Calculate(data) == inputCrc;
-        }
+            uint crc = 0xffffffffu;
+            int j, c = text.Length;
 
-        ///// <summary>
-        ///// Validates a memory block against an input CRC.
-        ///// </summary>
-        ///// <param name="data">The memory block validate.</param>
-        ///// <param name="length">The length of the memory block to validate.</param>
-        ///// <param name="inputCrc">The CRC value against which the validation should occur.</param>
-        ///// <returns>True if the input CRC matches the calculated CRC of the data.</returns>
-        ///// <remarks></remarks>
-        //public static bool Validate(IntPtr data, IntPtr length, uint inputCrc)
-        //{
-        //    return Calculate(data, length) == inputCrc;
-        //}
+            for (j = 0; j < c; j++)
+            {
+                crc = Crc32Table[(crc ^ (text[j] & 0xff)) & 0xff] ^ crc >> 8;
+                crc = Crc32Table[(crc ^ (text[j] >> 8)) & 0xff] ^ crc >> 8;
+            }
 
-        /// <summary>
-        /// Validates a file against an input CRC.
-        /// </summary>
-        /// <param name="fileName">Filename of the file to validate.</param>
-        /// <param name="inputCrc">The CRC value against which the validation should occur.</param>
-        /// <returns>True if the input CRC matches the calculated CRC of the data.</returns>
-        /// <remarks></remarks>
-        public static bool Validate(string fileName, uint inputCrc)
-        {
-            return Calculate(fileName) == inputCrc;
+            return crc ^ 0xffffffffu;
         }
 
         /// <summary>
-        /// Calculate the CRC-32 of an array of bytes.
+        /// Hash a string with the ISO-3309 CRC-32 algorithm.
         /// </summary>
-        /// <param name="data">Byte array containing the bytes to calculate.</param>
-        /// <param name="startIndex">Specifies the starting index to begin the calculation (default is 0).</param>
-        /// <param name="length">Specify the length of the byte array to check (default is -1, or all bytes).</param>
-        /// <param name="crc">Input CRC value for ongoing calculations (default is FFFFFFFFh).</param>
-        /// <returns>A 32-bit unsigned integer representing the calculated CRC.</returns>
-        /// <remarks></remarks>
-        public static uint Calculate(byte[] data, int startIndex = 0, int length = -1, uint crc = 0xffffffffu)
+        /// <remarks>
+        /// In order to conform to ISO-3309 the text is hashed as a byte array.<br />
+        /// Note: Encoding and decoding from the internal UTF-16 is a somewhat expensive task.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Hash(string text, Encoding encoding) => Hash(encoding.GetBytes(text));
+
+        /// <summary>
+        /// Consistently Hash characters using .NET default 2 byte Unicode enoding.
+        /// </summary>
+        /// <remarks>
+        /// In order to conform to ISO-3309 the text is hashed as a byte array.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Hash(char[] chars)
         {
-            if (data == null)
-                throw new ArgumentNullException("data", "data cannot be equal to null.");
+            uint crc = 0xffffffffu;
+            int j, c = chars.Length;
 
-            if (length == -1)
-                length = data.Length - startIndex;
-            if (length <= 0)
-                throw new ArgumentOutOfRangeException("length", "length must be -1 or a positive number.");
+            for (j = 0; j < c; j++)
+            {
+                crc = Crc32Table[(crc ^ (chars[j] & 0xff)) & 0xff] ^ crc >> 8;
+                crc = Crc32Table[(crc ^ (chars[j] >> 8)) & 0xff] ^ crc >> 8;
+            }
 
-            int j = 0;
-            int c = length;
+            return crc ^ 0xffffffffu;
+        }
 
-            for (j = startIndex; j < c; j++)
+        /// <summary>
+        /// Hash bytes with the ISO-3309 CRC-32 algorithm.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint Hash(byte[] data)
+        {
+            uint crc = 0xffffffffu;
+            int j, c = data.Length;
+
+            for (j = 0; j < c; j++)
             {
                 crc = Crc32Table[(crc ^ data[j]) & 0xff] ^ crc >> 8;
             }
@@ -108,110 +133,150 @@ namespace DataTools.Streams
         }
 
         /// <summary>
-        /// Calculate the CRC-32 of a memory pointer.
+        /// Hash bytes with the ISO-3309 CRC-32 algorithm.
         /// </summary>
-        /// <param name="data">Pointer containing the bytes to calculate.</param>
-        /// <param name="length">Specify the length, in bytes, of the data to be checked.</param>
-        /// <param name="crc">Input CRC value for ongoing calculations (default is FFFFFFFFh).</param>
-        /// <param name="bufflen">Specify the size, in bytes, of the marshaling buffer to be used (default is 1k).</param>
-        /// <returns>A 32-bit unsigned integer representing the calculated CRC.</returns>
-        /// <remarks></remarks>
-        public static uint Calculate(IntPtr data, IntPtr length, uint crc = 0xffffffffu)
+        /// <param name="data">A pointer to the data to hash.</param>
+        /// <param name="count">The number of bytes to hash.</param>
+        /// <param name="current">The current CRC to resume.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe uint Hash(byte* data, long count, uint current)
         {
-            uint ret;
+            uint crc = current ^ 0xffffffffu;
 
-            unsafe
+            for (long j = 0; j < count; j++)
             {
-                ret = Calculate((byte*)data, length.ToInt64(), crc);
-            }
-
-            return ret;
-        }
-
-        /// <summary>
-        /// Calculate the CRC-32 of a memory pointer.
-        /// </summary>
-        /// <param name="data">Pointer containing the bytes to calculate.</param>
-        /// <param name="length">Specify the length, in bytes, of the data to be checked.</param>
-        /// <param name="crc">Input CRC value for ongoing calculations (default is FFFFFFFFh).</param>
-        /// <param name="bufflen">Specify the size, in bytes, of the marshaling buffer to be used (default is 1k).</param>
-        /// <returns>A 32-bit unsigned integer representing the calculated CRC.</returns>
-        /// <remarks></remarks>
-        public static unsafe uint Calculate(byte* data, long length, uint crc = 0xffffffffu)
-        {
-            if (data == null)
-                throw new ArgumentNullException("data", "data cannot be equal to null.");
-
-            if (length <= 0)
-                throw new ArgumentOutOfRangeException("length", "length must be -1 or a positive number.");
-
-            for (long j = 0; j < length; j++)
-            {
-                crc = Crc32Table[(crc ^ *data++) & 0xff] ^ crc >> 8;
+                crc = Crc32Table[(crc ^ data[j]) & 0xff] ^ crc >> 8;
             }
 
             return crc ^ 0xffffffffu;
         }
 
         /// <summary>
-        /// Calculate the CRC-32 of a file.
+        /// Hash bytes with the ISO-3309 CRC-32 algorithm.
         /// </summary>
-        /// <param name="fileName">Filename of the file to calculate.</param>
-        /// <returns>A 32-bit unsigned integer representing the calculated CRC.</returns>
-        /// <param name="bufflen">Specify the size, in bytes, of the marshaling buffer to be used (default is 1k).</param>
-        /// <remarks></remarks>
-        public static uint Calculate(string fileName, int bufflen = 1024)
-        {
-            if (!System.IO.File.Exists(fileName))
-            {
-                throw new System.IO.FileNotFoundException(fileName + " could not be found.");
-            }
+        /// <param name="data">A pointer to the data to hash.</param>
+        /// <param name="count">The number of bytes to hash.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static unsafe uint Hash(byte* data, long count) => Hash(data, count, 0);
 
-            using (System.IO.FileStream fi = new System.IO.FileStream(
-                fileName,
-                System.IO.FileMode.Open,
-                System.IO.FileAccess.Read,
-                System.IO.FileShare.Read))
+        private uint current;
+
+        /// <summary>
+        /// Gets the current calculation of the CRC-32 as an unsigned 32-bit integer.
+        /// </summary>
+        public uint Current => current ^ 0xffffffffu;
+
+        /// <summary>
+        /// Create a rolling CRC-32 calculation.
+        /// </summary>
+        /// <param name="initialValue">The initial value.</param>
+        public Crc32(string initialValue)
+        {
+            current = Hash(initialValue) ^ 0xffffffffu;
+        }
+
+        /// <summary>
+        /// Create a rolling CRC-32 calculation.
+        /// </summary>
+        /// <param name="initialValue">The initial value.</param>
+        public Crc32(byte[] initialValue)
+        {
+            current = Hash(initialValue) ^ 0xffffffffu;
+        }
+
+        /// <summary>
+        /// Create a rolling CRC-32 calculation.
+        /// </summary>
+        /// <param name="initialValue">The initial value.</param>
+        public Crc32(char[] initialValue)
+        {
+            current = Hash(initialValue) ^ 0xffffffffu;
+        }
+
+        /// <summary>
+        /// Create a rolling CRC-32 calculation.
+        /// </summary>
+        public Crc32()
+        {
+            current = 0xffffffffu;
+        }
+
+        /// <summary>
+        /// Hash two bytes into the current calculation (UTF-16 <see cref="char"/>.)
+        /// </summary>
+        /// <param name="str"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Next(char str)
+        {
+            current = Crc32Table[(current ^ (str & 0xff)) & 0xff] ^ current >> 8;
+            current = Crc32Table[(current ^ (str >> 8)) & 0xff] ^ current >> 8;
+        }
+
+        /// <summary>
+        /// Hash characters into the current calculation (UTF-16 <see cref="char"/>.)
+        /// </summary>
+        /// <param name="str"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Next(char[] str)
+        {
+            int c = str.Length;
+            for (int i = 0; i < c; i++)
             {
-                return Calculate(fi, bufflen);
+                current = Crc32Table[(current ^ (str[i] & 0xff)) & 0xff] ^ current >> 8;
+                current = Crc32Table[(current ^ (str[i] >> 8)) & 0xff] ^ current >> 8;
             }
         }
 
         /// <summary>
-        /// Calculate the CRC-32 of a file.
+        /// Hash a string into the current calculation (UTF-16 <see cref="char"/>.)
         /// </summary>
-        /// <param name="stream">Stream to calculate.</param>
-        /// <returns>A 32-bit unsigned integer representing the calculated CRC.</returns>
-        /// <param name="bufflen">Specify the size, in bytes, of the marshaling buffer to be used (default is 1k).</param>
-        /// <remarks></remarks>
-        public static uint Calculate(System.IO.Stream stream, int bufflen = 1024)
+        /// <param name="str"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Next(string str)
         {
-            // our working marshal buffer will be 1k, this is a good compromise between eating up memory and efstreamciency.
-            uint crc = 0xffffffffu;
-
-            byte[] b;
-
-            long i, l = stream.Length;
-            int e, j, blen = bufflen;
-
-            b = new byte[blen];
-
-            for (i = 0; i < l; i += blen)
+            int c = str.Length;
+            for (int i = 0; i < c; i++)
             {
-                e = (int)(l - i);
-                if (e > blen) e = blen;
-
-                if (stream.Position != i) stream.Seek(i, System.IO.SeekOrigin.Begin);
-                stream.Read(b, 0, e);
-
-                for (j = 0; j < e; j++)
-                {
-                    crc = Crc32Table[(crc ^ b[j]) & 0xff] ^ crc >> 8;
-                }
+                current = Crc32Table[(current ^ (str[i] & 0xff)) & 0xff] ^ current >> 8;
+                current = Crc32Table[(current ^ (str[i] >> 8)) & 0xff] ^ current >> 8;
             }
+        }
 
-            stream.Close();
-            return crc ^ 0xffffffffu;
+        /// <summary>
+        /// Hash a byte into the current calculation.
+        /// </summary>
+        /// <param name="b"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Next(byte b)
+        {
+            current = Crc32Table[(current ^ b) & 0xff] ^ current >> 8;
+        }
+
+        /// <summary>
+        /// Hash bytes into the current calculation.
+        /// </summary>
+        /// <param name="b"></param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Next(byte[] data)
+        {
+            int c = data.Length;
+
+            for (int i = 0; i < c; i++)
+            {
+                current = Crc32Table[(current ^ data[i]) & 0xff] ^ current >> 8;
+            }
+        }
+
+        /// <summary>
+        /// Reset the calculation.
+        /// </summary>
+        /// <returns>The CRC calculated before reset.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public uint Reset()
+        {
+            uint c = current;
+            current = 0xffffffffu;
+            return c ^ 0xffffffffu;
         }
     }
 }

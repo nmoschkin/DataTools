@@ -15,7 +15,7 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace DataTools.MathTools.PolarMath
+namespace DataTools.MathTools.Polar
 {
     /// <summary>
     /// Flags to be used for formatting the display of a <see cref="PolarCoordinates"/> structure utilizing the <see cref="PolarCoordinates.ToString(PolarCoordinatesFormattingFlags, int)"/> function.
