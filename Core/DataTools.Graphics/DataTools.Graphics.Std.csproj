@@ -1,45 +1,50 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <nullable>disable</nullable>
+    <TargetFrameworks>netstandard2.0;net48</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
-    <AssemblyVersion>8.0.0.1009</AssemblyVersion>
-    <FileVersion>8.0.0.1009</FileVersion>
+    <Nullable>disable</Nullable>
+    <AssemblyVersion>8.0.0.1011</AssemblyVersion>
+    <FileVersion>8.0.0.1011</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1009</Version>
-    <Product>DataTools Desktop WPF Base Library</Product>
-    <Description>DataTools Desktop WPF Base Library</Description>
+    <Version>8.0.0.1011</Version>
+    <Product>DataTools Graphics Library</Product>
+    <Description>DataTools Graphics Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <Platforms>AnyCPU;x64</Platforms>
     <SignAssembly>False</SignAssembly>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Title>DataTools.Desktop.WPF</Title>
+    <Title>DataTools.Graphics</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1008</PreviousVersion>
+    <PreviousVersion>8.0.0.1010</PreviousVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="SkiaSharp" Version="2.88.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
-    <ProjectReference Include="..\..\..\Core\DataTools.Text\DataTools.Text.csproj" />
-    <ProjectReference Include="..\..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
-    <ProjectReference Include="..\..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
-    <ProjectReference Include="..\..\..\Win32\DataTools.Win32\DataTools.Win32.csproj" />
+    <ProjectReference Include="..\DataTools.Essentials\DataTools.Essentials.Std.csproj" />
+    <ProjectReference Include="..\DataTools.MathTools\DataTools.MathTools.Std.csproj" />
+    <ProjectReference Include="..\DataTools.Memory\DataTools.Memory.Std.csproj" />
+    <ProjectReference Include="..\DataTools.Text\DataTools.Text.Std.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="AppResources.Designer.cs">
+      <DependentUpon>AppResources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="AppResources.resx">
+      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
-    <Optimize>True</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|x64'">
     <Optimize>True</Optimize>
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">

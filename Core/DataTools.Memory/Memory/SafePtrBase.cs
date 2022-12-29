@@ -1,6 +1,7 @@
 ﻿using DataTools.Streams;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -21,7 +22,7 @@ namespace DataTools.Memory
         /// <param name="t">The type of memory being allocated.</param>
         /// <param name="fOwn">Whether we will own the memory pointer specified by <paramref name="ptr"/>.</param>
         /// <param name="gcpressure">True to make the garbage collector aware of memory allocations made by this object.</param>
-        protected SafePtrBase(nint ptr, bool fOwn, bool gcpressure) : base(0, fOwn)
+        protected SafePtrBase(IntPtr ptr, bool fOwn, bool gcpressure) : base(IntPtr.Zero, fOwn)
         {
             handle = ptr;
             IsOwner = fOwn;
@@ -36,9 +37,9 @@ namespace DataTools.Memory
         /// <param name="t">The type of memory being allocated.</param>
         /// <param name="fOwn">Whether we will own the memory pointer specified by <paramref name="ptr"/>.</param>
         /// <param name="gcpressure">True to make the garbage collector aware of memory allocations made by this object.</param>
-        protected unsafe SafePtrBase(void* ptr, bool fOwn, bool gcpressure) : base(0, fOwn)
+        protected unsafe SafePtrBase(void* ptr, bool fOwn, bool gcpressure) : base(IntPtr.Zero, fOwn)
         {
-            handle = (nint)ptr;
+            handle = (IntPtr)ptr;
             IsOwner = fOwn;
             HasGCPressure = gcpressure;
         }
@@ -47,7 +48,7 @@ namespace DataTools.Memory
 
         #region Public Properties
 
-        public override bool IsInvalid => handle == (nint)0;
+        public override bool IsInvalid => handle == (IntPtr)0;
 
         /// <summary>
         /// Gets or sets the length of the buffer.
@@ -86,7 +87,7 @@ namespace DataTools.Memory
         /// <summary>
         /// This is a new handle value that can be reached by other members of this assembly.
         /// </summary>
-        protected internal nint Handle
+        protected internal IntPtr Handle
         {
             get => base.handle;
             set => base.handle = value;
@@ -598,7 +599,7 @@ namespace DataTools.Memory
         /// <remarks>
         /// This method attempts to automatically extend the allocation of the memory block.
         /// </remarks>
-        public virtual void Append(nint buffer, int size)
+        public virtual void Append(IntPtr buffer, int size)
         {
             unsafe
             {
@@ -659,7 +660,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual T ToStructAt<T>(long byteIndex) where T : struct
         {
-            return (T)Marshal.PtrToStructure((nint)((long)handle + byteIndex), typeof(T));
+            return (T)Marshal.PtrToStructure((IntPtr)((long)handle + byteIndex), typeof(T));
         }
 
         /// <summary>
@@ -676,7 +677,7 @@ namespace DataTools.Memory
 
             if (byteIndex + cb > Length) ReAlloc(byteIndex + cb);
 
-            Marshal.StructureToPtr(val, (nint)((long)handle + byteIndex), false);
+            Marshal.StructureToPtr(val, (IntPtr)((long)handle + byteIndex), false);
         }
 
         /// <summary>
@@ -912,7 +913,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                char* ptr = (char*)*(nint*)((long)handle + index);
+                char* ptr = (char*)*(IntPtr*)((long)handle + index);
                 EncodeUTF16Ptr(ptr, value, addNull);
             }
         }
@@ -927,7 +928,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                char* ptr = (char*)*(nint*)((long)handle + index);
+                char* ptr = (char*)*(IntPtr*)((long)handle + index);
                 return new string(ptr);
             }
         }
@@ -956,7 +957,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return DecodeUTF8Ptr((byte*)*(nint*)((long)handle + index));
+                return DecodeUTF8Ptr((byte*)*(IntPtr*)((long)handle + index));
             }
         }
 
@@ -1002,7 +1003,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                EncodeUTF8Ptr((byte*)*(nint*)((long)handle + index), value, addNull);
+                EncodeUTF8Ptr((byte*)*(IntPtr*)((long)handle + index), value, addNull);
             }
         }
 
@@ -1073,7 +1074,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                if (handle == nint.Zero) return null;
+                if (handle == IntPtr.Zero) return null;
 
                 string s = null;
 
@@ -1128,7 +1129,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                if (handle == nint.Zero) return null;
+                if (handle == IntPtr.Zero) return null;
 
                 string s = null;
 
@@ -1181,7 +1182,7 @@ namespace DataTools.Memory
         /// <remarks></remarks>
         public virtual bool Reverse()
         {
-            if (handle == nint.Zero || Length == 0)
+            if (handle == IntPtr.Zero || Length == 0)
                 return false;
 
             long l = Length;
@@ -1235,11 +1236,11 @@ namespace DataTools.Memory
                 throw new IndexOutOfRangeException("Index out of bounds DataTools.Memory.AllocatedPtrBase.Slide().");
             }
 
-            nint p1;
-            nint p2;
+            IntPtr p1;
+            IntPtr p2;
 
-            p1 = (nint)((long)handle + index);
-            p2 = (nint)((long)handle + index + offset);
+            p1 = (IntPtr)((long)handle + index);
+            p2 = (IntPtr)((long)handle + index + offset);
 
             long a = Math.Abs(offset);
             MemPtr m = new MemPtr(length);
@@ -1248,7 +1249,7 @@ namespace DataTools.Memory
             Native.MemCpy(p1, m.handle, length);
             Native.MemCpy(p2, n.handle, a);
 
-            p1 = (nint)((long)handle + index + offset + length);
+            p1 = (IntPtr)((long)handle + index + offset + length);
             Native.MemCpy(n.handle, p1, a);
             Native.MemCpy(m.handle, p2, length);
 
@@ -1363,7 +1364,7 @@ namespace DataTools.Memory
         /// <remarks></remarks>
         public virtual void Part(long index, long amount, bool addPressure = false)
         {
-            if (handle == nint.Zero)
+            if (handle == IntPtr.Zero)
             {
                 Alloc(amount);
                 return;
@@ -1495,7 +1496,7 @@ namespace DataTools.Memory
         /// <returns></returns>
         protected long GetLogicalSize()
         {
-            if (handle == 0) return 0;
+            if (handle == IntPtr.Zero) return 0;
             return logSize;
         }
 
@@ -1508,7 +1509,7 @@ namespace DataTools.Memory
         /// </remarks>
         protected void DangerousSetLogicalSize(long logicalSize)
         {
-            if (handle == 0) logSize = 0;
+            if (handle == IntPtr.Zero) logSize = 0;
             else logSize = logicalSize;
         }
 
@@ -1527,13 +1528,13 @@ namespace DataTools.Memory
             lock (lockObj)
             {
                 // TODO: Logical Size!
-                if (handle != 0) return ReAlloc(size);
+                if (handle != IntPtr.Zero) return ReAlloc(size);
                 if (size > int.MaxValue) throw new NotSupportedException("CoTaskMem only supports 32-bit integer buffer lengths.");
 
                 try
                 {
                     handle = Allocate(size);
-                    if (handle != 0)
+                    if (handle != IntPtr.Zero)
                     {
                         DangerousSetLogicalSize(size);
                         if (HasGCPressure) GC.AddMemoryPressure(size);
@@ -1557,7 +1558,7 @@ namespace DataTools.Memory
         /// Overrides of this method should provide only the functionality necessary<br />
         /// to allocate a memory block and return the new pointer.
         /// </remarks>
-        protected abstract nint Allocate(long size);
+        protected abstract IntPtr Allocate(long size);
 
         /// <summary>
         /// Provide the low-level ability to re-allocate an existing memory block to change its size.
@@ -1568,7 +1569,7 @@ namespace DataTools.Memory
         /// Overrides of this method should provide only the functionality necessary<br />
         /// to reallocate a memory block and return the new pointer.
         /// </remarks>
-        protected abstract nint Reallocate(nint oldptr, long newsize);
+        protected abstract IntPtr Reallocate(IntPtr oldptr, long newsize);
 
         /// <summary>
         /// Provide the low-level ability to free an allocated memory block.
@@ -1578,7 +1579,7 @@ namespace DataTools.Memory
         /// Overrides of this method should provide only the functionality necessary<br />
         /// to free the memory block.
         /// </remarks>
-        protected abstract void Deallocate(nint ptr);
+        protected abstract void Deallocate(IntPtr ptr);
 
         /// <summary>
         /// Frees the block of memory.
@@ -1590,7 +1591,7 @@ namespace DataTools.Memory
         {
             lock (lockObj)
             {
-                if (handle == 0) return true;
+                if (handle == IntPtr.Zero) return true;
                 if (!IsOwner) return true;
 
                 try
@@ -1608,7 +1609,7 @@ namespace DataTools.Memory
                 }
                 finally
                 {
-                    handle = 0;
+                    handle = IntPtr.Zero;
                 }
             }
         }
@@ -1631,7 +1632,7 @@ namespace DataTools.Memory
         {
             lock (lockObj)
             {
-                if (handle == nint.Zero) return Alloc(size);
+                if (handle == IntPtr.Zero) return Alloc(size);
                 else if (size <= 0) return Free();
 
                 try
@@ -1639,7 +1640,7 @@ namespace DataTools.Memory
                     var oldsize = Length;
                     var newptr = Reallocate(handle, (int)size);
 
-                    if (newptr != 0)
+                    if (newptr != IntPtr.Zero)
                     {
                         handle = newptr;
 
@@ -1682,7 +1683,7 @@ namespace DataTools.Memory
         /// This function does the actual work of zeroing memory, which can vary between platforms.<br /><br />
         /// <see cref="ZeroMemory(long, long)"/> depends on this function.
         /// </remarks>
-        protected abstract void InternalDoZeroMem(nint startptr, long length);
+        protected abstract void InternalDoZeroMem(IntPtr startptr, long length);
 
         /// <summary>
         /// Set all bytes in the memory buffer to zero.
@@ -1725,7 +1726,7 @@ namespace DataTools.Memory
                         }
                     }
 
-                    InternalDoZeroMem((nint)p, len);
+                    InternalDoZeroMem((IntPtr)p, len);
                 }
             }
         }
@@ -1761,7 +1762,7 @@ namespace DataTools.Memory
         /// <param name="length">The number of bytes to copy.</param>
         /// <returns></returns>
         public bool CopyTo(SafePtrBase dest, int srcidx, int destidx, int length)
-            => CopyTo(dest, (nint)srcidx, (nint)destidx, (nint)length);
+            => CopyTo(dest, (IntPtr)srcidx, (IntPtr)destidx, (IntPtr)length);
 
         /// <summary>
         /// Copies the memory contents from this buffer to another buffer.
@@ -1772,7 +1773,7 @@ namespace DataTools.Memory
         /// <param name="length">The number of bytes to copy.</param>
         /// <returns></returns>
         public bool CopyTo(SafePtrBase dest, long srcidx, long destidx, long length)
-            => CopyTo(dest, (nint)srcidx, (nint)destidx, (nint)length);
+            => CopyTo(dest, (IntPtr)srcidx, (IntPtr)destidx, (IntPtr)length);
 
         /// <summary>
         /// Copies the memory contents from this buffer to another buffer.
@@ -1782,16 +1783,16 @@ namespace DataTools.Memory
         /// <param name="destidx">The start index in the destination buffer to start writing.</param>
         /// <param name="length">The number of bytes to copy.</param>
         /// <returns></returns>
-        public virtual bool CopyTo(SafePtrBase dest, nint srcidx, nint destidx, nint length)
+        public virtual bool CopyTo(SafePtrBase dest, IntPtr srcidx, IntPtr destidx, IntPtr length)
         {
             unsafe
             {
-                if (dest.Length < (destidx + length)) return false;
+                if (dest.Length < ((long)destidx + (long)length)) return false;
 
-                void* ptr1 = (void*)(handle + srcidx);
-                void* ptr2 = (void*)(dest.handle + destidx);
+                void* ptr1 = (void*)((long)handle + (long)srcidx);
+                void* ptr2 = (void*)((long)dest.handle + (long)destidx);
 
-                Buffer.MemoryCopy(ptr1, ptr2, length, length);
+                Buffer.MemoryCopy(ptr1, ptr2, (long)length, (long)length);
 
                 return true;
             }
@@ -1804,7 +1805,7 @@ namespace DataTools.Memory
         public virtual uint CalculateCrc32()
         {
             long c = Length;
-            if (handle == nint.Zero || c <= 0) return 0;
+            if (handle == IntPtr.Zero || c <= 0) return 0;
 
             unsafe
             {
@@ -1814,7 +1815,7 @@ namespace DataTools.Memory
 
         public override string ToString()
         {
-            if (handle == (nint)0) return "";
+            if (handle == (IntPtr)0) return "";
             return GetString(0);
         }
 
@@ -1827,7 +1828,7 @@ namespace DataTools.Memory
         /// If the other object is derived from <see cref="SafePtrBase"/>, then the two buffers are tested<br />
         /// for equality based on the ISO-3309 CRC-32 hash of their respective contents.<br />
         /// <br />
-        /// If the other object is of type <see cref="nint"/>, then the pointer references are compared.
+        /// If the other object is of type <see cref="IntPtr"/>, then the pointer references are compared.
         /// </remarks>
         public override bool Equals(object obj)
         {
@@ -1835,13 +1836,13 @@ namespace DataTools.Memory
             {
                 return Equals(ab);
             }
-            else if (obj is nint ip)
+            else if (obj is IntPtr ip)
             {
                 return ip == base.handle;
             }
             else if (obj is UIntPtr uip)
             {
-                return uip == (UIntPtr)base.handle;
+                return uip == (UIntPtr)(long)base.handle;
             }
             else if (obj is MemPtr mp)
             {
@@ -1970,7 +1971,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator string(SafePtrBase val)
         {
-            if (val?.handle == (nint)0) return null;
+            if (val?.handle == (IntPtr)0) return null;
             return val.GetString(0);
         }
 
@@ -1978,11 +1979,11 @@ namespace DataTools.Memory
 
         #region Implicit Cast Operators
 
-        public static implicit operator nint(SafePtrBase val) => val.handle;
+        public static implicit operator IntPtr(SafePtrBase val) => val.handle;
 
         public static unsafe implicit operator void*(SafePtrBase val) => (void*)val.handle;
 
-        public static implicit operator UIntPtr(SafePtrBase val) => (UIntPtr)val.handle;
+        public static implicit operator UIntPtr(SafePtrBase val) => (UIntPtr)(long)val.handle;
 
         #endregion Implicit Cast Operators
 
@@ -2180,49 +2181,49 @@ namespace DataTools.Memory
 
         public static SafePtrBase operator +(SafePtrBase val1, long val2)
         {
-            val1.handle = (nint)((long)val1.handle + val2);
+            val1.handle = (IntPtr)((long)val1.handle + val2);
             return val1;
         }
 
         public static SafePtrBase operator -(SafePtrBase val1, long val2)
         {
-            val1.handle = (nint)((long)val1.handle - val2);
+            val1.handle = (IntPtr)((long)val1.handle - val2);
             return val1;
         }
 
         public static SafePtrBase operator +(SafePtrBase val1, uint val2)
         {
-            val1.handle = (nint)((uint)val1.handle + val2);
+            val1.handle = (IntPtr)((uint)val1.handle + val2);
             return val1;
         }
 
         public static SafePtrBase operator -(SafePtrBase val1, uint val2)
         {
-            val1.handle = (nint)((uint)val1.handle - val2);
+            val1.handle = (IntPtr)((uint)val1.handle - val2);
             return val1;
         }
 
         public static SafePtrBase operator +(SafePtrBase val1, ulong val2)
         {
-            val1.handle = (nint)((ulong)val1.handle + val2);
+            val1.handle = (IntPtr)((ulong)val1.handle + val2);
             return val1;
         }
 
         public static SafePtrBase operator -(SafePtrBase val1, ulong val2)
         {
-            val1.handle = (nint)((ulong)val1.handle - val2);
+            val1.handle = (IntPtr)((ulong)val1.handle - val2);
             return val1;
         }
 
-        public static SafePtrBase operator +(SafePtrBase val1, nint val2)
+        public static SafePtrBase operator +(SafePtrBase val1, IntPtr val2)
         {
-            val1.handle = (nint)((long)val1.handle + (long)val2);
+            val1.handle = (IntPtr)((long)val1.handle + (long)val2);
             return val1;
         }
 
-        public static SafePtrBase operator -(SafePtrBase val1, nint val2)
+        public static SafePtrBase operator -(SafePtrBase val1, IntPtr val2)
         {
-            val1.handle = (nint)((long)val1.handle - (long)val2);
+            val1.handle = (IntPtr)((long)val1.handle - (long)val2);
             return val1;
         }
 
@@ -2230,24 +2231,24 @@ namespace DataTools.Memory
 
         #region Equality Operators
 
-        public static bool operator ==(nint val1, SafePtrBase val2)
+        public static bool operator ==(IntPtr val1, SafePtrBase val2)
         {
-            return val1 == (val2?.handle ?? nint.Zero);
+            return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static bool operator !=(nint val1, SafePtrBase val2)
+        public static bool operator !=(IntPtr val1, SafePtrBase val2)
         {
-            return val1 != (val2?.handle ?? nint.Zero);
+            return val1 != (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static bool operator ==(SafePtrBase val2, nint val1)
+        public static bool operator ==(SafePtrBase val2, IntPtr val1)
         {
-            return val1 == (val2?.handle ?? nint.Zero);
+            return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static bool operator !=(SafePtrBase val2, nint val1)
+        public static bool operator !=(SafePtrBase val2, IntPtr val1)
         {
-            return val1 != (val2?.handle ?? nint.Zero);
+            return val1 != (val2?.handle ?? IntPtr.Zero);
         }
 
         #endregion Equality Operators

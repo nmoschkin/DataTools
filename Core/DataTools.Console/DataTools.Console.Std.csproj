@@ -1,38 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <nullable>disable</nullable>
-    <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1009</AssemblyVersion>
-    <FileVersion>8.0.0.1009</FileVersion>
+    <TargetFrameworks>netstandard2.0;net48</TargetFrameworks>
+    <Nullable>disable</Nullable>
+    <AssemblyVersion>8.0.0.1008</AssemblyVersion>
+    <FileVersion>8.0.0.1008</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1009</Version>
-    <Product>DataTools Hardware Library</Product>
-    <Description>DataTools Hardware Library - Disk Library</Description>
+    <Version>8.0.0.1008</Version>
+    <Product>DataTools Color Console</Product>
+    <Description>DataTools Color Console</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <Platforms>AnyCPU;x64</Platforms>
     <SignAssembly>False</SignAssembly>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Title>DataTools.Win32.Disk</Title>
+    <Title>DataTools.Console</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1008</PreviousVersion>
+    <PreviousVersion>8.0.0.1007</PreviousVersion>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
-    <ProjectReference Include="..\DataTools.Win32\DataTools.Win32.csproj" />
-  </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
-    <Optimize>True</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|x64'">
     <Optimize>True</Optimize>
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">

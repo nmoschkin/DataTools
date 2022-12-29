@@ -1,19 +1,15 @@
-﻿using System;
+﻿using DataTools.Text;
+
+using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
-using DataTools.Text;
 
 using static DataTools.Essentials.SortedLists.BinarySearch;
 using static DataTools.Essentials.SortedLists.QuickSort;
 
 namespace DataTools.Graphics
 {
-
     public class NamedColor
     {
         private static NamedColor[] catalog;
@@ -109,6 +105,7 @@ namespace DataTools.Graphics
 
             return closest;
         }
+
         public static List<NamedColor> SearchAll(string search, bool includeWebCat = true)
         {
             List<NamedColor> output = new List<NamedColor>();
@@ -147,7 +144,6 @@ namespace DataTools.Graphics
             {
                 foreach (var nc in webCatalog)
                 {
-
                     if (anywhere)
                     {
                         if (nc.nidxstr.Contains(search))
@@ -165,12 +161,10 @@ namespace DataTools.Graphics
                 }
             }
 
-
             foreach (var nc in catalog)
             {
-
                 if (anywhere)
-                { 
+                {
                     if (nc.nidxstr.Contains(search))
                     {
                         if (!output.Contains(nc)) output.Add(nc);
@@ -265,7 +259,6 @@ namespace DataTools.Graphics
         {
             if (catalog == null) catalog = LoadColors(AppResources.ColorList, true);
             if (webCatalog == null) webCatalog = LoadColors(AppResources.WebPalette, false);
-
         }
 
         public static NamedColor[] LoadColors(string resource, bool sort)
@@ -297,7 +290,7 @@ namespace DataTools.Graphics
                 cc.eidxstr = TextTools.NoSpace(extra?.ToLower() ?? "");
 
                 cc.idxstr = cc.nidxstr + cc.eidxstr;
-                
+
                 var test = cl.Where((a) => a.Color == cc.Color).FirstOrDefault();
                 if (test == null) cl.Add(cc);
             }
@@ -360,7 +353,6 @@ namespace DataTools.Graphics
 
         public NamedColor(UniColor color, string extra = null)
         {
-
             Name = color.ToString("whr");
             Color = color;
             extraInfo = extra;
@@ -375,6 +367,5 @@ namespace DataTools.Graphics
         {
             return c.Color;
         }
-
     }
 }

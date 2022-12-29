@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFrameworks>net7.0;netstandard2.0;net48</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1008</AssemblyVersion>
-    <FileVersion>8.0.0.1008</FileVersion>
+    <AssemblyVersion>8.0.0.1012</AssemblyVersion>
+    <FileVersion>8.0.0.1012</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1008</Version>
+    <Version>8.0.0.1012</Version>
     <Product>DataTools App Essentials</Product>
     <Description>DataTools App Essentials</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -20,7 +19,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1007</PreviousVersion>
+    <PreviousVersion>8.0.0.1011</PreviousVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
@@ -33,7 +32,7 @@
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
     <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
-    <Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
     <Exec Command="post-build-tool /d ." />
   </Target>
 </Project>

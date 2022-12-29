@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using SkiaSharp;
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -1149,7 +1150,7 @@ namespace DataTools.Graphics
                     unsafe
                     {
                         var cr = new UniColor();
-                        byte* h = (byte*)(nint)sp;
+                        byte* h = (byte*)(IntPtr)sp;
 
                         cr.A = h[24];
                         cr.R = h[25];

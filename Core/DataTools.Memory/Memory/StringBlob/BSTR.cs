@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-using DataTools.Memory;
-
 namespace DataTools.Memory.StringBlob
 {
     public class BSTR : IEquatable<BSTR>, IEquatable<string>, IReadOnlyList<char>
@@ -76,14 +74,14 @@ namespace DataTools.Memory.StringBlob
             return lhs.Equals(rhs);
         }
 
-        public BSTR(nint m)
+        public BSTR(IntPtr m)
         {
             mem = new CoTaskMemPtr(m);
         }
 
         public unsafe BSTR(void* m)
         {
-            mem = new CoTaskMemPtr((nint)m, true);
+            mem = new CoTaskMemPtr((IntPtr)m, true);
         }
 
         public override bool Equals(object obj)
@@ -147,8 +145,8 @@ namespace DataTools.Memory.StringBlob
             return new BSTR(val);
         }
 
-        public static explicit operator nint(BSTR val) => val.mem.DangerousGetHandle();
+        public static explicit operator IntPtr(BSTR val) => val.mem.DangerousGetHandle();
 
-        public static explicit operator BSTR(nint val) => new BSTR(val);
+        public static explicit operator BSTR(IntPtr val) => new BSTR(val);
     }
 }

@@ -6,6 +6,8 @@ namespace DataTools.Graphics.Structs
 {
     public interface IParseableColorData
     {
+#if NET7_0_OR_GREATER
+
         /// <summary>
         /// Invoke the <see cref="Parse(string)"/> method for the specified object.
         /// </summary>
@@ -73,6 +75,7 @@ namespace DataTools.Graphics.Structs
         {
             return (T)FromColor(typeof(T), value);
         }
+#endif
     }
 
     /// <summary>
@@ -81,6 +84,8 @@ namespace DataTools.Graphics.Structs
     /// <typeparam name="TSelf"></typeparam>
     public interface IParseableColorData<TSelf> : IParseableColorData, IFormattable, IEquatable<TSelf> where TSelf : IParseableColorData<TSelf>
     {
+#if NET7_0_OR_GREATER
+
         /// <summary>
         /// Parse the string expression into a new instance of this type.
         /// </summary>
@@ -94,6 +99,7 @@ namespace DataTools.Graphics.Structs
         /// <param name="value"></param>
         /// <returns></returns>
         static abstract TSelf FromColor(UniColor value);
+#endif
 
         /// <summary>
         /// Create a <see cref="UniColor"/> from this instance.

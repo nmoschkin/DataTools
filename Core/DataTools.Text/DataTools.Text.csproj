@@ -1,13 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFrameworks>net7.0;netstandard2.0;net48</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1008</AssemblyVersion>
-    <FileVersion>8.0.0.1008</FileVersion>
+    <AssemblyVersion>8.0.0.1011</AssemblyVersion>
+    <FileVersion>8.0.0.1011</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <PreviousVersion>8.0.0.1007</PreviousVersion>
-    <Version>8.0.0.1008</Version>
+    <PreviousVersion>8.0.0.1010</PreviousVersion>
+    <Version>8.0.0.1011</Version>
     <Product>DataTools Text Library</Product>
     <Description>DataTools Text Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -33,7 +32,7 @@
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
     <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
-    <Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
     <Exec Command="post-build-tool /d ." />
   </Target>
 </Project>

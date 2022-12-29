@@ -7,12 +7,12 @@ namespace DataTools.Memory.StringBlob
     {
         private CoTaskMemPtr mem = null;
 
-        internal nint _ptr
+        internal IntPtr _ptr
         {
-            get => (mem?.DangerousGetHandle()) ?? nint.Zero;
+            get => (mem?.DangerousGetHandle()) ?? IntPtr.Zero;
             set
             {
-                if (value == (mem?.DangerousGetHandle() ?? nint.Zero)) return;
+                if (value == (mem?.DangerousGetHandle() ?? IntPtr.Zero)) return;
 
                 if (mem != null)
                 {
@@ -39,14 +39,14 @@ namespace DataTools.Memory.StringBlob
             mem.SetString(0, s);
         }
 
-        public LPWSTR(nint m)
+        public LPWSTR(IntPtr m)
         {
             mem = new CoTaskMemPtr(m);
         }
 
         public unsafe LPWSTR(void* m)
         {
-            mem = new CoTaskMemPtr((nint)m);
+            mem = new CoTaskMemPtr((IntPtr)m);
         }
 
         public override string ToString()

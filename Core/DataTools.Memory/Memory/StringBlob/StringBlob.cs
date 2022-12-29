@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace DataTools.Memory.StringBlob
@@ -62,7 +63,7 @@ namespace DataTools.Memory.StringBlob
             return sb.ToString();
         }
 
-        public static StringBlob FromNullTermPtr(nint ptr)
+        public static StringBlob FromNullTermPtr(IntPtr ptr)
         {
             var sb = new StringBlob();
             var b = new CoTaskMemPtr(ptr);

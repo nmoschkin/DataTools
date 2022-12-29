@@ -16,9 +16,9 @@ namespace DataTools.Memory
                 byte* bp1 = (byte*)handle;
                 byte* bep = (byte*)handle + len;
 
-                if (len >= nint.Size)
+                if (len >= IntPtr.Size)
                 {
-                    if (nint.Size == 8)
+                    if (IntPtr.Size == 8)
                     {
                         long* lp1 = (long*)bp1;
                         long* lep = (long*)bep;
@@ -57,7 +57,7 @@ namespace DataTools.Memory
             }
         }
 
-        public static void MemCpy(nint src, nint dest, long len)
+        public static void MemCpy(IntPtr src, IntPtr dest, long len)
         {
             unsafe
             {

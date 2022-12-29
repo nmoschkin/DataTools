@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Console
 {
-
     /// <summary>
     /// Colorful Console Printing Tool
     /// </summary>
@@ -52,7 +50,6 @@ namespace DataTools.Console
             System.Console.WriteLine(text);
             System.Console.ForegroundColor = oldColor;
         }
-
 
         /// <summary>
         /// Get or create a table context list.
@@ -126,7 +123,6 @@ namespace DataTools.Console
             {
                 Write(FixedText(columns[i], cols[i]));
             }
-
         }
 
         /// <summary>
@@ -135,7 +131,6 @@ namespace DataTools.Console
         /// <param name="text"></param>
         public static void Write(string text)
         {
-
             var stext = new StringBuilder();
             var sb = new StringBuilder();
 
@@ -193,7 +188,6 @@ namespace DataTools.Console
         {
             Write(text + "\r\n");
         }
-
 
         /// <summary>
         /// Write for printing to the console to the edge of the screen buffer into the <see cref="StringBuilder"/>.
@@ -262,8 +256,6 @@ namespace DataTools.Console
                 {
                     d++;
                 }
-
-
             }
 
             return d;
@@ -298,8 +290,6 @@ namespace DataTools.Console
 
             return str + new string(' ', length - c);
         }
-
-
     }
 
     /// <summary>
@@ -307,7 +297,6 @@ namespace DataTools.Console
     /// </summary>
     public struct TableContext : IEquatable<TableContext>, IComparable<TableContext>
     {
-
         /// <summary>
         /// Represents an invalid table context.
         /// </summary>
@@ -330,7 +319,10 @@ namespace DataTools.Console
             };
         }
 
-#if NETSTANDARD
+#if NETSTANDARD2_0
+
+        public override bool Equals(object obj)
+#elif NET48_OR_GREATER
         public override bool Equals(object obj)
 #else
         public override bool Equals([NotNullWhen(true)] object obj)
@@ -371,12 +363,10 @@ namespace DataTools.Console
         {
             return left.Equals(right);
         }
+
         public static bool operator !=(TableContext left, TableContext right)
         {
             return !left.Equals(right);
         }
-
     }
-
-
 }
