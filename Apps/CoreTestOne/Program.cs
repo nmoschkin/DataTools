@@ -111,6 +111,16 @@ namespace CoreTestOne
             get; set;
         }
 
+        public string Visibility
+        {
+            get; set;
+        }
+
+        public string Type
+        {
+            get; set;
+        }
+
         public string FullyQualifiedClassName
         {
             get
@@ -156,7 +166,7 @@ namespace CoreTestOne
 
         public override string ToString()
         {
-            return $"{ReturnType} {FunctionName} ({DLLName}.{EntryPoint}) [{FileName}] [Project: {Project}] [References: {ReferenceFiles?.Count ?? 0}]";
+            return $"{Visibility} {ReturnType} {FunctionName} ({DLLName}.{EntryPoint}) [{FileName}] [Project: {Project}] [References: {ReferenceFiles?.Count ?? 0}]";
         }
     }
 
@@ -520,7 +530,6 @@ namespace CoreTestOne
 
             var usings = new List<string>();
             var statics = new List<string>();
-
             var rusing = new Regex(@"using ([A-Za-z0-9_.]+);");
             var rstatic = new Regex(@"using static ([A-Za-z0-9_.]+);");
             var rns = new Regex(@"\s*namespace\s+([A-Za-z0-9_.]+).*");
@@ -547,7 +556,9 @@ namespace CoreTestOne
 
                     if (mcls.Success)
                     {
-                        var currClass = mcls.Groups[1].Value;
+                        string currClass;
+
+                        currClass = mcls.Groups[1].Value;
 
                         if (currNamespace != null)
                         {
@@ -653,6 +664,7 @@ namespace CoreTestOne
             int i, c = lines.Length;
             string classname = null;
             string nns = null;
+            var currvis = "private";
 
             var rcls = new Regex(@".* class (\w+).*");
             var rext = new Regex(@"\s*\[DllImport\(""([a-zA-Z0-9.]+)"".*\].*");
@@ -679,6 +691,8 @@ namespace CoreTestOne
                     if (m.Success)
                     {
                         classname = m.Groups[1].Value;
+                        if (lines[i].Contains("public ")) currvis = "public";
+                        else if (lines[i].Contains("internal ")) currvis = "internal";
                     }
                 }
                 else
@@ -708,6 +722,12 @@ namespace CoreTestOne
                         dtype = dm.Groups[1].Value;
                         dname = dm.Groups[2].Value;
 
+                        if (lines[i].Contains("public ") && currvis == "public") currvis = "public";
+                        else if (lines[i].Contains("internal ")) currvis = "internal";
+                        else if (lines[i].Contains("private ")) currvis = "private";
+                        else if (lines[i].Contains("protected ")) currvis = "protected";
+                        else if (lines[i].Contains("protected internal ")) currvis = "protected internal";
+
                         var mtypes = rtypes.Match(lines[i]);
 
                         if (mtypes.Success)
@@ -729,6 +749,7 @@ namespace CoreTestOne
                             FilePath = file,
                             FileName = Path.GetFileName(file),
                             Project = project,
+                            Visibility = currvis
                         };
 
                         if (!cn.DLLName.EndsWith(".dll")) cn.DLLName += ".dll";
