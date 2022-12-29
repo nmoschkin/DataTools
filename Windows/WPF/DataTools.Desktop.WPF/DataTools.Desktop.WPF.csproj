@@ -6,10 +6,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>8.0.0.1004</AssemblyVersion>
-    <FileVersion>8.0.0.1004</FileVersion>
+    <AssemblyVersion>8.0.0.1005</AssemblyVersion>
+    <FileVersion>8.0.0.1005</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1004</Version>
+    <Version>8.0.0.1005</Version>
     <Product>DataTools Desktop WPF Base Library</Product>
     <Description>DataTools Desktop WPF Base Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -24,7 +24,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1003</PreviousVersion>
+    <PreviousVersion>8.0.0.1004</PreviousVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.88.3" />

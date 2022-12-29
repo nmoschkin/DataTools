@@ -4,10 +4,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyVersion>8.0.0.1007</AssemblyVersion>
-    <FileVersion>8.0.0.1007</FileVersion>
+    <AssemblyVersion>8.0.0.1008</AssemblyVersion>
+    <FileVersion>8.0.0.1008</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1007</Version>
+    <Version>8.0.0.1008</Version>
     <Product>DataTools Memory Objects</Product>
     <Description>DataTools Memory Objects</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -21,7 +21,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1006</PreviousVersion>
+    <PreviousVersion>8.0.0.1007</PreviousVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
     <Optimize>True</Optimize>

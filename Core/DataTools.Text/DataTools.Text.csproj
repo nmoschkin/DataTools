@@ -3,11 +3,11 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1007</AssemblyVersion>
-    <FileVersion>8.0.0.1007</FileVersion>
+    <AssemblyVersion>8.0.0.1008</AssemblyVersion>
+    <FileVersion>8.0.0.1008</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <PreviousVersion>8.0.0.1006</PreviousVersion>
-    <Version>8.0.0.1007</Version>
+    <PreviousVersion>8.0.0.1007</PreviousVersion>
+    <Version>8.0.0.1008</Version>
     <Product>DataTools Text Library</Product>
     <Description>DataTools Text Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>

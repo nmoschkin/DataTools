@@ -3,10 +3,10 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1004</AssemblyVersion>
-    <FileVersion>8.0.0.1004</FileVersion>
+    <AssemblyVersion>8.0.0.1005</AssemblyVersion>
+    <FileVersion>8.0.0.1005</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1004</Version>
+    <Version>8.0.0.1005</Version>
     <Product>DataTools WPF Color Control Library</Product>
     <Description>DataTools WPF Color Control Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -20,7 +20,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1003</PreviousVersion>
+    <PreviousVersion>8.0.0.1004</PreviousVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
