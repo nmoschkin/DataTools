@@ -1,33 +1,35 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
-	  <UseWindowsForms>true</UseWindowsForms>
-	  <UseWPF>true</UseWPF>
-	  <UseWindowsForms>true</UseWindowsForms>
-	  <AssemblyVersion>8.0.0.1000</AssemblyVersion>
-	  <FileVersion>8.0.0.1000</FileVersion>
-	  <Authors>Nathaniel Moschkin</Authors>
-	  <Version>8.0.0</Version>
-	  <Product>DataTools Desktop Network Library</Product>
-	  <Description>DataTools Utility Library</Description>
-	  <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
-	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
-	  <RepositoryType>GitHub</RepositoryType>
-	  <NeutralLanguage>en-US</NeutralLanguage>
-	  <Platforms>AnyCPU;x64</Platforms>
-	  <Configurations>Debug;Release;NuGet</Configurations>
-  </PropertyGroup>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyVersion>8.0.0.1000</AssemblyVersion>
+    <FileVersion>8.0.0.1000</FileVersion>
+    <Authors>Nathaniel Moschkin</Authors>
+    <Version>8.0.0.1000</Version>
+    <Product>DataTools Desktop Network Library</Product>
+    <Description>DataTools Utility Library</Description>
+    <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
+    <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Platforms>AnyCPU;x64</Platforms>
+    <Configurations>Debug;Release;NuGet</Configurations>
+    <Nullable>disable</Nullable>
+    <PreviousVersion>8.0.0.999</PreviousVersion>
+	  <AssemblyOriginatorKeyFile>C:\Users\theim\OneDrive\Software Development\Personal Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+	  <SignAssembly>True</SignAssembly>
 
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
     <ProjectReference Include="..\..\..\Core\DataTools.Text\DataTools.Text.csproj" />
-<ProjectReference Include="..\..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
-<ProjectReference Include="..\..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
+    <ProjectReference Include="..\..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
+    <ProjectReference Include="..\..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
     <ProjectReference Include="..\..\..\Win32\DataTools.Win32.Network\DataTools.Win32.Network.csproj" />
     <ProjectReference Include="..\DataTools.Desktop.WPF\DataTools.Desktop.WPF.csproj" />
   </ItemGroup>
-
 </Project>

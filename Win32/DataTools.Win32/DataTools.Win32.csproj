@@ -1,42 +1,42 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RootNamespace>DataTools</RootNamespace>
-	  <AssemblyVersion>8.0.0.1000</AssemblyVersion>
-	  <FileVersion>8.0.0.1000</FileVersion>
-	  <Authors>Nathaniel Moschkin</Authors>
-	  <Version>8.0.0</Version>
-	  <Product>DataTools Hardware Library</Product>
-	  <Description>DataTools Hardware Library - Base Hardware Information Library</Description>
-	  <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
-	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
-	  <RepositoryType>GitHub</RepositoryType>
-	  <NeutralLanguage>en-US</NeutralLanguage>
-	  <Platforms>AnyCPU;x64</Platforms>
-	  <Configurations>Debug;Release;NuGet</Configurations>
-  </PropertyGroup>
+    <AssemblyVersion>8.0.0.1000</AssemblyVersion>
+    <FileVersion>8.0.0.1000</FileVersion>
+    <Authors>Nathaniel Moschkin</Authors>
+    <Version>8.0.0.1000</Version>
+    <Product>DataTools Hardware Library</Product>
+    <Description>DataTools Hardware Library - Base Hardware Information Library</Description>
+    <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
+    <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Platforms>AnyCPU;x64</Platforms>
+    <Configurations>Debug;Release;NuGet</Configurations>
+    <Nullable>disable</Nullable>
+    <PreviousVersion>8.0.0.999</PreviousVersion>
+	  <AssemblyOriginatorKeyFile>C:\Users\theim\OneDrive\Software Development\Personal Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+	  <SignAssembly>True</SignAssembly>
 
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="SystemInformation\SysInfo.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="TaskScheduler" Version="2.10.1" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
     <ProjectReference Include="..\..\Core\DataTools.MathTools\DataTools.MathTools.csproj" />
     <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
     <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="MessageResources\LocalizedMessages.Designer.cs">
       <DependentUpon>LocalizedMessages.resx</DependentUpon>
@@ -49,7 +49,6 @@
       <AutoGen>True</AutoGen>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="MessageResources\LocalizedMessages.resx">
       <LastGenOutput>LocalizedMessages.Designer.cs</LastGenOutput>
@@ -60,22 +59,19 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Device\Classes\" />
     <Folder Include="Device\Structs\" />
   </ItemGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
-		<Optimize>True</Optimize>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|x64'">
-		<Optimize>True</Optimize>
-	</PropertyGroup>
-	<Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
-		<Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
-		<Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
-		<Exec Command="post-build-tool /d ." />
-	</Target>
-
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|x64'">
+    <Optimize>True</Optimize>
+  </PropertyGroup>
+  <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
+    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <Exec Command="post-build-tool /d ." />
+  </Target>
 </Project>

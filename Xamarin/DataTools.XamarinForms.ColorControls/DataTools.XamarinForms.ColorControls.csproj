@@ -1,28 +1,25 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-	  <UseWindowsForms>true</UseWindowsForms>
-	  <AssemblyVersion>8.0.0.1000</AssemblyVersion>
-	  <FileVersion>8.0.0.1000</FileVersion>
-	  <Authors>Nathaniel Moschkin</Authors>
-	  <Version>8.0.0</Version>
-	  <Product>DataTools Xamarin.Forms Color Controls Library</Product>
-	  <Description>DataTools Xamarin.Forms Color Controls Library</Description>
-	  <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
-	  <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
-	  <RepositoryType>GitHub</RepositoryType>
-	  <NeutralLanguage>en-US</NeutralLanguage>	  
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyVersion>8.0.0.1000</AssemblyVersion>
+    <FileVersion>8.0.0.1000</FileVersion>
+    <Authors>Nathaniel Moschkin</Authors>
+    <Version>8.0.0.1000</Version>
+    <Product>DataTools Xamarin.Forms Color Controls Library</Product>
+    <Description>DataTools Xamarin.Forms Color Controls Library</Description>
+    <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
+    <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <PreviousVersion>8.0.0.999</PreviousVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="2.88.3" />
     <PackageReference Include="SkiaSharp.Views.Forms" Version="2.88.3" />
@@ -30,24 +27,20 @@
     <PackageReference Include="TouchTracking.Forms" Version="1.1.0" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2545" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Standard\DataTools.Graphics\DataTools.Graphics.csproj" />
     <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
-<ProjectReference Include="..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
-<ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="ColorPicker.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="ColorPicker.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
   </ItemGroup>
-
 </Project>

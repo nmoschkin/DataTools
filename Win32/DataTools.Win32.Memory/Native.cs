@@ -1,10 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-[assembly: InternalsVisibleTo("CTNativeLib")]
-[assembly: InternalsVisibleTo("CTShell")]
 
 namespace DataTools.Win32.Memory
 {

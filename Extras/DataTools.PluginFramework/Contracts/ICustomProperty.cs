@@ -1,19 +1,12 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-[assembly: InternalsVisibleTo("DataTools.Chart")]
-
 namespace DataTools.PluginFramework
 {
-
     public enum PropertyTypes
     {
         String,
@@ -113,7 +106,7 @@ namespace DataTools.PluginFramework
         string ChoiceKey { get; }
 
         /// <summary>
-        /// Clear custom choices. 
+        /// Clear custom choices.
         /// </summary>
         /// <remarks>
         /// Only local custom choices are cleared.  Choice pools must be cleared with a call to IChoicePool.ClearPool()
@@ -126,17 +119,13 @@ namespace DataTools.PluginFramework
         /// <param name="value">The value to validate.</param>
         /// <returns>True if the property contains a valid value.</returns>
         bool Validate(object value);
-
     }
-
-
 
     /// <summary>
     /// PlugIn properties interface
     /// </summary>
     public interface ICustomProperty<T> : ICustomProperty
     {
-
         /// <summary>
         /// The property value.
         /// </summary>
@@ -158,7 +147,6 @@ namespace DataTools.PluginFramework
         /// <param name="value">The value to validate.</param>
         /// <returns>True if the property contains a valid value.</returns>
         bool Validate(T value);
-
     }
 
     public enum AutoCompleteMode
@@ -182,6 +170,5 @@ namespace DataTools.PluginFramework
         /// Custom properties will look up by choice keys, and get pool data in addition to local data.
         /// </remarks>
         Task<IList<T>> GetAutoCompleteSuggestions(T input);
-
     }
 }

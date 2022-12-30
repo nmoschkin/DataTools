@@ -15,11 +15,8 @@ using DataTools.Win32.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-
-[assembly: InternalsVisibleTo("TLModel")]
 
 namespace DataTools.Win32.Usb
 {
