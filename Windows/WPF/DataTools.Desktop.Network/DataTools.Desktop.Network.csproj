@@ -6,10 +6,10 @@
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1020</AssemblyVersion>
-    <FileVersion>8.0.0.1020</FileVersion>
+    <AssemblyVersion>8.0.0.1021</AssemblyVersion>
+    <FileVersion>8.0.0.1021</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1020</Version>
+    <Version>8.0.0.1021</Version>
     <Product>DataTools Desktop Network Library</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -19,8 +19,8 @@
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1019</PreviousVersion>
-    <AssemblyOriginatorKeyFile>C:\Users\theim\OneDrive\Software Development\Personal Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <PreviousVersion>8.0.0.1020</PreviousVersion>
+    <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
