@@ -2,17 +2,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1000</AssemblyVersion>
-    <FileVersion>8.0.0.1000</FileVersion>
+    <AssemblyVersion>8.0.0.1020</AssemblyVersion>
+    <FileVersion>8.0.0.1020</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1000</Version>
+    <Version>8.0.0.1020</Version>
     <Product>DataTools Xamarin.Forms Color Controls Library</Product>
     <Description>DataTools Xamarin.Forms Color Controls Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PreviousVersion>8.0.0.999</PreviousVersion>
+    <PreviousVersion>8.0.0.1019</PreviousVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -28,10 +28,10 @@
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2545" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Standard\DataTools.Graphics\DataTools.Graphics.csproj" />
-    <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
-    <ProjectReference Include="..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
     <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="ColorPicker.xaml">

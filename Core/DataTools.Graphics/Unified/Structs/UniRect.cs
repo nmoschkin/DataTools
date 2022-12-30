@@ -174,6 +174,11 @@ namespace DataTools.Graphics
             height = rc.Height;
         }
 
+        public bool Contains(UniPoint pt)
+        {
+            return pt.X >= Left && pt.X <= Right && pt.Y >= Top && pt.Y <= Bottom;
+        }
+
         public static UniRect FromInts(int[] ints)
         {
             return new UniRect(ints[0], ints[1], ints[2], ints[3]);

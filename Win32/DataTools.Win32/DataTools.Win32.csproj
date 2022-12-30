@@ -5,10 +5,10 @@
     <nullable>disable</nullable>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1000</AssemblyVersion>
-    <FileVersion>8.0.0.1000</FileVersion>
+    <AssemblyVersion>8.0.0.1023</AssemblyVersion>
+    <FileVersion>8.0.0.1023</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1000</Version>
+    <Version>8.0.0.1023</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - Base Hardware Information Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -16,12 +16,13 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64</Platforms>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.999</PreviousVersion>
-	  <AssemblyOriginatorKeyFile>C:\Users\theim\OneDrive\Software Development\Personal Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
-	  <SignAssembly>True</SignAssembly>
-
+    <Title>DataTools.Win32</Title>
+    <PreviousVersion>8.0.0.1022</PreviousVersion>
+    <AssemblyOriginatorKeyFile>C:\Users\theim\OneDrive\Software Development\Personal Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="SystemInformation\SysInfo.cs" />
@@ -72,6 +73,6 @@
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
     <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
     <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
-    <Exec Command="post-build-tool /d ." />
+    <!-- <Exec Command="post-build-tool /d ." /> -->
   </Target>
 </Project>

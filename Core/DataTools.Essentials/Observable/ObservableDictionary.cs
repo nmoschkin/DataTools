@@ -351,11 +351,11 @@ namespace DataTools.Essentials.Observable
         /// <param name="key">The key to search for.</param>
         /// <param name="value">Receives the item that was found, or null/default.</param>
         /// <returns>True if the item was found.</returns>
-#if DOTNETSTD
+#if NETSTANDARD
         public bool TryGetValue(TKey key, out TValue value)
 #else
 
-        public bool TryGetValue(TKey key, out TValue value)
+        public new bool TryGetValue(TKey key, out TValue value)
 #endif
         {
             if (!Contains(key))

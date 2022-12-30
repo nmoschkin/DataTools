@@ -2,17 +2,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-    <AssemblyVersion>8.0.0.1000</AssemblyVersion>
-    <FileVersion>8.0.0.1000</FileVersion>
+    <AssemblyVersion>8.0.0.1020</AssemblyVersion>
+    <FileVersion>8.0.0.1020</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1000</Version>
+    <Version>8.0.0.1020</Version>
     <Product>DataTools Xamarin Controls Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PreviousVersion>8.0.0.999</PreviousVersion>
+    <PreviousVersion>8.0.0.1019</PreviousVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TouchTracking.Forms" Version="1.1.0" />
@@ -20,7 +20,7 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.7.4" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Standard\DataTools.Graphics\DataTools.Graphics.csproj" />
+    <ProjectReference Include="..\..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />
     <ProjectReference Include="..\..\..\Core\DataTools.Text\DataTools.Text.csproj" />
     <ProjectReference Include="..\..\..\Core\DataTools.Memory\DataTools.Memory.csproj" />
     <ProjectReference Include="..\..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />

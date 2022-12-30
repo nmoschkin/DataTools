@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
-    <AssemblyVersion>8.0.0.1001</AssemblyVersion>
-    <FileVersion>8.0.0.1001</FileVersion>
+    <AssemblyVersion>8.0.0.1025</AssemblyVersion>
+    <FileVersion>8.0.0.1025</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1001</Version>
+    <Version>8.0.0.1025</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - Aggregated Computer-Wide Hardware Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -22,7 +22,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1000</PreviousVersion>
+    <PreviousVersion>8.0.0.1024</PreviousVersion>
     <AssemblyOriginatorKeyFile>C:\Users\theim\OneDrive\Software Development\Personal Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
@@ -48,6 +48,6 @@
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
     <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
     <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
-    <Exec Command="post-build-tool /d ." />
+    <!-- <Exec Command="post-build-tool /d ." /> -->
   </Target>
 </Project>
