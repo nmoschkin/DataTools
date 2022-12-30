@@ -37,7 +37,7 @@ namespace DataTools.Win32
         public int fIcon;
         public int xHotspot;
         public int yHotspot;
-        public nint hbmMask;
-        public nint hbmColor;
+        public IntPtr hbmMask;
+        public IntPtr hbmColor;
     }
 }

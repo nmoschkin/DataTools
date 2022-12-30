@@ -33,7 +33,7 @@ namespace DataTools.Shell.Native
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult BindToHandler(
-            [In] nint pbc,
+            [In] IntPtr pbc,
             [In] ref Guid bhid,
             [In] ref Guid riid,
             [Out, MarshalAs(UnmanagedType.Interface)] out IShellFolder ppv);
@@ -41,7 +41,7 @@ namespace DataTools.Shell.Native
         //[PreserveSig]
         //[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         //HResult BindToHandler(
-        //    [In] nint pbc,
+        //    [In] IntPtr pbc,
         //    [In] ref Guid bhid,
         //    [In] ref Guid riid,
         //    [Out, MarshalAs(UnmanagedType.Interface)] out IPropertyStore ppv);
@@ -75,7 +75,7 @@ namespace DataTools.Shell.Native
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult BindToHandler(
-            [In] nint pbc,
+            [In] IntPtr pbc,
             [In] ref Guid bhid,
             [In] ref Guid riid,
             [Out, MarshalAs(UnmanagedType.Interface)] out IPropertyStore ppv);
@@ -83,7 +83,7 @@ namespace DataTools.Shell.Native
         //[PreserveSig]
         //[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         //HResult BindToHandler(
-        //    [In] nint pbc,
+        //    [In] IntPtr pbc,
         //    [In] ref Guid bhid,
         //    [In] ref Guid riid,
         //    [Out, MarshalAs(UnmanagedType.Interface)] out IPropertyStore ppv);
@@ -95,7 +95,7 @@ namespace DataTools.Shell.Native
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetDisplayName(
             [In] ShellItemDesignNameOptions sigdnName,
-            out nint ppszName);
+            out IntPtr ppszName);
 
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void GetAttributes([In] ShellFileGetAttributesOptions sfgaoMask, out ShellFileGetAttributesOptions psfgaoAttribs);

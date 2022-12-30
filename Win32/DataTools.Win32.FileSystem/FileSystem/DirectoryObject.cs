@@ -272,17 +272,17 @@ namespace DataTools.Desktop
         private void CreateEnumerator()
         {
             var shguid = ShellIIDGuid.IShellItemUuid;
-            var res = NativeShell.SHCreateItemFromParsingName(source.ParsingName, nint.Zero, ref shguid, out shitem);
+            var res = NativeShell.SHCreateItemFromParsingName(source.ParsingName, IntPtr.Zero, ref shguid, out shitem);
 
             if (res == HResult.Ok)
             {
                 var fldbind = ShellBHIDGuid.ShellFolderObjectUuid;
                 var fld2guid = ShellIIDGuid.IShellFolder2Uuid;
 
-                shitem.BindToHandler(nint.Zero, ref fldbind, ref fld2guid, out shfld);
+                shitem.BindToHandler(IntPtr.Zero, ref fldbind, ref fld2guid, out shfld);
                 if (shfld == null) return;
 
-                shfld.EnumObjects(nint.Zero,
+                shfld.EnumObjects(IntPtr.Zero,
                     ShellFolderEnumerationOptions.Folders |
                     ShellFolderEnumerationOptions.IncludeHidden |
                     ShellFolderEnumerationOptions.NonFolders |
@@ -305,7 +305,7 @@ namespace DataTools.Desktop
             {
                 var glist = new List<string>();
                 uint cf;
-                nint ptr;
+                IntPtr ptr;
                 string pout;
 
                 // mm.AllocCoTaskMem((MAX_PATH * 2) + 8)
@@ -327,14 +327,14 @@ namespace DataTools.Desktop
 
                 if (IntPtr.Size == 4)
                 {
-                    inv = (nint)mm2.IntAt(1L);
+                    inv = (IntPtr)mm2.IntAt(1L);
                 }
                 else
                 {
-                    inv = (nint)mm2.LongAt(1L);
+                    inv = (IntPtr)mm2.LongAt(1L);
                 }
                 var invh = inv.DangerousGetHandle();
-                if (invh != nint.Zero)
+                if (invh != IntPtr.Zero)
                 {
                     if (inv.CharAt(0L) != '\0')
                     {

@@ -53,26 +53,26 @@ namespace DataTools.Win32.Usb
         /// <param name="write">Attempt to open with write access.</param>
         /// <returns>A handle to the open device (close with CloseHid).</returns>
         /// <remarks></remarks>
-        public static nint OpenHid(HidDeviceInfo device, bool write = false)
+        public static IntPtr OpenHid(HidDeviceInfo device, bool write = false)
         {
-            nint hhid;
+            IntPtr hhid;
 
             try
             {
                 if (write)
                 {
-                    hhid = IO.CreateFile(device.DevicePath, IO.FILE_WRITE_ACCESS, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
+                    hhid = IO.CreateFile(device.DevicePath, IO.FILE_WRITE_ACCESS, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
                 }
                 else
                 {
-                    hhid = IO.CreateFile(device.DevicePath, 0, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
+                    hhid = IO.CreateFile(device.DevicePath, 0, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, default);
                 }
 
-                if (hhid.IsInvalidHandle()) return nint.Zero;
+                if (hhid.IsInvalidHandle()) return IntPtr.Zero;
             }
             catch
             {
-                return nint.Zero;
+                return IntPtr.Zero;
             }
 
             return hhid;
@@ -83,7 +83,7 @@ namespace DataTools.Win32.Usb
         /// </summary>
         /// <param name="handle">The handle of the device to be freed.</param>
         /// <remarks></remarks>
-        public static void CloseHid(nint handle)
+        public static void CloseHid(IntPtr handle)
         {
             if (!handle.IsInvalidHandle())
                 User32.CloseHandle(handle);
@@ -122,7 +122,7 @@ namespace DataTools.Win32.Usb
         /// <param name="datalen"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static HidFeatureValue? GetHIDFeature(nint hhid, byte code, int datalen = 16)
+        public static HidFeatureValue? GetHIDFeature(IntPtr hhid, byte code, int datalen = 16)
         {
             HidFeatureValue? result;
 

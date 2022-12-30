@@ -55,7 +55,7 @@ namespace DataTools.Shell.Native
 
         // Get a schema provider for browsing the currently loaded schema.
         [PreserveSig]
-        HResult GetSchemaProvider([Out] out /*ISchemaProvider*/ nint ppSchemaProvider);
+        HResult GetSchemaProvider([Out] out /*ISchemaProvider*/ IntPtr ppSchemaProvider);
 
         // Restate a condition as a query string according to the currently selected syntax.
         // The parameter fUseEnglish is reserved for future use; must be FALSE.

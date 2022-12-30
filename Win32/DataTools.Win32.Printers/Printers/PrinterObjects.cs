@@ -88,7 +88,7 @@ namespace DataTools.Hardware.Printers
             var sp = new List<string>();
             int ps = Marshal.SizeOf(pif);
             string ts;
-            PrinterModule.EnumPrinters(PrinterModule.PRINTER_ENUM_NAME, "", 4U, nint.Zero, 0U, ref cb, ref rc);
+            PrinterModule.EnumPrinters(PrinterModule.PRINTER_ENUM_NAME, "", 4U, IntPtr.Zero, 0U, ref cb, ref rc);
             if (cb > 0L)
             {
                 mm.Alloc(cb);

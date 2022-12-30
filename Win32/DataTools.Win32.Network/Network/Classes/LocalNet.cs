@@ -105,11 +105,11 @@ namespace DataTools.Win32.Network
         }
 
         [DllImport("Mpr.dll", EntryPoint = "WNetOpenEnumW", CharSet = CharSet.Unicode)]
-        internal static extern int WNetOpenEnum(int dwScope, int dwType, int dwUsage, nint lpNetResource, ref nint lphEnum);
+        internal static extern int WNetOpenEnum(int dwScope, int dwType, int dwUsage, IntPtr lpNetResource, ref IntPtr lphEnum);
         [DllImport("Mpr.dll", EntryPoint = "WNetEnumResourceW", CharSet = CharSet.Unicode)]
-        internal static extern int WNetEnumResource(nint hEnum, ref int lpcCount, nint lpBuffer, ref int lpBufferSize);
+        internal static extern int WNetEnumResource(IntPtr hEnum, ref int lpcCount, IntPtr lpBuffer, ref int lpBufferSize);
         [DllImport("Mpr.dll", CharSet = CharSet.Unicode)]
-        internal static extern int WNetCloseEnum(nint hEnum);
+        internal static extern int WNetCloseEnum(IntPtr hEnum);
 
 
         // DWORD WNetAddConnection3(
@@ -122,12 +122,12 @@ namespace DataTools.Win32.Network
 
 
         [DllImport("Mpr.dll", EntryPoint = "WNetAddConnection3W", CharSet = CharSet.Unicode)]
-        internal static extern int WNetAddConnection3(nint hwndOwner, nint lpNetResource, [MarshalAs(UnmanagedType.LPTStr)] string lpPassword, [MarshalAs(UnmanagedType.LPTStr)] string lpusername, int dwFlags);
+        internal static extern int WNetAddConnection3(IntPtr hwndOwner, IntPtr lpNetResource, [MarshalAs(UnmanagedType.LPTStr)] string lpPassword, [MarshalAs(UnmanagedType.LPTStr)] string lpusername, int dwFlags);
 
         public static NETRESOURCE[] EnumNetwork()
         {
             NETRESOURCE[] EnumNetworkRet = default;
-            EnumNetworkRet = DoEnum(nint.Zero);
+            EnumNetworkRet = DoEnum(IntPtr.Zero);
             return EnumNetworkRet;
         }
 
@@ -146,7 +146,7 @@ namespace DataTools.Win32.Network
             {
                 lpnet.lpRemoteName = @"\\" + computer;
                 Marshal.StructureToPtr(lpnet, mm.Handle, false);
-                int res = LocalNet.WNetAddConnection3(nint.Zero, mm.Handle,  password, username, CONNECT_INTERACTIVE);
+                int res = LocalNet.WNetAddConnection3(IntPtr.Zero, mm.Handle,  password, username, CONNECT_INTERACTIVE);
                 mm.Free();
                 if (res != 0)
                 {
@@ -166,14 +166,14 @@ namespace DataTools.Win32.Network
             return EnumComputerRet;
         }
 
-        public static NETRESOURCE[] DoEnum(nint lpNet)
+        public static NETRESOURCE[] DoEnum(IntPtr lpNet)
         {
             NETRESOURCE[] DoEnumRet = default;
             MemPtr mm = new MemPtr();
             int cb = 10240;
             NETRESOURCE[] bb = null;
             NETRESOURCE[] nin = null;
-            nint hEnum = nint.Zero;
+            IntPtr hEnum = IntPtr.Zero;
             int e = 0;
             e = WNetOpenEnum(RESOURCE_GLOBALNET, RESOURCETYPE_DISK, RESOURCEUSAGE_ALL, lpNet, ref hEnum);
             if (e != NO_ERROR)

@@ -52,7 +52,7 @@ namespace DataTools.Win32.Usb
         protected Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> inputBtnMap = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
         protected Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> outputBtnMap = new Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>();
 
-        protected internal nint hHid = (nint)(-1);
+        protected internal IntPtr hHid = (IntPtr)(-1);
         protected bool openWrite = false;
         private bool disposedValue;
 
@@ -148,7 +148,7 @@ namespace DataTools.Win32.Usb
         /// Retrieves the raw handle to the currently open HID device.
         /// </summary>
         /// <returns></returns>
-        public nint DangerousGetHidDeviceHandle()
+        public IntPtr DangerousGetHidDeviceHandle()
         {
             return hHid;
         }
@@ -204,7 +204,7 @@ namespace DataTools.Win32.Usb
 
             HidFeatures.CloseHid(hHid);
 
-            hHid = (nint)(-1);
+            hHid = (IntPtr)(-1);
             if (openWrite) openWrite = false;
 
             return true;
@@ -222,7 +222,7 @@ namespace DataTools.Win32.Usb
             {
                 var hhid = IsHidOpen ? this.hHid : HidFeatures.OpenHid(this);
 
-                if (hhid != nint.Zero)
+                if (hhid != IntPtr.Zero)
                 {
                     var b = UsbLibHelpers.HidD_GetIndexedString(hhid, index, mm, (int)mm.Length);
                     if (hhid != hHid) HidFeatures.CloseHid(hhid);
@@ -253,7 +253,7 @@ namespace DataTools.Win32.Usb
 
             var hhid = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
-            if (hhid == nint.Zero)
+            if (hhid == IntPtr.Zero)
             {
                 result = new byte[0];
                 return false;
@@ -296,7 +296,7 @@ namespace DataTools.Win32.Usb
 
             var hhid = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
-            if (hhid == nint.Zero) return false;
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
@@ -333,7 +333,7 @@ namespace DataTools.Win32.Usb
 
             var hhid = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
-            if (hhid == nint.Zero) return false;
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
@@ -370,7 +370,7 @@ namespace DataTools.Win32.Usb
 
             var hhid = IsHidOpen ? hHid : HidFeatures.OpenHid(this);
 
-            if (hhid == nint.Zero) return false;
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
@@ -406,7 +406,7 @@ namespace DataTools.Win32.Usb
 
             var hhid = IsOpenWrite ? hHid : HidFeatures.OpenHid(this);
 
-            if (hhid == nint.Zero) return false;
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
@@ -441,7 +441,7 @@ namespace DataTools.Win32.Usb
 
             var hhid = IsOpenWrite ? hHid : HidFeatures.OpenHid(this);
 
-            if (hhid == nint.Zero) return false;
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
@@ -476,7 +476,7 @@ namespace DataTools.Win32.Usb
 
             var hhid = IsOpenWrite ? hHid : HidFeatures.OpenHid(this);
 
-            if (hhid == nint.Zero) return false;
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {
@@ -512,7 +512,7 @@ namespace DataTools.Win32.Usb
 
             var hhid = IsOpenWrite ? hHid : HidFeatures.OpenHid(this);
 
-            if (hhid == nint.Zero) return false;
+            if (hhid == IntPtr.Zero) return false;
 
             using (var mm = new SafePtr())
             {

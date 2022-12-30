@@ -27,53 +27,53 @@ namespace DataTools.Win32
         public const int DIGCF_ALLCLASSES = 0x4;
         public const int DIGCF_PROFILE = 0x8;
         public const int DIGCF_DEVICEINTERFACE = 0x10;
-        public readonly static nint INVALID_HANDLE_VALUE = new nint(-1);
+        public readonly static IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
 
 
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true, CallingConvention = CallingConvention.StdCall, PreserveSig = true)]
-        public static extern nint SetupDiGetClassDevs([MarshalAs(UnmanagedType.LPStruct)] Guid ClassGuid, nint Enumerator, nint hwndParent, ClassDevFlags Flags);
+        public static extern IntPtr SetupDiGetClassDevs([MarshalAs(UnmanagedType.LPStruct)] Guid ClassGuid, IntPtr Enumerator, IntPtr hwndParent, ClassDevFlags Flags);
 
         [DllImport("setupapi.dll", EntryPoint = "SetupDiGetClassDevs", CharSet = CharSet.Unicode, SetLastError = true, CallingConvention = CallingConvention.StdCall, PreserveSig = true)]
-        public static extern nint SetupDiGetClassDevsNoRef([MarshalAs(UnmanagedType.LPStruct)] Guid ClassGuid, nint Enumerator, nint hwndParent, ClassDevFlags Flags);
+        public static extern IntPtr SetupDiGetClassDevsNoRef([MarshalAs(UnmanagedType.LPStruct)] Guid ClassGuid, IntPtr Enumerator, IntPtr hwndParent, ClassDevFlags Flags);
 
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true, CallingConvention = CallingConvention.StdCall, PreserveSig = true)]
-        public static extern bool SetupDiGetDevicePropertyKeys(nint hDev, [MarshalAs(UnmanagedType.Struct)] ref SP_DEVINFO_DATA DeviceInfoData, nint PropertyKeyArray, uint PropertyKeyCount, ref uint RequiredPropertyKeyCount, uint Flags);
+        public static extern bool SetupDiGetDevicePropertyKeys(IntPtr hDev, [MarshalAs(UnmanagedType.Struct)] ref SP_DEVINFO_DATA DeviceInfoData, IntPtr PropertyKeyArray, uint PropertyKeyCount, ref uint RequiredPropertyKeyCount, uint Flags);
 
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true, CallingConvention = CallingConvention.StdCall, PreserveSig = true, EntryPoint = "SetupDiGetDevicePropertyW")]
-        public static extern bool SetupDiGetDeviceProperty(nint DeviceInfoSet, [MarshalAs(UnmanagedType.Struct)] ref SP_DEVINFO_DATA DeviceInfoData, [MarshalAs(UnmanagedType.Struct)] ref DEVPROPKEY PropertyKey, out uint PropertyType, nint PropertyBuffer, uint PropertyBufferSize, out uint RequiredSize, uint Flags);
+        public static extern bool SetupDiGetDeviceProperty(IntPtr DeviceInfoSet, [MarshalAs(UnmanagedType.Struct)] ref SP_DEVINFO_DATA DeviceInfoData, [MarshalAs(UnmanagedType.Struct)] ref DEVPROPKEY PropertyKey, out uint PropertyType, IntPtr PropertyBuffer, uint PropertyBufferSize, out uint RequiredSize, uint Flags);
 
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true, CallingConvention = CallingConvention.StdCall, PreserveSig = true)]
-        public static extern bool SetupDiLoadClassIcon([MarshalAs(UnmanagedType.LPStruct)] Guid ClassGuid, ref nint hIcon, ref int MiniIconIndex);
+        public static extern bool SetupDiLoadClassIcon([MarshalAs(UnmanagedType.LPStruct)] Guid ClassGuid, ref IntPtr hIcon, ref int MiniIconIndex);
 
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true, CallingConvention = CallingConvention.StdCall, PreserveSig = true)]
-        public static extern bool SetupDiLoadDeviceIcon(nint hdev, ref SP_DEVINFO_DATA DeviceInfoData, uint cxIcon, uint cyIcon, uint Flags, ref nint hIcon);
+        public static extern bool SetupDiLoadDeviceIcon(IntPtr hdev, ref SP_DEVINFO_DATA DeviceInfoData, uint cxIcon, uint cyIcon, uint Flags, ref IntPtr hIcon);
 
         [DllImport("setupapi.dll", EntryPoint = "SetupDiGetClassPropertyW", CharSet = CharSet.Unicode)]
-        public static extern bool SetupDiGetClassProperty([MarshalAs(UnmanagedType.LPStruct)] Guid ClassGuid, [MarshalAs(UnmanagedType.Struct)] ref DEVPROPKEY PropertyKey, ref int propertyType, nint propertyBuffer, int propertyBufferSize, ref int RequiredSize, int Flags);
+        public static extern bool SetupDiGetClassProperty([MarshalAs(UnmanagedType.LPStruct)] Guid ClassGuid, [MarshalAs(UnmanagedType.Struct)] ref DEVPROPKEY PropertyKey, ref int propertyType, IntPtr propertyBuffer, int propertyBufferSize, ref int RequiredSize, int Flags);
 
         [DllImport("setupapi.dll")]
-        public static extern bool SetupDiDestroyDeviceInfoList(nint DeviceInfoSet);
+        public static extern bool SetupDiDestroyDeviceInfoList(IntPtr DeviceInfoSet);
 
         [DllImport("setupapi.dll")]
-        public static extern bool SetupDiEnumDeviceInterfaces(nint DeviceInfoSet, [MarshalAs(UnmanagedType.LPStruct)] SP_DEVINFO_DATA DeviceInfoData, Guid InterfaceClassGuid, uint MemberIndex, ref SP_DEVICE_INTERFACE_DATA DeviceInterfaceData);
+        public static extern bool SetupDiEnumDeviceInterfaces(IntPtr DeviceInfoSet, [MarshalAs(UnmanagedType.LPStruct)] SP_DEVINFO_DATA DeviceInfoData, Guid InterfaceClassGuid, uint MemberIndex, ref SP_DEVICE_INTERFACE_DATA DeviceInterfaceData);
 
         [DllImport("setupapi.dll")]
-        public static extern bool SetupDiEnumDeviceInterfaces(nint DeviceInfoSet, nint DeviceInfoData, [MarshalAs(UnmanagedType.LPStruct)] Guid InterfaceClassGuid, uint MemberIndex, ref SP_DEVICE_INTERFACE_DATA DeviceInterfaceData);
+        public static extern bool SetupDiEnumDeviceInterfaces(IntPtr DeviceInfoSet, IntPtr DeviceInfoData, [MarshalAs(UnmanagedType.LPStruct)] Guid InterfaceClassGuid, uint MemberIndex, ref SP_DEVICE_INTERFACE_DATA DeviceInterfaceData);
 
         [DllImport("setupapi.dll")]
-        public static extern bool SetupDiEnumDeviceInterfaces(nint DeviceInfoSet, nint DeviceInfoData, [MarshalAs(UnmanagedType.LPStruct)] Guid InterfaceClassGuid, uint MemberIndex, nint DeviceInterfaceData);
+        public static extern bool SetupDiEnumDeviceInterfaces(IntPtr DeviceInfoSet, IntPtr DeviceInfoData, [MarshalAs(UnmanagedType.LPStruct)] Guid InterfaceClassGuid, uint MemberIndex, IntPtr DeviceInterfaceData);
 
         [DllImport("setupapi.dll", CharSet = CharSet.Unicode, SetLastError = true, CallingConvention = CallingConvention.StdCall, PreserveSig = true)]
-        public static extern bool SetupDiEnumDeviceInfo(nint DeviceInfoSet, uint MemberIndex, out SP_DEVINFO_DATA DeviceInfoData);
+        public static extern bool SetupDiEnumDeviceInfo(IntPtr DeviceInfoSet, uint MemberIndex, out SP_DEVINFO_DATA DeviceInfoData);
 
         [DllImport("setupapi.dll", EntryPoint = "SetupDiGetDeviceInterfaceDetailW")]
         public static extern bool SetupDiGetDeviceInterfaceDetail(
-            nint DeviceInfoSet,
+            IntPtr DeviceInfoSet,
             [MarshalAs(UnmanagedType.Struct)] ref SP_DEVICE_INTERFACE_DATA beviceInterfaceData, 
-            nint DeviceInterfaceDetailData, 
+            IntPtr DeviceInterfaceDetailData, 
             uint DeviceInterfaceDetailDataSize, 
             out uint RequiredSize, 
-            nint DeviceInfoData);
+            IntPtr DeviceInfoData);
         
         public readonly static Guid GUID_DEVCLASS_1394 = new Guid(0x6BDD1FC1, 0x810F, 0x11D0, 0xBE, 0xC7, 0x8, 0x0, 0x2B, 0xE2, 0x9, 0x2F);
         public readonly static Guid GUID_DEVCLASS_1394DEBUG = new Guid(0x66F250D6, 0x7801, 0x4A64, 0xB1, 0x39, 0xEE, 0xA8, 0xA, 0x45, 0xB, 0x24);

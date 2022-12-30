@@ -34,7 +34,7 @@ namespace DataTools.Win32
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct SHFILEINFO
     {
-        public nint hIcon;           // out: icon
+        public IntPtr hIcon;           // out: icon
         public int iIcon;          // out: icon index
         public int dwAttributes;               // out: SFGAO_ flags
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]

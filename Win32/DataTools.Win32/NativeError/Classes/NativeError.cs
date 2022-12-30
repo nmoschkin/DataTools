@@ -66,7 +66,7 @@ namespace DataTools.Win32
             string s;
             mm.Length = 1026L;
             mm.ZeroMemory();
-            User32.FormatMessage(0x1000, nint.Zero, err, 0U, mm.handle, 512U, nint.Zero);
+            User32.FormatMessage(0x1000, IntPtr.Zero, err, 0U, mm.handle, 512U, IntPtr.Zero);
             s = "Error &H" + err.ToString("X8") + ": " + mm.ToString();
             mm.Dispose();
             return s;

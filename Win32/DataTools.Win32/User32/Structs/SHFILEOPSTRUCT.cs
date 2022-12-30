@@ -34,7 +34,7 @@ namespace DataTools.Win32
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct SHFILEOPSTRUCT
     {
-        public nint hWnd;
+        public IntPtr hWnd;
         public int wFunc;
         [MarshalAs(UnmanagedType.LPWStr)]
         public string pFrom;

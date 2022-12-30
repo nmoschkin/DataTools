@@ -19,8 +19,8 @@ namespace DataTools.Win32.Memory
 
         private readonly List<WeakReference<IHeapAssignable>> createdObjecs = new List<WeakReference<IHeapAssignable>>();
 
-        private nint maxsize = 0;
-        private nint currsize = 0;
+        private IntPtr maxsize = 0;
+        private IntPtr currsize = 0;
 
         public bool IsProcessHeap => ProcessHeap.handle == handle;
 
@@ -59,13 +59,13 @@ namespace DataTools.Win32.Memory
             }
         }
 
-        public Heap(nint heapPtr, bool fOwn) : base(0, fOwn)
+        public Heap(IntPtr heapPtr, bool fOwn) : base(0, fOwn)
         {
             handle = heapPtr;
             GetHeapSize();
         }
 
-        private Heap(nint ptr) : base(0, false)
+        private Heap(IntPtr ptr) : base(0, false)
         {
             handle = ptr;
             GetHeapSize();
@@ -73,22 +73,22 @@ namespace DataTools.Win32.Memory
 
         public Heap(long size) : base(0, true)
         {
-            CreateHeap((nint)size, (nint)size);
+            CreateHeap((IntPtr)size, (IntPtr)size);
         }
 
         public Heap(int size) : base(0, true)
         {
-            CreateHeap((nint)size, (nint)size);
+            CreateHeap((IntPtr)size, (IntPtr)size);
         }
 
         public Heap(long size, long maxsize) : base(0, true)
         {
-            CreateHeap((nint)size, (nint)maxsize);
+            CreateHeap((IntPtr)size, (IntPtr)maxsize);
         }
 
         public Heap(int size, int maxsize) : base(0, true)
         {
-            CreateHeap((nint)size, (nint)maxsize);
+            CreateHeap((IntPtr)size, (IntPtr)maxsize);
         }
 
         /// <summary>
@@ -135,13 +135,13 @@ namespace DataTools.Win32.Memory
                     {
                         var reg = sp.ToStruct<PROCESS_HEAP_ENTRY_REGION>();
 
-                        maxsize = (nint)(reg.dwCommittedSize + reg.dwUnCommittedSize);
-                        this.currsize = (nint)(reg.dwCommittedSize);
+                        maxsize = (IntPtr)(reg.dwCommittedSize + reg.dwUnCommittedSize);
+                        this.currsize = (IntPtr)(reg.dwCommittedSize);
 
-                        committed = (long)(nint)reg.dwCommittedSize;
-                        uncommitted = (long)(nint)reg.dwUnCommittedSize;
+                        committed = (long)(IntPtr)reg.dwCommittedSize;
+                        uncommitted = (long)(IntPtr)reg.dwUnCommittedSize;
 
-                        return (long)(nint)reg.cbData;
+                        return (long)(IntPtr)reg.cbData;
                     }
                 }
             }
@@ -149,7 +149,7 @@ namespace DataTools.Win32.Memory
             return 0;
         }
 
-        private void CreateHeap(nint size, nint maxsize)
+        private void CreateHeap(IntPtr size, IntPtr maxsize)
         {
             handle = Native.HeapCreate(0, size, maxsize);
             if (handle == 0)
@@ -231,7 +231,7 @@ namespace DataTools.Win32.Memory
 
         public override string ToString()
         {
-            var b = 2 * nint.Size;
+            var b = 2 * IntPtr.Size;
             var xb = "x" + b.ToString();
             return $"0x{handle.ToString(xb)} [{UsedSpace:#,##0} Used; {UnusedSpace:#,##0} Free]";
         }
@@ -261,7 +261,7 @@ namespace DataTools.Win32.Memory
         /// <remarks>
         /// This is usually the process heap, but creating independent heaps are possible.
         /// </remarks>
-        nint CurrentHeap { get; }
+        IntPtr CurrentHeap { get; }
 
         HeapDestroyBehavior HeapDestroyBehavior { get; }
 
@@ -279,9 +279,9 @@ namespace DataTools.Win32.Memory
         /// <summary>
         /// Gets the pointer to the process heap.
         /// </summary>
-        public static readonly nint ProcessHeap = Native.GetProcessHeap();
+        public static readonly IntPtr ProcessHeap = Native.GetProcessHeap();
 
-        private nint currentHeap = ProcessHeap;
+        private IntPtr currentHeap = ProcessHeap;
 
         public virtual HeapDestroyBehavior HeapDestroyBehavior { get; protected set; } = HeapDestroyBehavior.TransferOut;
 
@@ -306,7 +306,7 @@ namespace DataTools.Win32.Memory
                     {
                         unsafe
                         {
-                            var l = (nint)Length;
+                            var l = (IntPtr)Length;
                             void* ptr = (void*)Native.HeapAlloc(ProcessHeap, 0, l);
 
                             if (ptr != null)
@@ -316,7 +316,7 @@ namespace DataTools.Win32.Memory
 
                             Native.HeapFree(currentHeap, 0, handle);
                             currentHeap = ProcessHeap;
-                            handle = (nint)ptr;
+                            handle = (IntPtr)ptr;
                         }
                     }
                     catch
@@ -339,7 +339,7 @@ namespace DataTools.Win32.Memory
         /// <remarks>
         /// This is usually the process heap, but creating independent heaps are possible.
         /// </remarks>
-        public virtual nint CurrentHeap
+        public virtual IntPtr CurrentHeap
         {
             get => currentHeap;
             protected set
@@ -361,13 +361,13 @@ namespace DataTools.Win32.Memory
             }
         }
 
-        protected internal new nint handle
+        protected internal new IntPtr handle
         {
-            get => (nint)base.handle;
+            get => (IntPtr)base.handle;
             protected set => base.handle = value;
         }
 
-        public SafePtr(nint ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
+        public SafePtr(IntPtr ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
         }
 
@@ -394,9 +394,9 @@ namespace DataTools.Win32.Memory
 
         public override MemoryType MemoryType { get; }
 
-        protected override nint Allocate(long size)
+        protected override IntPtr Allocate(long size)
         {
-            return Native.HeapAlloc(CurrentHeap, 8, (nint)size);
+            return Native.HeapAlloc(CurrentHeap, 8, (IntPtr)size);
         }
 
         protected override bool CanGetNativeSize()
@@ -412,7 +412,7 @@ namespace DataTools.Win32.Memory
             return b;
         }
 
-        protected override void Deallocate(nint ptr)
+        protected override void Deallocate(IntPtr ptr)
         {
             Native.HeapFree(CurrentHeap, 0, ptr);
         }
@@ -423,9 +423,9 @@ namespace DataTools.Win32.Memory
             return (long)Native.HeapSize(CurrentHeap, 0, handle);
         }
 
-        protected override nint Reallocate(nint oldptr, long newsize)
+        protected override IntPtr Reallocate(IntPtr oldptr, long newsize)
         {
-            return Native.HeapReAlloc(CurrentHeap, 0, handle, (nint)newsize);
+            return Native.HeapReAlloc(CurrentHeap, 0, handle, (IntPtr)newsize);
         }
 
         #region Cast Operators
@@ -601,7 +601,7 @@ namespace DataTools.Win32.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator string(SafePtr val)
         {
-            if (val?.handle == (nint)0) return null;
+            if (val?.handle == (IntPtr)0) return null;
             return val.GetString(0);
         }
 
@@ -801,84 +801,84 @@ namespace DataTools.Win32.Memory
 
         public static SafePtr operator +(SafePtr val1, long val2)
         {
-            val1.handle = (nint)((long)val1.handle + val2);
+            val1.handle = (IntPtr)((long)val1.handle + val2);
             return val1;
         }
 
         public static SafePtr operator -(SafePtr val1, long val2)
         {
-            val1.handle = (nint)((long)val1.handle - val2);
+            val1.handle = (IntPtr)((long)val1.handle - val2);
             return val1;
         }
 
         public static SafePtr operator +(SafePtr val1, uint val2)
         {
-            val1.handle = (nint)((uint)val1.handle + val2);
+            val1.handle = (IntPtr)((uint)val1.handle + val2);
             return val1;
         }
 
         public static SafePtr operator -(SafePtr val1, uint val2)
         {
-            val1.handle = (nint)((uint)val1.handle - val2);
+            val1.handle = (IntPtr)((uint)val1.handle - val2);
             return val1;
         }
 
         public static SafePtr operator +(SafePtr val1, ulong val2)
         {
-            val1.handle = (nint)((ulong)val1.handle + val2);
+            val1.handle = (IntPtr)((ulong)val1.handle + val2);
             return val1;
         }
 
         public static SafePtr operator -(SafePtr val1, ulong val2)
         {
-            val1.handle = (nint)((ulong)val1.handle - val2);
+            val1.handle = (IntPtr)((ulong)val1.handle - val2);
             return val1;
         }
 
-        public static SafePtr operator +(SafePtr val1, nint val2)
+        public static SafePtr operator +(SafePtr val1, IntPtr val2)
         {
-            val1.handle = (nint)((long)val1.handle + (long)val2);
+            val1.handle = (IntPtr)((long)val1.handle + (long)val2);
             return val1;
         }
 
-        public static SafePtr operator -(SafePtr val1, nint val2)
+        public static SafePtr operator -(SafePtr val1, IntPtr val2)
         {
-            val1.handle = (nint)((long)val1.handle - (long)val2);
+            val1.handle = (IntPtr)((long)val1.handle - (long)val2);
             return val1;
         }
 
-        public static bool operator ==(nint val1, SafePtr val2)
+        public static bool operator ==(IntPtr val1, SafePtr val2)
         {
-            return val1 == (val2?.handle ?? nint.Zero);
+            return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static bool operator !=(nint val1, SafePtr val2)
+        public static bool operator !=(IntPtr val1, SafePtr val2)
         {
-            return val1 != (val2?.handle ?? nint.Zero);
+            return val1 != (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static bool operator ==(SafePtr val2, nint val1)
+        public static bool operator ==(SafePtr val2, IntPtr val1)
         {
-            return val1 == (val2?.handle ?? nint.Zero);
+            return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static bool operator !=(SafePtr val2, nint val1)
+        public static bool operator !=(SafePtr val2, IntPtr val1)
         {
-            return val1 != (val2?.handle ?? nint.Zero);
+            return val1 != (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static implicit operator nint(SafePtr val)
+        public static implicit operator IntPtr(SafePtr val)
         {
-            return val?.handle ?? nint.Zero;
+            return val?.handle ?? IntPtr.Zero;
         }
 
-        public static implicit operator SafePtr(nint val)
+        public static implicit operator SafePtr(IntPtr val)
         {
             unsafe
             {
                 return new SafePtr
                 {
-                    handle = (nint)(void*)val
+                    handle = (IntPtr)(void*)val
                 };
             }
         }
@@ -897,7 +897,7 @@ namespace DataTools.Win32.Memory
             {
                 return new SafePtr
                 {
-                    handle = (nint)(void*)val
+                    handle = (IntPtr)(void*)val
                 };
             }
         }

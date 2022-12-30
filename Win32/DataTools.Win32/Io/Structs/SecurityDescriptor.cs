@@ -25,7 +25,7 @@ namespace DataTools.Win32
     internal struct SECURITY_ATTRIBUTES
     {
         public int nLength;
-        public nint lpSecurityDescriptor;
+        public IntPtr lpSecurityDescriptor;
         // <MarshalAs(UnmanagedType.Bool)>
         public byte bInheritHandle;
     }
@@ -197,8 +197,8 @@ namespace DataTools.Win32
             public byte Revision;
             public byte Sbz1;
             public SECURITY_DESCRIPTOR_CONTROL Control;
-            public nint Owner;
-            public nint Group;
+            public IntPtr Owner;
+            public IntPtr Group;
             public ACL Sacl;
             public ACL Dacl;
         }
@@ -209,19 +209,19 @@ namespace DataTools.Win32
             public byte Revision;
             public byte Sbz1;
             public SECURITY_DESCRIPTOR_CONTROL Control;
-            public nint Owner;
-            public nint Group;
-            public nint Sacl;
-            public nint Dacl;
+            public IntPtr Owner;
+            public IntPtr Group;
+            public IntPtr Sacl;
+            public IntPtr Dacl;
 
             public void Dispose()
             {
-                if (Sacl != nint.Zero)
+                if (Sacl != IntPtr.Zero)
                 {
                     Marshal.FreeCoTaskMem(Sacl);
                 }
 
-                if (Dacl != nint.Zero)
+                if (Dacl != IntPtr.Zero)
                 {
                     Marshal.FreeCoTaskMem(Dacl);
                 }
@@ -283,15 +283,15 @@ namespace DataTools.Win32
 
         [DllImport("advapi32.dll", EntryPoint = "ConvertStringSecurityDescriptorToSecurityDescriptorW")]
 
-        public static extern bool ConvertStringSecurityDescriptorToSecurityDescriptor([MarshalAs(UnmanagedType.LPWStr)] string StringSecurityDescriptor, uint StringSDRevision, ref nint SecurityDescriptor, ref uint SecurityDescriptorSize);
+        public static extern bool ConvertStringSecurityDescriptorToSecurityDescriptor([MarshalAs(UnmanagedType.LPWStr)] string StringSecurityDescriptor, uint StringSDRevision, ref IntPtr SecurityDescriptor, ref uint SecurityDescriptorSize);
 
         public static SECURITY_DESCRIPTOR StringToSecurityDescriptor(string strSD)
         {
             SECURITY_DESCRIPTOR StringToSecurityDescriptorRet = default;
-            MemPtr ptr = nint.Zero;
+            MemPtr ptr = IntPtr.Zero;
             uint ls = 0U;
             SECURITY_DESCRIPTOR sd;
-            nint argSecurityDescriptor = ptr;
+            IntPtr argSecurityDescriptor = ptr;
             SecurityDescriptor.ConvertStringSecurityDescriptorToSecurityDescriptor(strSD, 1U, ref argSecurityDescriptor, ref ls);
             sd = ptr.ToStruct<SECURITY_DESCRIPTOR>();
             ptr.LocalFree();

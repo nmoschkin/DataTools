@@ -11,7 +11,7 @@ namespace SysInfoTool.Converters
 {
     internal class NativeImageToSourceConverter : IValueConverter
     {
-        private static readonly Dictionary<nint, BitmapSource> sessionCache = new();
+        private static readonly Dictionary<IntPtr, BitmapSource> sessionCache = new();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

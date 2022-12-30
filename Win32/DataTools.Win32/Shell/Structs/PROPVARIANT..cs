@@ -215,8 +215,8 @@ namespace DataTools.Shell.Native
         // ushort _wReserved3;
 
         // In order to allow x64 compat, we need to allow for
-        // expansion of the nint. However, the BLOB struct
-        // uses a 4-byte int, followed by an nint, so
+        // expansion of the IntPtr. However, the BLOB struct
+        // uses a 4-byte int, followed by an IntPtr, so
         // although the valueData field catches most pointer values,
         // we need an additional 4-bytes to get the BLOB
         // pointer. The valueDataExt field provides this, as well as
@@ -224,10 +224,10 @@ namespace DataTools.Shell.Native
         // architectures.
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources")]
         [FieldOffset(12)]
-        private nint _ptr2;
+        private IntPtr _ptr2;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2006:UseSafeHandleToEncapsulateNativeResources")]
         [FieldOffset(8)]
-        private nint _ptr;
+        private IntPtr _ptr;
         [FieldOffset(8)]
         private int _int32;
         [FieldOffset(8)]
@@ -600,7 +600,7 @@ namespace DataTools.Shell.Native
                 for (int i = 0, l = array.Length; i < l; i++)
                 {
                     var obj = array.GetValue(i);
-                    var punk = obj is object ? Marshal.GetIUnknownForObject(obj) : nint.Zero;
+                    var punk = obj is object ? Marshal.GetIUnknownForObject(obj) : IntPtr.Zero;
                     Marshal.WriteIntPtr(pvData, i * IntPtr.Size, punk);
                 }
             }
@@ -890,7 +890,7 @@ namespace DataTools.Shell.Native
             return array;
         }
 
-        private static Array CrackSingleDimSafeArray(nint psa)
+        private static Array CrackSingleDimSafeArray(IntPtr psa)
         {
             uint cDims = PropVariantNativeMethods.SafeArrayGetDim(psa);
             if (cDims != 1L)

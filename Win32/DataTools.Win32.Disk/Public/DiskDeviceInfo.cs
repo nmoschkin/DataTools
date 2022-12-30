@@ -181,7 +181,7 @@ namespace DataTools.Win32.Disk
 
                         Partitioning.DRIVE_LAYOUT_INFORMATION_EX arglayInfo = new Partitioning.DRIVE_LAYOUT_INFORMATION_EX();
 
-                        p = Partitioning.GetPartitions(@"\\.\PhysicalDrive" + PhysicalDevice, nint.Zero, layInfo: ref arglayInfo);
+                        p = Partitioning.GetPartitions(@"\\.\PhysicalDrive" + PhysicalDevice, IntPtr.Zero, layInfo: ref arglayInfo);
                         
                     }
                     catch

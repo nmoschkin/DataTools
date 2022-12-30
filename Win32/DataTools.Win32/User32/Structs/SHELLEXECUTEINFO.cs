@@ -36,7 +36,7 @@ namespace DataTools.Win32
     {
         public int cbSize;
         public uint fMask;
-        public nint hWnd;
+        public IntPtr hWnd;
         [MarshalAs(UnmanagedType.LPTStr)]
         public string lpVerb;
         [MarshalAs(UnmanagedType.LPTStr)]
@@ -46,13 +46,13 @@ namespace DataTools.Win32
         [MarshalAs(UnmanagedType.LPTStr)]
         public string lpDirectory;
         public int nShow;
-        public nint hInstApp;
-        public nint lpIDList;
+        public IntPtr hInstApp;
+        public IntPtr lpIDList;
         [MarshalAs(UnmanagedType.LPTStr)]
         public string lpClass;
-        public nint hkeyClass;
+        public IntPtr hkeyClass;
         public int dwHotKey;
-        public nint hIcon;
-        public nint hProcess;
+        public IntPtr hIcon;
+        public IntPtr hProcess;
     }
 }

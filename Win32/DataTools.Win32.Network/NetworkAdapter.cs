@@ -70,9 +70,9 @@ namespace DataTools.Win32.Network
                 string s = @"::{7007ACC7-3202-11D1-AAD2-00805FC1270E}\" + AdapterName;
                 var mm = new MemPtr();
 
-                NativeShell.SHParseDisplayName(s, nint.Zero, out mm.handle, 0, out _);
+                NativeShell.SHParseDisplayName(s, IntPtr.Zero, out mm.handle, 0, out _);
 
-                if (mm.Handle != nint.Zero)
+                if (mm.Handle != IntPtr.Zero)
                 {
                     // Get a WPFImage
 
@@ -198,7 +198,7 @@ namespace DataTools.Win32.Network
         /// </summary>
         /// <param name="hwnd"></param>
         /// <remarks></remarks>
-        public void ShowConnectionPropertiesDialog(nint hwnd = default)
+        public void ShowConnectionPropertiesDialog(IntPtr hwnd = default)
         {
             if (deviceInfo is null) return;
 
@@ -222,7 +222,7 @@ namespace DataTools.Win32.Network
         /// </summary>
         /// <param name="hwnd"></param>
         /// <remarks></remarks>
-        public void ShowNetworkStatusDialog(nint hwnd = default)
+        public void ShowNetworkStatusDialog(IntPtr hwnd = default)
         {
             var shex = new SHELLEXECUTEINFO
             {

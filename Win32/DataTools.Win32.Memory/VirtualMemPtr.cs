@@ -8,36 +8,36 @@ namespace DataTools
 {
     public class VirtualMemPtr : DataTools.Win32.Memory.WinPtrBase
     {
-        public VirtualMemPtr() : base(nint.Zero, true, true)
+        public VirtualMemPtr() : base(IntPtr.Zero, true, true)
         {
         }
 
-        public VirtualMemPtr(int size) : base(nint.Zero, true, true)
+        public VirtualMemPtr(int size) : base(IntPtr.Zero, true, true)
         {
             Alloc(size);
         }
 
         public override MemoryType MemoryType => MemoryType.Virtual;
 
-        protected override nint Allocate(long size)
+        protected override IntPtr Allocate(long size)
         {
-            return Native.VirtualAlloc(nint.Zero, (nint)size, VMemAllocFlags.MEM_COMMIT | VMemAllocFlags.MEM_RESERVE, MemoryProtectionFlags.PAGE_READWRITE);
+            return Native.VirtualAlloc(IntPtr.Zero, (IntPtr)size, VMemAllocFlags.MEM_COMMIT | VMemAllocFlags.MEM_RESERVE, MemoryProtectionFlags.PAGE_READWRITE);
         }
 
-        protected override void Deallocate(nint ptr)
+        protected override void Deallocate(IntPtr ptr)
         {
             Native.VirtualFree(ptr);
         }
 
-        protected override nint Reallocate(nint oldptr, long newsize)
+        protected override IntPtr Reallocate(IntPtr oldptr, long newsize)
         {
             var olds = GetNativeSize();
 
             var cpysize = olds > newsize ? newsize : olds;
 
-            var nhandle = Native.VirtualAlloc(nint.Zero, (nint)newsize, VMemAllocFlags.MEM_COMMIT | VMemAllocFlags.MEM_RESERVE, MemoryProtectionFlags.PAGE_READWRITE);
+            var nhandle = Native.VirtualAlloc(IntPtr.Zero, (IntPtr)newsize, VMemAllocFlags.MEM_COMMIT | VMemAllocFlags.MEM_RESERVE, MemoryProtectionFlags.PAGE_READWRITE);
 
-            if (nhandle == nint.Zero) return 0;
+            if (nhandle == IntPtr.Zero) return 0;
 
             Native.MemCpy(oldptr, nhandle, cpysize);
             Native.VirtualFree(oldptr);
@@ -47,11 +47,11 @@ namespace DataTools
 
         protected override long GetNativeSize()
         {
-            if (handle == nint.Zero) return 0;
+            if (handle == IntPtr.Zero) return 0;
 
             MEMORY_BASIC_INFORMATION m = new MEMORY_BASIC_INFORMATION();
 
-            if (Native.VirtualQuery(handle, ref m, (nint)Marshal.SizeOf(m)) != nint.Zero) return (long)m.RegionSize;
+            if (Native.VirtualQuery(handle, ref m, (IntPtr)Marshal.SizeOf(m)) != IntPtr.Zero) return (long)m.RegionSize;
 
             return 0;
         }
@@ -64,7 +64,7 @@ namespace DataTools
         protected override DataTools.Win32.Memory.WinPtrBase Clone()
         {
             var cm = new VirtualMemPtr();
-            if (handle == nint.Zero) return cm;
+            if (handle == IntPtr.Zero) return cm;
 
             unsafe
             {

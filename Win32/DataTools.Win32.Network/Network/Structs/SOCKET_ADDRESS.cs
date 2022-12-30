@@ -30,7 +30,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (lpSockaddr.Handle.Handle == nint.Zero) return "NULL";
+            if (lpSockaddr.Handle.Handle == IntPtr.Zero) return "NULL";
             return lpSockaddr.ToString();
         }
     }

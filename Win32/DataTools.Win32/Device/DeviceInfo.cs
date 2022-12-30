@@ -810,7 +810,7 @@ namespace DataTools.Win32
         /// Display the system device properties dialog page for this device.
         /// </summary>
         /// <remarks></remarks>
-        public void ShowDevicePropertiesDialog(nint hwnd = default)
+        public void ShowDevicePropertiesDialog(IntPtr hwnd = default)
         {
             DevPropDialog.OpenDeviceProperties(InstanceId, hwnd);
         }

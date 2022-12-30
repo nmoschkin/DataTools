@@ -44,7 +44,7 @@ namespace DataTools.Win32.Network
         /// <summary>
         /// Group Id
         /// </summary>
-        public nint GroupId;
+        public IntPtr GroupId;
 
         /// <summary>
         /// Attributes

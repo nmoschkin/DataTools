@@ -51,7 +51,7 @@ namespace DataTools.Win32.Network
         /// </summary>
         [MarshalAs(UnmanagedType.LPWStr)]
         public string InternetPrincipalName;
-        public nint UserSid;
+        public IntPtr UserSid;
 
         public override string ToString()
         {

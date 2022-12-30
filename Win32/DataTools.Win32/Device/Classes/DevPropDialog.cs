@@ -26,7 +26,7 @@ namespace DataTools.Win32
     public static class DevPropDialog
     {
         [DllImport("devmgr.dll", EntryPoint = "DeviceProperties_RunDLLW", CharSet = CharSet.Unicode)]
-        static extern bool DeviceProperties_RunDLL(nint hwnd, nint hAppInstance, [MarshalAs(UnmanagedType.LPWStr)] string cmdLine, int nCmdShow);
+        static extern bool DeviceProperties_RunDLL(IntPtr hwnd, IntPtr hAppInstance, [MarshalAs(UnmanagedType.LPWStr)] string cmdLine, int nCmdShow);
 
         /// <summary>
         /// Opens the hardware properties dialog box for the specified instance id.
@@ -34,7 +34,7 @@ namespace DataTools.Win32
         /// <param name="InstanceId"></param>
         /// <param name="hwnd"></param>
         /// <remarks></remarks>
-        public static void OpenDeviceProperties(string InstanceId, nint hwnd = default)
+        public static void OpenDeviceProperties(string InstanceId, IntPtr hwnd = default)
         {
             if (InstanceId is null)
                 return;

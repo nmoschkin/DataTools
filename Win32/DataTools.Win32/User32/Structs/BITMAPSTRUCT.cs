@@ -40,6 +40,6 @@ namespace DataTools.Win32
         public int bmWidthBytes;
         public short bmPlanes;
         public short bmBitsPixel;
-        public nint bmBits;
+        public IntPtr bmBits;
     }
 }

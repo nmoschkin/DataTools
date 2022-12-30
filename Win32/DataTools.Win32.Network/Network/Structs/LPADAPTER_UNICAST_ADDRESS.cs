@@ -58,7 +58,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Handle.Handle == nint.Zero)
+            if (Handle.Handle == IntPtr.Zero)
                 return "NULL";
             return "" + IPAddress.ToString() + " (" + AddressFamily.ToString() + ")";
         }
@@ -103,14 +103,14 @@ namespace DataTools.Win32.Network
             }
         }
 
-        //public static implicit operator LPADAPTER_UNICAST_ADDRESS(nint operand)
+        //public static implicit operator LPADAPTER_UNICAST_ADDRESS(IntPtr operand)
         //{
         //    var a = new LPADAPTER_UNICAST_ADDRESS();
         //    a.Handle = operand;
         //    return a;
         //}
 
-        //public static implicit operator nint(LPADAPTER_UNICAST_ADDRESS operand)
+        //public static implicit operator IntPtr(LPADAPTER_UNICAST_ADDRESS operand)
         //{
         //    return operand.Handle;
         //}

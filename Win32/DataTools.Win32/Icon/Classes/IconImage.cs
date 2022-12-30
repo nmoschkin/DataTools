@@ -116,7 +116,7 @@ namespace DataTools.Desktop
         /// <param name="ptr">The memory pointer to load.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool LoadIcon(nint ptr)
+        public bool LoadIcon(IntPtr ptr)
         {
             return internalLoadFromPtr(ptr);
         }
@@ -183,7 +183,7 @@ namespace DataTools.Desktop
         /// <param name="ptr">The pointer to load.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        private bool internalLoadFromPtr(nint ptr)
+        private bool internalLoadFromPtr(IntPtr ptr)
         {
             // get the icon file header directory.
             MemPtr mm = ptr;
@@ -356,7 +356,7 @@ namespace DataTools.Desktop
         /// </summary>
         /// <param name="ptr"></param>
         /// <remarks></remarks>
-        public IconImage(nint ptr)
+        public IconImage(IntPtr ptr)
         {
             internalLoadFromPtr(ptr);
         }

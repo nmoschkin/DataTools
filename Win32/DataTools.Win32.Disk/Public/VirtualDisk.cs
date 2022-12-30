@@ -61,7 +61,7 @@ namespace DataTools.Win32.Disk
     public sealed class VirtualDisk
     {
         internal DiskDeviceInfo _info;
-        internal nint _Handle = nint.Zero;
+        internal IntPtr _Handle = IntPtr.Zero;
         private string _ImageFile;
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace DataTools.Win32.Disk
         {
             get
             {
-                return _Handle != nint.Zero;
+                return _Handle != IntPtr.Zero;
             }
         }
 
@@ -208,7 +208,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public nint Handle
+        public IntPtr Handle
         {
             get
             {
@@ -262,7 +262,7 @@ namespace DataTools.Win32.Disk
             VIRTUAL_STORAGE_TYPE vst;
 
             var r = default(uint);
-            nint handleNew = new nint();
+            IntPtr handleNew = new IntPtr();
 
             vst.VendorId = VirtDisk.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
 
@@ -278,7 +278,7 @@ namespace DataTools.Win32.Disk
                         cp1.SectorSizeInBytes = 512;
                         vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
 
-                        r = VirtDisk.CreateVirtualDisk(vst, imageFile, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ALL, nint.Zero, fixedSize ? CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION : CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_NONE, 0U, cp1, nint.Zero, ref handleNew);
+                        r = VirtDisk.CreateVirtualDisk(vst, imageFile, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ALL, IntPtr.Zero, fixedSize ? CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION : CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_NONE, 0U, cp1, IntPtr.Zero, ref handleNew);
 
                         break;
                     }
@@ -311,7 +311,7 @@ namespace DataTools.Win32.Disk
                         cp2.OpenFlags = OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE;
                         vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
 
-                        r = VirtDisk.CreateVirtualDisk(vst, imageFile, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_NONE, nint.Zero, fixedSize ? CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION : CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_NONE, 0U, cp2, nint.Zero, ref handleNew);
+                        r = VirtDisk.CreateVirtualDisk(vst, imageFile, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_NONE, IntPtr.Zero, fixedSize ? CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION : CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_NONE, 0U, cp2, IntPtr.Zero, ref handleNew);
                         break;
                     }
             }
@@ -380,7 +380,7 @@ namespace DataTools.Win32.Disk
             bool OpenRet = default;
             string ext = Path.GetExtension(imageFile).ToLower();
             VIRTUAL_STORAGE_TYPE vst;
-            if (_Handle != nint.Zero)
+            if (_Handle != IntPtr.Zero)
                 Close();
 
             var vdp1 = new OPEN_VIRTUAL_DISK_PARAMETERS_V1();
@@ -448,14 +448,14 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public bool Attach(bool makePermanent)
         {
-            if (_Handle == nint.Zero || Attached)
+            if (_Handle == IntPtr.Zero || Attached)
                 return false;
 
             var mm = new MemPtr(8L);
 
             mm.ByteAt(0L) = 1;
 
-            uint r = VirtDisk.AttachVirtualDisk(_Handle, nint.Zero, makePermanent ? ATTACH_VIRTUAL_DISK_FLAG.ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME : ATTACH_VIRTUAL_DISK_FLAG.ATTACH_VIRTUAL_DISK_FLAG_NONE, 0U, mm.Handle, nint.Zero);
+            uint r = VirtDisk.AttachVirtualDisk(_Handle, IntPtr.Zero, makePermanent ? ATTACH_VIRTUAL_DISK_FLAG.ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME : ATTACH_VIRTUAL_DISK_FLAG.ATTACH_VIRTUAL_DISK_FLAG_NONE, 0U, mm.Handle, IntPtr.Zero);
 
             mm.Free();
 
@@ -483,13 +483,13 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public bool Close()
         {
-            if (_Handle == nint.Zero)
+            if (_Handle == IntPtr.Zero)
                 return false;
 
             bool r = User32.CloseHandle(_Handle);
 
             if (r)
-                _Handle = nint.Zero;
+                _Handle = IntPtr.Zero;
 
             return r;
         }

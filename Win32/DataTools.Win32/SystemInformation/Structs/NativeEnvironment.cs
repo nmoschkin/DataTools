@@ -40,12 +40,12 @@ namespace DataTools.SystemInformation
         /// <summary>
         /// Minimum allowed application memory address
         /// </summary>
-        public readonly nint MinimumApplicationAddress;
+        public readonly IntPtr MinimumApplicationAddress;
 
         /// <summary>
         /// Maximum allowed application memory address
         /// </summary>
-        public readonly nint MaximumApplicationAddress;
+        public readonly IntPtr MaximumApplicationAddress;
 
         /// <summary>
         /// Active processor mask

@@ -273,16 +273,16 @@ namespace DataTools.Win32.Disk.Partition
         /// <param name="layInfo">Optionally receives the layout information.</param>
         /// <returns>An array of PARTITION_INFORMATION_EX structures.</returns>
         /// <remarks></remarks>
-        public static PARTITION_INFORMATION_EX[] GetPartitions(string devicePath, nint hfile, ref DRIVE_LAYOUT_INFORMATION_EX layInfo)
+        public static PARTITION_INFORMATION_EX[] GetPartitions(string devicePath, IntPtr hfile, ref DRIVE_LAYOUT_INFORMATION_EX layInfo)
         {
             bool hf = false;
-            if (hfile != nint.Zero)
+            if (hfile != IntPtr.Zero)
             {
                 hf = true;
             }
             else
             {
-                hfile = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, 0, nint.Zero);
+                hfile = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, 0, IntPtr.Zero);
             }
 
             var pex = new DataTools.Win32.Memory.MemPtr();
@@ -300,7 +300,7 @@ namespace DataTools.Win32.Disk.Partition
             do
             {
                 pex.ReAlloc(sbs);
-                succeed = NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_LAYOUT_EX, nint.Zero, 0U, pex.Handle, (uint)pex.Length, ref cb, nint.Zero);
+                succeed = NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_LAYOUT_EX, IntPtr.Zero, 0U, pex.Handle, (uint)pex.Length, ref cb, IntPtr.Zero);
                 if (!succeed)
                 {
                     int xErr = User32.GetLastError();

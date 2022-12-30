@@ -41,11 +41,11 @@ namespace DataTools.Desktop
     {
         internal ICONDIRENTRY _entry;
         internal byte[] imageBytes;
-        internal nint _hIcon = nint.Zero;
+        internal IntPtr _hIcon = IntPtr.Zero;
 
 
         [DllImport("gdi32.dll")]
-        static extern bool DeleteObject(nint hObject);
+        static extern bool DeleteObject(IntPtr hObject);
 
         internal IconImageEntry()
         {
@@ -70,7 +70,7 @@ namespace DataTools.Desktop
         /// </summary>
         /// <param name="ptr">Pointer to the start of the ICONDIRENTRY structure.</param>
         /// <remarks></remarks>
-        internal IconImageEntry(nint ptr)
+        internal IconImageEntry(IntPtr ptr)
         {
             MemPtr mm = ptr;
             _entry = mm.ToStruct<ICONDIRENTRY>();
@@ -93,7 +93,7 @@ namespace DataTools.Desktop
         /// <param name="entry">Icon entry structure.</param>
         /// <param name="ptr">Pointer to the bitmap.</param>
         /// <remarks></remarks>
-        internal IconImageEntry(ICONDIRENTRY entry, nint ptr)
+        internal IconImageEntry(ICONDIRENTRY entry, IntPtr ptr)
         {
             _entry = entry;
             if (_entry.wBitsPixel < 24)
@@ -158,7 +158,7 @@ namespace DataTools.Desktop
 
                 var hIcon = User32.CreateIconIndirect(ref lpicon);
 
-                if (hIcon != nint.Zero)
+                if (hIcon != IntPtr.Zero)
                 {
                     iconOut = (Icon)Icon.FromHandle(hIcon).Clone();
                     User32.DestroyIcon(hIcon);
@@ -273,7 +273,7 @@ namespace DataTools.Desktop
                 return bytesOut;
             }
 
-            nint bmp = default;
+            IntPtr bmp = default;
         
             var hbmp = Resources.MakeDIBSection((Bitmap)ToImage(), ref bmp);
             
@@ -329,23 +329,23 @@ namespace DataTools.Desktop
         private Icon _constructIcon()
         {
             Icon _constructIconRet = default;
-            if (_hIcon != nint.Zero)
+            if (_hIcon != IntPtr.Zero)
             {
                 User32.DestroyIcon(_hIcon);
-                _hIcon = nint.Zero;
+                _hIcon = IntPtr.Zero;
             }
 
             MemPtr mm = (MemPtr)imageBytes;
             var bmp = mm.ToStruct<BITMAPINFOHEADER>();
 
-            nint hBmp;
-            nint ptr;
-            nint ppBits = new nint();
+            IntPtr hBmp;
+            IntPtr ptr;
+            IntPtr ppBits = new IntPtr();
 
             var lpicon = default(ICONINFO);
 
-            nint hicon;
-            nint hBmpMask = new nint();
+            IntPtr hicon;
+            IntPtr hBmpMask = new IntPtr();
 
             bool hasMask;
             if (bmp.biHeight == bmp.biWidth * 2)
@@ -374,7 +374,7 @@ namespace DataTools.Desktop
             if (bmp.biSize != 40)
                 return null;
             
-            hBmp = User32.CreateDIBSection(nint.Zero, mm.Handle, 0U, ref ppBits, nint.Zero, 0);
+            hBmp = User32.CreateDIBSection(IntPtr.Zero, mm.Handle, 0U, ref ppBits, IntPtr.Zero, 0);
 
             Native.MemCpy(ptr, ppBits, bmp.biSizeImage);
             
@@ -384,7 +384,7 @@ namespace DataTools.Desktop
                 bmp.biBitCount = 1;
                 bmp.biSizeImage = 0;
                 Marshal.StructureToPtr(bmp, mm.Handle, false);
-                hBmpMask = User32.CreateDIBSection(nint.Zero, mm.Handle, 0U, ref ppBits, nint.Zero, 0);
+                hBmpMask = User32.CreateDIBSection(IntPtr.Zero, mm.Handle, 0U, ref ppBits, IntPtr.Zero, 0);
                 Native.MemCpy(ptr, ppBits, (long)(Math.Max(bmp.biWidth, 32) * bmp.biHeight / 8d));
             }
 
@@ -572,7 +572,7 @@ namespace DataTools.Desktop
         {
             if (!disposedValue)
             {
-                if (_hIcon != nint.Zero)
+                if (_hIcon != IntPtr.Zero)
                 {
                     User32.DestroyIcon(_hIcon);
                 }

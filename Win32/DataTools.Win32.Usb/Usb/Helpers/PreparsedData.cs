@@ -13,11 +13,11 @@ namespace DataTools.Win32.Usb
     {
         public override bool IsInvalid => handle.IsInvalidHandle();
 
-        public PreparsedData(nint hHid) : base((nint)(-1), true)
+        public PreparsedData(IntPtr hHid) : base((IntPtr)(-1), true)
         {
             if (hHid.IsInvalidHandle()) throw new ArgumentException();
 
-            nint ppd = nint.Zero;
+            IntPtr ppd = IntPtr.Zero;
             if (UsbLibHelpers.HidD_GetPreparsedData(hHid, ref ppd))
             {
                 handle = ppd;
@@ -30,13 +30,13 @@ namespace DataTools.Win32.Usb
             if (!IsInvalid)
             {
                 UsbLibHelpers.HidD_FreePreparsedData(handle);
-                handle = (nint)(-1);
+                handle = (IntPtr)(-1);
             }
 
             return true;
         }
 
-        public static implicit operator nint(PreparsedData ppd) => ppd.handle;
+        public static implicit operator IntPtr(PreparsedData ppd) => ppd.handle;
     }
 
 }

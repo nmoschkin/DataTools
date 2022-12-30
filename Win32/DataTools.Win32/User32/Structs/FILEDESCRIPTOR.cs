@@ -88,7 +88,7 @@ namespace DataTools.Win32
         public static explicit operator FILEDESCRIPTOR(string operand)
         {
             var wf = new WIN32_FIND_DATA();
-            nint i;
+            IntPtr i;
             i = IO.FindFirstFile(operand, ref wf);
             if ((long)i > -1)
             {

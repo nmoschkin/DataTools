@@ -92,7 +92,7 @@ namespace DataTools.SystemInformation
         internal static extern void GetNativeSystemInfo(ref NativeEnvironment lpSysInfo);
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
-        internal static extern bool GetLogicalProcessorInformation(nint buffer, ref int ReturnLength);
+        internal static extern bool GetLogicalProcessorInformation(IntPtr buffer, ref int ReturnLength);
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
         internal static extern bool GlobalMemoryStatusEx(ref MemoryStatusDetails lpStatusEx);

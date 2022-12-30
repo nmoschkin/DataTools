@@ -34,10 +34,10 @@ namespace DataTools.Shell.Native
     InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     interface ISharedBitmap
     {
-        void GetSharedBitmap([Out] out nint phbm);
+        void GetSharedBitmap([Out] out IntPtr phbm);
         void GetSize([Out] out Size pSize);
         void GetFormat([Out] out ThumbnailAlphaType pat);
-        void InitializeBitmap([In] nint hbm, [In] ThumbnailAlphaType wtsAT);
-        void Detach([Out] out nint phbm);
+        void InitializeBitmap([In] IntPtr hbm, [In] ThumbnailAlphaType wtsAT);
+        void Detach([Out] out IntPtr phbm);
     }
 }

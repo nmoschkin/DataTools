@@ -15,7 +15,7 @@ namespace DataTools.Win32.Memory
         /// <param name="t">The type of memory being allocated.</param>
         /// <param name="fOwn">Whether we will own the memory pointer specified by <paramref name="ptr"/>.</param>
         /// <param name="gcpressure">True to make the garbage collector aware of memory allocations made by this object.</param>
-        protected WinPtrBase(nint ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
+        protected WinPtrBase(IntPtr ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
         }
 
@@ -31,11 +31,11 @@ namespace DataTools.Win32.Memory
         {
         }
 
-        protected override void InternalDoZeroMem(nint startptr, long length)
+        protected override void InternalDoZeroMem(IntPtr startptr, long length)
         {
             unsafe
             {
-                Native.ZeroMemory((void*)startptr, (nint)length);
+                Native.ZeroMemory((void*)startptr, (IntPtr)length);
             }
         }
     }

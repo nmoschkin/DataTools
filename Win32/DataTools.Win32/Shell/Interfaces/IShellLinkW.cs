@@ -38,10 +38,10 @@ namespace DataTools.Shell.Native
             [Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile,
             int cchMaxPath,
             //ref _WIN32_FIND_DATAW pfd,
-            nint pfd,
+            IntPtr pfd,
             uint fFlags);
-        void GetIDList(out nint ppidl);
-        void SetIDList(nint pidl);
+        void GetIDList(out IntPtr ppidl);
+        void SetIDList(IntPtr pidl);
         void GetDescription(
             [Out(), MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszFile,
             int cchMaxName);
@@ -72,7 +72,7 @@ namespace DataTools.Shell.Native
         void SetRelativePath(
             [MarshalAs(UnmanagedType.LPWStr)] string pszPathRel,
             uint dwReserved);
-        void Resolve(nint hwnd, uint fFlags);
+        void Resolve(IntPtr hwnd, uint fFlags);
         void SetPath(
             [MarshalAs(UnmanagedType.LPWStr)] string pszFile);
     }

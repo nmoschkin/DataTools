@@ -68,6 +68,6 @@ namespace DataTools.Shell.Native
         int GetShellItem(ref Guid riid, [Out, MarshalAs(UnmanagedType.Interface)] out IShellItem ppv);
 
         [PreserveSig]
-        HResult GetIDList([Out] nint ppidl);
+        HResult GetIDList([Out] IntPtr ppidl);
     };
 }

@@ -168,7 +168,7 @@ namespace DataTools.Win32.Network
 
     //        protected void Free()
     //        {
-    //            if (_origPtr.Handle != nint.Zero)
+    //            if (_origPtr.Handle != IntPtr.Zero)
     //            {
     //                _origPtr.Free(true);
     //            }

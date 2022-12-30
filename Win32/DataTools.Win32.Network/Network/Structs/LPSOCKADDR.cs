@@ -76,13 +76,13 @@ namespace DataTools.Win32.Network
 
         private Inet4Socket ToSockAddr()
         {
-            if (Handle == nint.Zero) return default;
+            if (Handle == IntPtr.Zero) return default;
             return Handle.ToStruct<Inet4Socket>();
         }
 
         private Inet6Socket ToSockAddr6()
         {
-            if (Handle == nint.Zero) return default;
+            if (Handle == IntPtr.Zero) return default;
             return Handle.ToStruct<Inet6Socket>();
         }
 

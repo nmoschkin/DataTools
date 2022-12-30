@@ -70,7 +70,7 @@ namespace DataTools.FileSystem
 
                 // let's see if we can parse it.
                 IShellItem shitem;
-                res = SHCreateItemFromParsingName(parsingName, nint.Zero, ref guid, out shitem);
+                res = SHCreateItemFromParsingName(parsingName, IntPtr.Zero, ref guid, out shitem);
 
                 string fp = null;
 
@@ -79,11 +79,11 @@ namespace DataTools.FileSystem
                     IShellItemPS shitemps = null;
                     IShellItem2 shitem2 = null;
 
-                    SHCreateItemFromParsingName(parsingName, nint.Zero, ref guid, out shitemps);
+                    SHCreateItemFromParsingName(parsingName, IntPtr.Zero, ref guid, out shitemps);
                     shellObjPS = shitemps;
 
                     guid = ShellIIDGuid.IShellItem2Uuid;
-                    SHCreateItemFromParsingName(parsingName, nint.Zero, ref guid, out shitem2);
+                    SHCreateItemFromParsingName(parsingName, IntPtr.Zero, ref guid, out shitem2);
                     shellObj2 = shitem2;
 
                     shitem.GetDisplayName(ShellItemDesignNameOptions.DesktopAbsoluteParsing, out strmem);
@@ -101,7 +101,7 @@ namespace DataTools.FileSystem
                 }
 
                 guid = ShellIIDGuid.IShellItemUuid;
-                res = SHCreateItemFromParsingName("shell:" + (fp ?? parsingName), nint.Zero, ref guid, out shitem);
+                res = SHCreateItemFromParsingName("shell:" + (fp ?? parsingName), IntPtr.Zero, ref guid, out shitem);
 
                 if (res == HResult.Ok)
                 {
@@ -171,17 +171,17 @@ namespace DataTools.FileSystem
                 IShellItem2 shitem2;
 
                 var riid = ShellIIDGuid.IShellItemUuid;
-                HResult res = SHCreateItemFromParsingName(ParsingName, nint.Zero, ref riid, out shitem);
+                HResult res = SHCreateItemFromParsingName(ParsingName, IntPtr.Zero, ref riid, out shitem);
 
                 if (res == HResult.Ok)
                 {
                     shellObj = shitem;
 
-                    SHCreateItemFromParsingName(ParsingName, nint.Zero, ref riid, out pssh);
+                    SHCreateItemFromParsingName(ParsingName, IntPtr.Zero, ref riid, out pssh);
                     shellObjPS = pssh;
 
                     riid = ShellIIDGuid.IShellItem2Uuid;
-                    SHCreateItemFromParsingName(ParsingName, nint.Zero, ref riid, out shitem2);
+                    SHCreateItemFromParsingName(ParsingName, IntPtr.Zero, ref riid, out shitem2);
                     shellObj2 = shitem2;
                 }
             }
@@ -458,7 +458,7 @@ namespace DataTools.FileSystem
 
             IPropertyStore p;
 
-            var h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
+            var h = shellObjPS.BindToHandler(IntPtr.Zero, ref g1, ref g2, out p);
 
             if (h != HResult.Ok) return null;
 
@@ -527,7 +527,7 @@ namespace DataTools.FileSystem
 
             IPropertyStore p;
 
-            var h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
+            var h = shellObjPS.BindToHandler(IntPtr.Zero, ref g1, ref g2, out p);
 
             if (h != HResult.Ok) return null;
 
@@ -697,7 +697,7 @@ namespace DataTools.FileSystem
                 {
                     var str = NativeError.FormatLastError((uint)h);
 
-                    h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
+                    h = shellObjPS.BindToHandler(IntPtr.Zero, ref g1, ref g2, out p);
 
                     if (h != HResult.Ok) return false;
                 }

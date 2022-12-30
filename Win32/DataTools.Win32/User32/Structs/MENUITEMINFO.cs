@@ -39,15 +39,15 @@ namespace DataTools.Win32
         public int fType;
         public int fState;
         public int wID;
-        public nint hSubMenu;
-        public nint hbmpChecked;
-        public nint hbmpUnchecked;
-        public nint dwItemData;
-        public nint dwTypeData;
+        public IntPtr hSubMenu;
+        public IntPtr hbmpChecked;
+        public IntPtr hbmpUnchecked;
+        public IntPtr dwItemData;
+        public IntPtr dwTypeData;
         public int cch;
 
         // Declared for Windows 2000/98.  Still backward compatible
 
-        public nint hbmpItem;
+        public IntPtr hbmpItem;
     }
 }

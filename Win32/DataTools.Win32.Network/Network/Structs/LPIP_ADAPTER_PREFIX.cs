@@ -32,7 +32,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
+                if (Handle == IntPtr.Zero)
                     return null;
                 int c = 0;
                 var mx = this;
@@ -44,7 +44,7 @@ namespace DataTools.Win32.Network
                     mx = mx.Next;
                     c += 1;
                 }
-                while (mx.Handle.Handle != nint.Zero);
+                while (mx.Handle.Handle != IntPtr.Zero);
                 return ac;
             }
         }
@@ -53,7 +53,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
+                if (Handle == IntPtr.Zero)
                     return default;
                 return Struct.Next;
             }
@@ -61,7 +61,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Handle.Handle == nint.Zero)
+            if (Handle.Handle == IntPtr.Zero)
                 return "NULL";
             return "" + IPAddress.ToString() + " (" + AddressFamily.ToString() + ")";
         }
@@ -70,7 +70,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero) return null;
+                if (Handle == IntPtr.Zero) return null;
                 return Struct.Address.lpSockaddr.IPAddress;
             }
         }
@@ -79,14 +79,14 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero) return default;
+                if (Handle == IntPtr.Zero) return default;
                 return ToAddress();
             }
         }
 
         public IP_ADAPTER_PREFIX ToAddress()
         {
-            if (Handle == nint.Zero) return default;
+            if (Handle == IntPtr.Zero) return default;
             return Handle.ToStruct<IP_ADAPTER_PREFIX>();
         }
 
@@ -99,12 +99,12 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero) return default;
+                if (Handle == IntPtr.Zero) return default;
                 return Struct.Address.lpSockaddr.AddressFamily;
             }
         }
 
-        public static implicit operator LPIP_ADAPTER_PREFIX(nint operand)
+        public static implicit operator LPIP_ADAPTER_PREFIX(IntPtr operand)
         {
             return new LPIP_ADAPTER_PREFIX
             {
@@ -112,7 +112,7 @@ namespace DataTools.Win32.Network
             };
         }
 
-        public static implicit operator nint(LPIP_ADAPTER_PREFIX operand)
+        public static implicit operator IntPtr(LPIP_ADAPTER_PREFIX operand)
         {
             return operand.Handle;
         }

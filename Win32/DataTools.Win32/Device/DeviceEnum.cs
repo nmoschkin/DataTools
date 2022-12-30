@@ -58,21 +58,21 @@ namespace DataTools.Win32
             var devInterface = default(SP_DEVICE_INTERFACE_DATA);
             var lIcon = new Dictionary<Guid, System.Drawing.Icon>();
             var mm = new SafePtr();
-            var hicon = nint.Zero;
+            var hicon = IntPtr.Zero;
             int picon = 0;
 
             System.Drawing.Icon icn = null;
-            nint hDev;
+            IntPtr hDev;
 
             // classOnly = Guid.Empty
 
             if (classOnly != Guid.Empty)
             {
-                hDev = SetupDiGetClassDevs(classOnly, nint.Zero, nint.Zero, (ClassDevFlags)DIGCF_PRESENT);
+                hDev = SetupDiGetClassDevs(classOnly, IntPtr.Zero, IntPtr.Zero, (ClassDevFlags)DIGCF_PRESENT);
             }
             else
             {
-                hDev = SetupDiGetClassDevs(Guid.Empty, nint.Zero, nint.Zero, (ClassDevFlags)(DIGCF_ALLCLASSES | DIGCF_PRESENT | DIGCF_DEVICEINTERFACE));
+                hDev = SetupDiGetClassDevs(Guid.Empty, IntPtr.Zero, IntPtr.Zero, (ClassDevFlags)(DIGCF_ALLCLASSES | DIGCF_PRESENT | DIGCF_DEVICEINTERFACE));
             }
 
             if (hDev == INVALID_HANDLE_VALUE)
@@ -90,7 +90,7 @@ namespace DataTools.Win32
                     Array.Resize(ref devOut, c + 1);
 
                     devOut[c] = PopulateDeviceInfo<DeviceInfo>(hDev, default, devInfo, devInterface);
-                    SetupDiEnumDeviceInterfaces(hDev, nint.Zero, devOut[c].DeviceClassGuid, (uint)c, ref devInterface);
+                    SetupDiEnumDeviceInterfaces(hDev, IntPtr.Zero, devOut[c].DeviceClassGuid, (uint)c, ref devInterface);
 
                     if (devInterface.InterfaceClassGuid != Guid.Empty)
                     {
@@ -102,7 +102,7 @@ namespace DataTools.Win32
                     {
                         SetupDiLoadClassIcon(devOut[c].DeviceClassGuid, ref hicon, ref picon);
 
-                        if (hicon != nint.Zero)
+                        if (hicon != IntPtr.Zero)
                         {
                             icn = (System.Drawing.Icon)System.Drawing.Icon.FromHandle(hicon).Clone();
                             User32.DestroyIcon(hicon);
@@ -139,7 +139,7 @@ namespace DataTools.Win32
 
             MemPtr mm = new MemPtr();
 
-            nint hDev;
+            IntPtr hDev;
             Guid cid;
 
             if (useClassId)
@@ -151,13 +151,13 @@ namespace DataTools.Win32
                 cid = info.DeviceInterfaceClassGuid;
             }
 
-            hDev = SetupDiGetClassDevs(cid, nint.Zero, nint.Zero, flags);
+            hDev = SetupDiGetClassDevs(cid, IntPtr.Zero, IntPtr.Zero, flags);
             if (hDev == INVALID_HANDLE_VALUE)
             {
                 return null;
             }
 
-            SetupDiGetDevicePropertyKeys(hDev, ref info._devInfo, nint.Zero, 0U, ref c, 0U);
+            SetupDiGetDevicePropertyKeys(hDev, ref info._devInfo, IntPtr.Zero, 0U, ref c, 0U);
             if (c == 0L)
             {
                 SetupDiDestroyDeviceInfoList(hDev);
@@ -202,7 +202,7 @@ namespace DataTools.Win32
 
             using (var mm = new SafePtr())
             {
-                nint hDev;
+                IntPtr hDev;
                 Guid cid;
 
                 if (useClassId)
@@ -214,7 +214,7 @@ namespace DataTools.Win32
                     cid = info.DeviceInterfaceClassGuid;
                 }
 
-                hDev = SetupDiGetClassDevs(cid, nint.Zero, nint.Zero, flags);
+                hDev = SetupDiGetClassDevs(cid, IntPtr.Zero, IntPtr.Zero, flags);
 
                 if (hDev == INVALID_HANDLE_VALUE)
                 {
@@ -223,7 +223,7 @@ namespace DataTools.Win32
 
                 uint utype = (uint)type;
 
-                SetupDiGetDeviceProperty(hDev, ref info._devInfo, ref prop, out utype, nint.Zero, 0U, out c, 0U);
+                SetupDiGetDeviceProperty(hDev, ref info._devInfo, ref prop, out utype, IntPtr.Zero, 0U, out c, 0U);
 
                 if (c == 0L)
                 {
@@ -265,13 +265,13 @@ namespace DataTools.Win32
             var lIcon = new Dictionary<Guid, System.Drawing.Icon>();
 
             var mm = new SafePtr();
-            var hicon = nint.Zero;
+            var hicon = IntPtr.Zero;
 
             int picon = 0;
 
             System.Drawing.Icon icn = null;
 
-            var hDev = SetupDiGetClassDevs(ClassId, nint.Zero, nint.Zero, flags);
+            var hDev = SetupDiGetClassDevs(ClassId, IntPtr.Zero, IntPtr.Zero, flags);
 
             if (hDev == INVALID_HANDLE_VALUE)
             {
@@ -283,7 +283,7 @@ namespace DataTools.Win32
 
             SetupDiLoadClassIcon(ClassId, ref hicon, ref picon);
 
-            if (hicon != nint.Zero)
+            if (hicon != IntPtr.Zero)
             {
                 icn = (System.Drawing.Icon)System.Drawing.Icon.FromHandle(hicon).Clone();
                 User32.DestroyIcon(hicon);
@@ -291,7 +291,7 @@ namespace DataTools.Win32
 
             if ((flags & ClassDevFlags.DeviceInterface) == ClassDevFlags.DeviceInterface)
             {
-                while (SetupDiEnumDeviceInterfaces(hDev, nint.Zero, ClassId, cu, ref devInterface))
+                while (SetupDiEnumDeviceInterfaces(hDev, IntPtr.Zero, ClassId, cu, ref devInterface))
                 {
                     c = (int)cu;
 
@@ -313,7 +313,7 @@ namespace DataTools.Win32
 
                     devOut[c] = PopulateDeviceInfo<T>(hDev, default, devInfo, devInterface);
 
-                    SetupDiEnumDeviceInterfaces(hDev, nint.Zero, devOut[c].DeviceClassGuid, cu, ref devInterface);
+                    SetupDiEnumDeviceInterfaces(hDev, IntPtr.Zero, devOut[c].DeviceClassGuid, cu, ref devInterface);
 
                     if (devInterface.InterfaceClassGuid != Guid.Empty)
                     {
@@ -337,11 +337,11 @@ namespace DataTools.Win32
 
         public static System.Drawing.Icon GetClassIcon(Guid ClassId)
         {
-            var hicon = nint.Zero;
+            var hicon = IntPtr.Zero;
 
             System.Drawing.Icon icn = null;
 
-            var hDev = SetupDiGetClassDevs(ClassId, nint.Zero, nint.Zero, 0);
+            var hDev = SetupDiGetClassDevs(ClassId, IntPtr.Zero, IntPtr.Zero, 0);
 
             if (hDev == INVALID_HANDLE_VALUE)
             {
@@ -352,7 +352,7 @@ namespace DataTools.Win32
 
             SetupDiLoadClassIcon(ClassId, ref hicon, ref atmp);
 
-            if (hicon != nint.Zero)
+            if (hicon != IntPtr.Zero)
             {
                 icn = (System.Drawing.Icon)System.Drawing.Icon.FromHandle(hicon).Clone();
                 User32.DestroyIcon(hicon);
@@ -372,9 +372,9 @@ namespace DataTools.Win32
         /// <param name="devInfo"></param>
         /// <param name="infoOut"></param>
         /// <remarks></remarks>
-        public static void GetDeviceIcon(nint hDev, SP_DEVINFO_DATA devInfo, DeviceInfo infoOut, DeviceClassEnum[] stagingClasses = null, bool noStaging = false)
+        public static void GetDeviceIcon(IntPtr hDev, SP_DEVINFO_DATA devInfo, DeviceInfo infoOut, DeviceClassEnum[] stagingClasses = null, bool noStaging = false)
         {
-            nint hIcon = new nint();
+            IntPtr hIcon = new IntPtr();
             if (stagingClasses is null)
             {
                 stagingClasses = StandardStagingClasses;
@@ -396,9 +396,9 @@ namespace DataTools.Win32
                         string s = sKey + pKey + rKey;
 
                         ShellFileGetAttributesOptions argpsfgaoOut = 0;
-                        NativeShell.SHParseDisplayName(s, nint.Zero, out mm.handle, (ShellFileGetAttributesOptions)0, out argpsfgaoOut);
+                        NativeShell.SHParseDisplayName(s, IntPtr.Zero, out mm.handle, (ShellFileGetAttributesOptions)0, out argpsfgaoOut);
 
-                        if (mm != nint.Zero)
+                        if (mm != IntPtr.Zero)
                         {
                             infoOut.DeviceIcon = Resources.GetItemIcon(mm, (Resources.SystemIconSizes)(User32.SHIL_JUMBO));
                             mm.Free();
@@ -431,7 +431,7 @@ namespace DataTools.Win32
         /// <param name="mm">An open memory object.</param>
         /// <returns>A new instance of T.</returns>
         /// <remarks></remarks>
-        public static T PopulateDeviceInfo<T>(nint hDev, Guid ClassId, SP_DEVINFO_DATA devInfo, SP_DEVICE_INTERFACE_DATA devInterface) where T : DeviceInfo, new()
+        public static T PopulateDeviceInfo<T>(IntPtr hDev, Guid ClassId, SP_DEVINFO_DATA devInfo, SP_DEVICE_INTERFACE_DATA devInterface) where T : DeviceInfo, new()
         {
             var devOut = new T();
             uint cbSize;
@@ -457,7 +457,7 @@ namespace DataTools.Win32
                 mm.Length = 0L;
                 mm.Length = Marshal.SizeOf(details);
 
-                SetupDiGetDeviceInterfaceDetail(hDev, ref devInterface, nint.Zero, 0U, out cbSize, nint.Zero);
+                SetupDiGetDeviceInterfaceDetail(hDev, ref devInterface, IntPtr.Zero, 0U, out cbSize, IntPtr.Zero);
                 if (cbSize > 0L)
                 {
                     mm.Length = cbSize;
@@ -484,7 +484,7 @@ namespace DataTools.Win32
 
                 DEVPROPKEY prop = DEVPKEY_Device_ClassGuid;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_ClassGuid), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_ClassGuid), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -508,7 +508,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_GUID;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_DeviceInterface_ClassGuid), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_DeviceInterface_ClassGuid), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -533,7 +533,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_FILETIME;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_InstallDate), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_InstallDate), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -554,7 +554,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_INT32;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Characteristics), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Characteristics), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -574,7 +574,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_INT32;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_RemovalPolicy), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_RemovalPolicy), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -595,7 +595,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_BOOLEAN;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_SafeRemovalRequired), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_SafeRemovalRequired), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -617,7 +617,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_GUID;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_BusTypeGuid), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_BusTypeGuid), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -638,7 +638,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_GUID;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_ContainerId), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_ContainerId), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -660,7 +660,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING_LIST;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Children), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Children), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -683,7 +683,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING_LIST;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_HardwareIds), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_HardwareIds), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -706,7 +706,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING_LIST;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_LocationPaths), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_LocationPaths), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -729,7 +729,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Parent), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Parent), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -750,7 +750,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_LocationInfo), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_LocationInfo), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -772,7 +772,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_BINARY;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_PhysicalDeviceLocation), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_PhysicalDeviceLocation), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
                 sb.AppendLine("cbSize is " + cbSize);
 
                 if (cbSize > 0L)
@@ -799,7 +799,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_PDOName), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_PDOName), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -820,7 +820,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_DeviceDesc), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_DeviceDesc), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -841,7 +841,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Class), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Class), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -860,7 +860,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Manufacturer), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_Manufacturer), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -879,7 +879,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_BusReportedDeviceDesc), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_BusReportedDeviceDesc), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -897,7 +897,7 @@ namespace DataTools.Win32
 
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_GUID;
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_ModelId), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_ModelId), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -920,7 +920,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_INT32;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_UINumber), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_UINumber), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -941,7 +941,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_FriendlyName), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_FriendlyName), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -962,7 +962,7 @@ namespace DataTools.Win32
                 cbSize = 0U;
                 propVal = DEVPROP_TYPE_STRING;
 
-                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_InstanceId), out propVal, nint.Zero, 0U, out cbSize, 0U);
+                SetupDiGetDeviceProperty(hDev, ref devInfo, ref GetDevPropRef(DEVPKEY_Device_InstanceId), out propVal, IntPtr.Zero, 0U, out cbSize, 0U);
 
                 if (cbSize > 0L)
                 {
@@ -1000,7 +1000,7 @@ namespace DataTools.Win32
         /// <param name="length">The length of the data.</param>
         /// <returns>A managed-memory object equivalent.</returns>
         /// <remarks></remarks>
-        public static object DevPropToObject(DevPropTypes type, nint data, int length = 0)
+        public static object DevPropToObject(DevPropTypes type, IntPtr data, int length = 0)
         {
             MemPtr mm = data;
             switch (type)
