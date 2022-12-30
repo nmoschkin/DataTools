@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("DataTools.Memory")]
-[assembly: InternalsVisibleTo("DataTools.Win32")]
-[assembly: InternalsVisibleTo("DataTools.Hardware")]
+[assembly: InternalsVisibleTo("DataTools.Memory, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c174bbb29449348a38b8385890700e1f1f83cd83dd6a93ee4db80993d85f6e46f49b6a3f31392dd63b033d03fc321190f3d7034876d13ed9ea8952fb5d32f03e958fc9062ed0a12b75cf85a9cf65aeef91404bfb09ca43489ec69e15dc763d459162aacb84d21ea39b6992d747b871af709a313621ec6bebcdf7c5396abc33bb")]
+[assembly: InternalsVisibleTo("DataTools.Win32, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c174bbb29449348a38b8385890700e1f1f83cd83dd6a93ee4db80993d85f6e46f49b6a3f31392dd63b033d03fc321190f3d7034876d13ed9ea8952fb5d32f03e958fc9062ed0a12b75cf85a9cf65aeef91404bfb09ca43489ec69e15dc763d459162aacb84d21ea39b6992d747b871af709a313621ec6bebcdf7c5396abc33bb")]
+[assembly: InternalsVisibleTo("DataTools.Hardware, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c174bbb29449348a38b8385890700e1f1f83cd83dd6a93ee4db80993d85f6e46f49b6a3f31392dd63b033d03fc321190f3d7034876d13ed9ea8952fb5d32f03e958fc9062ed0a12b75cf85a9cf65aeef91404bfb09ca43489ec69e15dc763d459162aacb84d21ea39b6992d747b871af709a313621ec6bebcdf7c5396abc33bb")]
 
 namespace DataTools.Memory
 {
@@ -16,9 +16,9 @@ namespace DataTools.Memory
                 byte* bp1 = (byte*)handle;
                 byte* bep = (byte*)handle + len;
 
-                if (len >= nint.Size)
+                if (len >= IntPtr.Size)
                 {
-                    if (nint.Size == 8)
+                    if (IntPtr.Size == 8)
                     {
                         long* lp1 = (long*)bp1;
                         long* lep = (long*)bep;
@@ -57,7 +57,7 @@ namespace DataTools.Memory
             }
         }
 
-        public static void MemCpy(nint src, nint dest, long len)
+        public static void MemCpy(IntPtr src, IntPtr dest, long len)
         {
             unsafe
             {

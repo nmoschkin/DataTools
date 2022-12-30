@@ -1,16 +1,18 @@
-﻿using DataTools.Win32.Usb.Keyboard;
-using static DataTools.Text.TextTools;
+﻿using DataTools.Win32.Usb.Globalization;
+using DataTools.Win32.Usb.Keyboard;
+using DataTools.Win32.Usb.Power;
+
 using Newtonsoft.Json;
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using DataTools.Win32.Usb.Globalization;
-using DataTools.Win32.Usb.Power;
+
+using static DataTools.Text.TextTools;
 
 namespace DataTools.Win32.Usb
 {
@@ -24,16 +26,16 @@ namespace DataTools.Win32.Usb
 
         public static HidUsagePageInfo CreatePage(HidUsagePage pageId)
         {
-            if (pageInfo.TryGetValue(pageId, out object? obj) && obj is HidUsagePageInfo cached)
+            if (pageInfo.TryGetValue(pageId, out object obj) && obj is HidUsagePageInfo cached)
             {
-                return cached;           
+                return cached;
             }
 
             var result = new HidUsagePageInfo(pageId);
 
             if (!pageInfo.ContainsKey(pageId))
             {
-                pageInfo.Add(pageId, result);   
+                pageInfo.Add(pageId, result);
             }
 
             return result;
@@ -44,7 +46,7 @@ namespace DataTools.Win32.Usb
         {
             return CreatePage<HidUsagePageInfo<TCreate>, TCreate>(pageId);
         }
-    
+
         /// <summary>
         /// Create the HID Page Catalog for the specified page.
         /// </summary>
@@ -53,11 +55,11 @@ namespace DataTools.Win32.Usb
         /// <param name="pageId">The HID Page ID</param>
         /// <returns></returns>
         /// <exception cref="AccessViolationException"></exception>
-        public static TPage CreatePage<TPage, TCreate>(HidUsagePage pageId)             
+        public static TPage CreatePage<TPage, TCreate>(HidUsagePage pageId)
             where TCreate : HidUsageInfo, new()
             where TPage : HidUsagePageInfo<TCreate>
         {
-            TPage? result = null;
+            TPage result = null;
 
             if (typeof(TCreate) == typeof(HidKeyboardUsageInfo))
             {
@@ -82,7 +84,7 @@ namespace DataTools.Win32.Usb
             }
             else
             {
-                if (pageInfo.TryGetValue(pageId, out object? obj) && obj is TPage cached)
+                if (pageInfo.TryGetValue(pageId, out object obj) && obj is TPage cached)
                 {
                     return cached;
                 }
@@ -101,10 +103,9 @@ namespace DataTools.Win32.Usb
                         return p;
                     }
                 }
-
             }
 
-            result = (TPage?)Activator.CreateInstance(typeof(TPage), new object[] { pageId }) ?? (TPage?)Activator.CreateInstance(typeof(TPage));
+            result = (TPage)Activator.CreateInstance(typeof(TPage), new object[] { pageId }) ?? (TPage)Activator.CreateInstance(typeof(TPage));
 
             if (!pageInfo.ContainsKey(pageId) && result != null)
             {
@@ -122,15 +123,15 @@ namespace DataTools.Win32.Usb
         /// <remarks>
         /// Name matching is done with casing neutral and spaces are discarded.
         /// </remarks>
-        public HidUsageInfo? GetUsageByName(string name)
+        public HidUsageInfo GetUsageByName(string name)
         {
             name = NoSpace(name).ToLower();
             return this.Where((x) => NoSpace(x.UsageName).ToLower() == name).FirstOrDefault();
         }
 
-        protected virtual void Parse(params object[] values) 
-        { 
-            string? json = null;
+        protected virtual void Parse(params object[] values)
+        {
+            string json = null;
 
             if (values[0] is string s)
             {
@@ -139,7 +140,7 @@ namespace DataTools.Win32.Usb
             else if (values[0] is HidUsagePage pageId)
             {
                 var resName = $"_{((int)pageId):x2}";
-                var compdat = (byte[]?)AppResources.ResourceManager.GetObject(resName);
+                var compdat = (byte[])AppResources.ResourceManager.GetObject(resName);
 
                 if (compdat != null)
                 {
@@ -155,7 +156,7 @@ namespace DataTools.Win32.Usb
                     json = Encoding.UTF8.GetString(buffer);
 
                     mem.Close();
-                    strm.Close();                            
+                    strm.Close();
                     arch.Dispose();
                 }
             }
@@ -164,6 +165,7 @@ namespace DataTools.Win32.Usb
 
             items = new List<T>(JsonConvert.DeserializeObject<List<T>>(json) ?? throw new BadImageFormatException());
         }
+
         public HidUsagePageInfo(HidUsagePage pageId)
         {
             PageId = pageId;
@@ -183,7 +185,6 @@ namespace DataTools.Win32.Usb
         {
             return ((IEnumerable)items).GetEnumerator();
         }
-
     }
 
     public class HidUsagePageInfo : HidUsagePageInfo<HidUsageInfo>
@@ -191,6 +192,5 @@ namespace DataTools.Win32.Usb
         public HidUsagePageInfo(HidUsagePage pageId) : base(pageId)
         {
         }
-
     }
 }

@@ -3,6 +3,8 @@
 using SkiaSharp;
 
 using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,7 +23,7 @@ namespace DataTools.Desktop
             cachedImages.Clear();
         }
 
-        public static BitmapSource? LookupIcon(Icon icon)
+        public static BitmapSource LookupIcon(Icon icon)
         {
             if (cachedImages.TryGetValue(icon.Handle, out BitmapSource result))
             {
@@ -41,7 +43,7 @@ namespace DataTools.Desktop
             }
         }
 
-        public static BitmapSource? MakeWPFImage(Icon img)
+        public static BitmapSource MakeWPFImage(Icon img)
         {
             if (cachedImages.ContainsKey(img.Handle))
             {
@@ -59,7 +61,7 @@ namespace DataTools.Desktop
             return result;
         }
 
-        public static BitmapSource? MakeWPFImage(Bitmap img)
+        public static BitmapSource MakeWPFImage(Bitmap img)
         {
             var _d = new IntPtr();
             return MakeWPFImage(img, ref _d);
@@ -75,7 +77,7 @@ namespace DataTools.Desktop
         /// <param name="createOnApplicationThread"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static BitmapSource? MakeWPFImage(System.Drawing.Icon img, ref IntPtr bitPtr, double dpiX = 96.0d, double dpiY = 96.0d, bool createOnApplicationThread = true)
+        public static BitmapSource MakeWPFImage(System.Drawing.Icon img, ref IntPtr bitPtr, double dpiX = 96.0d, double dpiY = 96.0d, bool createOnApplicationThread = true)
         {
             return MakeWPFImage(IconToTransparentBitmap(img), ref bitPtr, dpiX, dpiY, createOnApplicationThread);
         }
@@ -90,7 +92,7 @@ namespace DataTools.Desktop
         /// <param name="createOnApplicationThread"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static BitmapSource? MakeWPFImage(Bitmap img, ref IntPtr bitPtr, double dpiX = 96.0d, double dpiY = 96.0d, bool createOnApplicationThread = true)
+        public static BitmapSource MakeWPFImage(Bitmap img, ref IntPtr bitPtr, double dpiX = 96.0d, double dpiY = 96.0d, bool createOnApplicationThread = true)
         {
             if (img is null)
                 throw new ArgumentNullException(nameof(img));
@@ -106,7 +108,7 @@ namespace DataTools.Desktop
             int size = img.Height * BytesPerRow;
             var bm = new System.Drawing.Imaging.BitmapData();
 
-            BitmapSource? bmp = null;
+            BitmapSource bmp = null;
 
             try
             {
@@ -199,7 +201,7 @@ namespace DataTools.Desktop
         /// <param name="source"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static Bitmap? MakeBitmapFromWPF(System.Windows.Media.Imaging.BitmapSource source)
+        public static Bitmap MakeBitmapFromWPF(System.Windows.Media.Imaging.BitmapSource source)
         {
             var mm = new MemPtr();
             Bitmap bmp = null;

@@ -28,7 +28,7 @@ namespace DataTools.Win32.Usb
         public const int gPack = 1;
 
         [DllImport("kernel32.dll")]
-        public static extern bool DeviceIoControl(nint hDevice, uint dwIoControlCode, nint lpInBuffer, uint nInBufferSize, nint lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, nint lpOverlapped);
+        public static extern bool DeviceIoControl(IntPtr hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, IntPtr lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, IntPtr lpOverlapped);
 
         public enum USBRESULT : int
         {
@@ -393,7 +393,7 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return 0;
                     return ptr.ByteAt(0L);
                 }
@@ -403,7 +403,7 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return 0;
                     return ptr.ByteAt(1L);
                 }
@@ -413,7 +413,7 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return null;
                     return System.Text.Encoding.Unicode.GetString(ptr.ToByteArray(2L, bLength));
                 }
@@ -444,7 +444,7 @@ namespace DataTools.Win32.Usb
             public byte bInterval;
             public byte bRefresh;
             public byte bSynchAddress;
-            public nint extra; // Extra descriptors ''
+            public IntPtr extra; // Extra descriptors ''
             public int extralen;
 
             public byte[] extra_desc
@@ -482,7 +482,7 @@ namespace DataTools.Win32.Usb
             public byte bInterfaceSubClass;
             public byte bInterfaceProtocol;
             public byte iInterface;
-            private nint ep; // usb_endpoint_descriptor 'endpopublic Public as integer extra As nint
+            private IntPtr ep; // usb_endpoint_descriptor 'endpopublic Public as integer extra As IntPtr
 
             public usb_endpoint_descriptor endpoint
             {
@@ -495,7 +495,7 @@ namespace DataTools.Win32.Usb
                 }
             }
 
-            public nint extra;
+            public IntPtr extra;
             public int extralen;
 
             public UsbHidDescriptor hidDescriptor
@@ -524,7 +524,7 @@ namespace DataTools.Win32.Usb
         [StructLayout(LayoutKind.Sequential, Pack = gPack)]
         public struct usb_interface
         {
-            public nint altsetting; // usb_interface_descriptor
+            public IntPtr altsetting; // usb_interface_descriptor
             public int num_altsetting;
 
             public usb_interface_descriptor[] altsettings
@@ -559,7 +559,7 @@ namespace DataTools.Win32.Usb
             public byte iConfiguration;
             public byte bmAttributes;
             public byte MaxPower;
-            private nint iface; // usb_interface 'interface
+            private IntPtr iface; // usb_interface 'interface
 
             public usb_interface @interface
             {
@@ -572,7 +572,7 @@ namespace DataTools.Win32.Usb
                 }
             }
 
-            public nint extra;  // Extra descriptors ''
+            public IntPtr extra;  // Extra descriptors ''
             public int extralen;
 
             public byte[] extra_desc
@@ -692,19 +692,19 @@ namespace DataTools.Win32.Usb
         [StructLayout(LayoutKind.Sequential, Pack = gPack)]
         public struct usb_device
         {
-            public nint next; // usb_device
-            public nint prev; // usb_device
+            public IntPtr next; // usb_device
+            public IntPtr prev; // usb_device
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = LIBUSB_PATH_MAX)]
             public string filename;
 
-            public nint bus; // usb_bus
+            public IntPtr bus; // usb_bus
             public usb_device_descriptor descriptor;  // usb_device_descriptor
-            public nint config; // usb_config_descriptor 'config
-            public nint dev; // void 'dev		'' Darwin support ''
+            public IntPtr config; // usb_config_descriptor 'config
+            public IntPtr dev; // void 'dev		'' Darwin support ''
             public byte devnum;
             public byte num_children;
-            public nint children;  // usb_device ''children
+            public IntPtr children;  // usb_device ''children
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = gPack)]
@@ -716,16 +716,16 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     var lp = new lpusb_device();
                     if (IntPtr.Size == 4)
                     {
-                        lp.ptr = new nint(ptr.UIntAt(0L));
+                        lp.ptr = new IntPtr(ptr.UIntAt(0L));
                     }
                     else
                     {
-                        lp.ptr = new nint(ptr.LongAt(0L));
+                        lp.ptr = new IntPtr(ptr.LongAt(0L));
                     }
 
                     return lp;
@@ -736,16 +736,16 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     var lp = new lpusb_device();
                     if (IntPtr.Size == 4)
                     {
-                        lp.ptr = new nint(ptr.UIntAt(1L));
+                        lp.ptr = new IntPtr(ptr.UIntAt(1L));
                     }
                     else
                     {
-                        lp.ptr = new nint(ptr.LongAt(1L));
+                        lp.ptr = new IntPtr(ptr.LongAt(1L));
                     }
 
                     return lp;
@@ -757,7 +757,7 @@ namespace DataTools.Win32.Usb
                 get
                 {
                     string filenameRet = default;
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return null;
                     filenameRet = ptr.GetUTF8String(IntPtr.Size * 2);
                     return filenameRet;
@@ -769,17 +769,17 @@ namespace DataTools.Win32.Usb
                 get
                 {
                     lpusb_bus busRet = default;
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     busRet = new lpusb_bus();
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 2;
                     if (IntPtr.Size == 4)
                     {
-                        busRet.ptr = new nint(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        busRet.ptr = new IntPtr(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
                     else
                     {
-                        busRet.ptr = new nint(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        busRet.ptr = new IntPtr(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
 
                     return busRet;
@@ -791,7 +791,7 @@ namespace DataTools.Win32.Usb
                 get
                 {
                     usb_device_descriptor descriptorRet = default;
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 3;
                     descriptorRet = ptr.ToStructAt<usb_device_descriptor>(bc);
@@ -804,20 +804,20 @@ namespace DataTools.Win32.Usb
                 get
                 {
                     usb_config_descriptor configRet = default;
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 3 + Marshal.SizeOf<usb_device_descriptor>();
                     var str = new MemPtr();
                     if (IntPtr.Size == 4)
                     {
-                        str.Handle = new nint(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        str.Handle = new IntPtr(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
                     else
                     {
-                        str.Handle = new nint(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        str.Handle = new IntPtr(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
 
-                    if (str.Handle != nint.Zero)
+                    if (str.Handle != IntPtr.Zero)
                     {
                         configRet = str.ToStruct<usb_config_descriptor>();
                     }
@@ -826,21 +826,21 @@ namespace DataTools.Win32.Usb
                 }
             }
 
-            public nint dev
+            public IntPtr dev
             {
                 get
                 {
-                    nint devRet = default;
-                    if (ptr == nint.Zero)
+                    IntPtr devRet = default;
+                    if (ptr == IntPtr.Zero)
                         return default;
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 4 + Marshal.SizeOf<usb_device_descriptor>();
                     if (IntPtr.Size == 4)
                     {
-                        devRet = new nint(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        devRet = new IntPtr(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
                     else
                     {
-                        devRet = new nint(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        devRet = new IntPtr(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
 
                     return devRet;
@@ -851,7 +851,7 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 5 + Marshal.SizeOf<usb_device_descriptor>();
                     return ptr.ByteAt(bc);
@@ -862,7 +862,7 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 5 + 1 + Marshal.SizeOf<usb_device_descriptor>();
                     return ptr.ByteAt(bc);
@@ -873,24 +873,24 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     var lp = new lpusb_device();
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 5 + 2 + Marshal.SizeOf<usb_device_descriptor>();
                     MemPtr mm;
                     if (IntPtr.Size == 4)
                     {
-                        mm = new nint(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
-                        if (mm == nint.Zero)
+                        mm = new IntPtr(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        if (mm == IntPtr.Zero)
                             return default;
-                        lp.ptr = new nint(mm.UIntAt(0L));
+                        lp.ptr = new IntPtr(mm.UIntAt(0L));
                     }
                     else
                     {
-                        mm = new nint(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
-                        if (mm == nint.Zero)
+                        mm = new IntPtr(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        if (mm == IntPtr.Zero)
                             return default;
-                        lp.ptr = new nint(mm.LongAt(0L));
+                        lp.ptr = new IntPtr(mm.LongAt(0L));
                     }
 
                     return lp;
@@ -899,7 +899,7 @@ namespace DataTools.Win32.Usb
 
             public override string ToString()
             {
-                if (ptr == nint.Zero)
+                if (ptr == IntPtr.Zero)
                     return "null";
                 return filename;
             }
@@ -908,15 +908,15 @@ namespace DataTools.Win32.Usb
         [StructLayout(LayoutKind.Sequential, Pack = gPack)]
         public struct usb_bus
         {
-            public nint next; // usb_device
-            public nint prev; // usb_device
+            public IntPtr next; // usb_device
+            public IntPtr prev; // usb_device
 
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = LIBUSB_PATH_MAX)]
             public string filename;
 
-            public nint devices; // usb_device 'devices
+            public IntPtr devices; // usb_device 'devices
             public uint location;
-            public nint root_dev; // usb_device 'root_dev
+            public IntPtr root_dev; // usb_device 'root_dev
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = gPack)]
@@ -926,7 +926,7 @@ namespace DataTools.Win32.Usb
 
             public override string ToString()
             {
-                if (ptr == nint.Zero)
+                if (ptr == IntPtr.Zero)
                     return "null";
                 return filename;
             }
@@ -935,16 +935,16 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     var lp = new lpusb_bus();
                     if (IntPtr.Size == 4)
                     {
-                        lp.ptr = new nint(ptr.UIntAt(0L));
+                        lp.ptr = new IntPtr(ptr.UIntAt(0L));
                     }
                     else
                     {
-                        lp.ptr = new nint(ptr.LongAt(0L));
+                        lp.ptr = new IntPtr(ptr.LongAt(0L));
                     }
 
                     return lp;
@@ -955,16 +955,16 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     var lp = new lpusb_bus();
                     if (IntPtr.Size == 4)
                     {
-                        lp.ptr = new nint(ptr.UIntAt(1L));
+                        lp.ptr = new IntPtr(ptr.UIntAt(1L));
                     }
                     else
                     {
-                        lp.ptr = new nint(ptr.LongAt(1L));
+                        lp.ptr = new IntPtr(ptr.LongAt(1L));
                     }
 
                     return lp;
@@ -976,7 +976,7 @@ namespace DataTools.Win32.Usb
                 get
                 {
                     string filenameRet = default;
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return null;
                     filenameRet = ptr.GetUTF8String(IntPtr.Size * 2);
                     return filenameRet;
@@ -987,17 +987,17 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     var lp = new lpusb_device();
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 2;
                     if (IntPtr.Size == 4)
                     {
-                        lp.ptr = new nint(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        lp.ptr = new IntPtr(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
                     else
                     {
-                        lp.ptr = new nint(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        lp.ptr = new IntPtr(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
 
                     return lp;
@@ -1008,7 +1008,7 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     uint lp;
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 3;
@@ -1021,17 +1021,17 @@ namespace DataTools.Win32.Usb
             {
                 get
                 {
-                    if (ptr == nint.Zero)
+                    if (ptr == IntPtr.Zero)
                         return default;
                     var lp = new lpusb_device();
                     int bc = LIBUSB_PATH_MAX + IntPtr.Size * 3 + 4;
                     if (IntPtr.Size == 4)
                     {
-                        lp.ptr = new nint(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        lp.ptr = new IntPtr(BitConverter.ToUInt32(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
                     else
                     {
-                        lp.ptr = new nint(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
+                        lp.ptr = new IntPtr(BitConverter.ToInt64(ptr.ToByteArray(bc, IntPtr.Size), 0));
                     }
 
                     return lp;
@@ -1069,16 +1069,16 @@ namespace DataTools.Win32.Usb
         [StructLayout(LayoutKind.Sequential, Pack = gPack)]
         public struct usb_dev_handle
         {
-            public nint ptr;
+            public IntPtr ptr;
         }
 
         // Function prototypes ''
 
-        // Public Declare Function usb_open Lib "libusb0.dll" (dev As lpusb_device) As nint
-        // Public Declare Function usb_close Lib "libusb0.dll" (dev As nint) As USBRESULT
+        // Public Declare Function usb_open Lib "libusb0.dll" (dev As lpusb_device) As IntPtr
+        // Public Declare Function usb_close Lib "libusb0.dll" (dev As IntPtr) As USBRESULT
 
         // Public Declare Function usb_get_string Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // index As Integer, _
         // langid As Integer, _
         // <MarshalAs(UnmanagedType.LPStr)> _
@@ -1086,92 +1086,92 @@ namespace DataTools.Win32.Usb
         // buflen As Integer) As USBRESULT
 
         // Public Declare Function usb_get_string_simple Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // index As Integer, _
         // buf As MemPtr, _
         // buflen As Integer) As USBRESULT
 
         // Public Declare Function usb_get_descriptor_by_endpoint Lib "libusb0.dll" ( _
-        // udev As nint, _
+        // udev As IntPtr, _
         // ep As Integer, _
         // type As Byte, _
         // index As Byte, _
-        // buf As nint, _
+        // buf As IntPtr, _
         // size As Integer) As USBRESULT
 
         // Public Declare Function usb_get_descriptor Lib "libusb0.dll" ( _
-        // udev As nint, _
+        // udev As IntPtr, _
         // type As Byte, _
         // index As Byte, _
-        // buf As nint, _
+        // buf As IntPtr, _
         // size As Integer) As USBRESULT
 
         // Public Declare Function usb_bulk_write Lib "libusb0.dll" ( _
-        // udev As nint, _
+        // udev As IntPtr, _
         // ep As Integer, _
-        // bytes As nint, _
+        // bytes As IntPtr, _
         // size As Integer, _
         // timeout As Integer) As USBRESULT
 
         // Public Declare Function usb_bulk_read Lib "libusb0.dll" ( _
-        // udev As nint, _
+        // udev As IntPtr, _
         // ep As Integer, _
-        // bytes As nint, _
+        // bytes As IntPtr, _
         // size As Integer, _
         // timeout As Integer) As USBRESULT
 
         // Public Declare Function usb_interrupt_write Lib "libusb0.dll" ( _
-        // udev As nint, _
+        // udev As IntPtr, _
         // ep As Integer, _
-        // bytes As nint, _
+        // bytes As IntPtr, _
         // size As Integer, _
         // timeout As Integer) As USBRESULT
 
         // Public Declare Function usb_interrupt_read Lib "libusb0.dll" ( _
-        // udev As nint, _
+        // udev As IntPtr, _
         // ep As Integer, _
-        // bytes As nint, _
+        // bytes As IntPtr, _
         // size As Integer, _
         // timeout As Integer) As USBRESULT
 
         // Public Declare Function usb_control_msg Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // requesttype As Integer, _
         // request As Integer, _
         // value As Integer, _
         // index As Integer, _
-        // bytes As nint, _
+        // bytes As IntPtr, _
         // size As Integer, _
         // timeout As Integer) As USBRESULT
 
         // Public Declare Function usb_set_configuration Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // configuration As Integer) As USBRESULT
 
         // Public Declare Function usb_claim_interface Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // [interface] As Integer) As USBRESULT
 
         // Public Declare Function usb_release_interface Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // [interface] As Integer) As USBRESULT
 
         // Public Declare Function usb_set_altinterface Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // alternate As Integer) As USBRESULT
 
         // Public Declare Function usb_resetep Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // ep As Integer) As USBRESULT
 
         // Public Declare Function usb_clear_halt Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // ep As Integer) As USBRESULT
 
-        // Public Declare Function usb_reset Lib "libusb0.dll" (dev As nint) As USBRESULT
+        // Public Declare Function usb_reset Lib "libusb0.dll" (dev As IntPtr) As USBRESULT
 
         // Public Declare Function usb_reset_ex Lib "libusb0.dll" ( _
-        // dev As nint, _
+        // dev As IntPtr, _
         // reset_type As UInteger) As USBRESULT
 
         // Public Declare Function usb_strerror Lib "libusb0.dll" () As <MarshalAs(UnmanagedType.LPStr)> String
@@ -1185,93 +1185,93 @@ namespace DataTools.Win32.Usb
         // Public Declare Function usb_find_devices Lib "libusb0.dll" () As Integer
 
         //' usb_devices
-        // Public Declare Function usb_device Lib "libusb0.dll" Alias "usb_device" (dev As nint) As nint
+        // Public Declare Function usb_device Lib "libusb0.dll" Alias "usb_device" (dev As IntPtr) As IntPtr
 
         //' usb_busses
-        // Public Declare Function usb_get_busses Lib "libusb0.dll" () As nint
+        // Public Declare Function usb_get_busses Lib "libusb0.dll" () As IntPtr
 
         //' Windows specific functions
         // Public Declare Function usb_install_service_np Lib "libusb0.dll" () As USBRESULT
 
         // <DllImport("libusb0.dll", CallingConvention:=CallingConvention.Winapi, CharSet:=CharSet.Ansi)>
-        // Public Sub usb_install_service_np_rundll(hwnd As nint, instance As nint, <MarshalAs(UnmanagedType.LPStr)> cmd_line As String, cmd_show As Integer)
+        // Public Sub usb_install_service_np_rundll(hwnd As IntPtr, instance As IntPtr, <MarshalAs(UnmanagedType.LPStr)> cmd_line As String, cmd_show As Integer)
         // End Sub
 
         // Public Declare Function usb_uninstall_service_np Lib "libusb0.dll" () As USBRESULT
 
         // <DllImport("libusb0.dll", CallingConvention:=CallingConvention.Winapi, CharSet:=CharSet.Ansi)>
-        // Public Sub usb_uninstall_service_np_rundll(hwnd As nint, instance As nint, <MarshalAs(UnmanagedType.LPStr)> cmd_line As String, cmd_show As Integer)
+        // Public Sub usb_uninstall_service_np_rundll(hwnd As IntPtr, instance As IntPtr, <MarshalAs(UnmanagedType.LPStr)> cmd_line As String, cmd_show As Integer)
         // End Sub
 
         // Public Declare Function usb_install_driver_np Lib "libusb0.dll" (<MarshalAs(UnmanagedType.LPStr)> inf_file As String) As USBRESULT
 
         // <DllImport("libusb0.dll", CallingConvention:=CallingConvention.Winapi, CharSet:=CharSet.Ansi)>
-        // Public Sub usb_install_driver_np_rundll(hwnd As nint, instance As nint, <MarshalAs(UnmanagedType.LPStr)> cmd_line As String, cmd_show As Integer)
+        // Public Sub usb_install_driver_np_rundll(hwnd As IntPtr, instance As IntPtr, <MarshalAs(UnmanagedType.LPStr)> cmd_line As String, cmd_show As Integer)
         // End Sub
 
         // Public Declare Function usb_touch_inf_file_np Lib "libusb0.dll" (<MarshalAs(UnmanagedType.LPStr)> inf_file As String) As USBRESULT
 
         // <DllImport("libusb0.dll", CallingConvention:=CallingConvention.Winapi, CharSet:=CharSet.Ansi)>
-        // Public Sub usb_touch_inf_file_np_rundll(hwnd As nint, instance As nint, <MarshalAs(UnmanagedType.LPStr)> cmd_line As String, cmd_show As Integer)
+        // Public Sub usb_touch_inf_file_np_rundll(hwnd As IntPtr, instance As IntPtr, <MarshalAs(UnmanagedType.LPStr)> cmd_line As String, cmd_show As Integer)
         // End Sub
 
         // Public Declare Function usb_install_needs_restart_np Lib "libusb0.dll" () As USBRESULT
 
         // Public Declare Unicode Function usb_install_npW Lib "libusb0.dll" ( _
-        // hwnd As nint, _
-        // instance As nint, _
+        // hwnd As IntPtr, _
+        // instance As IntPtr, _
         // <MarshalAs(UnmanagedType.LPWStr)> _
         // cmd_line As String, _
         // starg_arg As Integer) As USBRESULT
 
         // Public Declare Ansi Function usb_install_npA Lib "libusb0.dll" ( _
-        // hwnd As nint, _
-        // instance As nint, _
+        // hwnd As IntPtr, _
+        // instance As IntPtr, _
         // <MarshalAs(UnmanagedType.LPStr)> _
         // cmd_line As String, _
         // starg_arg As Integer) As USBRESULT
 
         // Public Declare Unicode Function usb_install_np Lib "libusb0.dll" _
         // Alias "usb_install_npW" ( _
-        // hwnd As nint, _
-        // instance As nint, _
+        // hwnd As IntPtr, _
+        // instance As IntPtr, _
         // <MarshalAs(UnmanagedType.LPWStr)> _
         // cmd_line As String, _
         // starg_arg As Integer) As USBRESULT
 
         //' usb_version
-        // Public Declare Function usb_get_version Lib "libusb0.dll" () As nint
+        // Public Declare Function usb_get_version Lib "libusb0.dll" () As IntPtr
 
         // Public Declare Function usb_isochronous_setup_async Lib "libusb0.dll" ( _
-        // dev As nint, _
-        // ByRef context As nint, _
+        // dev As IntPtr, _
+        // ByRef context As IntPtr, _
         // ep As Byte, _
         // pktsize As Integer) As USBRESULT
 
         // Public Declare Function usb_bulk_setup_async Lib "libusb0.dll" ( _
-        // dev As nint, _
-        // ByRef context As nint, _
+        // dev As IntPtr, _
+        // ByRef context As IntPtr, _
         // ep As Byte) As USBRESULT
 
         // Public Declare Function usb_interrupt_setup_async Lib "libusb0.dll" ( _
-        // dev As nint, _
-        // ByRef context As nint, _
+        // dev As IntPtr, _
+        // ByRef context As IntPtr, _
         // ep As Byte) As USBRESULT
 
         // Public Declare Function usb_submit_async Lib "libusb0.dll" ( _
-        // context As nint, _
-        // bytes As nint, _
+        // context As IntPtr, _
+        // bytes As IntPtr, _
         // size As Integer) As USBRESULT
 
         // Public Declare Function usb_reap_async Lib "libusb0.dll" ( _
-        // context As nint, _
+        // context As IntPtr, _
         // timeout As Integer) As USBRESULT
         // Public Declare Function usb_reap_async_nocancel Lib "libusb0.dll" ( _
-        // context As nint, _
+        // context As IntPtr, _
         // timeout As Integer) As USBRESULT
 
-        // Public Declare Function usb_cancel_async Lib "libusb0.dll" (context As nint) As USBRESULT
+        // Public Declare Function usb_cancel_async Lib "libusb0.dll" (context As IntPtr) As USBRESULT
 
-        // Public Declare Function usb_free_async Lib "libusb0.dll" (context As nint) As USBRESULT
+        // Public Declare Function usb_free_async Lib "libusb0.dll" (context As IntPtr) As USBRESULT
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace DataTools.Win32.Usb
-{
+﻿using System.Collections.Generic;
+using System.Linq;
 
+namespace DataTools.Win32.Usb
+{
     public enum UnitInfoCode
     {
         ACVoltage = 0x00F0D121,
@@ -14,7 +16,6 @@
         BatteryCapacity = 0x00101001,
         None = 0x0
     }
-
 
     // 10 0001
     public sealed class HidUnitInfo
@@ -43,12 +44,12 @@
             units.Add(units.Where((o) => o.Name == name).FirstOrDefault() ?? this);
         }
 
-        public static HidUnitInfo? GetByCode(int code)
+        public static HidUnitInfo GetByCode(int code)
         {
             return units.Where((o) => o.Code == (UnitInfoCode)code).FirstOrDefault();
         }
 
-        public static HidUnitInfo? GetByCode(UnitInfoCode code)
+        public static HidUnitInfo GetByCode(UnitInfoCode code)
         {
             return units.Where((o) => o.Code == code).FirstOrDefault();
         }
@@ -58,7 +59,7 @@
             return Name;
         }
 
-        static List<HidUnitInfo> units = new List<HidUnitInfo>();
+        private static List<HidUnitInfo> units = new List<HidUnitInfo>();
 
         public static IReadOnlyList<HidUnitInfo> Units { get => units; private set => units = new List<HidUnitInfo>(value); }
 
@@ -72,6 +73,5 @@
         public static readonly HidUnitInfo Temperature = new HidUnitInfo("Temperature", "°K", "°K", 0x00010001, 0, 16);
         public static readonly HidUnitInfo BatteryCapacity = new HidUnitInfo("Battery Capacity", "AmpSec", "AmpSec", 0x00101001, 0, 24);
         public static readonly HidUnitInfo None = new HidUnitInfo("None", "None", "None", 0x0, 0, 8);
-
     }
 }

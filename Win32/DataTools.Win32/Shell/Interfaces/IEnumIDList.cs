@@ -36,7 +36,7 @@ namespace DataTools.Shell.Native
     {
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        HResult Next(uint celt, out nint rgelt, out uint pceltFetched);
+        HResult Next(uint celt, out IntPtr rgelt, out uint pceltFetched);
 
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]

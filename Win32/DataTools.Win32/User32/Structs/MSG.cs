@@ -34,7 +34,7 @@ namespace DataTools.Win32
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct MSG
     {
-        public nint hWnd;
+        public IntPtr hWnd;
         public int Message;
         public int wParam;
         public int lParam;

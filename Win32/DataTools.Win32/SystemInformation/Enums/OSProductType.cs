@@ -1,16 +1,17 @@
 // *************************************************
-// DataTools C# Native Utility Library For Windows 
+// DataTools C# Native Utility Library For Windows
 //
 // Module: SystemInfo
 //         Provides basic information about the
 //         current computer.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using System;
 using System.ComponentModel;
 
 namespace DataTools.SystemInformation
@@ -22,7 +23,6 @@ namespace DataTools.SystemInformation
     [Flags]
     public enum OSProductType : byte
     {
-
         /// <summary>
         /// The system is a domain controller and the operating system is Windows Server 2012 R2, Windows Server 2012, Windows Server 2008 R2, Windows Server 2008, Windows Server 2003, or Windows 2000 Server.
         /// </summary>

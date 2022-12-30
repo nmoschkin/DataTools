@@ -38,6 +38,6 @@ namespace DataTools.Shell.Native
     {
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime),
         PreserveSig]
-        int Show([In] nint parent);
+        int Show([In] IntPtr parent);
     }
 }

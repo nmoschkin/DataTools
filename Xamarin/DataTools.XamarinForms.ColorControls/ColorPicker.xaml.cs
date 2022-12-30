@@ -1,15 +1,14 @@
-﻿using System;
+﻿using DataTools.Graphics;
+
+using SkiaSharp;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-
-using DataTools.Graphics;
-using DataTools.Standard.Memory;
-
-using SkiaSharp;
 
 using TouchTracking;
 
@@ -21,14 +20,15 @@ namespace DataTools.XamarinForms.ColorControls
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ColorPicker : ContentView
     {
-        ColorPickerRenderer cpRender;
+        private ColorPickerRenderer cpRender;
 
         public delegate void ColorHitEvent(object sender, ColorHitEventArgs e);
+
         public event ColorHitEvent ColorHit;
+
         public event ColorHitEvent ColorOver;
 
-        UniPoint? selCoord;
-
+        private UniPoint? selCoord;
 
         public bool SnapToNamedColor
         {
@@ -49,8 +49,6 @@ namespace DataTools.XamarinForms.ColorControls
                 }
             }
         }
-
-
 
         public double HueOffset
         {
@@ -122,7 +120,6 @@ namespace DataTools.XamarinForms.ColorControls
             }
         }
 
-
         public IReadOnlyCollection<NamedColor> SelectedNamedColors
         {
             get { return (IReadOnlyCollection<NamedColor>)GetValue(SelectedNamedColorsProperty); }
@@ -139,11 +136,9 @@ namespace DataTools.XamarinForms.ColorControls
                 if ((IReadOnlyCollection<NamedColor>)oldValue != (IReadOnlyCollection<NamedColor>)newValue)
                 {
                     //p.RenderPicker();
-
                 }
             }
         }
-
 
         public bool InvertSaturation
         {
@@ -166,9 +161,6 @@ namespace DataTools.XamarinForms.ColorControls
             }
         }
 
-
-
-
         public float ElementSize
         {
             get { return (float)GetValue(ElementSizeProperty); }
@@ -189,7 +181,6 @@ namespace DataTools.XamarinForms.ColorControls
                 }
             }
         }
-
 
         public double ColorValue
         {
@@ -232,10 +223,6 @@ namespace DataTools.XamarinForms.ColorControls
             }
         }
 
-
-
-
-
         public ColorPickerMode Mode
         {
             get { return (ColorPickerMode)GetValue(ModeProperty); }
@@ -245,7 +232,6 @@ namespace DataTools.XamarinForms.ColorControls
         // Using a BindableProperty as the backing store for Mode.  This enables animation, styling, binding, etc...
         public static readonly BindableProperty ModeProperty =
             BindableProperty.Create(nameof(Mode), typeof(ColorPickerMode), typeof(ColorPicker), defaultValue: ColorPickerMode.Wheel, propertyChanged: ModePropertyChanged);
-
 
         private static void ModePropertyChanged(BindableObject d, object oldValue, object newValue)
         {
@@ -305,11 +291,11 @@ namespace DataTools.XamarinForms.ColorControls
                 if (cpRender.Mode == ColorPickerMode.HexagonWheel || cpRender.Mode == ColorPickerMode.Wheel)
                 {
                     float mn1 = width < height ? (float)width : (float)height;
-                    float mn2 = cpRender.Bounds.Width;
+                    float mn2 = (float)cpRender.Bounds.Width;
 
                     if (mn1 == mn2) return;
                 }
-                else if (cpRender.Bounds.Width == width && cpRender.Bounds.Height == height) 
+                else if (cpRender.Bounds.Width == width && cpRender.Bounds.Height == height)
                 {
                     return;
                 }
@@ -324,7 +310,6 @@ namespace DataTools.XamarinForms.ColorControls
 
         private void SetSelectedColor(UniColor? selc = null)
         {
-
             UniColor clr;
             string cname;
 
@@ -338,7 +323,7 @@ namespace DataTools.XamarinForms.ColorControls
             }
 
             NamedColor nc;
-            
+
             if (SnapToNamedColor)
             {
                 nc = NamedColor.GetClosestColor(clr, 0.05, false);
@@ -367,12 +352,10 @@ namespace DataTools.XamarinForms.ColorControls
             {
                 SelectedColorName = cname;
             }
-
         }
 
-        void OnTouch(object sender, TouchActionEventArgs args)
+        private void OnTouch(object sender, TouchActionEventArgs args)
         {
-
             if (args.Type == TouchActionType.Pressed || args.Type == TouchActionType.Moved)
             {
                 var pt = new UniPoint(args.Location.X, args.Location.Y);
@@ -381,7 +364,7 @@ namespace DataTools.XamarinForms.ColorControls
                 pt.X -= (Width - cpRender.Bounds.Width) / 2;
                 pt.Y -= (Height - cpRender.Bounds.Height) / 2;
 
-                if (!cpRender.Bounds.Contains((System.Drawing.PointF)pt))
+                if (!cpRender.Bounds.Contains(pt))
                 {
                     selCoord = null;
                     Canvas.InvalidateSurface();
@@ -408,7 +391,7 @@ namespace DataTools.XamarinForms.ColorControls
 
                 pt.X -= (Width - cpRender.Bounds.Width) / 2;
                 pt.Y -= (Height - cpRender.Bounds.Height) / 2;
-                
+
                 if (!cpRender.Bounds.Contains((System.Drawing.PointF)pt))
                 {
                     return;
@@ -419,7 +402,6 @@ namespace DataTools.XamarinForms.ColorControls
 
                 ColorOver?.Invoke(this, new ColorHitEventArgs(c));
             }
-
         }
 
         private void RenderPicker(int w = 0, int h = 0)
@@ -442,7 +424,7 @@ namespace DataTools.XamarinForms.ColorControls
             {
                 ColorPickerRenderer cw;
 
-                    if (w <= 0)
+                if (w <= 0)
                 {
                     if (double.IsNaN(width)) return;
                     w = (int)width;
@@ -471,18 +453,14 @@ namespace DataTools.XamarinForms.ColorControls
                     }
 
                     cw = new ColorPickerRenderer(rad, colorVal, offset, invert, true);
-
                 }
                 else
                 {
-
                     cw = new ColorPickerRenderer(w, h, colorVal, offset, invert, mode == ColorPickerMode.LinearVertical, true);
-
                 }
 
                 Device.BeginInvokeOnMainThread(() =>
                 {
-
                     SKImage img;
                     SKBitmap bmp = new SKBitmap((int)cw.Bounds.Width, (int)cw.Bounds.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
 
@@ -495,7 +473,7 @@ namespace DataTools.XamarinForms.ColorControls
                         Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)ptr, cw.ImageBytes.Length, cw.ImageBytes.Length);
                         gch.Free();
                     }
-                    
+
                     bmp.SetImmutable();
                     img = SKImage.FromBitmap(bmp);
 
@@ -506,11 +484,8 @@ namespace DataTools.XamarinForms.ColorControls
 
                     cpRender = cw;
                     PickerSite.Source = ret;
-
                 });
-
             });
         }
-
     }
 }

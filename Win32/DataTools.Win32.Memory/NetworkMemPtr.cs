@@ -7,40 +7,40 @@ namespace DataTools
 {
     internal class NetworkMemPtr : DataTools.Win32.Memory.WinPtrBase
     {
-        public NetworkMemPtr() : base(nint.Zero, true, false)
+        public NetworkMemPtr() : base(IntPtr.Zero, true, false)
         {
         }
 
-        public NetworkMemPtr(int size) : base(nint.Zero, true, true)
+        public NetworkMemPtr(int size) : base(IntPtr.Zero, true, true)
         {
             Alloc(size);
         }
 
-        public NetworkMemPtr(nint ptr) : base(ptr, true, false)
+        public NetworkMemPtr(IntPtr ptr) : base(ptr, true, false)
         {
             GetNativeSize();
         }
 
-        public NetworkMemPtr(nint ptr, bool fOwn) : base(ptr, fOwn, false)
+        public NetworkMemPtr(IntPtr ptr, bool fOwn) : base(ptr, fOwn, false)
         {
             GetNativeSize();
         }
 
-        public NetworkMemPtr(nint ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
+        public NetworkMemPtr(IntPtr ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
             GetNativeSize();
         }
 
         public override MemoryType MemoryType { get; }
 
-        protected override nint Allocate(long size)
+        protected override IntPtr Allocate(long size)
         {
             var r = Native.NetApiBufferAllocate((int)size, out var nhandle);
             if (r != 0) return nhandle;
-            return 0;
+            return IntPtr.Zero;
         }
 
-        protected override void Deallocate(nint ptr)
+        protected override void Deallocate(IntPtr ptr)
         {
             Native.NetApiBufferFree(ptr);
         }
@@ -56,18 +56,18 @@ namespace DataTools
             return true;
         }
 
-        protected override nint Reallocate(nint oldptr, long newsize)
+        protected override IntPtr Reallocate(IntPtr oldptr, long newsize)
         {
             var r = Native.NetApiBufferReallocate(oldptr, (int)newsize, out var nhandle);
 
             if (r != 0) return nhandle;
-            return 0;
+            return IntPtr.Zero;
         }
 
-        protected override WinPtrBase Clone()
+        protected override SafePtrBase Clone()
         {
             var cm = new NetworkMemPtr();
-            if (handle == nint.Zero) return cm;
+            if (handle == IntPtr.Zero) return cm;
 
             unsafe
             {
@@ -82,10 +82,10 @@ namespace DataTools
             }
         }
 
-        public static implicit operator NetworkMemPtr(nint handle)
+        public static implicit operator NetworkMemPtr(IntPtr handle)
             => new NetworkMemPtr(handle, true, false);
 
-        public static implicit operator nint(NetworkMemPtr ptr) => ptr.handle;
+        public static implicit operator IntPtr(NetworkMemPtr ptr) => ptr.handle;
 
         public static explicit operator NetworkMemPtr(DataTools.Memory.MemPtr handle)
             => new NetworkMemPtr(handle, true, false);

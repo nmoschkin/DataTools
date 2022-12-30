@@ -34,8 +34,8 @@ namespace DataTools.Win32
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct IMAGEINFO
     {
-        public nint hbmImage;
-        public nint hbmMask;
+        public IntPtr hbmImage;
+        public IntPtr hbmMask;
         public int Unused1;
         public int Unused2;
         [MarshalAs(UnmanagedType.Struct)]

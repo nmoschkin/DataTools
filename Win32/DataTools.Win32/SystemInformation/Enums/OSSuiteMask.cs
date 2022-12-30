@@ -1,16 +1,17 @@
 // *************************************************
-// DataTools C# Native Utility Library For Windows 
+// DataTools C# Native Utility Library For Windows
 //
 // Module: SystemInfo
 //         Provides basic information about the
 //         current computer.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using System;
 using System.ComponentModel;
 
 namespace DataTools.SystemInformation
@@ -22,7 +23,6 @@ namespace DataTools.SystemInformation
     [Flags]
     public enum OSSuiteMask : ushort
     {
-
         /// <summary>
         /// Microsoft BackOffice components are installed.
         /// </summary>

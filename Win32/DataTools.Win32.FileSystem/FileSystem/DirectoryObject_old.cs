@@ -4,6 +4,7 @@ using DataTools.Shell.Native;
 using DataTools.Win32;
 
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
@@ -82,7 +83,7 @@ namespace DataTools.Desktop_Old
             // res = SHCreateItemFromParsingName("shell:" + If(parts IsNot Nothing, parts(parts.Length - 1), If(fp, ParsingName)), Nothing, ShellIIDGuid.IShellItemUuid, shitem)
 
             // If (res = HResult.Ok) Then
-            // Dim ip As nint
+            // Dim ip As IntPtr
 
             // res = shitem.GetDisplayName(ShellItemDesignNameOptions.DesktopAbsoluteParsing, ip)
             // mm = ip
@@ -115,7 +116,7 @@ namespace DataTools.Desktop_Old
                     CoTaskMemPtr mem;
 
                     var riid = ShellIIDGuid.IShellItemUuid;
-                    var res = NativeShell.SHCreateItemFromParsingName(parsingName, nint.Zero, ref riid, out shitem);
+                    var res = NativeShell.SHCreateItemFromParsingName(parsingName, IntPtr.Zero, ref riid, out shitem);
 
                     string absname = null;
 
@@ -150,7 +151,7 @@ namespace DataTools.Desktop_Old
                     HResult localSHCreateItemFromParsingName()
                     {
                         var riid = ShellIIDGuid.IShellItemUuid;
-                        return NativeShell.SHCreateItemFromParsingName("shell:" + (absname ?? parsingName), nint.Zero, ref riid, out shitem);
+                        return NativeShell.SHCreateItemFromParsingName("shell:" + (absname ?? parsingName), IntPtr.Zero, ref riid, out shitem);
                     }
 
                     res = localSHCreateItemFromParsingName();
@@ -614,7 +615,7 @@ namespace DataTools.Desktop_Old
                 pname = pname.Substring(0, pname.Length - 1);
 
             var argriid = ShellIIDGuid.IShellItemUuid;
-            var res = NativeShell.SHCreateItemFromParsingName(ParsingName, nint.Zero, ref argriid, out shitem);
+            var res = NativeShell.SHCreateItemFromParsingName(ParsingName, IntPtr.Zero, ref argriid, out shitem);
 
             int? argiIndex = null;
 
@@ -631,26 +632,26 @@ namespace DataTools.Desktop_Old
                 shellObj = shitem;
 
                 var riid = ShellIIDGuid.IShellItemUuid;
-                NativeShell.SHCreateItemFromParsingName(ParsingName, nint.Zero, ref riid, out pssh);
+                NativeShell.SHCreateItemFromParsingName(ParsingName, IntPtr.Zero, ref riid, out pssh);
                 shellObjPS = pssh;
 
                 riid = ShellIIDGuid.IShellItem2Uuid;
-                NativeShell.SHCreateItemFromParsingName(ParsingName, nint.Zero, ref riid, out shitem2);
+                NativeShell.SHCreateItemFromParsingName(ParsingName, IntPtr.Zero, ref riid, out shitem2);
                 shellObj2 = shitem2;
 
                 var fldbind = ShellBHIDGuid.ShellFolderObjectUuid;
                 var fld2guid = ShellIIDGuid.IShellFolder2Uuid;
 
-                shitem.BindToHandler(nint.Zero, ref fldbind, ref fld2guid, out shfld);
+                shitem.BindToHandler(IntPtr.Zero, ref fldbind, ref fld2guid, out shfld);
                 shellFld = shfld;
 
-                shfld.EnumObjects(nint.Zero, ShellFolderEnumerationOptions.Folders | ShellFolderEnumerationOptions.IncludeHidden | ShellFolderEnumerationOptions.NonFolders | ShellFolderEnumerationOptions.InitializeOnFirstNext, out enumer);
+                shfld.EnumObjects(IntPtr.Zero, ShellFolderEnumerationOptions.Folders | ShellFolderEnumerationOptions.IncludeHidden | ShellFolderEnumerationOptions.NonFolders | ShellFolderEnumerationOptions.InitializeOnFirstNext, out enumer);
 
                 if (enumer != null)
                 {
                     var glist = new List<string>();
                     uint cf;
-                    var ptr = nint.Zero;
+                    var ptr = IntPtr.Zero;
                     string pout;
 
                     // mm.AllocCoTaskMem((MAX_PATH * 2) + 8)
@@ -677,14 +678,14 @@ namespace DataTools.Desktop_Old
 
                         if (IntPtr.Size == 4)
                         {
-                            inv = (nint)mm2.IntAt(1L);
+                            inv = (IntPtr)mm2.IntAt(1L);
                         }
                         else
                         {
-                            inv = (nint)mm2.LongAt(1L);
+                            inv = (IntPtr)mm2.LongAt(1L);
                         }
 
-                        if (inv.Handle != nint.Zero)
+                        if (inv.Handle != IntPtr.Zero)
                         {
                             if (inv.CharAt(0L) != '\0')
                             {
@@ -859,7 +860,7 @@ namespace DataTools.Desktop_Old
 
             IPropertyStore p;
 
-            var h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
+            var h = shellObjPS.BindToHandler(IntPtr.Zero, ref g1, ref g2, out p);
 
             if (h != HResult.Ok) return null;
 
@@ -925,7 +926,7 @@ namespace DataTools.Desktop_Old
 
             IPropertyStore p;
 
-            var h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
+            var h = shellObjPS.BindToHandler(IntPtr.Zero, ref g1, ref g2, out p);
 
             if (h != HResult.Ok) return null;
 
@@ -1084,7 +1085,7 @@ namespace DataTools.Desktop_Old
                 {
                     var str = NativeError.FormatLastError((uint)h);
 
-                    h = shellObjPS.BindToHandler(nint.Zero, ref g1, ref g2, out p);
+                    h = shellObjPS.BindToHandler(IntPtr.Zero, ref g1, ref g2, out p);
 
                     if (h != HResult.Ok) return false;
                 }

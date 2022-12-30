@@ -7,10 +7,10 @@ namespace DataTools.Memory
 {
     public class SafePtr : SafePtrBase
     {
-        public override bool IsInvalid => handle == 0;
+        public override bool IsInvalid => handle == IntPtr.Zero;
         private long size = 0;
 
-        internal virtual new nint handle
+        internal virtual new IntPtr handle
         {
             get => base.handle;
             set
@@ -22,11 +22,11 @@ namespace DataTools.Memory
 
         public override MemoryType MemoryType => MemoryType.HGlobal;
 
-        public SafePtr(nint ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
+        public SafePtr(IntPtr ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
         }
 
-        public SafePtr(long size) : this(0, true, true)
+        public SafePtr(long size) : this(IntPtr.Zero, true, true)
         {
             Alloc(size);
         }
@@ -35,40 +35,40 @@ namespace DataTools.Memory
         {
         }
 
-        public SafePtr() : this(0, true, true)
+        public SafePtr() : this(IntPtr.Zero, true, true)
         {
         }
 
-        public SafePtr(nint ptr, long size, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
+        public SafePtr(IntPtr ptr, long size, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
             this.size = size;
         }
 
-        public SafePtr(nint ptr, long size) : this(ptr, size, true, true)
+        public SafePtr(IntPtr ptr, long size) : this(ptr, size, true, true)
         {
         }
 
-        public SafePtr(nint ptr, int size) : this(ptr, (long)size, true, true)
+        public SafePtr(IntPtr ptr, int size) : this(ptr, (long)size, true, true)
         {
         }
 
-        public SafePtr(nint ptr) : this(ptr, false, false)
+        public SafePtr(IntPtr ptr) : this(ptr, false, false)
         {
         }
 
-        public SafePtr(nint ptr, bool fOwn) : this(ptr, fOwn, fOwn)
+        public SafePtr(IntPtr ptr, bool fOwn) : this(ptr, fOwn, fOwn)
         {
         }
 
-        public unsafe SafePtr(void* ptr, long size) : this((nint)ptr, size, true, true)
+        public unsafe SafePtr(void* ptr, long size) : this((IntPtr)ptr, size, true, true)
         {
         }
 
-        public unsafe SafePtr(void* ptr) : this((nint)ptr, 0L, true, true)
+        public unsafe SafePtr(void* ptr) : this((IntPtr)ptr, 0L, true, true)
         {
         }
 
-        protected override void InternalDoZeroMem(nint startptr, long length)
+        protected override void InternalDoZeroMem(IntPtr startptr, long length)
         {
             unsafe
             {
@@ -76,20 +76,20 @@ namespace DataTools.Memory
             }
         }
 
-        protected override nint Allocate(long size)
+        protected override IntPtr Allocate(long size)
         {
             return Marshal.AllocHGlobal((int)size);
         }
 
-        protected override void Deallocate(nint ptr)
+        protected override void Deallocate(IntPtr ptr)
         {
             Marshal.FreeHGlobal(ptr);
             this.size = 0;
         }
 
-        protected override nint Reallocate(nint oldptr, long newsize)
+        protected override IntPtr Reallocate(IntPtr oldptr, long newsize)
         {
-            return Marshal.ReAllocHGlobal(oldptr, (int)newsize);
+            return Marshal.ReAllocHGlobal(oldptr, (IntPtr)newsize);
         }
 
         protected override long GetNativeSize()
@@ -102,7 +102,7 @@ namespace DataTools.Memory
             return false;
         }
 
-        protected override SafePtr Clone()
+        protected override SafePtrBase Clone()
         {
             unsafe
             {
@@ -117,7 +117,7 @@ namespace DataTools.Memory
 
         public override string ToString()
         {
-            if (handle == 0) return "";
+            if (handle == IntPtr.Zero) return "";
             return GetString(0);
         }
 
@@ -302,7 +302,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator string(SafePtr val)
         {
-            if (val?.handle == 0) return null;
+            if (val?.handle == IntPtr.Zero) return null;
             return val.GetString(0);
         }
 
@@ -509,84 +509,84 @@ namespace DataTools.Memory
 
         public static SafePtr operator +(SafePtr val1, long val2)
         {
-            val1.handle = (nint)(val1.handle + val2);
+            val1.handle = (IntPtr)((long)val1.handle + val2);
             return val1;
         }
 
         public static SafePtr operator -(SafePtr val1, long val2)
         {
-            val1.handle = (nint)(val1.handle - val2);
+            val1.handle = (IntPtr)((long)val1.handle - val2);
             return val1;
         }
 
         public static SafePtr operator +(SafePtr val1, uint val2)
         {
-            val1.handle = (nint)((uint)val1.handle + val2);
+            val1.handle = (IntPtr)((uint)val1.handle + val2);
             return val1;
         }
 
         public static SafePtr operator -(SafePtr val1, uint val2)
         {
-            val1.handle = (nint)((uint)val1.handle - val2);
+            val1.handle = (IntPtr)((uint)val1.handle - val2);
             return val1;
         }
 
         public static SafePtr operator +(SafePtr val1, ulong val2)
         {
-            val1.handle = (nint)((ulong)val1.handle + val2);
+            val1.handle = (IntPtr)((ulong)val1.handle + val2);
             return val1;
         }
 
         public static SafePtr operator -(SafePtr val1, ulong val2)
         {
-            val1.handle = (nint)((ulong)val1.handle - val2);
+            val1.handle = (IntPtr)((ulong)val1.handle - val2);
             return val1;
         }
 
-        public static SafePtr operator +(SafePtr val1, nint val2)
+        public static SafePtr operator +(SafePtr val1, IntPtr val2)
         {
-            val1.handle = (nint)(val1.handle + (long)val2);
+            val1.handle = (IntPtr)((long)val1.handle + (long)val2);
             return val1;
         }
 
-        public static SafePtr operator -(SafePtr val1, nint val2)
+        public static SafePtr operator -(SafePtr val1, IntPtr val2)
         {
-            val1.handle = (nint)(val1.handle - (long)val2);
+            val1.handle = (IntPtr)((long)val1.handle - (long)val2);
             return val1;
         }
 
-        public static bool operator ==(nint val1, SafePtr val2)
+        public static bool operator ==(IntPtr val1, SafePtr val2)
         {
-            return val1 == (val2?.handle ?? nint.Zero);
+            return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static bool operator !=(nint val1, SafePtr val2)
+        public static bool operator !=(IntPtr val1, SafePtr val2)
         {
-            return val1 != (val2?.handle ?? nint.Zero);
+            return val1 != (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static bool operator ==(SafePtr val2, nint val1)
+        public static bool operator ==(SafePtr val2, IntPtr val1)
         {
-            return val1 == (val2?.handle ?? nint.Zero);
+            return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static bool operator !=(SafePtr val2, nint val1)
+        public static bool operator !=(SafePtr val2, IntPtr val1)
         {
-            return val1 != (val2?.handle ?? nint.Zero);
+            return val1 != (val2?.handle ?? IntPtr.Zero);
         }
 
-        public static implicit operator nint(SafePtr val)
+        public static implicit operator IntPtr(SafePtr val)
         {
-            return val?.handle ?? nint.Zero;
+            return val?.handle ?? IntPtr.Zero;
         }
 
-        public static implicit operator SafePtr(nint val)
+        public static implicit operator SafePtr(IntPtr val)
         {
             unsafe
             {
                 return new SafePtr
                 {
-                    handle = (nint)(void*)val
+                    handle = (IntPtr)(void*)val
                 };
             }
         }
@@ -605,7 +605,7 @@ namespace DataTools.Memory
             {
                 return new SafePtr
                 {
-                    handle = (nint)(void*)val
+                    handle = (IntPtr)(void*)val
                 };
             }
         }

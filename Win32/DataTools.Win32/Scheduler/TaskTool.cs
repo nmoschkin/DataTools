@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Win32.TaskScheduler;
+
+using System;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
-using System.Reflection;
-using Microsoft.Win32.TaskScheduler;
-using System.Security.Principal;
-using System.Security.Permissions;
 
 namespace DataTools.Scheduler
 {
@@ -21,8 +16,8 @@ namespace DataTools.Scheduler
         /// </summary>
         /// <param name="args">Optional arguments to pass to the program on startup.</param>
         /// <param name="runLevel">Optional <see cref="TaskRunLevel"/> to use to start the application.</param>
-        public static void EnableOnStartup(string? args = null, TaskRunLevel runLevel = TaskRunLevel.LUA)
-        {            
+        public static void EnableOnStartup(string args = null, TaskRunLevel runLevel = TaskRunLevel.LUA)
+        {
             var task = TaskService.Instance.NewTask();
             var exec = AppDomain.CurrentDomain.BaseDirectory + "\\" + AppDomain.CurrentDomain.FriendlyName + ".exe";
 
@@ -64,7 +59,5 @@ namespace DataTools.Scheduler
 
             return false;
         }
-
     }
-
 }

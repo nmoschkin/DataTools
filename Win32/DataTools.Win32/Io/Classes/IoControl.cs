@@ -473,7 +473,7 @@ namespace DataTools.Win32
             CALLBACK_STREAM_SWITCH = 1U
         }
 
-        public delegate uint CopyProgressRoutine(LARGE_INTEGER TotalFileSize, LARGE_INTEGER TotalBytesTrasnferred, LARGE_INTEGER StreamSize, LARGE_INTEGER StreambytesTransferred, uint dwStreamNumber, CALLBACK_REASON dwCallbackReason, nint hSourceFile, nint hDestinationFile, nint lpData);
+        public delegate uint CopyProgressRoutine(LARGE_INTEGER TotalFileSize, LARGE_INTEGER TotalBytesTrasnferred, LARGE_INTEGER StreamSize, LARGE_INTEGER StreambytesTransferred, uint dwStreamNumber, CALLBACK_REASON dwCallbackReason, IntPtr hSourceFile, IntPtr hDestinationFile, IntPtr lpData);
 
 
 
@@ -489,7 +489,7 @@ namespace DataTools.Win32
 
 
         [DllImport("kernel32", EntryPoint = "MoveFileWithProgressW", CharSet = CharSet.Unicode, PreserveSig = true)]
-        public static extern bool MoveFileWithProgress(string lpExistingFilename, string lpNewFilename, [MarshalAs(UnmanagedType.FunctionPtr)] CopyProgressRoutine lpPRogressRoutine, nint lpData, MOVE_FILE_FLAGS dwFlag);
+        public static extern bool MoveFileWithProgress(string lpExistingFilename, string lpNewFilename, [MarshalAs(UnmanagedType.FunctionPtr)] CopyProgressRoutine lpPRogressRoutine, IntPtr lpData, MOVE_FILE_FLAGS dwFlag);
 
         // BOOL WINAPI CopyFileEx(
         // _In_      LPCTSTR lpExistingFileName,
@@ -502,7 +502,7 @@ namespace DataTools.Win32
 
 
         [DllImport("kernel32", EntryPoint = "CopyFilExW", CharSet = CharSet.Unicode, PreserveSig = true)]
-        public static extern bool CopyFileEx(string lpExistingFilename, string lpNewFilename, [MarshalAs(UnmanagedType.FunctionPtr)] CopyProgressRoutine lpProgressRoutine, nint lpDAta, [MarshalAs(UnmanagedType.Bool)] ref bool pbCancel, uint dwCopyFlags);
+        public static extern bool CopyFileEx(string lpExistingFilename, string lpNewFilename, [MarshalAs(UnmanagedType.FunctionPtr)] CopyProgressRoutine lpProgressRoutine, IntPtr lpDAta, [MarshalAs(UnmanagedType.Bool)] ref bool pbCancel, uint dwCopyFlags);
 
 
 

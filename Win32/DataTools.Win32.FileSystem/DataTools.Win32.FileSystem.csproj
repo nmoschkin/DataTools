@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1005</AssemblyVersion>
-    <FileVersion>8.0.0.1005</FileVersion>
+    <AssemblyVersion>8.0.0.1026</AssemblyVersion>
+    <FileVersion>8.0.0.1026</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1005</Version>
+    <Version>8.0.0.1026</Version>
     <Product>DataTools Win32 File System and Shell Library</Product>
     <Description>DataTools Win32 File System and Shell Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -15,14 +15,20 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64</Platforms>
-    <SignAssembly>False</SignAssembly>
+    <SignAssembly>True</SignAssembly>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>DataTools.Win32.FileSystem</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1004</PreviousVersion>
+    <PreviousVersion>8.0.0.1025</PreviousVersion>
+    <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="FileSystem\DirectoryObject_old.cs" />
+    <Compile Remove="FileSystem\FileObject_old.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
@@ -38,8 +44,8 @@
     <Optimize>True</Optimize>
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
-    <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
-    <Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
-    <Exec Command="post-build-tool /d ." />
+    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <!-- <Exec Command="post-build-tool /d ." /> -->
   </Target>
 </Project>

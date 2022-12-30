@@ -43,10 +43,10 @@ namespace DataTools.Shell.Native
         HResult GetPropertyType(ref VarEnum pvartype);
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         [PreserveSig]
-        HResult GetDisplayName(ref nint ppszName);
+        HResult GetDisplayName(ref IntPtr ppszName);
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        HResult GetEditInvitation(ref nint ppszInvite);
+        HResult GetEditInvitation(ref IntPtr ppszInvite);
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetTypeFlags([In] PropertyTypeOptions mask, ref PropertyTypeOptions ppdtFlags);
@@ -74,7 +74,7 @@ namespace DataTools.Shell.Native
         HResult GetSortDescription(ref PropertySortDescription psd);
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        HResult GetSortDescriptionLabel([In] bool fDescending, ref nint ppszDescription);
+        HResult GetSortDescriptionLabel([In] bool fDescending, ref IntPtr ppszDescription);
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetAggregationType(ref PropertyAggregationType paggtype);

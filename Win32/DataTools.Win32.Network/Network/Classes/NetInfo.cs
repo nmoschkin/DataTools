@@ -28,46 +28,46 @@ namespace DataTools.Win32.Network
         private static extern bool GetUserNameEx(ExtendedNameFormat NameFormat, [MarshalAs(UnmanagedType.LPWStr)] string lpNameBuffer, ref int lpnSize);
 
         [DllImport("Secur32.dll", EntryPoint = "GetUserNameExW", CharSet = CharSet.Unicode)]
-        private static extern bool GetUserNameEx(ExtendedNameFormat NameFormat, nint lpNameBuffer, ref int lpnSize);
+        private static extern bool GetUserNameEx(ExtendedNameFormat NameFormat, IntPtr lpNameBuffer, ref int lpnSize);
 
         [DllImport("advapi32.dll", EntryPoint = "GetUserNameW", CharSet = CharSet.Unicode)]
-        private static extern bool GetUserName(nint lpNameBuffer, ref int lpnSize);
+        private static extern bool GetUserName(IntPtr lpNameBuffer, ref int lpnSize);
 
         [DllImport("netapi32.dll")]
         private static extern NET_API_STATUS NetUserGetInfo([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string username, int level, ref MemPtr bufptr);
 
         [DllImport("netapi32.dll", EntryPoint = "NetServerEnum", CharSet = CharSet.Unicode)]
-        private static extern NET_API_STATUS NetServerEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ServerTypes serverType, [MarshalAs(UnmanagedType.LPWStr)] string domain, ref nint resume_handle);
+        private static extern NET_API_STATUS NetServerEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ServerTypes serverType, [MarshalAs(UnmanagedType.LPWStr)] string domain, ref IntPtr resume_handle);
 
         [DllImport("netapi32.dll", EntryPoint = "NetServerGetInfo", CharSet = CharSet.Unicode)]
         private static extern NET_API_STATUS NetServerGetInfo([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr);
 
         [DllImport("netapi32.dll", EntryPoint = "NetLocalGroupEnum", CharSet = CharSet.Unicode)]
-        private static extern NET_API_STATUS NetLocalGroupEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
+        private static extern NET_API_STATUS NetLocalGroupEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref IntPtr resume_handle);
 
         [DllImport("netapi32.dll", EntryPoint = "NetGroupEnum", CharSet = CharSet.Unicode)]
-        private static extern NET_API_STATUS NetGroupEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
+        private static extern NET_API_STATUS NetGroupEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref IntPtr resume_handle);
 
         [DllImport("netapi32.dll", EntryPoint = "NetUserEnum", CharSet = CharSet.Unicode)]
-        private static extern NET_API_STATUS NetUserEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, int filter, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint resume_handle);
+        private static extern NET_API_STATUS NetUserEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, int filter, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref IntPtr resume_handle);
 
         [DllImport("netapi32.dll", EntryPoint = "NetUserEnum", CharSet = CharSet.Unicode)]
-        private static extern NET_API_STATUS NetUserEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, int filter, out NetworkMemPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, ref nint resume_handle);
+        private static extern NET_API_STATUS NetUserEnum([MarshalAs(UnmanagedType.LPWStr)] string servername, int level, int filter, out NetworkMemPtr bufptr, int prefmaxlen, out int entriesread, out int totalentries, ref IntPtr resume_handle);
 
         [DllImport("netapi32.dll")]
-        private static extern NET_API_STATUS NetApiBufferFree(nint buffer);
+        private static extern NET_API_STATUS NetApiBufferFree(IntPtr buffer);
 
         [DllImport("netapi32.dll")]
-        private static extern NET_API_STATUS NetApiBufferAllocate(int bytecount, ref nint buffer);
+        private static extern NET_API_STATUS NetApiBufferAllocate(int bytecount, ref IntPtr buffer);
 
         [DllImport("Netapi32.dll", CharSet = CharSet.Unicode)]
-        private static extern NET_API_STATUS NetGetJoinInformation(string lpServer, ref nint lpNameBuffer, ref NetworkJoinStatus bufferType);
+        private static extern NET_API_STATUS NetGetJoinInformation(string lpServer, ref IntPtr lpNameBuffer, ref NetworkJoinStatus bufferType);
 
         [DllImport("netapi32.dll")]
-        private static extern NET_API_STATUS NetGroupGetUsers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string groupname, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint ResumeHandle);
+        private static extern NET_API_STATUS NetGroupGetUsers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string groupname, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref IntPtr ResumeHandle);
 
         [DllImport("netapi32.dll")]
-        private static extern NET_API_STATUS NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string groupname, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref nint ResumeHandle);
+        private static extern NET_API_STATUS NetLocalGroupGetMembers([MarshalAs(UnmanagedType.LPWStr)] string servername, [MarshalAs(UnmanagedType.LPWStr)] string groupname, int level, ref MemPtr bufptr, int prefmaxlen, ref int entriesread, ref int totalentries, ref IntPtr ResumeHandle);
 
         /// <summary>
         /// Return the current user's full display name
@@ -135,7 +135,7 @@ namespace DataTools.Win32.Network
             int i;
             int c;
 
-            var inul = new nint();
+            var inul = new IntPtr();
 
             try
             {
@@ -212,7 +212,7 @@ namespace DataTools.Win32.Network
             MemPtr adv;
             GroupInfo2[] grp;
 
-            var inul = new nint();
+            var inul = new IntPtr();
 
             try
             {
@@ -261,7 +261,7 @@ namespace DataTools.Win32.Network
             MemPtr adv;
             LocalGroupInfo1[] grp;
 
-            var inul = new nint();
+            var inul = new IntPtr();
 
             try
             {
@@ -315,7 +315,7 @@ namespace DataTools.Win32.Network
 
             try
             {
-                var inul = new nint();
+                var inul = new IntPtr();
 
                 if (NetGroupGetUsers(computer, group, 0, ref mm, -1, ref cb, ref cbt, ref inul) == NET_API_STATUS.NERR_Success)
                 {
@@ -371,7 +371,7 @@ namespace DataTools.Win32.Network
 
             try
             {
-                var inul = new nint();
+                var inul = new IntPtr();
                 if (NetLocalGroupGetMembers(computer, group, 1, ref mm, -1, ref cb, ref cbt, ref inul) == NET_API_STATUS.NERR_Success)
                 {
                     if (cb == 0)
@@ -472,7 +472,7 @@ namespace DataTools.Win32.Network
                     //Interaction.MsgBox(ex.Message + "\r\n" + "\r\n" + "Stack Trace: " + ex.StackTrace, MsgBoxStyle.Exclamation);
                 }
 
-                var inul = new nint();
+                var inul = new IntPtr();
                 var err = NetUserEnum(machine, 11, 0, out NetworkMemPtr rh, -1, out er, out te, ref inul);
 
                 if (err == NET_API_STATUS.NERR_Success)
@@ -484,7 +484,7 @@ namespace DataTools.Win32.Network
                     for (int i = 0; i < te; i++)
                     {
                         usas[i] = buff.ToStruct<UserInfo11>();
-                        usas[i].LogonHours = nint.Zero;
+                        usas[i].LogonHours = IntPtr.Zero;
 
                         buff += cb;
                     }
@@ -508,7 +508,7 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         public static UserInfo24[] EnumUsers24(string machine = null)
         {
-            MemPtr rh = nint.Zero;
+            MemPtr rh = IntPtr.Zero;
 
             try
             {

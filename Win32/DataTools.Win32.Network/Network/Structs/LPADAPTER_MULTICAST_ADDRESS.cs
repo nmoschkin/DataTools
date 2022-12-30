@@ -32,7 +32,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
+                if (Handle == IntPtr.Zero)
                     return null;
                 int c = 0;
                 var mx = this;
@@ -44,7 +44,7 @@ namespace DataTools.Win32.Network
                     mx = mx.Next;
                     c += 1;
                 }
-                while (mx.Handle.Handle != nint.Zero);
+                while (mx.Handle.Handle != IntPtr.Zero);
                 return ac;
             }
         }
@@ -53,7 +53,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
+                if (Handle == IntPtr.Zero)
                     return default;
                 return Struct.Next;
             }
@@ -61,7 +61,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Handle.Handle == nint.Zero)
+            if (Handle.Handle == IntPtr.Zero)
                 return "NULL";
             return "" + IPAddress.ToString() + " (" + AddressFamily.ToString() + ")";
         }
@@ -70,7 +70,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
+                if (Handle == IntPtr.Zero)
                     return null;
                 return Struct.Address.lpSockaddr.IPAddress;
             }
@@ -80,14 +80,14 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero) return default;
+                if (Handle == IntPtr.Zero) return default;
                 return ToAddress();
             }
         }
 
         public ADAPTER_MULTICAST_ADDRESS ToAddress()
         {
-            if (Handle == nint.Zero) return default;
+            if (Handle == IntPtr.Zero) return default;
             return Handle.ToStruct<ADAPTER_MULTICAST_ADDRESS>();
         }
 
@@ -100,19 +100,19 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero) return AddressFamily.AfUnspecified;
+                if (Handle == IntPtr.Zero) return AddressFamily.AfUnspecified;
                 return Struct.Address.lpSockaddr.AddressFamily;
             }
         }
 
-        public static implicit operator LPADAPTER_MULTICAST_ADDRESS(nint operand)
+        public static implicit operator LPADAPTER_MULTICAST_ADDRESS(IntPtr operand)
         {
             var a = new LPADAPTER_MULTICAST_ADDRESS();
             a.Handle = operand;
             return a;
         }
 
-        public static implicit operator nint(LPADAPTER_MULTICAST_ADDRESS operand)
+        public static implicit operator IntPtr(LPADAPTER_MULTICAST_ADDRESS operand)
         {
             return operand.Handle;
         }

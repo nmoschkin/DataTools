@@ -2,12 +2,17 @@
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: System file association utility classes.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
+
+using DataTools.Essentials.SortedLists;
+using DataTools.Shell.Native;
+
+using Microsoft.Win32;
 
 using System;
 using System.Collections.Generic;
@@ -16,16 +21,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using DataTools.Win32;
-using DataTools.Shell.Native;
-using Microsoft.Win32;
-using DataTools.Essentials.SortedLists;
+using System.Threading.Tasks;
 
 namespace DataTools.Desktop
 {
-
-
-
     /// <summary>
     /// Represents a registered file-type handler program.
     /// </summary>
@@ -191,7 +190,7 @@ namespace DataTools.Desktop
         /// <param name="handler"></param>
         internal void Refresh(IAssocHandler handler)
         {
-            string? pth = null;
+            string pth = null;
 
             int idx = 0;
 
@@ -317,7 +316,7 @@ namespace DataTools.Desktop
 
         private bool disposedValue; // To detect redundant calls
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void Dispose(bool disposing)
         {
@@ -338,7 +337,7 @@ namespace DataTools.Desktop
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
+
         public override string ToString()
         {
             return UIName;
@@ -352,7 +351,6 @@ namespace DataTools.Desktop
 
     public class UIHandlerEnumEventArgs : EventArgs
     {
-
         public UIHandler Handler { get; private set; }
 
         public UIHandlerEnumEventArgs(UIHandler handler)
@@ -426,15 +424,15 @@ namespace DataTools.Desktop
     public sealed class SystemFileType : INotifyPropertyChanged, IDisposable
     {
         private System.Collections.ObjectModel.ObservableCollection<UIHandler> handlers = new System.Collections.ObjectModel.ObservableCollection<UIHandler>();
-        private AllSystemFileTypes? parent;
+        private AllSystemFileTypes parent;
 
         private string ext;
-        private string? desc;
+        private string desc;
 
-        private Icon? defaultIcon;
-        private Bitmap? defaultImage;
+        private Icon defaultIcon;
+        private Bitmap defaultImage;
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
         /// Gets the size of the file icon.
@@ -452,7 +450,7 @@ namespace DataTools.Desktop
         /// Returns the default icon.
         /// </summary>
         /// <returns></returns>
-        public Icon? DefaultIcon
+        public Icon DefaultIcon
         {
             get
             {
@@ -476,7 +474,7 @@ namespace DataTools.Desktop
             {
                 if (defaultImage is null)
                     return PreferredHandler.Image;
-               
+
                 return defaultImage;
             }
 
@@ -490,7 +488,7 @@ namespace DataTools.Desktop
         /// Returns the parent object.
         /// </summary>
         /// <returns></returns>
-        public AllSystemFileTypes? Parent
+        public AllSystemFileTypes Parent
         {
             get
             {
@@ -507,7 +505,7 @@ namespace DataTools.Desktop
         /// Returns the description of the file extension.
         /// </summary>
         /// <returns></returns>
-        public string? Description
+        public string Description
         {
             get
             {
@@ -599,10 +597,10 @@ namespace DataTools.Desktop
         /// <param name="parent">The parent <see cref="AllSystemFileTypes"/> object.</param>
         /// <param name="size">The default icon size.</param>
         /// <returns></returns>
-        public static SystemFileType? FromExtension(string ext, AllSystemFileTypes? parent = null, StandardIcons size = StandardIcons.Icon48)
+        public static SystemFileType FromExtension(string ext, AllSystemFileTypes parent = null, StandardIcons size = StandardIcons.Icon48)
         {
             var c = new SystemFileType(ext);
-            
+
             if (parent is object)
                 c.Parent = parent;
 
@@ -625,7 +623,7 @@ namespace DataTools.Desktop
         /// <param name="ext">The file extension.</param>
         /// <param name="size">The default icon size.</param>
         /// <returns></returns>
-        public static Bitmap? ImageFromExtension(string ext, StandardIcons size = StandardIcons.Icon48)
+        public static Bitmap ImageFromExtension(string ext, StandardIcons size = StandardIcons.Icon48)
         {
             var sft = FromExtension(ext, size: size);
 
@@ -644,7 +642,6 @@ namespace DataTools.Desktop
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         internal bool Populate(IAssocHandler[] assoc = null, StandardIcons size = StandardIcons.Icon48)
         {
-
             if (assoc is null)
                 assoc = NativeShell.EnumFileHandlers(ext);
 
@@ -682,11 +679,11 @@ namespace DataTools.Desktop
             try
             {
                 var pk = Registry.ClassesRoot.OpenSubKey(ext);
-                RegistryKey? pk2 = null;
+                RegistryKey pk2 = null;
 
                 if (pk != null)
                 {
-                    var pkv = (string?)(pk.GetValue(null));
+                    var pkv = (string)(pk.GetValue(null));
 
                     if (pkv != null)
                     {
@@ -694,22 +691,22 @@ namespace DataTools.Desktop
 
                         if (pk2 is object)
                         {
-                            string? d = (string?)(pk2.GetValue(null));
+                            string d = (string)(pk2.GetValue(null));
                             if (string.Equals(d, desc) == false)
                             {
-                                desc = (string?)(pk2.GetValue(null));
+                                desc = (string)(pk2.GetValue(null));
                                 OnPropertyChanged("Description");
                             }
 
                             pk2.Close();
-                          
+
                             pk2 = Registry.ClassesRoot.OpenSubKey(pkv + @"\DefaultIcon");
 
                             pk.Close();
 
                             if (pk2 is object)
                             {
-                                d = (string?)(pk2.GetValue(null));
+                                d = (string)(pk2.GetValue(null));
                                 pk2.Close();
 
                                 if (d != null)
@@ -739,9 +736,7 @@ namespace DataTools.Desktop
                                 }
                             }
                         }
-
                     }
-
                 }
 
                 if (desc is null || string.IsNullOrEmpty(desc))
@@ -761,8 +756,6 @@ namespace DataTools.Desktop
             return Description;
         }
 
-
-        
         private bool disposedValue; // To detect redundant calls
 
         // IDisposable
@@ -789,7 +782,6 @@ namespace DataTools.Desktop
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        
 
         private void OnPropertyChanged([CallerMemberName] string e = null)
         {
@@ -797,7 +789,6 @@ namespace DataTools.Desktop
         }
     }
 
-    
     /// <summary>
     /// Compares type SystemFileType objects by extension
     /// </summary>
@@ -820,7 +811,6 @@ namespace DataTools.Desktop
         }
     }
 
-    
     /// <summary>
     /// Reprents a list of all registered file types on the system, and their handlers.
     /// </summary>
@@ -828,15 +818,17 @@ namespace DataTools.Desktop
     {
         private List<SystemFileType> fileTypes = new List<SystemFileType>();
         private List<UIHandler> handlers = new List<UIHandler>();
-        
+
         private StandardIcons _IconSize = StandardIcons.Icon48;
 
         public event PopulatingEventHandler Populating;
+
         public event PopulatingUIHandlersEventHandler PopulatingUIHandlers;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public delegate void PopulatingEventHandler(object sender, FileTypeEnumEventArgs e);
+
         public delegate void PopulatingUIHandlersEventHandler(object sender, UIHandlerEnumEventArgs e);
 
         /// <summary>
@@ -901,8 +893,8 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         internal UIHandler HandlerFromAssocHandler(IAssocHandler assoc, string ext)
         {
-            UIHandler? newHandler = null;
-            string? exepath = null;
+            UIHandler newHandler = null;
+            string exepath = null;
 
             assoc.GetName(out exepath);
 
@@ -938,12 +930,12 @@ namespace DataTools.Desktop
             NativeShell.ClearHandlerCache();
 
             var n = Registry.ClassesRoot.GetSubKeyNames();
-            SystemFileType? sf;
-            
+            SystemFileType sf;
+
             int x = 0;
             int y;
             var sn2 = new List<string>();
-            
+
             foreach (var sn in n)
             {
                 if (sn.Substring(0, 1) == ".")
@@ -955,11 +947,11 @@ namespace DataTools.Desktop
             y = sn2.Count;
 
             foreach (var sn in sn2)
-            {                
-                if ((sn is not object)) continue;
+            {
+                if ((sn != null)) continue;
 
-                sf = SystemFileType.FromExtension(sn, this);                
-                
+                sf = SystemFileType.FromExtension(sn, this);
+
                 if (sf is object)
                 {
                     fileTypes.Add(sf);
@@ -967,15 +959,14 @@ namespace DataTools.Desktop
                     if (fireEvent)
                     {
                         // If fireEvent AndAlso x Mod 10 = 0 Then
-                        Populating?.Invoke(this, new FileTypeEnumEventArgs(sf, x, y));
+                        Populating.Invoke(this, new FileTypeEnumEventArgs(sf, x, y));
                         Task.Yield();
                     }
                 }
             }
 
-
             QuickSort.Sort(fileTypes, new SysFileTypeComp().Compare);
-            QuickSort.Sort(handlers, new UIHandlerComp().Compare);  
+            QuickSort.Sort(handlers, new UIHandlerComp().Compare);
 
             OnPropertyChanged(nameof(UIHandlers));
             OnPropertyChanged(nameof(FileTypes));
@@ -983,7 +974,6 @@ namespace DataTools.Desktop
             return x;
         }
 
-        
         private bool disposedValue; // To detect redundant calls
 
         private void Dispose(bool disposing)
@@ -1012,5 +1002,4 @@ namespace DataTools.Desktop
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(e));
         }
     }
-
 }

@@ -38,7 +38,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
+                if (Handle == IntPtr.Zero)
                     return null;
                 int c = 0;
                 var mx = this;
@@ -50,7 +50,7 @@ namespace DataTools.Win32.Network
                     mx = mx.Next;
                     c += 1;
                 }
-                while (mx.Handle.Handle != nint.Zero);
+                while (mx.Handle.Handle != IntPtr.Zero);
                 return ac;
             }
         }
@@ -59,7 +59,7 @@ namespace DataTools.Win32.Network
         {
             get
             {
-                if (Handle == nint.Zero)
+                if (Handle == IntPtr.Zero)
                     return default;
                 return Struct.Next;
             }
@@ -67,7 +67,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Handle.Handle == nint.Zero)
+            if (Handle.Handle == IntPtr.Zero)
                 return "NULL";
             return Struct.String;
         }
@@ -77,7 +77,7 @@ namespace DataTools.Win32.Network
             get
             {
                 IP_ADAPTER_DNS_SUFFIX StructRet = default;
-                if (Handle == nint.Zero)
+                if (Handle == IntPtr.Zero)
                     return default;
                 StructRet = ToStruct();
                 return StructRet;
@@ -87,7 +87,7 @@ namespace DataTools.Win32.Network
         public IP_ADAPTER_DNS_SUFFIX ToStruct()
         {
             IP_ADAPTER_DNS_SUFFIX ToStructRet = default;
-            if (Handle == nint.Zero)
+            if (Handle == IntPtr.Zero)
                 return default;
             ToStructRet = Handle.ToStruct<IP_ADAPTER_DNS_SUFFIX>();
             return ToStructRet;
@@ -98,14 +98,14 @@ namespace DataTools.Win32.Network
             Handle.Free();
         }
 
-        public static implicit operator LPIP_ADAPTER_DNS_SUFFIX(nint operand)
+        public static implicit operator LPIP_ADAPTER_DNS_SUFFIX(IntPtr operand)
         {
             var a = new LPIP_ADAPTER_DNS_SUFFIX();
             a.Handle = operand;
             return a;
         }
 
-        public static implicit operator nint(LPIP_ADAPTER_DNS_SUFFIX operand)
+        public static implicit operator IntPtr(LPIP_ADAPTER_DNS_SUFFIX operand)
         {
             return operand.Handle;
         }

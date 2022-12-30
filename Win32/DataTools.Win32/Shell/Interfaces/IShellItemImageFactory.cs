@@ -38,6 +38,6 @@ namespace DataTools.Shell.Native
         HResult GetImage(
         [In, MarshalAs(UnmanagedType.Struct)] Size size,
         [In] SIIGBF flags,
-        [Out] out nint phbm);
+        [Out] out IntPtr phbm);
     }
 }

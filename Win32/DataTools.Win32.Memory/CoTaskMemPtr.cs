@@ -7,7 +7,7 @@ namespace DataTools.Win32.Memory
     /// </summary>
     public sealed class CoTaskMemPtr : DataTools.Memory.CoTaskMemPtr
     {
-        public static readonly nint ProcessHeap = Native.GetProcessHeap();
+        public static readonly IntPtr ProcessHeap = Native.GetProcessHeap();
 
         protected override long GetNativeSize()
         {
@@ -19,11 +19,11 @@ namespace DataTools.Win32.Memory
             return true;
         }
 
-        protected override void InternalDoZeroMem(nint startptr, long length)
+        protected override void InternalDoZeroMem(IntPtr startptr, long length)
         {
             unsafe
             {
-                Native.ZeroMemory((void*)startptr, (nint)length);
+                Native.ZeroMemory((void*)startptr, length);
             }
         }
     }

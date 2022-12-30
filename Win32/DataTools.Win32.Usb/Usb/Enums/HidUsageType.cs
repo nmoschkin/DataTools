@@ -14,6 +14,7 @@ using DataTools.Essentials.Converters;
 
 using Newtonsoft.Json;
 
+using System;
 using System.ComponentModel;
 
 namespace DataTools.Win32.Usb

@@ -13,11 +13,10 @@
 using DataTools.Win32.Memory;
 
 using System;
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-
-[assembly: InternalsVisibleTo("TLModel")]
 
 namespace DataTools.Win32.Usb
 {
@@ -27,44 +26,44 @@ namespace DataTools.Win32.Usb
     public static class UsbLibHelpers
     {
         [DllImport("hid.dll")]
-        internal static extern bool HidD_GetProductString(nint HidDeviceObject, nint Buffer, int BufferLength);
+        internal static extern bool HidD_GetProductString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidD_GetInputReport(nint HidDeviceObject, nint ReportBuffer, int ReportBufferLength);
+        internal static extern bool HidD_GetInputReport(IntPtr HidDeviceObject, IntPtr ReportBuffer, int ReportBufferLength);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidD_GetAttributes(nint HidDeviceObject, out HidAttributes attributes);
+        internal static extern bool HidD_GetAttributes(IntPtr HidDeviceObject, out HidAttributes attributes);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidP_GetCaps(nint ppd, out HidCaps attributes);
+        internal static extern bool HidP_GetCaps(IntPtr ppd, out HidCaps attributes);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidD_GetFeature(nint HidDeviceObject, nint Buffer, int BufferLength);
+        internal static extern bool HidD_GetFeature(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
 
         [DllImport("hid.dll", EntryPoint = "HidD_GetFeature")]
-        internal static extern bool HidD_GetFeatureL(nint HidDeviceObject, ref long Buffer, int BufferLength);
+        internal static extern bool HidD_GetFeatureL(IntPtr HidDeviceObject, ref long Buffer, int BufferLength);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidD_SetFeature(nint HidDeviceObject, nint Buffer, int BufferLength);
+        internal static extern bool HidD_SetFeature(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidD_GetManufacturerString(nint HidDeviceObject, nint Buffer, int BufferLength);
+        internal static extern bool HidD_GetManufacturerString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidD_GetSerialNumberString(nint HidDeviceObject, nint Buffer, int BufferLength);
+        internal static extern bool HidD_GetSerialNumberString(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidD_GetPhysicalDescriptor(nint HidDeviceObject, nint Buffer, int BufferLength);
+        internal static extern bool HidD_GetPhysicalDescriptor(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidD_GetPreparsedData(nint HidDeviceObject, ref nint PreparsedData);
+        internal static extern bool HidD_GetPreparsedData(IntPtr HidDeviceObject, ref IntPtr PreparsedData);
 
         [DllImport("hid.dll")]
-        internal static extern bool HidD_FreePreparsedData(nint PreparsedData);
+        internal static extern bool HidD_FreePreparsedData(IntPtr PreparsedData);
 
         [DllImport("hid.dll", CharSet = CharSet.Unicode)]
         internal static extern bool HidD_GetIndexedString(
-          [In] nint HidDeviceObject,
+          [In] IntPtr HidDeviceObject,
           [In] int StringIndex,
 
           StringBuilder Buffer,
@@ -73,10 +72,10 @@ namespace DataTools.Win32.Usb
 
         [DllImport("hid.dll", CharSet = CharSet.Unicode)]
         internal static extern bool HidD_GetIndexedString(
-          [In] nint HidDeviceObject,
+          [In] IntPtr HidDeviceObject,
           [In] int StringIndex,
 
-          nint Buffer,
+          IntPtr Buffer,
           [In] int BufferLength
         );
 
@@ -85,15 +84,15 @@ namespace DataTools.Win32.Usb
           HidReportType ReportType,
           ref HidPValueCaps[] ValueCaps,
           ref ushort ValueCapsLength,
-          nint PreparsedData
+          IntPtr PreparsedData
         );
 
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetValueCaps(
           HidReportType ReportType,
-          nint ValueCaps,
+          IntPtr ValueCaps,
           ref ushort ValueCapsLength,
-          nint PreparsedData
+          IntPtr PreparsedData
         );
 
         [DllImport("hid.dll")]
@@ -101,15 +100,15 @@ namespace DataTools.Win32.Usb
           HidReportType ReportType,
           ref HidPButtonCaps[] ValueCaps,
           ref ushort ValueCapsLength,
-          nint PreparsedData
+          IntPtr PreparsedData
         );
 
         [DllImport("hid.dll")]
         internal static extern bool HidP_GetButtonCaps(
           HidReportType ReportType,
-          nint ValueCaps,
+          IntPtr ValueCaps,
           ref ushort ValueCapsLength,
-          nint PreparsedData
+          IntPtr PreparsedData
         );
 
         [DllImport("hid.dll")]
@@ -117,10 +116,10 @@ namespace DataTools.Win32.Usb
           HidReportType ReportType,
           HidUsagePage UsagePage,
           ushort LinkCollection,
-          nint UsageList,
+          IntPtr UsageList,
           [In, Out] ref uint UsageLength,
-          nint PreparsedData,
-          nint Report,
+          IntPtr PreparsedData,
+          IntPtr Report,
           uint ReportLength
         );
 
@@ -131,8 +130,8 @@ namespace DataTools.Win32.Usb
           ushort LinkCollection,
           ushort Usage,
           [Out] out long UsageValue,
-          nint PreparsedData,
-          nint Report,
+          IntPtr PreparsedData,
+          IntPtr Report,
           uint ReportLength
         );
 
@@ -146,7 +145,7 @@ namespace DataTools.Win32.Usb
             uint ulen;
             var output = new List<(ushort, ushort)>();
 
-            nint hhid;
+            IntPtr hhid;
 
             var caps = device.HidCaps;
             var ch = false;
@@ -159,7 +158,7 @@ namespace DataTools.Win32.Usb
 
             hhid = device.DangerousGetHidDeviceHandle();
 
-            if (hhid == 0)
+            if ((int)hhid == 0)
             {
                 return new (ushort, ushort)[0];
             }
@@ -223,7 +222,7 @@ namespace DataTools.Win32.Usb
         {
             var output = new List<(ushort, ushort, HidFeatureValue)>();
 
-            nint hhid;
+            IntPtr hhid;
 
             var caps = device.HidCaps;
             var ch = false;
@@ -236,7 +235,7 @@ namespace DataTools.Win32.Usb
 
             hhid = device.DangerousGetHidDeviceHandle();
 
-            if (hhid == 0)
+            if ((int)hhid == 0)
             {
                 return new (ushort, ushort, HidFeatureValue)[0];
             }
@@ -289,7 +288,7 @@ namespace DataTools.Win32.Usb
         {
             ushort ncaps = 0;
 
-            HidP_GetButtonCaps(reportType, nint.Zero, ref ncaps, ppd);
+            HidP_GetButtonCaps(reportType, IntPtr.Zero, ref ncaps, ppd);
 
             if (ncaps <= 0) return new HidPButtonCaps[0];
 
@@ -320,7 +319,7 @@ namespace DataTools.Win32.Usb
         {
             ushort ncaps = 0;
 
-            HidP_GetValueCaps(reportType, nint.Zero, ref ncaps, ppd);
+            HidP_GetValueCaps(reportType, IntPtr.Zero, ref ncaps, ppd);
 
             if (ncaps <= 0) return new HidPValueCaps[0];
 
@@ -351,18 +350,18 @@ namespace DataTools.Win32.Usb
         /// <remarks>
         /// If you provide a device handle, you must free the resource, yourself.
         /// </remarks>
-        public static bool PopulateDeviceCaps(HidDeviceInfo device, nint? hHid = null)
+        public static bool PopulateDeviceCaps(HidDeviceInfo device, IntPtr? hHid = null)
         {
             try
             {
                 var hhid = hHid ?? HidFeatures.OpenHid(device);
-                if (hhid == 0) return false;
+                if ((int)hhid == 0) return false;
 
                 HidAttributes attr;
 
                 HidCaps caps;
 
-                if (hhid == (nint)(-1)) return false;
+                if (hhid == (IntPtr)(-1)) return false;
 
                 using (var ppd = new PreparsedData(hhid))
                 {
@@ -371,21 +370,21 @@ namespace DataTools.Win32.Usb
 
                     device.HidCaps = caps;
 
-                    HidPButtonCaps[]? featBtn;
-                    HidPButtonCaps[]? inBtn;
-                    HidPButtonCaps[]? outBtn;
+                    HidPButtonCaps[] featBtn;
+                    HidPButtonCaps[] inBtn;
+                    HidPButtonCaps[] outBtn;
 
-                    HidPValueCaps[]? featVal;
-                    HidPValueCaps[]? inVal;
-                    HidPValueCaps[]? outVal;
+                    HidPValueCaps[] featVal;
+                    HidPValueCaps[] inVal;
+                    HidPValueCaps[] outVal;
 
-                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? fbmap = null;
-                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? ibmap = null;
-                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? obmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> fbmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> ibmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> obmap = null;
 
-                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? fvmap = null;
-                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? ivmap = null;
-                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? ovmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> fvmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> ivmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> ovmap = null;
 
                     featBtn = GetButtonCaps(HidReportType.Feature, ppd);
                     inBtn = GetButtonCaps(HidReportType.Input, ppd);
@@ -477,7 +476,7 @@ namespace DataTools.Win32.Usb
             return true;
         }
 
-        private static void ExpandCaps(ref HidPValueCaps[]? data)
+        private static void ExpandCaps(ref HidPValueCaps[] data)
         {
             if (data == null) return;
 
@@ -505,7 +504,7 @@ namespace DataTools.Win32.Usb
             data = l.ToArray();
         }
 
-        private static void ExpandCaps(ref HidPButtonCaps[]? data)
+        private static void ExpandCaps(ref HidPButtonCaps[] data)
         {
             if (data == null) return;
 

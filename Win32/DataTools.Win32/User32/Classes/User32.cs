@@ -211,24 +211,24 @@ namespace DataTools.Win32
         public const int WM_MOUSELAST = 0x20E;
         public const int WHEEL_DELTA = 120;
 
-        public static short GET_WHEEL_DELTA_WPARAM(nint wParam)
+        public static short GET_WHEEL_DELTA_WPARAM(IntPtr wParam)
         {
             return (short)(wParam.ToInt32() >> 16);
         }
 
         public const uint WHEEL_PAGESCROLL = uint.MaxValue;
 
-        public static short GET_KEYSTATE_WPARAM(nint wParam)
+        public static short GET_KEYSTATE_WPARAM(IntPtr wParam)
         {
             return (short)(wParam.ToInt32() & 0xFFFF);
         }
 
-        public static short GET_NCHITTEST_WPARAM(nint wParam)
+        public static short GET_NCHITTEST_WPARAM(IntPtr wParam)
         {
             return (short)(wParam.ToInt32() & 0xFFFF);
         }
 
-        public static short GET_XBUTTON_WPARAM(nint wParam)
+        public static short GET_XBUTTON_WPARAM(IntPtr wParam)
         {
             return (short)(wParam.ToInt32() >> 16);
         }
@@ -384,7 +384,7 @@ namespace DataTools.Win32
         public const int SC_ICON = SC_MINIMIZE;
         public const int SC_ZOOM = SC_MAXIMIZE;
 
-        public static int GET_SC_WPARAM(nint wParam)
+        public static int GET_SC_WPARAM(IntPtr wParam)
         {
             return wParam.ToInt32() & 0xFFF0;
         }
@@ -596,31 +596,31 @@ namespace DataTools.Win32
         public const int LVM_SETUNICODEFORMAT = CCM_SETUNICODEFORMAT;
         public const int LVM_GETUNICODEFORMAT = CCM_GETUNICODEFORMAT;
 
-        public static nint ListView_SetUnicodeFormat(nint hwnd, int fUnicode)
+        public static IntPtr ListView_SetUnicodeFormat(IntPtr hwnd, int fUnicode)
         {
-            return SendMessage(hwnd, LVM_SETUNICODEFORMAT, fUnicode, nint.Zero);
+            return SendMessage(hwnd, LVM_SETUNICODEFORMAT, fUnicode, IntPtr.Zero);
         }
 
-        public static nint ListView_GetUnicodeFormat(nint hwnd)
+        public static IntPtr ListView_GetUnicodeFormat(IntPtr hwnd)
         {
-            return SendMessage(hwnd, LVM_GETUNICODEFORMAT, nint.Zero, nint.Zero);
+            return SendMessage(hwnd, LVM_GETUNICODEFORMAT, IntPtr.Zero, IntPtr.Zero);
         }
 
         public const int LVM_GETBKCOLOR = LVM_FIRST + 0;
         public const int LVM_SETBKCOLOR = LVM_FIRST + 1;
         public const int LVM_GETIMAGELIST = LVM_FIRST + 2;
 
-        public static Color ListView_SetBkColor(nint hwnd)
+        public static Color ListView_SetBkColor(IntPtr hwnd)
         {
             return Color.FromArgb((int)SendMessage(hwnd, LVM_GETBKCOLOR, 0, 0));
         }
 
-        public static nint ListView_SetBkColor(nint hwnd, Color clrBk)
+        public static IntPtr ListView_SetBkColor(IntPtr hwnd, Color clrBk)
         {
             return SendMessage(hwnd, LVM_SETBKCOLOR, 0, clrBk.ToArgb());
         }
 
-        public static nint ListView_GetImageList(nint hwnd, int iImageList)
+        public static IntPtr ListView_GetImageList(IntPtr hwnd, int iImageList)
         {
             return SendMessage(hwnd, LVM_GETIMAGELIST, iImageList, 0);
         }
@@ -631,16 +631,16 @@ namespace DataTools.Win32
         public const int LVSIL_GROUPHEADER = 3;
         public const int LVM_SETIMAGELIST = LVM_FIRST + 3;
 
-        public static nint ListView_SetImageList(nint hwnd, int iImageList, nint hImageList)
+        public static IntPtr ListView_SetImageList(IntPtr hwnd, int iImageList, IntPtr hImageList)
         {
             return SendMessage(hwnd, LVM_SETIMAGELIST, iImageList, hImageList);
         }
 
         public const int LVM_GETITEMCOUNT = LVM_FIRST + 4;
 
-        public static nint ListView_GetItemCount(nint hwnd)
+        public static IntPtr ListView_GetItemCount(IntPtr hwnd)
         {
-            return SendMessage(hwnd, LVM_GETITEMCOUNT, nint.Zero, nint.Zero);
+            return SendMessage(hwnd, LVM_GETITEMCOUNT, IntPtr.Zero, IntPtr.Zero);
         }
 
         public const int LVIF_TEXT = 0x1;
@@ -1685,9 +1685,9 @@ namespace DataTools.Win32
         
         
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern nint GetDC(nint hWnd);
+        public static extern IntPtr GetDC(IntPtr hWnd);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int ReleaseDC(nint hWnd, nint hDC);
+        public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
         [DllImport("user32", EntryPoint = "SystemParametersInfoW", CharSet = CharSet.Unicode)]
         public static extern int SystemParametersInfo(int uAction, int uParam, ref object lpvParam, int fuWinIni);
         //[DllImport("user32", EntryPoint = "SystemParametersInfoW", CharSet = CharSet.Unicode)]
@@ -1695,70 +1695,70 @@ namespace DataTools.Win32
 
 
         [DllImport("user32", EntryPoint = "SendMessageW", CharSet = CharSet.Unicode)]
-        public static extern nint SendMessage(nint hWnd, uint wMsg, int wParam, int lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, int wParam, int lParam);
         [DllImport("user32", EntryPoint = "SendMessageW", CharSet = CharSet.Unicode)]
-        public static extern nint SendMessage(nint hWnd, uint wMsg, int wParam, nint lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, int wParam, IntPtr lParam);
         [DllImport("user32", EntryPoint = "SendMessageW", CharSet = CharSet.Unicode)]
-        public static extern nint SendMessage(nint hWnd, uint wMsg, nint wParam, int lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, int lParam);
         [DllImport("user32", EntryPoint = "SendMessageW", CharSet = CharSet.Unicode)]
-        public static extern nint SendMessage(nint hWnd, uint wMsg, nint wParam, nint lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
         [DllImport("user32", EntryPoint = "PostMessageW", CharSet = CharSet.Unicode)]
-        public static extern bool PostMessage(nint hWnd, uint wMsg, nint wParam, nint lParam);
+        public static extern bool PostMessage(IntPtr hWnd, uint wMsg, IntPtr wParam, IntPtr lParam);
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
         public static extern int GetLastError();
         [DllImport("kernel32", EntryPoint = "FormatMessageW", CharSet = CharSet.Unicode)]
-        public static extern int FormatMessage(uint dwFlags, nint lpSource, uint dwMessageId, uint dwLanguageId, nint lpBuffer, uint dwSize, nint va_list);
+        public static extern int FormatMessage(uint dwFlags, IntPtr lpSource, uint dwMessageId, uint dwLanguageId, IntPtr lpBuffer, uint dwSize, IntPtr va_list);
 
         // Executable assembly version functions for 16, 32 and 64 bit binaries.
         [DllImport("version.dll", EntryPoint = "GetFileVersionInfoW", CharSet = CharSet.Unicode)]
-        public static extern bool GetFileVersionInfo([MarshalAs(UnmanagedType.LPTStr)] string lptstrFilename, nint dwHandle, int dwLen, nint lpData);
+        public static extern bool GetFileVersionInfo([MarshalAs(UnmanagedType.LPTStr)] string lptstrFilename, IntPtr dwHandle, int dwLen, IntPtr lpData);
         [DllImport("Version.dll", EntryPoint = "GetFileVersionInfoSizeW", CharSet = CharSet.Unicode)]
-        public static extern uint GetFileVersionInfoSize([MarshalAs(UnmanagedType.LPTStr)] string lptstrFilename, nint lpdwHandle);
+        public static extern uint GetFileVersionInfoSize([MarshalAs(UnmanagedType.LPTStr)] string lptstrFilename, IntPtr lpdwHandle);
         [DllImport("version.dll", EntryPoint = "VerQueryValueW", CharSet = CharSet.Unicode)]
-        public static extern bool VerQueryValue(nint pBlock, [MarshalAs(UnmanagedType.LPTStr)] string lpSubBlock, ref nint lplpVoid, ref uint puInt);
+        public static extern bool VerQueryValue(IntPtr pBlock, [MarshalAs(UnmanagedType.LPTStr)] string lpSubBlock, ref IntPtr lplpVoid, ref uint puInt);
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         public static extern bool GetCursorPos(ref W32POINT lpPoint);
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
-        public static extern bool CloseHandle(nint hObject);
+        public static extern bool CloseHandle(IntPtr hObject);
 
         
         
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern nint LoadLibrary([MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
+        public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern nint GetModuleHandle([MarshalAs(UnmanagedType.LPWStr)] string name);
+        public static extern IntPtr GetModuleHandle([MarshalAs(UnmanagedType.LPWStr)] string name);
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern nint GetProcAddress(nint hModule, [MarshalAs(UnmanagedType.LPWStr)] string lpProcName);
+        public static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPWStr)] string lpProcName);
         [DllImport("kernel32.dll", EntryPoint = "GetProcAddress", SetLastError = true, CharSet = CharSet.Unicode)]
-        public static extern Delegate GetProcAddressDelegate(nint hModule, [MarshalAs(UnmanagedType.LPWStr)] string lpProcName);
+        public static extern Delegate GetProcAddressDelegate(IntPtr hModule, [MarshalAs(UnmanagedType.LPWStr)] string lpProcName);
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern nint FreeLibrary(nint hInst);
+        public static extern IntPtr FreeLibrary(IntPtr hInst);
         [DllImport("user32.dll", SetLastError = true)]
-        public static extern nint LoadImage(nint hInst, [MarshalAs(UnmanagedType.LPWStr)] string lpszName, int uType, int cxDesired, int cyDesired, int fuLoad);
+        public static extern IntPtr LoadImage(IntPtr hInst, [MarshalAs(UnmanagedType.LPWStr)] string lpszName, int uType, int cxDesired, int cyDesired, int fuLoad);
         [DllImport("user32.dll", SetLastError = true)]
-        public static extern nint LoadImage(nint hInst, nint lpszName, int uType, int cxDesired, int cyDesired, int fuLoad);
+        public static extern IntPtr LoadImage(IntPtr hInst, IntPtr lpszName, int uType, int cxDesired, int cyDesired, int fuLoad);
         [DllImport("coredll.dll")]
-        public static extern nint LoadIcon(nint hinst, [MarshalAs(UnmanagedType.LPWStr)] string iconName);
+        public static extern IntPtr LoadIcon(IntPtr hinst, [MarshalAs(UnmanagedType.LPWStr)] string iconName);
 
         
         
         [DllImport("shell32.dll", EntryPoint = "ExtractIconExW", CharSet = CharSet.Unicode)]
-        public static extern int ExtractIconEx([MarshalAs(UnmanagedType.LPTStr)] string lpszFile, int nIconIndex, ref nint phiconLarge, ref nint phiconSmall, uint nIcons);
+        public static extern int ExtractIconEx([MarshalAs(UnmanagedType.LPTStr)] string lpszFile, int nIconIndex, ref IntPtr phiconLarge, ref IntPtr phiconSmall, uint nIcons);
         [DllImport("shell32.dll", EntryPoint = "ExtractIconExW", CharSet = CharSet.Unicode)]
-        public static extern int ExtractIconEx2([MarshalAs(UnmanagedType.LPTStr)] string lpszFile, int nIconIndex, nint phiconLarge, nint phiconSmall, uint nIcons);
+        public static extern int ExtractIconEx2([MarshalAs(UnmanagedType.LPTStr)] string lpszFile, int nIconIndex, IntPtr phiconLarge, IntPtr phiconSmall, uint nIcons);
         [DllImport("ntshrui.dll", EntryPoint = "ShowShareFolderUIW", CharSet = CharSet.Unicode)]
-        public static extern int ShowShareFolderUI(nint hwnd, [MarshalAs(UnmanagedType.LPWStr)] string lpszFolder);
+        public static extern int ShowShareFolderUI(IntPtr hwnd, [MarshalAs(UnmanagedType.LPWStr)] string lpszFolder);
 
         // Public Declare Unicode Function GetCurrentDirectory Lib "kernel32" Alias "GetCurrentDirectoryW" (bLen As Integer, <MarshalAs(UnmanagedType.LPWStr)> ByRef lpszBuffer As String) As Integer
 
-        // Public Declare Unicode Function GetFullPathName Lib "kernel32" Alias "GetFullPathNameW" (<MarshalAs(UnmanagedType.LPWStr)> lpFilename As String, nBufferLength As Integer, lpBuffer As nint, ByRef lpFilepart As nint) As Integer
+        // Public Declare Unicode Function GetFullPathName Lib "kernel32" Alias "GetFullPathNameW" (<MarshalAs(UnmanagedType.LPWStr)> lpFilename As String, nBufferLength As Integer, lpBuffer As IntPtr, ByRef lpFilepart As IntPtr) As Integer
 
         [DllImport("kernel32", EntryPoint = "ReplaceFileW", CharSet = CharSet.Unicode)]
-        public static extern bool ReplaceFile([MarshalAs(UnmanagedType.LPWStr)] string lpReplacedFileName, [MarshalAs(UnmanagedType.LPWStr)] string lpReplacementName, [MarshalAs(UnmanagedType.LPWStr)] string lpBackupFileName, ReplaceFileFlags dwReplaceFlags, nint lpExclude, nint lpReserved);
+        public static extern bool ReplaceFile([MarshalAs(UnmanagedType.LPWStr)] string lpReplacedFileName, [MarshalAs(UnmanagedType.LPWStr)] string lpReplacementName, [MarshalAs(UnmanagedType.LPWStr)] string lpBackupFileName, ReplaceFileFlags dwReplaceFlags, IntPtr lpExclude, IntPtr lpReserved);
         [DllImport("Shell32", CharSet = CharSet.Unicode)]
         public static extern int SHBrowseForFolder(BROWSEINFO bInfo);
         [DllImport("Shell32", EntryPoint = "SHGetSpecialFolderPathW", CharSet = CharSet.Unicode)]
-        public static extern int SHGetSpecialFolderPath(nint hWnd, string lpPath, int nFolder, bool fCreate);
+        public static extern int SHGetSpecialFolderPath(IntPtr hWnd, string lpPath, int nFolder, bool fCreate);
         [DllImport("Shell32", CharSet = CharSet.Unicode)]
         public static extern int SHGetPathFromIDList(int pidl, [MarshalAs(UnmanagedType.LPWStr)] string pszPath);
         [DllImport("shell32.dll", EntryPoint = "ShellExecuteExW", CharSet = CharSet.Unicode)]
@@ -1768,11 +1768,11 @@ namespace DataTools.Win32
         [DllImport("shell32.dll", EntryPoint = "SHGetFileInfoW", CharSet = CharSet.Unicode)]
         public static extern int SHGetFileInfo([MarshalAs(UnmanagedType.LPWStr)] string pszPath, int dwFileAttributes, ref SHFILEINFO psfi, int cbFileInfo, int uFlags);
         [DllImport("shell32.dll", EntryPoint = "SHGetFileInfoW", CharSet = CharSet.Unicode)]
-        public static extern nint SHGetItemInfo(nint pidl, int dwFileAttributes, ref SHFILEINFO psfi, int cbFileInfo, int uFlags);
+        public static extern IntPtr SHGetItemInfo(IntPtr pidl, int dwFileAttributes, ref SHFILEINFO psfi, int cbFileInfo, int uFlags);
         [DllImport("shell32.dll", EntryPoint = "SHFileOperationW", CharSet = CharSet.Unicode)]
         public static extern int SHFileOperation(SHFILEOPSTRUCT lpFileOp);
         [DllImport("shell32.dll", EntryPoint = "SHGetDataFromIDListW", CharSet = CharSet.Unicode)]
-        public static extern int SHGetDataFromIDList([MarshalAs(UnmanagedType.Interface)] object lpFolder, int pidl, int nFormat, nint pv, int cb);
+        public static extern int SHGetDataFromIDList([MarshalAs(UnmanagedType.Interface)] object lpFolder, int pidl, int nFormat, IntPtr pv, int cb);
         [DllImport("shell32.dll", EntryPoint = "#660", CharSet = CharSet.Unicode)]
         public static extern bool FileIconInit([MarshalAs(UnmanagedType.Bool)] bool fRestoreCache);
 
@@ -1780,29 +1780,29 @@ namespace DataTools.Win32
         public static int BrowserLastFolder;
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int CopyImage(nint Handle, int un1, int n1, int n2, int un2);
+        public static extern int CopyImage(IntPtr Handle, int un1, int n1, int n2, int un2);
         [DllImport("comctl32.dll", CharSet = CharSet.Unicode)]
-        public static extern int ImageList_GetImageInfo(nint himl, int i, ref IMAGEINFO pImageInfo);
+        public static extern int ImageList_GetImageInfo(IntPtr himl, int i, ref IMAGEINFO pImageInfo);
         [DllImport("comctl32.dll", CharSet = CharSet.Unicode)]
-        public static extern int ImageList_GetIcon(nint himl, int i, uint flags);
+        public static extern int ImageList_GetIcon(IntPtr himl, int i, uint flags);
         [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
-        public static extern int SHGetImageList(int iImageList, ref Guid riid, ref nint hIml);
+        public static extern int SHGetImageList(int iImageList, ref Guid riid, ref IntPtr hIml);
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        public static extern int DestroyIcon(nint hIcon);
+        public static extern int DestroyIcon(IntPtr hIcon);
 
         
         
-        public delegate nint WndProcDelegate(nint hwnd, uint uMsg, nint wParam, nint lParam);
+        public delegate IntPtr WndProcDelegate(IntPtr hwnd, uint uMsg, IntPtr wParam, IntPtr lParam);
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "SetWindowLongPtrW")]
-        public static extern nint SetWindowLongPtr(nint hWnd, int code, nint value);
+        public static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int code, IntPtr value);
         [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "SetWindowLongPtrW")]
-        public static extern WndProcDelegate SetWindowLongPtr(nint hWnd, int code, WndProcDelegate value);
+        public static extern WndProcDelegate SetWindowLongPtr(IntPtr hWnd, int code, WndProcDelegate value);
 
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
         public static extern bool MoveWindow(
-          nint hWnd,
+          IntPtr hWnd,
           int X,
           int Y,
           int nWidth,
@@ -1811,24 +1811,24 @@ namespace DataTools.Win32
         );
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern bool GetWindowRect(nint hWnd, ref W32RECT rc);
+        public static extern bool GetWindowRect(IntPtr hWnd, ref W32RECT rc);
         [DllImport("user32", EntryPoint = "GetWindowLongW", CharSet = CharSet.Unicode)]
-        public static extern nint GetWindowLong(nint hWnd, int code);
+        public static extern IntPtr GetWindowLong(IntPtr hWnd, int code);
         [DllImport("user32", EntryPoint = "GetWindowLongPtrW", CharSet = CharSet.Unicode)]
-        public static extern nint GetWindowLongPtr(nint hWnd, int code);
+        public static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int code);
 
 
         [DllImport("user32", EntryPoint = "GetClassLongW", CharSet = CharSet.Unicode)]
-        public static extern nint GetClassLong(nint hWnd, int nIndex);
+        public static extern IntPtr GetClassLong(IntPtr hWnd, int nIndex);
 
         [DllImport("user32", EntryPoint = "GetClassLongPtrW", CharSet = CharSet.Unicode)]
-        public static extern nint GetClassLongPtr(nint hWnd, int nIndex);
+        public static extern IntPtr GetClassLongPtr(IntPtr hWnd, int nIndex);
 
 
-        public static System.Drawing.Icon GetWindowIcon(nint hwnd, int iconType = 0)
+        public static System.Drawing.Icon GetWindowIcon(IntPtr hwnd, int iconType = 0)
         {
-            nint hIcon = SendMessage(hwnd, WM_GETICON, iconType, 96);
-            if (hIcon != nint.Zero)
+            IntPtr hIcon = SendMessage(hwnd, WM_GETICON, iconType, 96);
+            if (hIcon != IntPtr.Zero)
             {
                 var ico = (Icon)Icon.FromHandle(hIcon).Clone();
                 return ico;
@@ -1843,7 +1843,7 @@ namespace DataTools.Win32
                 hIcon = GetClassLong(hwnd, GCLP_HICON);
             }
 
-            if (hIcon != nint.Zero)
+            if (hIcon != IntPtr.Zero)
             {
                 var ico = (Icon)Icon.FromHandle(hIcon).Clone();
                 return ico;
@@ -1857,7 +1857,7 @@ namespace DataTools.Win32
 
         [DllImport("user32", EntryPoint = "GetWindowModuleFileNameW", CharSet = CharSet.Unicode)]
         public static extern uint GetWindowModuleFileName(
-                                  nint hwnd,
+                                  IntPtr hwnd,
                                   StringBuilder pszFileName,
                                   int cchFileNameMax
                                   );
@@ -1865,44 +1865,44 @@ namespace DataTools.Win32
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         public static extern bool EnumChildWindows(
-              nint hWndParent,
+              IntPtr hWndParent,
               [MarshalAs(UnmanagedType.FunctionPtr)] 
               EnumWindowsProc lpEnumFunc,
-              nint lParam
+              IntPtr lParam
             );
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         public static extern bool EnumChildWindows(
-              nint hWndParent,
+              IntPtr hWndParent,
               [MarshalAs(UnmanagedType.FunctionPtr)]
               EnumWindowsProcObj lpEnumFunc,
               object lParam
             );
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        public static extern int GetWindowText(nint hWnd, StringBuilder title, int size);
+        public static extern int GetWindowText(IntPtr hWnd, StringBuilder title, int size);
         [DllImport("user32.dll")]
-        public static extern uint RealGetWindowClass(nint hWnd, StringBuilder pszType, uint cchType);
+        public static extern uint RealGetWindowClass(IntPtr hWnd, StringBuilder pszType, uint cchType);
 
         [DllImport("user32", EntryPoint = "CreateWindowExW", CharSet = CharSet.Unicode)]
-        public static extern nint CreateWindowEx(uint dwExStyle, [MarshalAs(UnmanagedType.LPWStr)] string lpClassName, [MarshalAs(UnmanagedType.LPWStr)] string lpWindowName, uint dwStyle, int x, int y, int nWidth, int nHeight, nint hWndParent, nint hMenu, nint hInstance, nint lpParam);
+        public static extern IntPtr CreateWindowEx(uint dwExStyle, [MarshalAs(UnmanagedType.LPWStr)] string lpClassName, [MarshalAs(UnmanagedType.LPWStr)] string lpWindowName, uint dwStyle, int x, int y, int nWidth, int nHeight, IntPtr hWndParent, IntPtr hMenu, IntPtr hInstance, IntPtr lpParam);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern bool DestroyWindow(nint hwnd);
+        public static extern bool DestroyWindow(IntPtr hwnd);
 
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "FindWindowW")]
-        public static extern nint FindWindow(string lpClassName, string lpWindowName);
+        public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "FindWindowExW")]
-        public static extern nint FindWindowEx(nint parentHandle, nint childAfter, string lclassName, string windowTitle);
+        public static extern IntPtr FindWindowEx(IntPtr parentHandle, IntPtr childAfter, string lclassName, string windowTitle);
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, EntryPoint = "GetClassNameW")]
-        public static extern int GetClassName(nint hwnd, StringBuilder lpClassName, int nMaxCount);
+        public static extern int GetClassName(IntPtr hwnd, StringBuilder lpClassName, int nMaxCount);
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
         public static extern int GetSysColor(int nIndex);
         [DllImport("user32")]
-        public static extern int GetWindowThreadProcessId(nint hwnd, [Optional, DefaultParameterValue(default(int))] ref int lpdwProcessId);
+        public static extern int GetWindowThreadProcessId(IntPtr hwnd, [Optional, DefaultParameterValue(default(int))] ref int lpdwProcessId);
 
         public const int DF_ALLOWOTHERACCOUNTHOOK = 1;
 
@@ -1914,44 +1914,44 @@ namespace DataTools.Win32
         /// <param name="dwDesiredAccess">Desktop access mask.</param>
         /// <returns></returns>
         [DllImport("user32")]
-        public static extern nint OpenInputDesktop(int dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, DESKTOP_ACCESS_MASK dwDesiredAccess);
+        public static extern IntPtr OpenInputDesktop(int dwFlags, [MarshalAs(UnmanagedType.Bool)] bool fInherit, DESKTOP_ACCESS_MASK dwDesiredAccess);
         [DllImport("user32")]
-        public static extern bool CloseDesktop(nint hDesk);
+        public static extern bool CloseDesktop(IntPtr hDesk);
         [DllImport("user32")]
-        public static extern nint GetThreadDesktop(int dwThreadId);
+        public static extern IntPtr GetThreadDesktop(int dwThreadId);
 
-        public delegate bool EnumWindowsProcObj(nint hwnd, object lParam);
+        public delegate bool EnumWindowsProcObj(IntPtr hwnd, object lParam);
 
-        public delegate bool EnumWindowsProc(nint hwnd, nint lParam);
+        public delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern bool EnumDesktopWindows(nint hDesk, [MarshalAs(UnmanagedType.FunctionPtr)] EnumWindowsProc lpfn, nint lParam);
+        public static extern bool EnumDesktopWindows(IntPtr hDesk, [MarshalAs(UnmanagedType.FunctionPtr)] EnumWindowsProc lpfn, IntPtr lParam);
 
         /// <summary>
         /// Returns an array of all current top-level windows HWND pointers on the current desktop.
         /// </summary>
-        /// <returns>Array of HWNDs as nint</returns>
-        public static nint[] GetCurrentDesktopWindows()
+        /// <returns>Array of HWNDs as IntPtr</returns>
+        public static IntPtr[] GetCurrentDesktopWindows()
         {
-            return GetDesktopWindows(nint.Zero);
+            return GetDesktopWindows(IntPtr.Zero);
         }
 
         /// <summary>
         /// Returns an array of all current top-level windows HWND pointers on the current desktop.
         /// </summary>
-        /// <returns>Array of HWNDs as nint</returns>
-        public static nint[] GetDesktopWindows(nint hDesk)
+        /// <returns>Array of HWNDs as IntPtr</returns>
+        public static IntPtr[] GetDesktopWindows(IntPtr hDesk)
         {
-            var l = new List<nint>();
+            var l = new List<IntPtr>();
             EnumDesktopWindows(hDesk, new EnumWindowsProc((hwnd, lParam) =>
             {
                 l.Add(hwnd);
                 return true;
-            }), nint.Zero);
+            }), IntPtr.Zero);
             return l.ToArray();
         }
 
-        public static IEnumerable<Process> GetDesktopProcesses(nint hDesk = default)
+        public static IEnumerable<Process> GetDesktopProcesses(IntPtr hDesk = default)
         {
             var l = new List<Process>();
             var hwnd = GetDesktopWindows(hDesk);
@@ -1977,14 +1977,14 @@ namespace DataTools.Win32
             return t;
         }
 
-        public static Process GetWindowProcess(nint hwnd)
+        public static Process GetWindowProcess(IntPtr hwnd)
         {
             int pid = 0;
             GetWindowThreadProcessId(hwnd, ref pid);
             return Process.GetProcessById(pid);
         }
 
-        public static string GetWindowName(nint Hwnd)
+        public static string GetWindowName(IntPtr Hwnd)
         {
             // This function gets the name of a window from its handle
             StringBuilder Title = new StringBuilder(256);
@@ -1998,118 +1998,118 @@ namespace DataTools.Win32
         
         
         [DllImport("user32", EntryPoint = "GetMessageW", CharSet = CharSet.Unicode)]
-        public static extern int GetMessage([MarshalAs(UnmanagedType.LPStruct)] ref MSG lpMsg, nint hWnd, int wMsgFilterMin, int wMsgFilterMax);
+        public static extern int GetMessage([MarshalAs(UnmanagedType.LPStruct)] ref MSG lpMsg, IntPtr hWnd, int wMsgFilterMin, int wMsgFilterMax);
         [DllImport("user32", EntryPoint = "PeekMessageW", CharSet = CharSet.Unicode)]
-        public static extern int PeekMessage([MarshalAs(UnmanagedType.LPStruct)] ref MSG lpMsg, nint hWnd, int wMsgFilterMin, int wMsgFilterMax, int wRemoveMsg);
+        public static extern int PeekMessage([MarshalAs(UnmanagedType.LPStruct)] ref MSG lpMsg, IntPtr hWnd, int wMsgFilterMin, int wMsgFilterMax, int wRemoveMsg);
         [DllImport("user32", CharSet = CharSet.Unicode)]
         public static extern int TranslateMessage([MarshalAs(UnmanagedType.LPStruct)] ref MSG lpMsg);
         [DllImport("user32", CharSet = CharSet.Unicode)]
         public static extern int GetKeyState(int nVirtKey);
         [DllImport("user32", EntryPoint = "CopyAcceleratorTableW", CharSet = CharSet.Unicode)]
-        public static extern int CopyAcceleratorTable(nint hAccelSrc, nint lpAccelDst, int cAccelEntries);
+        public static extern int CopyAcceleratorTable(IntPtr hAccelSrc, IntPtr lpAccelDst, int cAccelEntries);
         [DllImport("user32", EntryPoint = "CreateAcceleratorTableW", CharSet = CharSet.Unicode)]
-        public static extern int CreateAcceleratorTable(nint lpaccl, int cEntries);
+        public static extern int CreateAcceleratorTable(IntPtr lpaccl, int cEntries);
         [DllImport("user32", EntryPoint = "TranslateAcceleratorW", CharSet = CharSet.Unicode)]
-        public static extern int TranslateAccelerator(nint hWnd, nint hAccTable, [MarshalAs(UnmanagedType.LPStruct)] ref MSG lpMsg);
+        public static extern int TranslateAccelerator(IntPtr hWnd, IntPtr hAccTable, [MarshalAs(UnmanagedType.LPStruct)] ref MSG lpMsg);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int DestroyAcceleratorTable(nint haccel);
+        public static extern int DestroyAcceleratorTable(IntPtr haccel);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int TrackPopupMenu(nint Handle, uint wFlags, short x, short y, short nReserved, nint hWnd, nint lprc);
+        public static extern int TrackPopupMenu(IntPtr Handle, uint wFlags, short x, short y, short nReserved, IntPtr hWnd, IntPtr lprc);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern nint TrackPopupMenuEx(nint Handle, uint wFlags, int x, int y, nint hWnd, nint lpTPMParams);
+        public static extern IntPtr TrackPopupMenuEx(IntPtr Handle, uint wFlags, int x, int y, IntPtr hWnd, IntPtr lpTPMParams);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int DrawMenuBar(nint hWnd);
+        public static extern int DrawMenuBar(IntPtr hWnd);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern nint CreatePopupMenu();
+        public static extern IntPtr CreatePopupMenu();
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern nint CreateMenu();
+        public static extern IntPtr CreateMenu();
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int DeleteMenu(nint Handle, int nPosition, int wFlags);
+        public static extern int DeleteMenu(IntPtr Handle, int nPosition, int wFlags);
         [DllImport("user32", EntryPoint = "InsertMenuItemW", CharSet = CharSet.Unicode)]
-        public static extern int InsertMenuItem(nint Handle, int un, bool @bool, [MarshalAs(UnmanagedType.Struct)] ref MENUITEMINFO lpcMenuItemInfo);
+        public static extern int InsertMenuItem(IntPtr Handle, int un, bool @bool, [MarshalAs(UnmanagedType.Struct)] ref MENUITEMINFO lpcMenuItemInfo);
         [DllImport("user32", EntryPoint = "AppendMenuW", CharSet = CharSet.Unicode)]
-        public static extern int AppendMenu(nint Handle, int wFlags, int wIDNewItem, nint lpNewItem);
+        public static extern int AppendMenu(IntPtr Handle, int wFlags, int wIDNewItem, IntPtr lpNewItem);
         [DllImport("user32", EntryPoint = "InsertMenuW", CharSet = CharSet.Unicode)]
-        public static extern int InsertMenu(nint Handle, int nPosition, int wFlags, int wIDNewItem, nint lpNewItem);
+        public static extern int InsertMenu(IntPtr Handle, int nPosition, int wFlags, int wIDNewItem, IntPtr lpNewItem);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int RemoveMenu(nint Handle, int nPosition, int wFlags);
+        public static extern int RemoveMenu(IntPtr Handle, int nPosition, int wFlags);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int DestroyMenu(nint Handle);
+        public static extern int DestroyMenu(IntPtr Handle);
         [DllImport("user32", CharSet = CharSet.Unicode)]
         public static extern int GetSystemMenu(int hWnd, int bRevert);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuItemCount(nint Handle);
+        public static extern int GetMenuItemCount(IntPtr Handle);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuItemID(nint Handle, int nPos);
+        public static extern int GetMenuItemID(IntPtr Handle, int nPos);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuDefaultItem(nint Handle, [MarshalAs(UnmanagedType.Bool)] bool fByPos, int gmdiFlags);
+        public static extern int GetMenuDefaultItem(IntPtr Handle, [MarshalAs(UnmanagedType.Bool)] bool fByPos, int gmdiFlags);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuContextHelpId(nint Handle);
+        public static extern int GetMenuContextHelpId(IntPtr Handle);
         [DllImport("user32", CharSet = CharSet.Unicode)]
         public static extern int GetMenuCheckMarkDimensions();
         [DllImport("user32", CharSet = CharSet.Unicode)]
         public static extern int GetMenu(int hWnd);
         [DllImport("user32", EntryPoint = "GetMenuItemInfoW", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuItemInfo(nint Handle, int un, [MarshalAs(UnmanagedType.Bool)] bool fByItem, ref MENUITEMINFO lpMenuItemInfo);
+        public static extern int GetMenuItemInfo(IntPtr Handle, int un, [MarshalAs(UnmanagedType.Bool)] bool fByItem, ref MENUITEMINFO lpMenuItemInfo);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuInfo(nint hMenu, MENUINFO lpcmi);
+        public static extern int GetMenuInfo(IntPtr hMenu, MENUINFO lpcmi);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuBarInfo(nint hWnd, int idObject, int idItem, [MarshalAs(UnmanagedType.LPStruct)] ref MENUBARINFO pmbi);
+        public static extern int GetMenuBarInfo(IntPtr hWnd, int idObject, int idItem, [MarshalAs(UnmanagedType.LPStruct)] ref MENUBARINFO pmbi);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuItemRect(nint hWnd, nint Handle, int uItem, [MarshalAs(UnmanagedType.LPStruct)] ref W32RECT lprcItem);
+        public static extern int GetMenuItemRect(IntPtr hWnd, IntPtr Handle, int uItem, [MarshalAs(UnmanagedType.LPStruct)] ref W32RECT lprcItem);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuState(nint Handle, int wID, int wFlags);
+        public static extern int GetMenuState(IntPtr Handle, int wID, int wFlags);
         [DllImport("user32", EntryPoint = "GetMenuStringW", CharSet = CharSet.Unicode)]
-        public static extern int GetMenuString(nint Handle, int wIDItem, [MarshalAs(UnmanagedType.LPWStr)] string lpString, int nMaxCount, int wFlag);
+        public static extern int GetMenuString(IntPtr Handle, int wIDItem, [MarshalAs(UnmanagedType.LPWStr)] string lpString, int nMaxCount, int wFlag);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int SetMenuInfo(nint hMenu, [MarshalAs(UnmanagedType.LPStruct)] MENUINFO lpcmi);
+        public static extern int SetMenuInfo(IntPtr hMenu, [MarshalAs(UnmanagedType.LPStruct)] MENUINFO lpcmi);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int SetMenu(nint hWnd, nint Handle);
+        public static extern int SetMenu(IntPtr hWnd, IntPtr Handle);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int SetMenuContextHelpId(nint Handle, int dw);
+        public static extern int SetMenuContextHelpId(IntPtr Handle, int dw);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int SetMenuDefaultItem(nint Handle, int uItem, int fByPos);
+        public static extern int SetMenuDefaultItem(IntPtr Handle, int uItem, int fByPos);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int SetMenuItemBitmaps(nint Handle, int nPosition, int wFlags, int hBitmapUnchecked, int hBitmapChecked);
+        public static extern int SetMenuItemBitmaps(IntPtr Handle, int nPosition, int wFlags, int hBitmapUnchecked, int hBitmapChecked);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int EnableMenuItem(nint hMenu, int wIDEnableItem, int wEnable);
+        public static extern int EnableMenuItem(IntPtr hMenu, int wIDEnableItem, int wEnable);
         [DllImport("user32", EntryPoint = "SetMenuItemInfoW", CharSet = CharSet.Unicode)]
-        public static extern int SetMenuItemInfo(nint Handle, int un, [MarshalAs(UnmanagedType.Bool)] bool fByItem, ref MENUITEMINFO lpcMenuItemInfo);
+        public static extern int SetMenuItemInfo(IntPtr Handle, int un, [MarshalAs(UnmanagedType.Bool)] bool fByItem, ref MENUITEMINFO lpcMenuItemInfo);
 
         
         
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int SetScrollInfo(nint hWnd, int n, [MarshalAs(UnmanagedType.LPStruct)] ref SCROLLINFO lpcScrollInfo, bool @bool);
+        public static extern int SetScrollInfo(IntPtr hWnd, int n, [MarshalAs(UnmanagedType.LPStruct)] ref SCROLLINFO lpcScrollInfo, bool @bool);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int SetScrollPos(nint hWnd, int nBar, int nPos, int bRedraw);
+        public static extern int SetScrollPos(IntPtr hWnd, int nBar, int nPos, int bRedraw);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int SetScrollRange(nint hWnd, int nBar, int nMinPos, int nMaxPos, int bRedraw);
+        public static extern int SetScrollRange(IntPtr hWnd, int nBar, int nMinPos, int nMaxPos, int bRedraw);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetScrollInfo(nint hWnd, int n, [MarshalAs(UnmanagedType.LPStruct)] ref SCROLLINFO lpScrollInfo);
+        public static extern int GetScrollInfo(IntPtr hWnd, int n, [MarshalAs(UnmanagedType.LPStruct)] ref SCROLLINFO lpScrollInfo);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetScrollPos(nint hWnd, int nBar);
+        public static extern int GetScrollPos(IntPtr hWnd, int nBar);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int GetScrollRange(nint hWnd, int nBar, ref int lpMinPos, ref int lpMaxPos);
+        public static extern int GetScrollRange(IntPtr hWnd, int nBar, ref int lpMinPos, ref int lpMaxPos);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int EnableScrollBar(nint hWnd, int wSBflags, int wArrows);
+        public static extern int EnableScrollBar(IntPtr hWnd, int wSBflags, int wArrows);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int ShowScrollBar(nint hWnd, int wBar, int bShow);
+        public static extern int ShowScrollBar(IntPtr hWnd, int wBar, int bShow);
         
         
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int SelectObject(nint hDC, nint hObject);
+        public static extern int SelectObject(IntPtr hDC, IntPtr hObject);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int GetCurrentObject(nint hDC, int uObjectType);
+        public static extern int GetCurrentObject(IntPtr hDC, int uObjectType);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
         public static extern int GetStockObject(int nIndex);
 
         // Pen
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int GetObject(nint hObject, int nCount, [MarshalAs(UnmanagedType.Struct)] LOGPEN lpObject);
+        public static extern int GetObject(IntPtr hObject, int nCount, [MarshalAs(UnmanagedType.Struct)] LOGPEN lpObject);
 
         // Brush
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int GetObject(nint hObject, int nCount, [MarshalAs(UnmanagedType.Struct)] LOGBRUSH lpObject);
+        public static extern int GetObject(IntPtr hObject, int nCount, [MarshalAs(UnmanagedType.Struct)] LOGBRUSH lpObject);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
         public static extern int ExtCreatePen(int dwPenStyle, int dwWidth, [MarshalAs(UnmanagedType.Struct)] LOGBRUSH lplb, int dwStyleCount, int lpStyle);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
@@ -2119,9 +2119,9 @@ namespace DataTools.Win32
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
         public static extern int CreateBrushIndirect([MarshalAs(UnmanagedType.Struct)] LOGBRUSH lpLogBrush);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern nint CreateIconIndirect([MarshalAs(UnmanagedType.Struct)] ref ICONINFO lpIconInfo);
+        public static extern IntPtr CreateIconIndirect([MarshalAs(UnmanagedType.Struct)] ref ICONINFO lpIconInfo);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern nint CreateBitmapIndirect([MarshalAs(UnmanagedType.Struct)] ref BITMAPSTRUCT lpBitmap);
+        public static extern IntPtr CreateBitmapIndirect([MarshalAs(UnmanagedType.Struct)] ref BITMAPSTRUCT lpBitmap);
 
         // HDC CreateDC(
         // LPCTSTR lpszDriver,
@@ -2131,66 +2131,66 @@ namespace DataTools.Win32
         // );
 
         [DllImport("gdi32")]
-        public static extern bool DeleteDC(nint hdc);
+        public static extern bool DeleteDC(IntPtr hdc);
 
         [DllImport("gdi32", EntryPoint = "CreateDCW", CharSet = CharSet.Unicode)]
-        public static extern nint CreateDC([MarshalAs(UnmanagedType.LPWStr)] string lpszDriver, [MarshalAs(UnmanagedType.LPWStr)] string lpszDevice, nint lpszOutput, nint devMode);
+        public static extern IntPtr CreateDC([MarshalAs(UnmanagedType.LPWStr)] string lpszDriver, [MarshalAs(UnmanagedType.LPWStr)] string lpszDevice, IntPtr lpszOutput, IntPtr devMode);
         [DllImport("gdi32")]
-        public static extern int GetDeviceCaps(nint hDc, int index);
+        public static extern int GetDeviceCaps(IntPtr hDc, int index);
 
         
         
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int MoveToEx(nint hDC, int nXOrg, int nYOrg, [MarshalAs(UnmanagedType.Struct)] ref W32POINT lppt);
+        public static extern int MoveToEx(IntPtr hDC, int nXOrg, int nYOrg, [MarshalAs(UnmanagedType.Struct)] ref W32POINT lppt);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int LineTo(nint hDC, int x, int y);
+        public static extern int LineTo(IntPtr hDC, int x, int y);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
         public static extern int GdiFlush();
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int FillRect(nint hDC, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, int hBrush);
+        public static extern int FillRect(IntPtr hDC, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, int hBrush);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int BeginPaint(nint hWnd, [MarshalAs(UnmanagedType.Struct)] ref PAINTSTRUCT lpPaint);
+        public static extern int BeginPaint(IntPtr hWnd, [MarshalAs(UnmanagedType.Struct)] ref PAINTSTRUCT lpPaint);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int EndPaint(nint hWnd, [MarshalAs(UnmanagedType.Struct)] ref PAINTSTRUCT lpPaint);
+        public static extern int EndPaint(IntPtr hWnd, [MarshalAs(UnmanagedType.Struct)] ref PAINTSTRUCT lpPaint);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int SetTextAlign(nint hDC, int wFlags);
+        public static extern int SetTextAlign(IntPtr hDC, int wFlags);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int GetTextAlign(nint hDC);
+        public static extern int GetTextAlign(IntPtr hDC);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int SetBkMode(nint hDC, int nMode);
+        public static extern int SetBkMode(IntPtr hDC, int nMode);
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int DrawTextW(nint hDC, [MarshalAs(UnmanagedType.LPWStr)] ref string lpStr, int nCount, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, int wFormat);
+        public static extern int DrawTextW(IntPtr hDC, [MarshalAs(UnmanagedType.LPWStr)] ref string lpStr, int nCount, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, int wFormat);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int TextOutW(nint hDC, int x, int y, [MarshalAs(UnmanagedType.LPWStr)] ref string lpString, int nCount);
+        public static extern int TextOutW(IntPtr hDC, int x, int y, [MarshalAs(UnmanagedType.LPWStr)] ref string lpString, int nCount);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int ExtTextOutW(nint hDC, int x, int y, int wOptions, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, [MarshalAs(UnmanagedType.LPWStr)] ref string lpString, int nCount, int lpDx);
+        public static extern int ExtTextOutW(IntPtr hDC, int x, int y, int wOptions, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, [MarshalAs(UnmanagedType.LPWStr)] ref string lpString, int nCount, int lpDx);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int GetTextExtentPoint32W(nint hDC, [MarshalAs(UnmanagedType.LPWStr)] ref string lpsz, int cbString, [MarshalAs(UnmanagedType.LPStruct)] ref W32SIZE lpSize);
+        public static extern int GetTextExtentPoint32W(IntPtr hDC, [MarshalAs(UnmanagedType.LPWStr)] ref string lpsz, int cbString, [MarshalAs(UnmanagedType.LPStruct)] ref W32SIZE lpSize);
         [DllImport("user32", CharSet = CharSet.Ansi)]
-        public static extern int DrawTextA(nint hDC, [MarshalAs(UnmanagedType.LPStr)] ref string lpStr, int nCount, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, int wFormat);
+        public static extern int DrawTextA(IntPtr hDC, [MarshalAs(UnmanagedType.LPStr)] ref string lpStr, int nCount, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, int wFormat);
         [DllImport("gdi32", CharSet = CharSet.Ansi)]
-        public static extern int TextOutA(nint hDC, int x, int y, [MarshalAs(UnmanagedType.LPStr)] ref string lpString, int nCount);
+        public static extern int TextOutA(IntPtr hDC, int x, int y, [MarshalAs(UnmanagedType.LPStr)] ref string lpString, int nCount);
         [DllImport("gdi32", CharSet = CharSet.Ansi)]
-        public static extern int ExtTextOutA(nint hDC, int x, int y, int wOptions, ref W32RECT lpRect, [MarshalAs(UnmanagedType.LPStr)] ref string lpString, int nCount, int lpDx);
+        public static extern int ExtTextOutA(IntPtr hDC, int x, int y, int wOptions, ref W32RECT lpRect, [MarshalAs(UnmanagedType.LPStr)] ref string lpString, int nCount, int lpDx);
         [DllImport("gdi32", CharSet = CharSet.Ansi)]
-        public static extern int GetTextExtentPoint32A(nint hDC, [MarshalAs(UnmanagedType.LPStr)] ref string lpsz, int cbString, [MarshalAs(UnmanagedType.Struct)] ref W32SIZE lpSize);
+        public static extern int GetTextExtentPoint32A(IntPtr hDC, [MarshalAs(UnmanagedType.LPStr)] ref string lpsz, int cbString, [MarshalAs(UnmanagedType.Struct)] ref W32SIZE lpSize);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int GetFontLanguageInfo(nint hDC);
+        public static extern int GetFontLanguageInfo(IntPtr hDC);
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int SetTextColor(nint hDC, int crColor);
+        public static extern int SetTextColor(IntPtr hDC, int crColor);
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int DrawFrameControl(nint hDC, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, int un1, int un2);
+        public static extern int DrawFrameControl(IntPtr hDC, [MarshalAs(UnmanagedType.Struct)] ref W32RECT lpRect, int un1, int un2);
         // draw caption text
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        public static extern int DrawCaption(nint hWnd, nint hDC, [MarshalAs(UnmanagedType.Struct)] ref W32RECT pcRect, int un);
+        public static extern int DrawCaption(IntPtr hWnd, IntPtr hDC, [MarshalAs(UnmanagedType.Struct)] ref W32RECT pcRect, int un);
         
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern int BitBlt(nint dest, int x, int y, int cx, int cy, nint src, int x2, int y2, int dwROP);
+        public static extern int BitBlt(IntPtr dest, int x, int y, int cx, int cy, IntPtr src, int x2, int y2, int dwROP);
 
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        public static extern nint CreateDIBSection(nint hdc, nint pbmi, uint usage, ref nint ppvBits, nint hSection, int offset);
+        public static extern IntPtr CreateDIBSection(IntPtr hdc, IntPtr pbmi, uint usage, ref IntPtr ppvBits, IntPtr hSection, int offset);
 
         
         
@@ -2207,7 +2207,7 @@ namespace DataTools.Win32
         
         
         [DllImport("kernel32", EntryPoint = "RtlZeroMemory")]
-        static extern void RtlZeroMemory(nint pDst, long ByteLen);
+        static extern void RtlZeroMemory(IntPtr pDst, long ByteLen);
 
         
         
@@ -2216,7 +2216,7 @@ namespace DataTools.Win32
 
         [DllImport("kernel32", EntryPoint = "GetModuleFileNameW")]
         public static extern int GetModuleFileName(
-            nint hModule,
+            IntPtr hModule,
             StringBuilder lpFilename,
             int nSize
         );
@@ -2225,7 +2225,7 @@ namespace DataTools.Win32
 
         //[DllImport("kernel32")]
         //public static extern int GetWindowThreadProcessId(
-        //    nint hWnd,
+        //    IntPtr hWnd,
         //    out int lpdwProcessId
         //);
 

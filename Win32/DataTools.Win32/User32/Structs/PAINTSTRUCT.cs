@@ -34,7 +34,7 @@ namespace DataTools.Win32
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct PAINTSTRUCT
     {
-        public nint hDC;
+        public IntPtr hDC;
         public int fErase;
         public W32RECT rcpaint;
         public int fRestore;

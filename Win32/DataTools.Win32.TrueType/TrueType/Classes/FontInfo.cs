@@ -153,7 +153,7 @@ namespace DataTools.Desktop
         /// Copy the ENUMLOGFONTEX structure for this object into a memory buffer.
         /// </summary>
         /// <param name="lpElf">Pointer to a buffer to receive the ENUMLOGFONTEX structure.  The memory must already be allocated and freed by the caller.</param>
-        public void GetElfEx(nint lpElf)
+        public void GetElfEx(IntPtr lpElf)
         {
             var mm = new MemPtr(lpElf);
             mm.FromStruct(elf);

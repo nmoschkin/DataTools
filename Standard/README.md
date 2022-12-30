@@ -1,2 +1,0 @@
-# datatools-common
-Common projects.

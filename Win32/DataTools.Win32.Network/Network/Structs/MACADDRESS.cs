@@ -16,6 +16,7 @@
 using DataTools.Streams;
 using DataTools.Text;
 
+using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;

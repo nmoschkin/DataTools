@@ -1,4 +1,6 @@
-﻿namespace DataTools.MathTools
+﻿using System;
+
+namespace DataTools.MathTools
 {
     public class OrderAwareDataSet<T> : DataSet<T> where T : class, IComparable<T>
     {

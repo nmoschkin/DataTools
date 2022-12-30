@@ -38,24 +38,24 @@ namespace DataTools.Shell.Native
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult BindToHandler(
-            [In, MarshalAs(UnmanagedType.Interface)] nint pbc,
+            [In, MarshalAs(UnmanagedType.Interface)] IntPtr pbc,
             [In] ref Guid rbhid,
             [In] ref Guid riid,
-            out nint ppvOut);
+            out IntPtr ppvOut);
 
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetPropertyStore(
             [In] int Flags,
             [In] ref Guid riid,
-            out nint ppv);
+            out IntPtr ppv);
 
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         HResult GetPropertyDescriptionList(
             [In] ref PropertyKey keyType,
             [In] ref Guid riid,
-            out nint ppv);
+            out IntPtr ppv);
 
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
@@ -77,6 +77,6 @@ namespace DataTools.Shell.Native
         // Not supported: IEnumShellItems (will use GetCount and GetItemAt instead).
         [PreserveSig]
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        HResult EnumItems([MarshalAs(UnmanagedType.Interface)] out nint ppenumShellItems);
+        HResult EnumItems([MarshalAs(UnmanagedType.Interface)] out IntPtr ppenumShellItems);
     }
 }

@@ -1,12 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
+    <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1005</AssemblyVersion>
-    <FileVersion>8.0.0.1005</FileVersion>
+    <AssemblyVersion>8.0.0.1026</AssemblyVersion>
+    <FileVersion>8.0.0.1026</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1005</Version>
+    <Version>8.0.0.1026</Version>
     <Product>DataTools WPF Color Control Library</Product>
     <Description>DataTools WPF Color Control Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -14,13 +16,15 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64</Platforms>
-    <SignAssembly>False</SignAssembly>
+    <SignAssembly>True</SignAssembly>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>DataTools.ColorControls</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1004</PreviousVersion>
+    <PreviousVersion>8.0.0.1025</PreviousVersion>
+    <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -74,8 +78,8 @@
     <Optimize>True</Optimize>
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
-    <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
-    <Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
-    <Exec Command="post-build-tool /d ." />
+    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <!-- <Exec Command="post-build-tool /d ." /> -->
   </Target>
 </Project>

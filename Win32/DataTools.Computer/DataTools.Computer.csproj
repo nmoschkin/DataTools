@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>8.0.0.1005</AssemblyVersion>
-    <FileVersion>8.0.0.1005</FileVersion>
+    <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyVersion>8.0.0.1026</AssemblyVersion>
+    <FileVersion>8.0.0.1026</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1005</Version>
+    <Version>8.0.0.1026</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - Aggregated Computer-Wide Hardware Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -15,14 +15,16 @@
     <nullable>disable</nullable>
     <RootNamespace>DataTools</RootNamespace>
     <Platforms>AnyCPU;x64</Platforms>
-    <SignAssembly>False</SignAssembly>
+    <SignAssembly>True</SignAssembly>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>DataTools.Computer</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1004</PreviousVersion>
+    <PreviousVersion>8.0.0.1025</PreviousVersion>
+    <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
@@ -44,8 +46,8 @@
     <Optimize>True</Optimize>
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
-    <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" />
-    <Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
-    <Exec Command="post-build-tool /d ." />
+    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <!-- <Exec Command="post-build-tool /d ." /> -->
   </Target>
 </Project>

@@ -1,5 +1,6 @@
 ﻿using DataTools.Win32.Memory;
 
+using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
@@ -15,7 +16,7 @@ namespace DataTools.Win32
         public const long BI_PNG = 5L;
 
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        internal static extern nint CreateDIBSection(nint hdc, nint pbmi, uint usage, ref nint ppvBits, nint hSection, int offset);
+        internal static extern IntPtr CreateDIBSection(IntPtr hdc, IntPtr pbmi, uint usage, ref IntPtr ppvBits, IntPtr hSection, int offset);
 
         /// <summary>
         /// Gray out an icon.
@@ -70,10 +71,10 @@ namespace DataTools.Win32
         /// <param name="icn"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static nint DIBFromIcon(Icon icn)
+        public static IntPtr DIBFromIcon(Icon icn)
         {
             var bmp = IconToTransparentBitmap(icn);
-            var _d = new nint();
+            var _d = new IntPtr();
 
             return MakeDIBSection(bmp, ref _d);
         }
@@ -85,7 +86,7 @@ namespace DataTools.Win32
         /// <param name="bitPtr">Optional variable to receive a pointer to the bitmap bits.</param>
         /// <returns>A new DIB handle that must be destroyed with DeleteObject().</returns>
         /// <remarks></remarks>
-        public static nint MakeDIBSection(Bitmap img, ref nint bitPtr)
+        public static IntPtr MakeDIBSection(Bitmap img, ref IntPtr bitPtr)
         {
             // Build header.
             // adapted from C++ code examples.
@@ -109,10 +110,10 @@ namespace DataTools.Win32
             pbmih.biYPelsPerMeter = (int)(24.5d * 1000d); // pixels per meter!
             pbmih.biClrUsed = 0;
             pbmih.biClrImportant = 0;
-            var pPixels = nint.Zero;
+            var pPixels = IntPtr.Zero;
             int DIB_RGB_COLORS = 0;
             Marshal.StructureToPtr(pbmih, mm.Handle, false);
-            var hPreviewBitmap = BitmapTools.CreateDIBSection(nint.Zero, mm.Handle, (uint)DIB_RGB_COLORS, ref pPixels, nint.Zero, 0);
+            var hPreviewBitmap = BitmapTools.CreateDIBSection(IntPtr.Zero, mm.Handle, (uint)DIB_RGB_COLORS, ref pPixels, IntPtr.Zero, 0);
             bitPtr = pPixels;
             var bm = new System.Drawing.Imaging.BitmapData();
             bm = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppPArgb, bm);

@@ -45,7 +45,7 @@ namespace DataTools.Hardware.Printers
         private MemPtr _ptr;
         private MemPtr _str;
 
-        internal JobInfo(nint ptr) : base(nint.Zero, true)
+        internal JobInfo(IntPtr ptr) : base(IntPtr.Zero, true)
         {
             _ptr = ptr;
             _str = ptr + 4;
@@ -56,7 +56,7 @@ namespace DataTools.Hardware.Printers
         {
             get
             {
-                return _ptr.Handle == nint.Zero;
+                return _ptr.Handle == IntPtr.Zero;
             }
         }
 
@@ -64,7 +64,7 @@ namespace DataTools.Hardware.Printers
         {
             try
             {
-                if (_ptr.Handle != nint.Zero)
+                if (_ptr.Handle != IntPtr.Zero)
                     _ptr.Free();
                 return true;
             }
@@ -244,11 +244,11 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        internal nint DevMode
+        internal IntPtr DevMode
         {
             get
             {
-                return IntPtr.Size == 8 ? (nint)_str.LongAt(9L) : (nint)_str.IntAt(9L);
+                return IntPtr.Size == 8 ? (IntPtr)_str.LongAt(9L) : (IntPtr)_str.IntAt(9L);
             }
 
             set
@@ -281,11 +281,11 @@ namespace DataTools.Hardware.Printers
             }
         }
 
-        internal nint SecurityDescriptor
+        internal IntPtr SecurityDescriptor
         {
             get
             {
-                return IntPtr.Size == 8 ? (nint)_str.LongAt(11L) : (nint)_str.IntAt(11L);
+                return IntPtr.Size == 8 ? (IntPtr)_str.LongAt(11L) : (IntPtr)_str.IntAt(11L);
             }
 
             set

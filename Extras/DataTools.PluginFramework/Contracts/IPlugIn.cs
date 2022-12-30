@@ -1,21 +1,14 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Threading.Tasks;
-
-[assembly: InternalsVisibleTo("DataTools.Chart")]
 
 namespace DataTools.PluginFramework
 {
     public interface IPlugIn : INotifyPropertyChanged, INotifyPropertyChanging, ISerializable
     {
-
         /// <summary>
         /// Gets the company that created the plugin.
         /// </summary>
@@ -61,7 +54,7 @@ namespace DataTools.PluginFramework
         /// </summary>
         /// <param name="site">The site to place the configuration panel.</param>
         void OpenConfigPanel(object site);
-                
+
         /// <summary>
         /// Gets additional properties that are not intrinsically known to the plugin engine.
         /// </summary>
@@ -127,6 +120,5 @@ namespace DataTools.PluginFramework
         /// Arbitrary data that may be stored.
         /// </summary>
         object Tag { get; set; }
-
     }
 }

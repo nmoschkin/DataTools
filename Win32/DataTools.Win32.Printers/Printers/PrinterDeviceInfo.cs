@@ -2,25 +2,25 @@
 // DataTools C# Native Utility Library For Windows - Interop
 //
 // Module: PrinterDeviceInfo
-//         Descendant class of DeviceInfo for 
+//         Descendant class of DeviceInfo for
 //         printers.
 //
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using DataTools.Win32;
+
 using static DataTools.Win32.DeviceEnum;
 
 namespace DataTools.Hardware.Printers
 {
-
-    
     /// <summary>
     /// Describes a printer.
     /// </summary>
@@ -29,9 +29,7 @@ namespace DataTools.Hardware.Printers
     {
         private PrinterObject _printInfo;
 
-        
         private static IEnumerable<PrinterDeviceInfo> _allPrinters = null;
-
 
         /// <summary>
         /// Enumerate all printer queues available to the local system.
@@ -53,7 +51,6 @@ namespace DataTools.Hardware.Printers
                     }
                     catch
                     {
-
                         // can't connect to that printer!
                         continue;
                     }
@@ -65,7 +62,6 @@ namespace DataTools.Hardware.Printers
             Array.Sort(p, new Comparison<PrinterDeviceInfo>((x, y) => { if (x.FriendlyName is object && y.FriendlyName is object) { return string.Compare(x.FriendlyName, y.FriendlyName); } else { return string.Compare(x.Description, y.Description); } }));
             return p;
         }
-
 
         /// <summary>
         /// Refreshes the list of all system printers.
@@ -177,8 +173,7 @@ namespace DataTools.Hardware.Printers
             else
                 return FriendlyName;
         }
-            
     }
 
-    #endregion
+    #endregion PrinterObject
 }

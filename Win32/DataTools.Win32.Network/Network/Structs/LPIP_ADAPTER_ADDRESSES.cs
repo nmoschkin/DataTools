@@ -33,7 +33,7 @@ namespace DataTools.Win32.Network
 
         public override string ToString()
         {
-            if (Handle.Handle == nint.Zero) return "NULL";
+            if (Handle.Handle == IntPtr.Zero) return "NULL";
             return Struct.FriendlyName;
         }
 
@@ -43,7 +43,7 @@ namespace DataTools.Win32.Network
 
         public IP_ADAPTER_ADDRESSES ToAdapterStruct()
         {
-            if (Handle == nint.Zero) return default;
+            if (Handle == IntPtr.Zero) return default;
             return Handle.ToStruct<IP_ADAPTER_ADDRESSES>();
         }
 

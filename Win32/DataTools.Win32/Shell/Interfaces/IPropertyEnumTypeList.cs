@@ -41,7 +41,7 @@ namespace DataTools.Shell.Native
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void GetAt([In] uint itype, [In] ref Guid riid, [MarshalAs(UnmanagedType.Interface)] out IPropertyEnumType ppv);
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
-        void GetConditionAt([In] uint index, [In] ref Guid riid, ref nint ppv);
+        void GetConditionAt([In] uint index, [In] ref Guid riid, ref IntPtr ppv);
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         void FindMatchingIndex([In] PropVariant propvarCmp, out uint pnIndex);
     }

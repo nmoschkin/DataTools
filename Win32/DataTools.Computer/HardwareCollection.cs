@@ -1,26 +1,22 @@
 ﻿// *************************************************
 // DataTools C# Native Utility Library For Windows - Interop
 //
-// Module: HardwareCollection 
+// Module: HardwareCollection
 //         Computer information collection class.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Win32;
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-using DataTools.Desktop;
-using DataTools.Win32;
-
 namespace DataTools.Computer
 {
-
-
     /// <summary>
     /// Encapsulates a hierarchical representation of all visible devices on the system.
     /// </summary>
@@ -28,7 +24,7 @@ namespace DataTools.Computer
     public class HardwareCollection : ObservableCollection<object>
     {
         private DeviceClassEnum deviceClass;
-        private System.Drawing.Icon? icon;
+        private System.Drawing.Icon icon;
 
         /// <summary>
         /// Returns the class device enumeration for this device collection.
@@ -140,10 +136,9 @@ namespace DataTools.Computer
                     return string.Compare(a.DeviceClass.ToString(), b.DeviceClass.ToString());
                 }
             });
- 
+
             foreach (var x in c)
             {
-
                 // If we don't already have an object devoted to particular type create it
                 if (x.DeviceClass != chw)
                 {
@@ -154,7 +149,6 @@ namespace DataTools.Computer
 
                     g.DeviceClass = chw;
                     g.ClassIcon = x.DeviceClassIcon;
-                    
                 }
 
                 g.Add(x);
@@ -172,7 +166,6 @@ namespace DataTools.Computer
     /// <remarks></remarks>
     public class HardwareObjectSorter : IComparer<DeviceInfo>
     {
-
         /// <summary>
         /// Compare two DeviceInfo-derived objects by DeviceClass (alphabetically).
         /// </summary>
@@ -197,10 +190,6 @@ namespace DataTools.Computer
             {
                 return string.Compare(a.DeviceClass.ToString(), b.DeviceClass.ToString());
             }
-
-
         }
     }
 }
-
-

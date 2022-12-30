@@ -35,7 +35,7 @@ namespace DataTools.Shell.Native
     internal interface IEnumUnknown
     {
         [PreserveSig]
-        HResult Next(UInt32 requestedNumber, ref nint buffer, ref UInt32 fetchedNumber);
+        HResult Next(UInt32 requestedNumber, ref IntPtr buffer, ref UInt32 fetchedNumber);
         [PreserveSig]
         HResult Skip(UInt32 number);
         [PreserveSig]

@@ -3,18 +3,15 @@ using DataTools.Win32;
 using DataTools.Win32.Menu;
 
 using System;
-using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Desktop
 {
-
     public static class Assoc
     {
-
         /// <summary>
         /// Populates the Open With menu and returns a <see cref="NativeMenu"/> object.
         /// </summary>

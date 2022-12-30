@@ -27,6 +27,6 @@ namespace DataTools.Win32
         public uint cbSize;
         public Guid InterfaceClassGuid;
         public uint Flags;
-        public nint Reserved;
+        public IntPtr Reserved;
     }
 }

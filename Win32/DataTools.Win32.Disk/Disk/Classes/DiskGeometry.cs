@@ -17,18 +17,18 @@ namespace DataTools.Win32.Disk
         /// <param name="layInfo">Optionally receives the layout information.</param>
         /// <returns>An array of PARTITION_INFORMATION_EX structures.</returns>
         /// <remarks></remarks>
-        public static bool GetDiskGeometry(string? devicePath, nint hfile, out DISK_GEOMETRY_EX? geometry)
+        public static bool GetDiskGeometry(string devicePath, IntPtr hfile, out DISK_GEOMETRY_EX? geometry)
         {
             bool hf = false;
             geometry = null;
 
-            if (hfile != nint.Zero)
+            if (hfile != IntPtr.Zero)
             {
                 hf = true;
             }
             else if (devicePath != null)
             {
-                hfile = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, nint.Zero, IO.OPEN_EXISTING, 0, nint.Zero);
+                hfile = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, 0, IntPtr.Zero);
             }
             else
             {
@@ -51,7 +51,7 @@ namespace DataTools.Win32.Disk
             do
             {
                 pex.ReAlloc(sbs);
-                succeed = NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, nint.Zero, 0U, pex, (uint)pex.Length, ref cb, nint.Zero);
+                succeed = NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, IntPtr.Zero, 0U, pex, (uint)pex.Length, ref cb, IntPtr.Zero);
 
                 if (!succeed)
                 {

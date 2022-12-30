@@ -30,7 +30,7 @@ namespace DataTools.Win32.Network
         /// <summary>
         /// Sid
         /// </summary>
-        public nint Sid;
+        public IntPtr Sid;
 
         /// <summary>
         /// Sid usage type

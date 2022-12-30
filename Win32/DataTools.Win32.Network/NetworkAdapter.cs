@@ -17,6 +17,7 @@ using DataTools.Text;
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -25,7 +26,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: InternalsVisibleTo("DataTools.Desktop.Network")]
+[assembly: InternalsVisibleTo("DataTools.Desktop.Network, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c174bbb29449348a38b8385890700e1f1f83cd83dd6a93ee4db80993d85f6e46f49b6a3f31392dd63b033d03fc321190f3d7034876d13ed9ea8952fb5d32f03e958fc9062ed0a12b75cf85a9cf65aeef91404bfb09ca43489ec69e15dc763d459162aacb84d21ea39b6992d747b871af709a313621ec6bebcdf7c5396abc33bb")]
 
 namespace DataTools.Win32.Network
 {
@@ -35,13 +36,13 @@ namespace DataTools.Win32.Network
     /// <remarks></remarks>
     public class NetworkAdapter : IDisposable, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private IP_ADAPTER_ADDRESSES Source;
 
-        private DeviceInfo? deviceInfo;
+        private DeviceInfo deviceInfo;
         private bool canShowNet;
-        private System.Drawing.Bitmap? deviceIcon;
+        private System.Drawing.Bitmap deviceIcon;
 
         private List<MIB_IFROW> physifaces = new List<MIB_IFROW>();
         private static readonly PropertyInfo[] allProps = typeof(NetworkAdapter).GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -70,9 +71,9 @@ namespace DataTools.Win32.Network
                 string s = @"::{7007ACC7-3202-11D1-AAD2-00805FC1270E}\" + AdapterName;
                 var mm = new MemPtr();
 
-                NativeShell.SHParseDisplayName(s, nint.Zero, out mm.handle, 0, out _);
+                NativeShell.SHParseDisplayName(s, IntPtr.Zero, out mm.handle, 0, out _);
 
-                if (mm.Handle != nint.Zero)
+                if (mm.Handle != IntPtr.Zero)
                 {
                     // Get a WPFImage
 
@@ -129,7 +130,7 @@ namespace DataTools.Win32.Network
             }
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string? e = null)
+        protected void OnPropertyChanged([CallerMemberName] string e = null)
         {
             if (e == null) return;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(e));
@@ -156,7 +157,7 @@ namespace DataTools.Win32.Network
         /// <returns></returns>
         /// <remarks></remarks>
         [Browsable(false)]
-        public virtual System.Drawing.Bitmap? DeviceIcon
+        public virtual System.Drawing.Bitmap DeviceIcon
         {
             get
             {
@@ -198,7 +199,7 @@ namespace DataTools.Win32.Network
         /// </summary>
         /// <param name="hwnd"></param>
         /// <remarks></remarks>
-        public void ShowConnectionPropertiesDialog(nint hwnd = default)
+        public void ShowConnectionPropertiesDialog(IntPtr hwnd = default)
         {
             if (deviceInfo is null) return;
 
@@ -222,7 +223,7 @@ namespace DataTools.Win32.Network
         /// </summary>
         /// <param name="hwnd"></param>
         /// <remarks></remarks>
-        public void ShowNetworkStatusDialog(nint hwnd = default)
+        public void ShowNetworkStatusDialog(IntPtr hwnd = default)
         {
             var shex = new SHELLEXECUTEINFO
             {
@@ -247,7 +248,7 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         [Browsable(true)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public DeviceInfo? DeviceInfo
+        public DeviceInfo DeviceInfo
         {
             get
             {
@@ -297,7 +298,7 @@ namespace DataTools.Win32.Network
         }
 
         [Browsable(true)]
-        public IPAddress? IPV4Address
+        public IPAddress IPV4Address
         {
             get
             {
@@ -318,7 +319,7 @@ namespace DataTools.Win32.Network
         }
 
         [Browsable(true)]
-        public IPAddress? IPV6Address
+        public IPAddress IPV6Address
         {
             get
             {

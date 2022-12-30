@@ -16,6 +16,7 @@
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace DataTools.Win32.Network
@@ -28,7 +29,7 @@ namespace DataTools.Win32.Network
         public const int MAX_DHCPV6_DUID_LENGTH = 130;
 
         [DllImport("Iphlpapi.dll")]
-        private static extern ADAPTER_ENUM_RESULT GetAdaptersAddresses(AfENUM Family, GAA_FLAGS Flags, nint Reserved, LPIP_ADAPTER_ADDRESSES Addresses, ref uint SizePointer);
+        private static extern ADAPTER_ENUM_RESULT GetAdaptersAddresses(AfENUM Family, GAA_FLAGS Flags, IntPtr Reserved, LPIP_ADAPTER_ADDRESSES Addresses, ref uint SizePointer);
 
         /// <summary>
         /// Retrieves a linked, unmanaged structure array of IP_ADAPTER_ADDRESSES, enumerating all network interfaces on the system.
@@ -46,13 +47,13 @@ namespace DataTools.Win32.Network
 
             uint cblen = 0;
 
-            var res = GetAdaptersAddresses(AfENUM.AfUnspecified, GAA_FLAGS.GAA_FLAG_INCLUDE_GATEWAYS | GAA_FLAGS.GAA_FLAG_INCLUDE_WINS_INFO | GAA_FLAGS.GAA_FLAG_INCLUDE_ALL_COMPARTMENTS | GAA_FLAGS.GAA_FLAG_INCLUDE_ALL_INTERFACES, nint.Zero, lpadapt, ref cblen);
+            var res = GetAdaptersAddresses(AfENUM.AfUnspecified, GAA_FLAGS.GAA_FLAG_INCLUDE_GATEWAYS | GAA_FLAGS.GAA_FLAG_INCLUDE_WINS_INFO | GAA_FLAGS.GAA_FLAG_INCLUDE_ALL_COMPARTMENTS | GAA_FLAGS.GAA_FLAG_INCLUDE_ALL_INTERFACES, IntPtr.Zero, lpadapt, ref cblen);
 
             // we have a buffer overflow?  We need to get more memory.
             if (res == ADAPTER_ENUM_RESULT.ERROR_BUFFER_OVERFLOW)
             {
                 lpadapt.Handle.Alloc(cblen, noRelease);
-                res = GetAdaptersAddresses(AfENUM.AfUnspecified, GAA_FLAGS.GAA_FLAG_INCLUDE_GATEWAYS | GAA_FLAGS.GAA_FLAG_INCLUDE_WINS_INFO, nint.Zero, lpadapt, ref cblen);
+                res = GetAdaptersAddresses(AfENUM.AfUnspecified, GAA_FLAGS.GAA_FLAG_INCLUDE_GATEWAYS | GAA_FLAGS.GAA_FLAG_INCLUDE_WINS_INFO, IntPtr.Zero, lpadapt, ref cblen);
             }
 
             if (res != ADAPTER_ENUM_RESULT.NO_ERROR)

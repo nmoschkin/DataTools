@@ -38,7 +38,7 @@ namespace DataTools.Hardware.Printers
         internal MemPtr _ptr;
         private bool _own = true;
 
-        internal DeviceMode(nint ptr, bool fOwn)
+        internal DeviceMode(IntPtr ptr, bool fOwn)
         {
             _ptr = ptr;
             _own = fOwn;

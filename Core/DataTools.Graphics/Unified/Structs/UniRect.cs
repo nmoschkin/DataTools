@@ -174,6 +174,11 @@ namespace DataTools.Graphics
             height = rc.Height;
         }
 
+        public bool Contains(UniPoint pt)
+        {
+            return pt.X >= Left && pt.X <= Right && pt.Y >= Top && pt.Y <= Bottom;
+        }
+
         public static UniRect FromInts(int[] ints)
         {
             return new UniRect(ints[0], ints[1], ints[2], ints[3]);
@@ -185,7 +190,7 @@ namespace DataTools.Graphics
             return new UniRect(ints[0], ints[1], ints[2], ints[3]);
         }
 
-        public static UniRect FromIntsPointer(nint ptr)
+        public static UniRect FromIntsPointer(IntPtr ptr)
         {
             unsafe
             {
@@ -199,7 +204,7 @@ namespace DataTools.Graphics
             return new UniRect(doubles[0], doubles[1], doubles[2], doubles[3]);
         }
 
-        public static UniRect FromDoublesPointer(nint ptr)
+        public static UniRect FromDoublesPointer(IntPtr ptr)
         {
             unsafe
             {
@@ -219,7 +224,7 @@ namespace DataTools.Graphics
             return new UniRect(floats[0], floats[1], floats[2], floats[3]);
         }
 
-        public static UniRect FromFloatsPointer(nint ptr)
+        public static UniRect FromFloatsPointer(IntPtr ptr)
         {
             unsafe
             {

@@ -1,6 +1,8 @@
 ﻿using DataTools.MathTools.Polar;
 using DataTools.Win32.Memory;
 
+using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using static DataTools.Win32.DeviceEnum;
@@ -100,11 +102,11 @@ namespace DataTools.Win32.Display
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        internal nint hMonitor
+        internal IntPtr hMonitor
         {
             get
             {
-                return (nint)source.hMonitor;
+                return (IntPtr)source.hMonitor;
             }
         }
 

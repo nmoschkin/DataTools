@@ -66,11 +66,11 @@ namespace DataTools.Shell.Native
         // where lVal is from the ParseErrorType enumeration. The valid
         // values for riid are IID_IEnumUnknown and IID_IEnumVARIANT.
         [PreserveSig]
-        HResult GetErrors([In] ref Guid riid, [Out] out /* void** */ nint ppParseErrors);
+        HResult GetErrors([In] ref Guid riid, [Out] out /* void** */ IntPtr ppParseErrors);
 
         // Report the query string, how it was tokenized and what LCID and word breaker were used (for recognizing keywords).
         // ppszInputString, ppTokens, pLocale and ppWordBreaker may be NULL.
         [PreserveSig]
-        HResult GetLexicalData([MarshalAs(UnmanagedType.LPWStr)] out string ppszInputString, [Out] /* ITokenCollection** */ out nint ppTokens, [Out] out uint plcid, [Out] /* IUnknown** */ out nint ppWordBreaker);
+        HResult GetLexicalData([MarshalAs(UnmanagedType.LPWStr)] out string ppszInputString, [Out] /* ITokenCollection** */ out IntPtr ppTokens, [Out] out uint plcid, [Out] /* IUnknown** */ out IntPtr ppWordBreaker);
     }
 }

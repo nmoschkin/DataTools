@@ -24,6 +24,9 @@
 
 using DataTools.Win32.Memory;
 
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace DataTools.Desktop
@@ -36,7 +39,7 @@ namespace DataTools.Desktop
     {
         private readonly List<IconImageEntry> entries = new List<IconImageEntry>();
         private ICONDIR icondir;
-        private string? filename;
+        private string filename;
 
         /// <summary>
         /// Gets or sets the filename of the icon file.
@@ -44,7 +47,7 @@ namespace DataTools.Desktop
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string? FileName
+        public string FileName
         {
             get => filename;
             set
@@ -74,7 +77,7 @@ namespace DataTools.Desktop
         /// <param name="StandardIconType"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public IconImageEntry? FindIcon(StandardIcons StandardIconType)
+        public IconImageEntry FindIcon(StandardIcons StandardIconType)
         {
             foreach (var e in entries)
             {
@@ -116,7 +119,7 @@ namespace DataTools.Desktop
         /// <param name="ptr">The memory pointer to load.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        public bool LoadIcon(nint ptr)
+        public bool LoadIcon(IntPtr ptr)
         {
             return internalLoadFromPtr(ptr);
         }
@@ -183,7 +186,7 @@ namespace DataTools.Desktop
         /// <param name="ptr">The pointer to load.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        private bool internalLoadFromPtr(nint ptr)
+        private bool internalLoadFromPtr(IntPtr ptr)
         {
             // get the icon file header directory.
             MemPtr mm = ptr;
@@ -356,7 +359,7 @@ namespace DataTools.Desktop
         /// </summary>
         /// <param name="ptr"></param>
         /// <remarks></remarks>
-        public IconImage(nint ptr)
+        public IconImage(IntPtr ptr)
         {
             internalLoadFromPtr(ptr);
         }

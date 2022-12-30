@@ -1,6 +1,7 @@
 ﻿using DataTools.Streams;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -10,10 +11,10 @@ namespace DataTools.Memory
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct MemPtr
     {
-        internal nint handle;
-        public static readonly MemPtr Empty = new MemPtr(nint.Zero);
+        internal IntPtr handle;
+        public static readonly MemPtr Empty = new MemPtr(IntPtr.Zero);
 
-        public nint Handle
+        public IntPtr Handle
         {
             get
             {
@@ -34,24 +35,24 @@ namespace DataTools.Memory
         public MemPtr(long size = 1024)
         {
             if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
-            handle = nint.Zero;
+            handle = IntPtr.Zero;
             Alloc(size);
         }
 
-        public MemPtr(nint ptr)
+        public MemPtr(IntPtr ptr)
         {
             handle = ptr;
         }
 
         public unsafe MemPtr(void* ptr)
         {
-            handle = (nint)ptr;
+            handle = (IntPtr)ptr;
         }
 
         public uint CalculateCrc32(int size)
         {
             long c = size;
-            if (handle == nint.Zero || c <= 0) return 0;
+            if (handle == IntPtr.Zero || c <= 0) return 0;
 
             unsafe
             {
@@ -64,7 +65,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(byte*)(handle + index);
+                return ref *(byte*)(handle.ToInt64() + index);
             }
         }
 
@@ -73,7 +74,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(sbyte*)(handle + index);
+                return ref *(sbyte*)(handle.ToInt64() + index);
             }
         }
 
@@ -82,7 +83,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(char*)(handle + index * sizeof(char));
+                return ref *(char*)(handle.ToInt64() + index * sizeof(char));
             }
         }
 
@@ -91,7 +92,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(char*)(handle + index);
+                return ref *(char*)(handle.ToInt64() + index);
             }
         }
 
@@ -100,7 +101,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(short*)(handle + index * sizeof(short));
+                return ref *(short*)(handle.ToInt64() + index * sizeof(short));
             }
         }
 
@@ -109,7 +110,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(short*)(handle + index);
+                return ref *(short*)(handle.ToInt64() + index);
             }
         }
 
@@ -118,7 +119,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(ushort*)(handle + index * sizeof(ushort));
+                return ref *(ushort*)(handle.ToInt64() + index * sizeof(ushort));
             }
         }
 
@@ -127,7 +128,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(ushort*)(handle + index);
+                return ref *(ushort*)(handle.ToInt64() + index);
             }
         }
 
@@ -136,7 +137,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(int*)(handle + index * sizeof(int));
+                return ref *(int*)(handle.ToInt64() + index * sizeof(int));
             }
         }
 
@@ -145,7 +146,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(int*)(handle + index);
+                return ref *(int*)(handle.ToInt64() + index);
             }
         }
 
@@ -154,7 +155,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(uint*)(handle + index * sizeof(uint));
+                return ref *(uint*)(handle.ToInt64() + index * sizeof(uint));
             }
         }
 
@@ -163,7 +164,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(uint*)(handle + index);
+                return ref *(uint*)(handle.ToInt64() + index);
             }
         }
 
@@ -172,7 +173,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(long*)(handle + index * sizeof(long));
+                return ref *(long*)(handle.ToInt64() + index * sizeof(long));
             }
         }
 
@@ -181,7 +182,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(long*)(handle + index);
+                return ref *(long*)(handle.ToInt64() + index);
             }
         }
 
@@ -190,7 +191,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(ulong*)(handle + index * sizeof(ulong));
+                return ref *(ulong*)(handle.ToInt64() + index * sizeof(ulong));
             }
         }
 
@@ -199,7 +200,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(ulong*)(handle + index);
+                return ref *(ulong*)(handle.ToInt64() + index);
             }
         }
 
@@ -208,7 +209,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(float*)(handle + index * sizeof(float));
+                return ref *(float*)(handle.ToInt64() + index * sizeof(float));
             }
         }
 
@@ -217,7 +218,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(float*)(handle + index);
+                return ref *(float*)(handle.ToInt64() + index);
             }
         }
 
@@ -232,7 +233,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(double*)(handle + index * sizeof(double));
+                return ref *(double*)(handle.ToInt64() + index * sizeof(double));
             }
         }
 
@@ -241,7 +242,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(double*)(handle + index);
+                return ref *(double*)(handle.ToInt64() + index);
             }
         }
 
@@ -250,7 +251,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(decimal*)(handle + index * sizeof(decimal));
+                return ref *(decimal*)(handle.ToInt64() + index * sizeof(decimal));
             }
         }
 
@@ -259,7 +260,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(decimal*)(handle + index);
+                return ref *(decimal*)(handle.ToInt64() + index);
             }
         }
 
@@ -268,7 +269,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(Guid*)(handle + index * sizeof(Guid));
+                return ref *(Guid*)(handle.ToInt64() + index * sizeof(Guid));
             }
         }
 
@@ -277,7 +278,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(Guid*)(handle + index);
+                return ref *(Guid*)(handle.ToInt64() + index);
             }
         }
 
@@ -286,7 +287,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(DateTime*)(handle + index * sizeof(DateTime));
+                return ref *(DateTime*)(handle.ToInt64() + index * sizeof(DateTime));
             }
         }
 
@@ -295,7 +296,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return ref *(DateTime*)(handle + index);
+                return ref *(DateTime*)(handle.ToInt64() + index);
             }
         }
 
@@ -385,7 +386,7 @@ namespace DataTools.Memory
 
             unsafe
             {
-                nint h1 = gc1.AddrOfPinnedObject();
+                IntPtr h1 = gc1.AddrOfPinnedObject();
                 //void* h2 = (void*)gc2.AddrOfPinnedObject();
 
                 val2 = Marshal.PtrToStructure<U>(h1);
@@ -408,7 +409,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T ToStruct<T>() where T : struct
         {
-            if (handle == nint.Zero) return default;
+            if (handle == IntPtr.Zero) return default;
             return (T)Marshal.PtrToStructure(handle, typeof(T));
         }
 
@@ -421,7 +422,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void FromStruct<T>(T val) where T : struct
         {
-            if (handle == nint.Zero)
+            if (handle == IntPtr.Zero)
             {
                 Alloc(Marshal.SizeOf(val));
             }
@@ -439,7 +440,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T ToStructAt<T>(long byteIndex) where T : struct
         {
-            return (T)Marshal.PtrToStructure((nint)(handle + byteIndex), typeof(T));
+            return (T)Marshal.PtrToStructure((IntPtr)(handle.ToInt64() + byteIndex), typeof(T));
         }
 
         /// <summary>
@@ -452,18 +453,18 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void FromStructAt<T>(long byteIndex, T val) where T : struct
         {
-            if (handle == nint.Zero)
+            if (handle == IntPtr.Zero)
             {
                 Alloc(Marshal.SizeOf(val) + byteIndex);
             }
 
-            Marshal.StructureToPtr(val, (nint)(handle + byteIndex), false);
+            Marshal.StructureToPtr(val, (IntPtr)(handle.ToInt64() + byteIndex), false);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public byte[] ToByteArray(long index, long length)
         {
-            if (handle == nint.Zero || length < 0) return null;
+            if (handle == IntPtr.Zero || length < 0) return null;
 
             long len = length;
 
@@ -473,7 +474,7 @@ namespace DataTools.Memory
 
             unsafe
             {
-                void* ptr1 = (void*)(handle + index);
+                void* ptr1 = (void*)(handle.ToInt64() + index);
                 void* ptr2 = (void*)gch.AddrOfPinnedObject();
 
                 Buffer.MemoryCopy(ptr1, ptr2, len, len);
@@ -486,7 +487,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public char[] ToCharArray(long index, int length)
         {
-            if (handle == nint.Zero || length < 0) return null;
+            if (handle == IntPtr.Zero || length < 0) return null;
 
             long len = length * sizeof(char);
 
@@ -503,7 +504,7 @@ namespace DataTools.Memory
 
             unsafe
             {
-                void* ptr1 = (void*)(handle + index);
+                void* ptr1 = (void*)(handle.ToInt64() + index);
                 void* ptr2 = (void*)gch.AddrOfPinnedObject();
 
                 Buffer.MemoryCopy(ptr1, ptr2, len, len);
@@ -516,7 +517,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T[] ToArray<T>(long index, int length) where T : struct
         {
-            if (handle == nint.Zero || length < 0) return null;
+            if (handle == IntPtr.Zero || length < 0) return null;
 
             unsafe
             {
@@ -541,7 +542,7 @@ namespace DataTools.Memory
 
                 unsafe
                 {
-                    void* ptr1 = (void*)(handle + index);
+                    void* ptr1 = (void*)(handle.ToInt64() + index);
                     void* ptr2 = (void*)gch.AddrOfPinnedObject();
 
                     Buffer.MemoryCopy(ptr1, ptr2, len, len);
@@ -554,7 +555,7 @@ namespace DataTools.Memory
 
         public void FromByteArray(byte[] value, long index = 0)
         {
-            if (handle != nint.Zero)
+            if (handle != IntPtr.Zero)
             {
                 ReAlloc(value.Length + index);
             }
@@ -566,14 +567,14 @@ namespace DataTools.Memory
             {
                 var vl = value.Length;
                 GCHandle gch = GCHandle.Alloc(value, GCHandleType.Pinned);
-                Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)(handle + index), vl, vl);
+                Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)(handle.ToInt64() + index), vl, vl);
                 gch.Free();
             }
         }
 
         public void FromCharArray(char[] value, long index = 0)
         {
-            if (handle != nint.Zero)
+            if (handle != IntPtr.Zero)
             {
                 ReAlloc(value.Length * sizeof(char) + index);
             }
@@ -585,7 +586,7 @@ namespace DataTools.Memory
             {
                 var vl = value.Length * 2;
                 GCHandle gch = GCHandle.Alloc(value, GCHandleType.Pinned);
-                Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)(handle + index), vl, vl);
+                Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)(handle.ToInt64() + index), vl, vl);
                 gch.Free();
             }
         }
@@ -594,7 +595,7 @@ namespace DataTools.Memory
         {
             var cb = Marshal.SizeOf<T>();
 
-            if (handle != nint.Zero)
+            if (handle != IntPtr.Zero)
             {
                 ReAlloc(value.Length * cb + index);
             }
@@ -606,7 +607,7 @@ namespace DataTools.Memory
             {
                 var vl = value.Length * cb;
                 GCHandle gch = GCHandle.Alloc(value, GCHandleType.Pinned);
-                Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)(handle + index), vl, vl);
+                Buffer.MemoryCopy((void*)gch.AddrOfPinnedObject(), (void*)(handle.ToInt64() + index), vl, vl);
                 gch.Free();
             }
         }
@@ -616,7 +617,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return new string((char*)(handle + index));
+                return new string((char*)(handle.ToInt64() + index));
             }
         }
 
@@ -625,7 +626,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return new string((char*)(handle + index), 0, length);
+                return new string((char*)(handle.ToInt64() + index), 0, length);
             }
         }
 
@@ -634,7 +635,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                internalSetString((char*)(handle + index), value, addNull);
+                internalSetString((char*)(handle.ToInt64() + index), value, addNull);
             }
         }
 
@@ -643,7 +644,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                char* ptr = (char*)*(nint*)(handle + index);
+                char* ptr = (char*)*(IntPtr*)(handle.ToInt64() + index);
                 internalSetString(ptr, value, addNull);
             }
         }
@@ -653,7 +654,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                char* ptr = (char*)*(nint*)(handle + index);
+                char* ptr = (char*)*(IntPtr*)(handle.ToInt64() + index);
                 return new string(ptr);
             }
         }
@@ -663,7 +664,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return internalGetUTF8String((byte*)(handle + index));
+                return internalGetUTF8String((byte*)(handle.ToInt64() + index));
             }
         }
 
@@ -672,7 +673,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                return internalGetUTF8String((byte*)*(nint*)(handle + index));
+                return internalGetUTF8String((byte*)*(IntPtr*)(handle.ToInt64() + index));
             }
         }
 
@@ -692,7 +693,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                internalSetUTF8String((byte*)(handle + index), value, addNull);
+                internalSetUTF8String((byte*)(handle.ToInt64() + index), value, addNull);
             }
         }
 
@@ -701,7 +702,7 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                internalSetUTF8String((byte*)*(nint*)(handle + index), value, addNull);
+                internalSetUTF8String((byte*)*(IntPtr*)(handle.ToInt64() + index), value, addNull);
             }
         }
 
@@ -752,11 +753,11 @@ namespace DataTools.Memory
         {
             unsafe
             {
-                if (handle == nint.Zero) return null;
+                if (handle == IntPtr.Zero) return null;
 
                 string s = null;
 
-                char* cp = (char*)((ulong)handle + (ulong)byteIndex);
+                char* cp = (char*)((ulong)handle.ToInt64() + (ulong)byteIndex);
                 char* ap = cp;
 
                 int x = 0;
@@ -816,12 +817,12 @@ namespace DataTools.Memory
 
             unsafe
             {
-                byte* bp1 = (byte*)(handle + idx);
-                byte* bep = (byte*)(handle + idx + len);
+                byte* bp1 = (byte*)(handle.ToInt64() + idx);
+                byte* bep = (byte*)(handle.ToInt64() + idx + len);
 
-                if (len >= nint.Size)
+                if (len >= IntPtr.Size)
                 {
-                    if (nint.Size == 8)
+                    if (IntPtr.Size == 8)
                     {
                         long* lp1 = (long*)bp1;
                         long* lep = (long*)bep;
@@ -859,7 +860,7 @@ namespace DataTools.Memory
                 } while (bp1 < bep);
             }
 
-            // Native.n_memset(handle, 0, (nint)len);
+            // Native.n_memset(handle, 0, (IntPtr)len);
         }
 
         /// <summary>
@@ -878,8 +879,8 @@ namespace DataTools.Memory
         {
             bool al;
 
-            handle = Marshal.AllocHGlobal((nint)size);
-            al = handle != nint.Zero;
+            handle = Marshal.AllocHGlobal((IntPtr)size);
+            al = handle != IntPtr.Zero;
 
             // see if we need to tell the garbage collector anything.
             if (al && addPressure)
@@ -944,15 +945,15 @@ namespace DataTools.Memory
         /// <remarks></remarks>
         public bool ReAlloc(long size, int oldsize = 0, bool modifyPressure = false)
         {
-            if (handle == nint.Zero) return Alloc(size, modifyPressure);
+            if (handle == IntPtr.Zero) return Alloc(size, modifyPressure);
 
             bool ra;
 
             // While the function doesn't need to call HeapReAlloc, it hasn't necessarily failed, either.
 
-            handle = Marshal.ReAllocHGlobal(handle, new nint(size));
+            handle = Marshal.ReAllocHGlobal(handle, new IntPtr(size));
 
-            ra = handle != nint.Zero;
+            ra = handle != IntPtr.Zero;
 
             // see if we need to tell the garbage collector anything.
             if (ra && modifyPressure && oldsize > 0)
@@ -979,7 +980,7 @@ namespace DataTools.Memory
         public bool Free(bool removePressure = false, long oldSize = 0)
         {
             // While the function doesn't need to call HeapFree, it hasn't necessarily failed, either.
-            if (handle == nint.Zero)
+            if (handle == IntPtr.Zero)
                 return true;
             else
             {
@@ -988,7 +989,7 @@ namespace DataTools.Memory
                 Marshal.FreeHGlobal(handle);
 
                 // see if we need to tell the garbage collector anything.
-                handle = nint.Zero;
+                handle = IntPtr.Zero;
                 if (removePressure && oldSize > 0) GC.RemoveMemoryPressure(l);
             }
 
@@ -997,7 +998,7 @@ namespace DataTools.Memory
 
         public override string ToString()
         {
-            if (handle == nint.Zero) return "";
+            if (handle == IntPtr.Zero) return "";
             return GetString(0);
         }
 
@@ -1014,7 +1015,7 @@ namespace DataTools.Memory
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator string(MemPtr val)
         {
-            if (val.handle == 0) return null;
+            if (val.handle == IntPtr.Zero) return null;
             return val.GetString(0);
         }
 
@@ -1064,68 +1065,68 @@ namespace DataTools.Memory
 
         public static MemPtr operator +(MemPtr val1, long val2)
         {
-            val1.handle = (nint)(val1.handle + val2);
+            val1.handle = (IntPtr)(val1.handle.ToInt64() + val2);
             return val1;
         }
 
         public static MemPtr operator -(MemPtr val1, long val2)
         {
-            val1.handle = (nint)(val1.handle - val2);
+            val1.handle = (IntPtr)(val1.handle.ToInt64() - val2);
             return val1;
         }
 
         public static MemPtr operator +(MemPtr val1, uint val2)
         {
-            val1.handle = (nint)((uint)val1.handle + val2);
+            val1.handle = (IntPtr)((uint)val1.handle.ToInt64() + val2);
             return val1;
         }
 
         public static MemPtr operator -(MemPtr val1, uint val2)
         {
-            val1.handle = (nint)((uint)val1.handle - val2);
+            val1.handle = (IntPtr)((uint)val1.handle.ToInt64() - val2);
             return val1;
         }
 
         public static MemPtr operator +(MemPtr val1, ulong val2)
         {
-            val1.handle = (nint)((ulong)val1.handle + val2);
+            val1.handle = (IntPtr)((ulong)val1.handle.ToInt64() + val2);
             return val1;
         }
 
         public static MemPtr operator -(MemPtr val1, ulong val2)
         {
-            val1.handle = (nint)((ulong)val1.handle - val2);
+            val1.handle = (IntPtr)((ulong)val1.handle - val2);
             return val1;
         }
 
-        public static MemPtr operator +(MemPtr val1, nint val2)
+        public static MemPtr operator +(MemPtr val1, IntPtr val2)
         {
-            val1.handle = (nint)(val1.handle + (long)val2);
+            val1.handle = (IntPtr)(val1.handle.ToInt64() + (long)val2);
             return val1;
         }
 
-        public static MemPtr operator -(MemPtr val1, nint val2)
+        public static MemPtr operator -(MemPtr val1, IntPtr val2)
         {
-            val1.handle = (nint)(val1.handle - (long)val2);
+            val1.handle = (IntPtr)(val1.handle.ToInt64() - (long)val2);
             return val1;
         }
 
-        public static bool operator ==(nint val1, MemPtr val2)
+        public static bool operator ==(IntPtr val1, MemPtr val2)
         {
             return val1 == val2.handle;
         }
 
-        public static bool operator !=(nint val1, MemPtr val2)
+        public static bool operator !=(IntPtr val1, MemPtr val2)
         {
             return val1 != val2.handle;
         }
 
-        public static bool operator ==(MemPtr val2, nint val1)
+        public static bool operator ==(MemPtr val2, IntPtr val1)
         {
             return val1 == val2.handle;
         }
 
-        public static bool operator !=(MemPtr val2, nint val1)
+        public static bool operator !=(MemPtr val2, IntPtr val1)
         {
             return val1 != val2.handle;
         }
@@ -1140,7 +1141,7 @@ namespace DataTools.Memory
             return val1.handle != val2.handle;
         }
 
-        public static implicit operator nint(MemPtr val)
+        public static implicit operator IntPtr(MemPtr val)
         {
             unsafe
             {
@@ -1148,13 +1149,13 @@ namespace DataTools.Memory
             }
         }
 
-        public static implicit operator MemPtr(nint val)
+        public static implicit operator MemPtr(IntPtr val)
         {
             unsafe
             {
                 return new MemPtr
                 {
-                    handle = (nint)(void*)val
+                    handle = (IntPtr)(void*)val
                 };
             }
         }
@@ -1173,7 +1174,7 @@ namespace DataTools.Memory
             {
                 return new MemPtr
                 {
-                    handle = (nint)(void*)val
+                    handle = (IntPtr)(void*)val
                 };
             }
         }

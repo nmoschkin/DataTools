@@ -14,6 +14,7 @@ using DataTools.MathTools.Polar;
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using static DataTools.Win32.Display.MultiMon;
@@ -29,12 +30,12 @@ namespace DataTools.Win32.Display
         [DllImport("Dxva2.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "GetNumberOfPhysicalMonitorsFromHMONITOR")]
         public static extern bool GetNumberOfPhysicalMonitorsFromHMONITOR
         (
-            nint hMonitor,
+            IntPtr hMonitor,
             out uint pdwNumberOfPhysicalMonitors
 
         );
 
-        public static string[] GetPhysicalMonitorNames(nint hMonitor)
+        public static string[] GetPhysicalMonitorNames(IntPtr hMonitor)
         {
             var mm = new MemPtr();
             string[] sOut = null;
@@ -90,7 +91,7 @@ namespace DataTools.Win32.Display
         [DllImport("Dxva2.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "GetPhysicalMonitorsFromHMONITOR")]
         public static extern bool GetPhysicalMonitorsFromHMONITOR
             (
-            nint hMonitor,
+            IntPtr hMonitor,
             int dwPhysicalMonitorArraySize,
             MemPtr pPhysicalMonitorArray
 
@@ -98,7 +99,7 @@ namespace DataTools.Win32.Display
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "EnumDisplayDevicesW")]
         public static extern bool EnumDisplayDevices(
-            nint lpDevice,
+            IntPtr lpDevice,
             uint iDevNum,
             MemPtr lpDisplayDevice,
             int dwFlags
@@ -115,7 +116,7 @@ namespace DataTools.Win32.Display
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true, EntryPoint = "EnumDisplaySettingsExW")]
         public static extern bool EnumDisplaySettingsEx(
-            nint lpszDeviceName,
+            IntPtr lpszDeviceName,
             uint iModeNum,
             ref DEVMODE lpDevMode,
             uint dwFlags);
@@ -138,7 +139,7 @@ namespace DataTools.Win32.Display
         //    );
 
         [DllImport("Dxva2.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-        public static extern bool DestroyPhysicalMonitor(nint hMonitor);
+        public static extern bool DestroyPhysicalMonitor(IntPtr hMonitor);
 
         [DllImport("Dxva2.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern bool DestroyPhysicalMonitors
@@ -187,7 +188,7 @@ namespace DataTools.Win32.Display
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     internal struct PHYSICAL_MONITOR
     {
-        public nint hPhysicalMonitor;
+        public IntPtr hPhysicalMonitor;
 
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = PHYSICAL_MONITOR_DESCRIPTION_SIZE)]
         public string szPhysicalMonitorDescription;
@@ -243,21 +244,21 @@ namespace DataTools.Win32.Display
     public class Monitors : List<MonitorInfo>
     {
         [return: MarshalAs(UnmanagedType.Bool)]
-        private delegate bool MonitorEnumProc(nint hMonitor, nint hdcMonitor, ref W32RECT lpRect, nint lParam);
+        private delegate bool MonitorEnumProc(IntPtr hMonitor, IntPtr hdcMonitor, ref W32RECT lpRect, IntPtr lParam);
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        private static extern bool EnumDisplayMonitors(nint hdc, nint lprcClip, [MarshalAs(UnmanagedType.FunctionPtr)] MonitorEnumProc lpfnEnum, nint dwData);
+        private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, [MarshalAs(UnmanagedType.FunctionPtr)] MonitorEnumProc lpfnEnum, IntPtr dwData);
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        private static extern nint MonitorFromPoint(W32POINT pt, MultiMonFlags dwFlags);
+        private static extern IntPtr MonitorFromPoint(W32POINT pt, MultiMonFlags dwFlags);
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        private static extern nint MonitorFromRect(W32RECT pt, MultiMonFlags dwFlags);
+        private static extern IntPtr MonitorFromRect(W32RECT pt, MultiMonFlags dwFlags);
 
         [DllImport("user32", CharSet = CharSet.Unicode)]
-        private static extern nint MonitorFromWindow(nint hWnd, MultiMonFlags dwFlags);
+        private static extern IntPtr MonitorFromWindow(IntPtr hWnd, MultiMonFlags dwFlags);
 
-        private bool _enum(nint hMonitor, nint hdcMonitor, ref W32RECT lpRect, nint lParamIn)
+        private bool _enum(IntPtr hMonitor, IntPtr hdcMonitor, ref W32RECT lpRect, IntPtr lParamIn)
         {
             MemPtr lParam = lParamIn;
             Add(new MonitorInfo(hMonitor, lParam.IntAt(0L)));
@@ -278,7 +279,7 @@ namespace DataTools.Win32.Display
                 Refresh();
 
             var h = MonitorFromPoint((W32POINT)pt, flags);
-            if (h == nint.Zero)
+            if (h == IntPtr.Zero)
                 return null;
             foreach (var m in this)
             {
@@ -299,7 +300,7 @@ namespace DataTools.Win32.Display
             if (Count == 0)
                 Refresh();
             var h = MonitorFromRect((W32RECT)rc, flags);
-            if (h == nint.Zero)
+            if (h == IntPtr.Zero)
                 return null;
             foreach (var m in this)
             {
@@ -316,12 +317,12 @@ namespace DataTools.Win32.Display
         /// <param name="hwnd"></param>
         /// <param name="flags"></param>
         /// <returns></returns>
-        public MonitorInfo GetMonitorFromWindow(nint hwnd, MultiMonFlags flags = MultiMonFlags.DefaultToNearest)
+        public MonitorInfo GetMonitorFromWindow(IntPtr hwnd, MultiMonFlags flags = MultiMonFlags.DefaultToNearest)
         {
             if (Count == 0)
                 Refresh();
             var h = MonitorFromWindow(hwnd, flags);
-            if (h == nint.Zero)
+            if (h == IntPtr.Zero)
                 return null;
             foreach (var m in this)
             {
@@ -348,7 +349,7 @@ namespace DataTools.Win32.Display
 
             int i = mm.IntAt(0L);
 
-            ret = EnumDisplayMonitors(nint.Zero, nint.Zero, _enum, mm);
+            ret = EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, _enum, mm);
 
             mm.Free();
 
@@ -398,12 +399,12 @@ namespace DataTools.Win32.Display
     /// <remarks></remarks>
     public class MonitorInfo
     {
-        private nint _hMonitor;
+        private IntPtr _hMonitor;
         private MONITORINFOEX _data;
         private int _idx;
 
         [DllImport("user32", EntryPoint = "GetMonitorInfoW", CharSet = CharSet.Unicode)]
-        internal static extern bool GetMonitorInfo(nint hMonitor, ref MONITORINFOEX info);
+        internal static extern bool GetMonitorInfo(IntPtr hMonitor, ref MONITORINFOEX info);
 
         /// <summary>
         /// Returns the monitor index, or the order in which this monitor was reported to the monitor collection.
@@ -490,7 +491,7 @@ namespace DataTools.Win32.Display
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        internal nint hMonitor
+        internal IntPtr hMonitor
         {
             get
             {
@@ -513,7 +514,7 @@ namespace DataTools.Win32.Display
         /// </summary>
         /// <param name="hMonitor"></param>
         /// <remarks></remarks>
-        internal MonitorInfo(nint hMonitor, int idx)
+        internal MonitorInfo(IntPtr hMonitor, int idx)
         {
             _hMonitor = hMonitor;
             _data.cbSize = (uint)Marshal.SizeOf(_data);

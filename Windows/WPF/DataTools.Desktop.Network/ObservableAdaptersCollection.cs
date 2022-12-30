@@ -1,24 +1,21 @@
 ﻿using DataTools.Win32.Network;
 
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace DataTools.Desktop.Network
 {
-
     public class ObservableAdaptersCollection : AdaptersCollection<NetworkAdapterViewModel>, INotifyPropertyChanged, INotifyCollectionChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        System.Windows.Application app = System.Windows.Application.Current;
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        private System.Windows.Application app = System.Windows.Application.Current;
 
         public ObservableAdaptersCollection() : base()
         {
@@ -36,7 +33,7 @@ namespace DataTools.Desktop.Network
 
         protected override void Sort()
         {
-            lock(lockObj)
+            lock (lockObj)
             {
                 base.Sort();
             }
@@ -77,15 +74,14 @@ namespace DataTools.Desktop.Network
             });
         }
 
-        private void OnPropertyChanged([CallerMemberName]string? propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));  
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         ~ObservableAdaptersCollection()
         {
             Dispose(false);
         }
-
     }
 }

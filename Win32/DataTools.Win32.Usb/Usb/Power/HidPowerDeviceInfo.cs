@@ -1,11 +1,7 @@
-﻿using DataTools.Win32.Memory;
-
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Win32.Usb.Power
 {
@@ -14,8 +10,7 @@ namespace DataTools.Win32.Usb.Power
     /// </summary>
     public class HidPowerDeviceInfo : HidDeviceInfo
     {
-
-        protected Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>>? powerCollections;
+        protected Dictionary<HidPowerUsageInfo, List<HidPowerUsageInfo>> powerCollections;
 
         /// <summary>
         /// Create a <see cref="HidPowerDeviceInfo"/> object from an existing <see cref="HidDeviceInfo"/> object.
@@ -38,7 +33,7 @@ namespace DataTools.Win32.Usb.Power
             return result;
         }
 
-        public override object? RetrieveValue(HidUsageInfo item, bool populateItemValue = false)
+        public override object RetrieveValue(HidUsageInfo item, bool populateItemValue = false)
         {
             var res = base.RetrieveValue(item, populateItemValue);
 
@@ -81,6 +76,5 @@ namespace DataTools.Win32.Usb.Power
 
             return res;
         }
-
     }
 }

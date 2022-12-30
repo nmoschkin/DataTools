@@ -156,6 +156,6 @@ namespace DataTools.Win32
         public const int JOB_OBJECT_ALL_ACCESS = IO.STANDARD_RIGHTS_REQUIRED | IO.SYNCHRONIZE | 0x1F;
 
         [DllImport("kernel32")]
-        public static extern nint OpenThread(int wdDesiredAccess, bool binheritHandle, int dwThreadId);
+        public static extern IntPtr OpenThread(int wdDesiredAccess, bool binheritHandle, int dwThreadId);
     }
 }

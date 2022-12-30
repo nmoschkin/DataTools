@@ -25,7 +25,9 @@
 using DataTools.Win32.Memory;
 
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace DataTools.Win32.Menu
 {
