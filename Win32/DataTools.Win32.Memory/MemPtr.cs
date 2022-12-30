@@ -1093,7 +1093,7 @@ namespace DataTools.Win32.Memory
             {
                 unsafe
                 {
-                    Native.ZeroMemory((void*)((long)handle + index), (IntPtr)amount);
+                    Native.ZeroMemory((void*)((long)handle + index), amount);
                 }
             }
 
@@ -1682,7 +1682,7 @@ namespace DataTools.Win32.Memory
                 void* p = (void*)handle;
                 if (p == null || Size == 0) return;
 
-                Native.ZeroMemory(p, (IntPtr)Size);
+                Native.ZeroMemory(p, Size);
             }
         }
 

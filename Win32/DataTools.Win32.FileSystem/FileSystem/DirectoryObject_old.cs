@@ -4,6 +4,7 @@ using DataTools.Shell.Native;
 using DataTools.Win32;
 
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;

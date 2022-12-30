@@ -19,8 +19,8 @@ namespace DataTools.Win32.Memory
 
         private readonly List<WeakReference<IHeapAssignable>> createdObjecs = new List<WeakReference<IHeapAssignable>>();
 
-        private IntPtr maxsize = 0;
-        private IntPtr currsize = 0;
+        private IntPtr maxsize = IntPtr.Zero;
+        private IntPtr currsize = IntPtr.Zero;
 
         public bool IsProcessHeap => ProcessHeap.handle == handle;
 
@@ -29,7 +29,7 @@ namespace DataTools.Win32.Memory
             get
             {
                 GetHeapSize();
-                return maxsize;
+                return (long)maxsize;
             }
         }
 
@@ -38,7 +38,7 @@ namespace DataTools.Win32.Memory
             get
             {
                 GetHeapSize();
-                return currsize;
+                return (long)currsize;
             }
         }
 
@@ -59,34 +59,34 @@ namespace DataTools.Win32.Memory
             }
         }
 
-        public Heap(IntPtr heapPtr, bool fOwn) : base(0, fOwn)
+        public Heap(IntPtr heapPtr, bool fOwn) : base(IntPtr.Zero, fOwn)
         {
             handle = heapPtr;
             GetHeapSize();
         }
 
-        private Heap(IntPtr ptr) : base(0, false)
+        private Heap(IntPtr ptr) : base(IntPtr.Zero, false)
         {
             handle = ptr;
             GetHeapSize();
         }
 
-        public Heap(long size) : base(0, true)
+        public Heap(long size) : base(IntPtr.Zero, true)
         {
             CreateHeap((IntPtr)size, (IntPtr)size);
         }
 
-        public Heap(int size) : base(0, true)
+        public Heap(int size) : base(IntPtr.Zero, true)
         {
             CreateHeap((IntPtr)size, (IntPtr)size);
         }
 
-        public Heap(long size, long maxsize) : base(0, true)
+        public Heap(long size, long maxsize) : base(IntPtr.Zero, true)
         {
             CreateHeap((IntPtr)size, (IntPtr)maxsize);
         }
 
-        public Heap(int size, int maxsize) : base(0, true)
+        public Heap(int size, int maxsize) : base(IntPtr.Zero, true)
         {
             CreateHeap((IntPtr)size, (IntPtr)maxsize);
         }
@@ -110,7 +110,7 @@ namespace DataTools.Win32.Memory
         {
             committed = uncommitted = 0;
 
-            if (handle == 0) return 0;
+            if ((long)handle == 0) return 0;
             using (var sp = new SafePtr())
             {
                 int cbsize = Marshal.SizeOf<PROCESS_HEAP_ENTRY_REGION>();
@@ -152,13 +152,13 @@ namespace DataTools.Win32.Memory
         private void CreateHeap(IntPtr size, IntPtr maxsize)
         {
             handle = Native.HeapCreate(0, size, maxsize);
-            if (handle == 0)
+            if ((long)handle == 0)
             {
-                this.maxsize = this.currsize = 0;
+                this.maxsize = this.currsize = IntPtr.Zero;
             }
             else
             {
-                GC.AddMemoryPressure(maxsize);
+                GC.AddMemoryPressure((long)maxsize);
 
                 this.maxsize = maxsize;
                 this.currsize = size;
@@ -171,10 +171,10 @@ namespace DataTools.Win32.Memory
         {
             bool b = true;
 
-            if (handle != 0)
+            if ((long)handle != 0)
             {
                 b = Native.HeapDestroy(handle);
-                if (b) handle = 0;
+                if (b) handle = IntPtr.Zero;
             }
 
             return b;
@@ -214,7 +214,7 @@ namespace DataTools.Win32.Memory
             return ptr;
         }
 
-        public override bool IsInvalid => handle == 0;
+        public override bool IsInvalid => handle == IntPtr.Zero;
 
         protected override bool ReleaseHandle()
         {
@@ -265,6 +265,8 @@ namespace DataTools.Win32.Memory
 
         HeapDestroyBehavior HeapDestroyBehavior { get; }
 
+#if NET6_0_OR_GREATER
+
         /// <summary>
         /// Set the heap for the object
         /// </summary>
@@ -272,6 +274,17 @@ namespace DataTools.Win32.Memory
         protected internal void AssignHeap(Heap heap);
 
         protected internal void HeapIsClosing(Heap heap);
+
+#else
+        /// <summary>
+        /// Set the heap for the object
+        /// </summary>
+        /// <param name="heap"></param>
+        void AssignHeap(Heap heap);
+
+        void HeapIsClosing(Heap heap);
+
+#endif
     }
 
     public class SafePtr : WinPtrBase, IHeapAssignable
@@ -300,7 +313,7 @@ namespace DataTools.Win32.Memory
                     return;
                 }
 
-                if (handle != 0)
+                if ((long)handle != 0)
                 {
                     try
                     {
@@ -311,7 +324,7 @@ namespace DataTools.Win32.Memory
 
                             if (ptr != null)
                             {
-                                Buffer.MemoryCopy((void*)handle, ptr, l, l);
+                                Buffer.MemoryCopy((void*)handle, ptr, (long)l, (long)l);
                             }
 
                             Native.HeapFree(currentHeap, 0, handle);
@@ -344,13 +357,13 @@ namespace DataTools.Win32.Memory
             get => currentHeap;
             protected set
             {
-                if (handle != 0) throw new InvalidOperationException("Can't change heap when the buffer is allocated!");
+                if (handle != IntPtr.Zero) throw new InvalidOperationException("Can't change heap when the buffer is allocated!");
 
                 if (currentHeap == value)
                 {
                     return;
                 }
-                else if (value == 0)
+                else if (value == IntPtr.Zero)
                 {
                     currentHeap = ProcessHeap;
                 }
@@ -371,16 +384,16 @@ namespace DataTools.Win32.Memory
         {
         }
 
-        public SafePtr() : this(0, true, true)
+        public SafePtr() : this(IntPtr.Zero, true, true)
         {
         }
 
-        public SafePtr(long size) : this(0, true, true)
+        public SafePtr(long size) : this(IntPtr.Zero, true, true)
         {
             Alloc(size);
         }
 
-        public SafePtr(int size) : this(0, true, true)
+        public SafePtr(int size) : this(IntPtr.Zero, true, true)
         {
             Alloc(size);
         }
@@ -404,7 +417,7 @@ namespace DataTools.Win32.Memory
             return true;
         }
 
-        protected override SafePtr Clone()
+        protected override SafePtrBase Clone()
         {
             var b = new SafePtr();
             var by = this.ToByteArray();
@@ -419,7 +432,7 @@ namespace DataTools.Win32.Memory
 
         protected override long GetNativeSize()
         {
-            if (handle == 0) return 0;
+            if ((long)handle == 0) return 0;
             return (long)Native.HeapSize(CurrentHeap, 0, handle);
         }
 

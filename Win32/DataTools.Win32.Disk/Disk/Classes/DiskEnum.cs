@@ -2,6 +2,7 @@
 using DataTools.Win32.Memory;
 
 using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;

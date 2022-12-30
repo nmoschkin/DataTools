@@ -13,6 +13,8 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -25,8 +27,6 @@ namespace DataTools.Shell.Native
 
     internal static class NativeShell
     {
-        #region Public Fields
-
         public const int CommandLink = 0xE;
 
         public const uint GetNote = 0x160AU;
@@ -43,21 +43,9 @@ namespace DataTools.Shell.Native
 
         public static List<KeyValuePair<string, IAssocHandler[]>> HandlerCache = new List<KeyValuePair<string, IAssocHandler[]>>();
 
-        #endregion Public Fields
-
-        #region Internal Fields
-
         internal const int MAX_PATH = 260;
 
-        #endregion Internal Fields
-
-        #region Private Fields
-
         private static List<IAssocHandler> lAssoc = new List<IAssocHandler>();
-
-        #endregion Private Fields
-
-        #region Public Enums
 
         public enum ASSOC_FILTER
         {
@@ -80,10 +68,6 @@ namespace DataTools.Shell.Native
             STRRET_OFFSET = 1U,
             STRRET_CSTR = 2U
         }
-
-        #endregion Public Enums
-
-        #region Public Methods
 
         public static void AddToCache(string fileExtension, IAssocHandler[] assoc)
         {
@@ -168,10 +152,6 @@ namespace DataTools.Shell.Native
         [DllImport("shell32.dll")]
         public static extern bool SHGetPathFromIDListW(IntPtr pidl, [MarshalAs(UnmanagedType.LPWStr)] StringBuilder pszPath);
 
-        #endregion Public Methods
-
-        #region Internal Methods
-
         [DllImport("gdi32.dll")]
         internal static extern bool DeleteObject(IntPtr hObject);
 
@@ -230,10 +210,6 @@ namespace DataTools.Shell.Native
         [DllImport("Shell32", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         internal static extern int SHShowManageLibraryUI([In][MarshalAs(UnmanagedType.Interface)] IShellItem library, [In] IntPtr hwndOwner, [In] string title, [In] string instruction, [In] LibraryManageDialogOptions lmdOptions);
 
-        #endregion Internal Methods
-
-        #region Public Structs
-
         [StructLayout(LayoutKind.Sequential)]
         public struct SHChangeNotifyEntry
         {
@@ -265,7 +241,5 @@ namespace DataTools.Shell.Native
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = MAX_PATH)]
             public char[] _cStr;
         }
-
-        #endregion Public Structs
     }
 }

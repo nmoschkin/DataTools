@@ -1,5 +1,6 @@
 ﻿using DataTools.Win32.Memory;
 
+using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 

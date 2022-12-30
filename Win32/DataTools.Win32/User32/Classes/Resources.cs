@@ -15,7 +15,10 @@ using DataTools.Text;
 using DataTools.Win32;
 using DataTools.Win32.Memory;
 
+using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace DataTools.Desktop
@@ -1204,7 +1207,7 @@ namespace DataTools.Desktop
         /// <param name="icn">Input icon.</param>
         /// <returns>A 32-bit Argb Bitmap object.</returns>
         /// <remarks></remarks>
-        public static Bitmap? IconToTransparentBitmap(Icon? icn)
+        public static Bitmap IconToTransparentBitmap(Icon icn)
         {
             if (icn == null)
                 return null;

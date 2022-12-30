@@ -17,7 +17,7 @@ namespace DataTools.Win32.Disk
         /// <param name="layInfo">Optionally receives the layout information.</param>
         /// <returns>An array of PARTITION_INFORMATION_EX structures.</returns>
         /// <remarks></remarks>
-        public static bool GetDiskGeometry(string? devicePath, IntPtr hfile, out DISK_GEOMETRY_EX? geometry)
+        public static bool GetDiskGeometry(string devicePath, IntPtr hfile, out DISK_GEOMETRY_EX? geometry)
         {
             bool hf = false;
             geometry = null;

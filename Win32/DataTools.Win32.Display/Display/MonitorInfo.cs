@@ -14,6 +14,7 @@ using DataTools.MathTools.Polar;
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using static DataTools.Win32.Display.MultiMon;

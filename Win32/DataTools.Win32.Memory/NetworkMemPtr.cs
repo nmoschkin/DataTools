@@ -37,7 +37,7 @@ namespace DataTools
         {
             var r = Native.NetApiBufferAllocate((int)size, out var nhandle);
             if (r != 0) return nhandle;
-            return 0;
+            return IntPtr.Zero;
         }
 
         protected override void Deallocate(IntPtr ptr)
@@ -61,10 +61,10 @@ namespace DataTools
             var r = Native.NetApiBufferReallocate(oldptr, (int)newsize, out var nhandle);
 
             if (r != 0) return nhandle;
-            return 0;
+            return IntPtr.Zero;
         }
 
-        protected override WinPtrBase Clone()
+        protected override SafePtrBase Clone()
         {
             var cm = new NetworkMemPtr();
             if (handle == IntPtr.Zero) return cm;

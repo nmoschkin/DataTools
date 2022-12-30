@@ -1,6 +1,8 @@
 ﻿using DataTools.MathTools.Polar;
 using DataTools.Win32.Memory;
 
+using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 using static DataTools.Win32.DeviceEnum;

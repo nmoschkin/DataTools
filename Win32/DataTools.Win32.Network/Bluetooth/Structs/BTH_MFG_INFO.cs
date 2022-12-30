@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 // *************************************************
 // DataTools C# Native Utility Library For Windows

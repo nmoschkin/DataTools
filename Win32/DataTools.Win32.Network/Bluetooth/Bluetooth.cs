@@ -15,6 +15,7 @@ using DataTools.Text;
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace DataTools.Win32

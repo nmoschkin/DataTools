@@ -15,6 +15,9 @@ using DataTools.Text;
 
 using Newtonsoft.Json;
 
+using System;
+using System.Collections.Generic;
+
 namespace DataTools.Win32.Usb
 {
     /// <summary>
@@ -22,15 +25,15 @@ namespace DataTools.Win32.Usb
     /// </summary>
     public class HidUsageInfo : ICloneable, IComparable<HidUsageInfo>
     {
-        private WeakReference<HidUsageCollection?>? wfparent = null;
+        private WeakReference<HidUsageCollection> wfparent = null;
 
         protected string name = "";
 
-        public virtual HidUsageCollection? Parent
+        public virtual HidUsageCollection Parent
         {
             get
             {
-                if (wfparent != null && wfparent.TryGetTarget(out HidUsageCollection? target) && target is HidUsageCollection)
+                if (wfparent != null && wfparent.TryGetTarget(out HidUsageCollection target) && target is HidUsageCollection)
                 {
                     return target;
                 }
@@ -49,7 +52,7 @@ namespace DataTools.Win32.Usb
                 }
                 else
                 {
-                    wfparent = new WeakReference<HidUsageCollection?>(value);
+                    wfparent = new WeakReference<HidUsageCollection>(value);
                 }
             }
         }
@@ -64,7 +67,7 @@ namespace DataTools.Win32.Usb
         /// The Usage Name
         /// </summary>
         [JsonProperty("usageName")]
-        public virtual string? UsageName
+        public virtual string UsageName
         {
             get => name;
             set
@@ -149,7 +152,7 @@ namespace DataTools.Win32.Usb
         /// HID Standard Publication Version
         /// </summary>
         [JsonProperty("standard")]
-        public virtual string? Standard { get; set; }
+        public virtual string Standard { get; set; }
 
         /// <summary>
         /// Can Read
@@ -170,13 +173,13 @@ namespace DataTools.Win32.Usb
         public virtual byte ReportID { get; set; }
 
         [JsonProperty("reservedRanges")]
-        public virtual List<int[]>? ReservedRanges { get; set; }
+        public virtual List<int[]> ReservedRanges { get; set; }
 
         /// <summary>
         /// The value
         /// </summary>
         [JsonIgnore]
-        public virtual object? Value { get; set; }
+        public virtual object Value { get; set; }
 
         /// <summary>
         /// Button Value
@@ -303,10 +306,10 @@ namespace DataTools.Win32.Usb
             return ret;
         }
 
-        public virtual HidUsageInfo? Clone(HidReportType reportType, bool isButton = false, HidUsageCollection? parent = null)
+        public virtual HidUsageInfo Clone(HidReportType reportType, bool isButton = false, HidUsageCollection parent = null)
         {
             var ret = MemberwiseClone();
-            HidUsageInfo? rpt = (HidUsageInfo)ret;
+            HidUsageInfo rpt = (HidUsageInfo)ret;
 
             if (rpt != null)
             {
@@ -318,7 +321,7 @@ namespace DataTools.Win32.Usb
             return rpt;
         }
 
-        public int CompareTo(HidUsageInfo? other)
+        public int CompareTo(HidUsageInfo other)
         {
             if (other == null) return 1;
 

@@ -13,6 +13,7 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
+using System;
 using System.Reflection;
 
 //using DataTools.Hardware.MessageResources;
@@ -126,11 +127,11 @@ namespace DataTools.Shell.Native
         {
             get
             {
-                PropertyInfo? pi = typeof(Resources.LocalizedProperties).GetProperty(Name);
+                PropertyInfo pi = typeof(Resources.LocalizedProperties).GetProperty(Name);
 
                 if (pi != null)
                 {
-                    return (string?)pi.GetValue(null) ?? PropertyKeys.GetPropertyName(this);
+                    return (string)pi.GetValue(null) ?? PropertyKeys.GetPropertyName(this);
                 }
                 else
                 {

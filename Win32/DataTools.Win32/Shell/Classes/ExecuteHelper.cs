@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace DataTools.Win32
 {
@@ -23,7 +20,7 @@ namespace DataTools.Win32
         /// <remarks>
         /// If <paramref name="dir"/> is not explicitly provided, then a directory will not be passed to the call.
         /// </remarks>
-        public static void Execute(string filename, string verb = "open", string? dir = null)
+        public static void Execute(string filename, string verb = "open", string dir = null)
         {
             var shex = new SHELLEXECUTEINFO();
             var proc = Process.GetCurrentProcess();

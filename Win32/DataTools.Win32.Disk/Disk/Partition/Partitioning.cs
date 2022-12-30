@@ -15,6 +15,7 @@ using DataTools.Win32.Disk.Partition.Gpt;
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
 

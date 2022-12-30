@@ -353,9 +353,9 @@ namespace DataTools.Win32.Memory
         [DllImport("kernel32", EntryPoint = "HeapValidate", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
         internal static extern bool HeapValidate(IntPtr hHeap, uint dwOptions, IntPtr lpMem);
 
-        internal static unsafe void PlatformZeroMemory(void* dest, IntPtr byteCount)
+        internal static unsafe void PlatformZeroMemory(void* dest, long byteCount)
         {
-            n_memset(dest, 0, byteCount);
+            n_memset(dest, 0, (IntPtr)byteCount);
         }
 
         // used for specific operating system functions.
@@ -378,7 +378,7 @@ namespace DataTools.Win32.Memory
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
         internal static extern IntPtr n_memcpy(IntPtr dest, IntPtr src, UIntPtr count);
 
-        internal static unsafe void ZeroMemory(void* handle, IntPtr len)
+        internal static unsafe void ZeroMemory(void* handle, long len)
         {
             if (len > 1024)
             {

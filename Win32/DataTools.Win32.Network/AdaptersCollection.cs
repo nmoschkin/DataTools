@@ -14,11 +14,14 @@
 using DataTools.Essentials.SortedLists;
 using DataTools.Win32.Memory;
 
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Security;
+using System.Threading.Tasks;
 
 namespace DataTools.Win32.Network
 {
@@ -352,12 +355,12 @@ namespace DataTools.Win32.Network
 
         protected object lockObj = new object();
         protected bool sortOnRefresh = true;
-        protected Comparison<T>? sortComparison = new Comparison<T>((a, b) => a.IfIndex - b.IfIndex);
+        protected Comparison<T> sortComparison = new Comparison<T>((a, b) => a.IfIndex - b.IfIndex);
 
         /// <summary>
         /// Gets or sets the <see cref="Comparison{T}"/> method that is used to compare elements during a sort.
         /// </summary>
-        public virtual Comparison<T>? SortComparison
+        public virtual Comparison<T> SortComparison
         {
             get => sortComparison;
             set
@@ -406,9 +409,9 @@ namespace DataTools.Win32.Network
         /// Create a NetworkAdapter instance.
         /// </summary>
         /// <returns>A new instance or null if not able to create.</returns>
-        protected virtual T? CreateAdapterInstance()
+        protected virtual T CreateAdapterInstance()
         {
-            ConstructorInfo? maker = null;
+            ConstructorInfo maker = null;
 
             var candidates = typeof(T).GetConstructors(BindingFlags.Instance | BindingFlags.Public);
 

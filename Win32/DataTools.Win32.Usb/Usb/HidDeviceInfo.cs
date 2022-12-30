@@ -16,6 +16,8 @@ using DataTools.Win32.Usb.Keyboard;
 using DataTools.Win32.Usb.Power;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DataTools.Win32.Usb
 {
@@ -25,7 +27,7 @@ namespace DataTools.Win32.Usb
     /// <remarks></remarks>
     public class HidDeviceInfo : DeviceInfo, IDisposable
     {
-        protected List<HidUsageCollection>? usageCollections;
+        protected List<HidUsageCollection> usageCollections;
 
         protected HidUsagePage hidPage;
 
@@ -34,13 +36,13 @@ namespace DataTools.Win32.Usb
         protected string physicalDescriptor = "";
         protected string hidManufacturer = "";
 
-        protected HidPValueCaps[]? featureValCaps;
-        protected HidPValueCaps[]? inputValCaps;
-        protected HidPValueCaps[]? outputValCaps;
+        protected HidPValueCaps[] featureValCaps;
+        protected HidPValueCaps[] inputValCaps;
+        protected HidPValueCaps[] outputValCaps;
 
-        protected HidPButtonCaps[]? featureBtnCaps;
-        protected HidPButtonCaps[]? inputBtnCaps;
-        protected HidPButtonCaps[]? outputBtnCaps;
+        protected HidPButtonCaps[] featureBtnCaps;
+        protected HidPButtonCaps[] inputBtnCaps;
+        protected HidPButtonCaps[] outputBtnCaps;
 
         protected HidCaps? hidCaps;
 
@@ -72,7 +74,7 @@ namespace DataTools.Win32.Usb
         /// </summary>
         /// <param name="populateDevCaps"><see cref="true"/> to enumerate all device capabilities for each device.</param>
         /// <returns></returns>
-        public static HidDeviceInfo[] EnumerateHidDevices(bool populateDevCaps = false, IList<HidUsagePage>? pages = null)
+        public static HidDeviceInfo[] EnumerateHidDevices(bool populateDevCaps = false, IList<HidUsagePage> pages = null)
         {
             var result = new List<HidDeviceInfo>(DeviceEnum.EnumerateDevices<HidDeviceInfo>(DevProp.GUID_DEVINTERFACE_HID));
 
@@ -216,7 +218,7 @@ namespace DataTools.Win32.Usb
         /// <param name="index">The index of the string to retrieve.</param>
         /// <param name="result">The result of the call.</param>
         /// <returns>True if successful.</returns>
-        public bool HidGetString(int index, out string? result)
+        public bool HidGetString(int index, out string result)
         {
             using (var mm = new SafePtr(256))
             {
@@ -847,7 +849,7 @@ namespace DataTools.Win32.Usb
         /// <summary>
         /// Usage Collections for this <see cref="HidUsagePage"/>.
         /// </summary>
-        public List<HidUsageCollection>? UsageCollections
+        public List<HidUsageCollection> UsageCollections
         {
             get => usageCollections;
             protected internal set => usageCollections = value;
@@ -900,7 +902,7 @@ namespace DataTools.Win32.Usb
         /// Retrieve dynamic values live from the device.
         /// </summary>
         /// <returns></returns>
-        public List<HidUsageCollection>? RefreshDynamicValues()
+        public List<HidUsageCollection> RefreshDynamicValues()
         {
             var retCols = GetFeatureValues(HidUsageType.CP | HidUsageType.CL | HidUsageType.CA, HidUsageType.DV | HidUsageType.DF);
 
@@ -962,7 +964,7 @@ namespace DataTools.Win32.Usb
         /// <remarks>
         /// The <paramref name="collectionType"/> and <paramref name="usageType"/> properties can be OR'd to retrieve more than one kind of value set.
         /// </remarks>
-        public virtual List<HidUsageCollection>? GetFeatureValues(HidUsageType collectionType, HidUsageType usageType, bool includeUnlinked = false)
+        public virtual List<HidUsageCollection> GetFeatureValues(HidUsageType collectionType, HidUsageType usageType, bool includeUnlinked = false)
         {
             var result = new List<HidUsageCollection>();
 
@@ -1021,7 +1023,7 @@ namespace DataTools.Win32.Usb
         /// <remarks>
         /// Several reported usages can have identical <paramref name="usageId"/>'s. Only the first found is returned if <paramref name="collectionId"/> is not specified.
         /// </remarks>
-        public virtual HidUsageInfo? LookupValue(byte usageId, byte collectionId = 0, bool populateItemValue = false)
+        public virtual HidUsageInfo LookupValue(byte usageId, byte collectionId = 0, bool populateItemValue = false)
         {
             if (UsageCollections == null) return null;
 
@@ -1060,9 +1062,9 @@ namespace DataTools.Win32.Usb
         /// <remarks>
         /// This method may return additional types of values if overridden in a derived class.
         /// </remarks>
-        public virtual object? RetrieveValue(HidUsageInfo item, bool populateItemValue = false)
+        public virtual object RetrieveValue(HidUsageInfo item, bool populateItemValue = false)
         {
-            object? result = null;
+            object result = null;
 
             if (item.IsButton && item.ButtonCaps != null)
             {
@@ -1081,7 +1083,7 @@ namespace DataTools.Win32.Usb
             }
             else if (item.ValueCaps is HidPValueCaps vc && vc.StringIndex != 0)
             {
-                if (HidGetString(vc.StringIndex, out string? strres))
+                if (HidGetString(vc.StringIndex, out string strres))
                 {
                     result = strres ?? string.Empty;
                 }
@@ -1117,7 +1119,7 @@ namespace DataTools.Win32.Usb
         /// <returns>
         /// Either <paramref name="currCol"/> or a new collection.
         /// </returns>
-        public List<HidUsageCollection> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> data, HidReportType reportType, List<HidUsageCollection>? currCol = null)
+        public List<HidUsageCollection> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> data, HidReportType reportType, List<HidUsageCollection> currCol = null)
         {
             var result = currCol ?? new List<HidUsageCollection>();
 
@@ -1130,7 +1132,7 @@ namespace DataTools.Win32.Usb
                 var collectionid = kv.Key.Item2;
                 var list = kv.Value;
 
-                HidUsageInfo? bitem;
+                HidUsageInfo bitem;
 
                 if (page == HidUsagePage.PowerDevice1)
                 {
@@ -1158,7 +1160,7 @@ namespace DataTools.Win32.Usb
 
                 foreach (var item in list)
                 {
-                    HidUsageInfo? bitem2;
+                    HidUsageInfo bitem2;
 
                     if (item.UsagePage == HidUsagePage.PowerDevice1)
                     {
@@ -1206,7 +1208,7 @@ namespace DataTools.Win32.Usb
         /// <returns>
         /// Either <paramref name="currCol"/> or a new collection.
         /// </returns>
-        public List<HidUsageCollection> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> data, HidReportType reportType, List<HidUsageCollection>? currCol = null)
+        public List<HidUsageCollection> GetCollection(Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> data, HidReportType reportType, List<HidUsageCollection> currCol = null)
         {
             var result = currCol ?? new List<HidUsageCollection>();
 
@@ -1216,7 +1218,7 @@ namespace DataTools.Win32.Usb
                 var collectionid = kv.Key.Item2;
                 var list = kv.Value;
 
-                HidUsageInfo? bitem;
+                HidUsageInfo bitem;
 
                 if (page == HidUsagePage.PowerDevice1)
                 {
@@ -1244,7 +1246,7 @@ namespace DataTools.Win32.Usb
 
                 foreach (var item in list)
                 {
-                    HidUsageInfo? bitem2;
+                    HidUsageInfo bitem2;
 
                     if (item.UsagePage == HidUsagePage.PowerDevice1)
                     {

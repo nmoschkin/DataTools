@@ -16,6 +16,7 @@
 //using DataTools.Hardware.MessageResources;
 //using DataTools.Hardware;
 //using DataTools.Hardware.Native;
+using System;
 
 namespace DataTools.Shell.Native
 {

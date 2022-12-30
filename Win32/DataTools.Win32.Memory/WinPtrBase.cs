@@ -35,7 +35,7 @@ namespace DataTools.Win32.Memory
         {
             unsafe
             {
-                Native.ZeroMemory((void*)startptr, (IntPtr)length);
+                Native.ZeroMemory((void*)startptr, length);
             }
         }
     }

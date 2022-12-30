@@ -6,7 +6,10 @@
  * Licensed Under the Apache 2.0 License
  * *************************************************/
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 
 namespace DataTools.Desktop
 {

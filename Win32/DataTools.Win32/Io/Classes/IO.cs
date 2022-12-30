@@ -3,25 +3,25 @@
 //
 // Module: FileApi
 //         Native File Services.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-using System;
-using System.Runtime.InteropServices;
-
 using DataTools.Win32.Memory;
+
+using System;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace DataTools.Win32
 {
     internal static class IO
     {
-
         public static readonly IntPtr INVALID_HANDLE_VALUE = (IntPtr)(-1);
-        
+
         public const int WAIT_FAILED = unchecked((int)0xFFFFFFFF);
         public const int WAIT_OBJECT_0 = Async.STATUS_WAIT_0 + 0;
         public const int WAIT_ABANDONED = Async.STATUS_ABANDONED_WAIT_0 + 0;
@@ -53,7 +53,7 @@ namespace DataTools.Win32
                 throw new ArgumentException("T must be an enumeration type.");
             }
 
-            var vs = values.Split(",");
+            var vs = values.Split(',');
 
             int vOut = 0;
 
@@ -83,9 +83,10 @@ namespace DataTools.Win32
 
         [DllImport("kernel32", EntryPoint = "RtlSecureZeroMemory", CharSet = CharSet.Unicode)]
         public static extern IntPtr SecureZeroMemory(IntPtr ptr, int cnt);
-        [DllImport("kernel32", EntryPoint = "RtlCaptureStackBacktrace", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32", EntryPoint = "RtlCaptureStackBacktrace", CharSet = CharSet.Unicode)]
         public static extern ushort CaptureStackBacktrace(uint FramesToskip, uint FramesToCapture, IntPtr BackTrace, ref uint BackTraceHash);
+
         //
         // File creation flags must start at the high end since they
         // are combined with the attributes
@@ -154,6 +155,7 @@ namespace DataTools.Win32
 
         //  (_WIN32_WINNT >= &H0600)
         public const int COPY_FILE_COPY_SYMLINK = 0x800;
+
         public const int COPY_FILE_NO_BUFFERING = 0x1000;
         //
 
@@ -181,6 +183,7 @@ namespace DataTools.Win32
 
         //  (_WIN32_WINNT >= &H0600)
         public const int REPLACEFILE_IGNORE_ACL_ERRORS = 0x4;
+
         //
 
         //  '' ''  (_WIN32_WINNT >= &H0500)
@@ -189,8 +192,6 @@ namespace DataTools.Win32
         // Define the NamedPipe definitions
         //
 
-        
-        
         //
         // Define the dwOpenMode values for CreateNamedPipe
         //
@@ -230,7 +231,6 @@ namespace DataTools.Win32
         // into CreateFile
         //
 
-        
         public const int FILE_BEGIN = 0;
         public const int FILE_CURRENT = 1;
         public const int FILE_END = 2;
@@ -300,7 +300,7 @@ namespace DataTools.Win32
         //  These are the generic rights.
         //
 
-        public const int GENERIC_READ = unchecked((int) 0x80000000);
+        public const int GENERIC_READ = unchecked((int)0x80000000);
         public const int GENERIC_WRITE = 0x40000000;
         public const int GENERIC_EXECUTE = 0x20000000;
         public const int GENERIC_ALL = 0x10000000;
@@ -415,7 +415,6 @@ namespace DataTools.Win32
         public const int FILE_SUPPORTS_INTEGRITY_STREAMS = 0x4000000;
         public const long FILE_INVALID_FILE_ID = -1L;
 
-        
         // begin_1_0
         // begin_2_0
         // begin_2_1
@@ -466,14 +465,14 @@ namespace DataTools.Win32
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern int CompareFileTime(FILETIME lpFileTime1, FILETIME lpFileTime2);
+
         [DllImport("kernel32.dll", EntryPoint = "CreateDirectoryW", CharSet = CharSet.Unicode)]
-
         public static extern bool CreateDirectory([MarshalAs(UnmanagedType.LPWStr)] string lpPathName, SECURITY_ATTRIBUTES lpSecurityAttributes);
-        [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode)]
         public static extern IntPtr CreateFile([MarshalAs(UnmanagedType.LPWStr)] string lpFileName, int dwDesiredAccess, int dwShareMode, SECURITY_ATTRIBUTES lpSecurityAttributes, int dwCreationDisposition, int dwFlagsAndAttributes, IntPtr hTemplateFile);
-        [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode)]
         public static extern IntPtr CreateFile([MarshalAs(UnmanagedType.LPWStr)] string lpFileName, int dwDesiredAccess, int dwShareMode, IntPtr lpSecurityAttributes, int dwCreationDisposition, int dwFlagsAndAttributes, IntPtr hTemplateFile);
 
         /// <summary>
@@ -503,69 +502,79 @@ namespace DataTools.Win32
         public const int DDD_REMOVE_DEFINITION = 2;
 
         [DllImport("kernel32.dll", EntryPoint = "DefineDosDeviceW", CharSet = CharSet.Unicode)]
-
         public static extern bool DefineDosDevice(int dwFlags, [MarshalAs(UnmanagedType.LPWStr)] string lpDeviceName, [MarshalAs(UnmanagedType.LPWStr)] string lpTargetPath);
+
         [DllImport("kernel32.dll", EntryPoint = "DeleteFileW", CharSet = CharSet.Unicode)]
-
         public static extern bool DeleteFile([MarshalAs(UnmanagedType.LPWStr)] string lpFileName);
+
         [DllImport("kernel32", EntryPoint = "MoveFileW", CharSet = CharSet.Unicode)]
-
         public static extern int MoveFile([MarshalAs(UnmanagedType.LPWStr)] string lpExistingFilename, [MarshalAs(UnmanagedType.LPWStr)] string lpNewFilename);
+
         [DllImport("kernel32", EntryPoint = "CopyFileW", CharSet = CharSet.Unicode)]
-
         public static extern int CopyFile([MarshalAs(UnmanagedType.LPWStr)] string lpExistingFilename, [MarshalAs(UnmanagedType.LPWStr)] string lpNewFilename, int bFailIfExists);
-        [DllImport("kernel32.dll", EntryPoint = "DeleteVolumeMointPointW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "DeleteVolumeMointPointW", CharSet = CharSet.Unicode)]
         public static extern bool DeleteVolumeMointPoint([MarshalAs(UnmanagedType.LPWStr)] string lpszVolumeMointPoint);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool FindCloseChangeNotification(IntPtr hChangeHandle);
+
         [DllImport("kernel32.dll", EntryPoint = "FindFirstChangeNotificationW", CharSet = CharSet.Unicode)]
         public static extern IntPtr FindFirstChangeNotification([MarshalAs(UnmanagedType.LPWStr)] string lpPathName, [MarshalAs(UnmanagedType.Bool)] bool bWatchSubtree, int dwNotifyFilter);
-        [DllImport("kernel32.dll", EntryPoint = "FindFirstVolumeW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "FindFirstVolumeW", CharSet = CharSet.Unicode)]
         public static extern IntPtr FindFirstVolume([MarshalAs(UnmanagedType.LPWStr)] string lpszVolumeName, int cchBufferLength);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool FindNextChangeNotification(IntPtr hChangeHandle);
+
         [DllImport("kernel32", EntryPoint = "FindFirstFileW", CharSet = CharSet.Unicode)]
         public static extern IntPtr FindFirstFile([MarshalAs(UnmanagedType.LPWStr)] string lpFilename, [MarshalAs(UnmanagedType.Struct)] ref WIN32_FIND_DATA lpFindFileData);
+
         [DllImport("kernel32", EntryPoint = "FindNextFileW", CharSet = CharSet.Unicode)]
         public static extern bool FindNextFile(IntPtr hFindFile, [MarshalAs(UnmanagedType.Struct)] ref WIN32_FIND_DATA lpFindFileData);
+
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
         public static extern int FindClose(IntPtr hFindFile);
+
         [DllImport("kernel32", EntryPoint = "FindFirstFileExW", CharSet = CharSet.Unicode)]
-
-
         public static extern IntPtr FindFirstFileEx([MarshalAs(UnmanagedType.LPWStr)] string lpFilename, FINDEX_INFO_LEVELS fInfoLevelId, ref WIN32_FIND_DATA lpFindFileData, FINDEX_SEARCH_OPS fSearchOp, IntPtr lpSearchFilter, int dwAdditionalFlags);
-        [DllImport("kernel32.dll", EntryPoint = "FindNextVolumeW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "FindNextVolumeW", CharSet = CharSet.Unicode)]
         public static extern bool FindNextVolume(IntPtr hFindVolume, [MarshalAs(UnmanagedType.LPWStr)] string lpszVolumeName, int cchBufferLength);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool FindVolumeClose(IntPtr hFindVolume);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool FlushFileBuffers(IntPtr hFile);
-        [DllImport("kernel32.dll", EntryPoint = "GetDiskFreeSpaceW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "GetDiskFreeSpaceW", CharSet = CharSet.Unicode)]
         public static extern bool GetDiskFreeSpace(string lpRootPathName, ref uint lpSectorsPerCluster, ref uint lpBytesPerSector, ref uint lpNumberOfFreeClusters, ref uint lpTotalNumberOfClusters);
+
         [DllImport("kernel32.dll", EntryPoint = "GetDiskFreeSpaceExW", CharSet = CharSet.Unicode)]
-
         public static extern bool GetDiskFreeSpaceEx(string lpRootPathName, ref ulong lpFreeBytesAvailableToCaller, ref ulong lpTotalNumberOfBytes, ref ulong lpTotalNumberOfFreeBytes);
+
         [DllImport("kernel32.dll", EntryPoint = "GetDiskFreeSpaceW", CharSet = CharSet.Unicode)]
-
         public static extern bool GetDiskFreeSpace(string lpRootPathName, ref int lpSectorsPerCluster, ref int lpBytesPerSector, ref int lpNumberOfFreeClusters, ref int lpTotalNumberofClusters);
-        [DllImport("kernel32.dll", EntryPoint = "GetDriveTypeW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "GetDriveTypeW", CharSet = CharSet.Unicode)]
         public static extern uint GetDriveType([MarshalAs(UnmanagedType.LPWStr)] string lpRootPathName);
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct BY_HANDLE_FILE_INFORMATION
         {
             public int dwFileAttributesInteger;
+
             [MarshalAs(UnmanagedType.Struct)]
             public FILETIME ftCreationTimeInteger;
+
             [MarshalAs(UnmanagedType.Struct)]
             public FILETIME ftLastAccessTimeInteger;
+
             [MarshalAs(UnmanagedType.Struct)]
             public FILETIME ftLastWriteTimeInteger;
+
             public int dwVolumeSerialNumberInteger;
             public int nFileSizeHighInteger;
             public int nFileSizeLowInteger;
@@ -576,45 +585,56 @@ namespace DataTools.Win32
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool GetFileInformationByHandle(IntPtr hFile, BY_HANDLE_FILE_INFORMATION lpFileInformation);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern uint GetFileType(IntPtr hFile);
-        [DllImport("kernel32.dll", EntryPoint = "GetFinalPathNameByHandle", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "GetFinalPathNameByHandle", CharSet = CharSet.Unicode)]
         public static extern uint GetFinalPathNameByHandle(IntPtr hFile, [MarshalAs(UnmanagedType.LPWStr)] string lpszFilePath, uint cchFilePath, uint dwFlags);
+
         [DllImport("kernel32", EntryPoint = "GetCurrentDirectoryW", CharSet = CharSet.Unicode)]
         public static extern int GetCurrentDirectory(int bLen, [MarshalAs(UnmanagedType.LPWStr)] ref string lpszBuffer);
+
         [DllImport("kernel32", EntryPoint = "GetFullPathNameW", CharSet = CharSet.Unicode)]
         public static extern int GetFullPathName([MarshalAs(UnmanagedType.LPWStr)] string lpFilename, int nBufferLength, IntPtr lpBuffer, ref IntPtr lpFilepart);
-        [DllImport("kernel32.dll", EntryPoint = "GetFullPathNameW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "GetFullPathNameW", CharSet = CharSet.Unicode)]
         public static extern uint GetFullPathName([MarshalAs(UnmanagedType.LPWStr)] string lpszFilePath, uint nBufferLength, [MarshalAs(UnmanagedType.LPWStr)] string lpBuffer, [MarshalAs(UnmanagedType.LPWStr)] ref string lpFilePart);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern uint GetLogicalDrives();
+
         [DllImport("kernel32.dll", EntryPoint = "GetLogicalDriveStringsW", CharSet = CharSet.Unicode)]
         public static extern uint GetLogicalDriveStrings(uint nBufferLength, [MarshalAs(UnmanagedType.LPWStr)] string lpBuffer);
+
         [DllImport("kernel32.dll", EntryPoint = "GetLogicalDriveStringsW", CharSet = CharSet.Unicode)]
         public static extern uint GetLogicalDriveStrings(uint nBufferLength, IntPtr lpBuffer);
+
         [DllImport("kernel32.dll", EntryPoint = "GetTempFileNameW", CharSet = CharSet.Unicode)]
-
         public static extern uint GetTempFileName([MarshalAs(UnmanagedType.LPWStr)] string lpPathName, [MarshalAs(UnmanagedType.LPWStr)] string lpPrefixString, uint uUnique, [MarshalAs(UnmanagedType.LPWStr)] string lpTempFileName);
+
         [DllImport("kernel32.dll", EntryPoint = "GetVolumeInformationByHandleW", CharSet = CharSet.Unicode)]
-
         public static extern bool GetVolumeInformationByHandle(IntPtr hFile, [MarshalAs(UnmanagedType.LPWStr)] string lpVolumeNameBuffer, uint nVolumeNameSize, ref uint lpVolumeSerialNumber, ref uint lpMaximumComponentLength, ref uint lpFileSystemFlags, [MarshalAs(UnmanagedType.LPWStr)] string lpFileSystemNameBuffer, uint nFileSystemNameSize);
-        [DllImport("kernel32.dll", EntryPoint = "GetVolumePathName", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "GetVolumePathName", CharSet = CharSet.Unicode)]
         public static extern bool GetVolumePathName([MarshalAs(UnmanagedType.LPWStr)] string lpszFileName, [MarshalAs(UnmanagedType.LPWStr)] string lpszVolumePathName, uint cchBufferLength);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool CancelIoEx(IntPtr hFile, OVERLAPPED lpOverlapped);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool CancelIoEx(IntPtr hFile, IntPtr lpOverlapped);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool CancelSynchronousIo(IntPtr hThread);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool LockFile(IntPtr hFile, uint dwFileOffsetLow, uint dwFileOffsetHigh, uint nNumberOfBytesToLockLow, uint nNumberOfBytesToLockHigh);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool LockFileEx(IntPtr hFile, uint dwFlags, uint dwReserved, uint nNumberOfBytesToLockLow, uint nNumberOfBytesToLockHigh, IntPtr lpOverlapped);
-        [DllImport("kernel32.dll", EntryPoint = "QueryDosDeviceW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "QueryDosDeviceW", CharSet = CharSet.Unicode)]
         public static extern uint QueryDosDevice([MarshalAs(UnmanagedType.LPWStr)] string lpDeviceName, [MarshalAs(UnmanagedType.LPWStr)] string lpTargetPath, uint ucchMax);
 
         public delegate void OVERLAPPED_COMPLETION_ROUTINE(int dwErrorCode, int dwNumberOfBytesTransfered, OVERLAPPED lpOverlapped);
@@ -623,14 +643,19 @@ namespace DataTools.Win32
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool ReadFile(IntPtr hFile, IntPtr lpBuffer, uint nNumberOfBytesToRead, ref uint lpNumberOfBytesRead, IntPtr lpOverlapped);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool ReadFileEx(IntPtr hFile, IntPtr lpBuffer, uint nNumberOfBytesToRead, ref uint lpNumberOfBytesRead, IntPtr lpOverlapped, OVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool ReadFileEx(IntPtr hFile, IntPtr lpBuffer, uint nNumberOfBytesToRead, ref uint lpNumberOfBytesRead, IntPtr lpOverlapped, OVERLAPPED_COMPLETION_ROUTINE_PTR lpCompletionRoutine);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool ReadFile(IntPtr hFile, byte[] lpBuffer, uint nNumberOfBytesToRead, ref uint lpNumberOfBytesRead, IntPtr lpOverlapped);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool ReadFileEx(IntPtr hFile, byte[] lpBuffer, uint nNumberOfBytesToRead, ref uint lpNumberOfBytesRead, IntPtr lpOverlapped, OVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool ReadFileEx(IntPtr hFile, byte[] lpBuffer, uint nNumberOfBytesToRead, ref uint lpNumberOfBytesRead, IntPtr lpOverlapped, OVERLAPPED_COMPLETION_ROUTINE_PTR lpCompletionRoutine);
 
@@ -642,69 +667,95 @@ namespace DataTools.Win32
         // #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
 
         [DllImport("kernel32.dll", EntryPoint = "RemoveDirectoryW", CharSet = CharSet.Unicode)]
-
         public static extern bool RemoveDirectory([MarshalAs(UnmanagedType.LPWStr)] string lpPathName);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool SetFileInformationByHandle(IntPtr hFile, object FileInformationClass, byte[] lpFileInformation, uint dwBufferSize);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern uint SetFilePointer(IntPtr hFile, int lDistanceToMove, ref int lpDistanceToMoveHigh, FilePointerMoveMethod dwMoveMethod);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool SetFilePointerEx(IntPtr hFile, long liDistanceToMove, ref long lpNewFilePointer, FilePointerMoveMethod dwMoveMethod);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool SetFileValidData(IntPtr hFile, long ValidDataLength);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool UnlockFile(IntPtr hFile, uint dwFileOffsetLow, uint dwFileOffsetHigh, uint nNumberOfBytesToLockLow, uint nNumberOfBytesToLockHigh);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool UnlockFileEx(IntPtr hFile, uint dwReserved, uint nNumberOfBytesToLockLow, uint nNumberOfBytesToLockHigh, IntPtr lpOverlapped);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool WriteFile(IntPtr hFile, IntPtr lpBuffer, uint nNumberOfBytesToWrite, ref uint lpNumberOfBytesWritten, IntPtr lpOverlapped);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool WriteFile(IntPtr hFile, byte[] lpBuffer, uint nNumberOfBytesToWrite, ref uint lpNumberOfBytesWritten, IntPtr lpOverlapped);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool WriteFileEx(IntPtr hFile, IntPtr lpBuffer, uint nNumberOfBytesToWrite, IntPtr lpOverlapped, OVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool WriteFileEx(IntPtr hFile, IntPtr lpBuffer, uint nNumberOfBytesToWrite, IntPtr lpOverlapped, OVERLAPPED_COMPLETION_ROUTINE_PTR lpCompletionRoutine);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool WriteFileEx(IntPtr hFile, byte[] lpBuffer, uint nNumberOfBytesToWrite, IntPtr lpOverlapped, OVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern bool WriteFileEx(IntPtr hFile, byte[] lpBuffer, uint nNumberOfBytesToWrite, IntPtr lpOverlapped, OVERLAPPED_COMPLETION_ROUTINE_PTR lpCompletionRoutine);
+
         [DllImport("kernel32.dll", EntryPoint = "GetTempPathW", CharSet = CharSet.Unicode)]
-
         public static extern uint GetTempPath(uint nBufferLength, string lpBuffer);
-        [DllImport("kernel32.dll", EntryPoint = "GetVolumeNameForVolumeMountPointW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "GetVolumeNameForVolumeMountPointW", CharSet = CharSet.Unicode)]
         public static extern bool GetVolumeNameForVolumeMountPoint([MarshalAs(UnmanagedType.LPWStr)] string lpszVolumeMountPoint, [MarshalAs(UnmanagedType.LPWStr)] string lpszVolumeName, uint cchBufferLength);
-        [DllImport("kernel32.dll", EntryPoint = "GetVolumeNameForVolumeMountPointW", CharSet = CharSet.Unicode)]
 
+        [DllImport("kernel32.dll", EntryPoint = "GetVolumeNameForVolumeMountPointW", CharSet = CharSet.Unicode)]
         public static extern bool GetVolumeNameForVolumeMountPoint([MarshalAs(UnmanagedType.LPWStr)] string lpszVolumeMountPoint, IntPtr lpszVolumeName, uint cchBufferLength);
+
         [DllImport("kernel32")]
         public static extern int FileTimeToDosDateTime(ref FILETIME lpFileTime, int lpFatDate, int lpFatTime);
+
         [DllImport("kernel32")]
         public static extern int FileTimeToLocalFileTime(ref FILETIME lpFileTime, ref FILETIME lpLocalFileTime);
+
         [DllImport("kernel32")]
         public static extern int FileTimeToSystemTime(ref FILETIME lpFileTime, ref SYSTEMTIME lpSystemTime);
+
         [DllImport("kernel32")]
         public static extern int LocalFileTimeToFileTime(ref FILETIME lpLocalFileTime, ref FILETIME lpFileTime);
+
         [DllImport("kernel32")]
         public static extern int SystemTimeToFileTime(ref SYSTEMTIME lpSystemTime, ref FILETIME lpFileTime);
+
         [DllImport("kernel32", EntryPoint = "GetFileAttributesW", CharSet = CharSet.Unicode)]
         public static extern int pGetFileAttributes([MarshalAs(UnmanagedType.LPWStr)] string lpFilename);
+
         [DllImport("kernel32", EntryPoint = "SetFileAttributesW", CharSet = CharSet.Unicode)]
         public static extern int pSetFileAttributes([MarshalAs(UnmanagedType.LPWStr)] string lpFilename, int dwFileAttributes);
+
         [DllImport("kernel32", EntryPoint = "GetFileTime")]
         public static extern int pGetFileTime(IntPtr hFile, FILETIME lpCreationTime, FILETIME lpLastAccessTime, FILETIME lpLastWriteTime);
+
         [DllImport("kernel32", EntryPoint = "SetFileTime")]
         public static extern int pSetFileTime(IntPtr hFile, FILETIME lpCreationTime, FILETIME lpLastAccessTime, FILETIME lpLastWriteTime);
+
         [DllImport("kernel32", EntryPoint = "SetFileTime")]
         public static extern int pSetFileTime2(IntPtr hFile, ref FILETIME lpCreationTime, ref FILETIME lpLastAccessTime, ref FILETIME lpLastWriteTime);
+
         [DllImport("kernel32", EntryPoint = "GetFileSize")]
         public static extern uint pGetFileSize(IntPtr hFile, ref uint lpFileSizeHigh);
+
         [DllImport("comdlg32.dll", EntryPoint = "GetFileTitleW", CharSet = CharSet.Unicode)]
         public static extern short pGetFileTitle([MarshalAs(UnmanagedType.LPWStr)] string lpszFile, string lpszTitle, short cbBuf);
+
         [DllImport("kernel32", EntryPoint = "GetFileType")]
         public static extern int pGetFileType(IntPtr hFile);
+
         [DllImport("version.dll", EntryPoint = "GetFileVersionInfoW", CharSet = CharSet.Unicode)]
         public static extern int GetFileVersionInfo([MarshalAs(UnmanagedType.LPWStr)] string lptstrFilename, int dwHandle, int dwLen, IntPtr lpData);
+
         [DllImport("version.dll", EntryPoint = "GetFileVersionInfoSizeW", CharSet = CharSet.Unicode)]
         public static extern int GetFileVersionInfoSize([MarshalAs(UnmanagedType.LPWStr)] string lptstrFilename, int lpdwHandle);
 
@@ -769,6 +820,7 @@ namespace DataTools.Win32
         /// The time-out interval is the default value specified by the server process in the CreateNamedPipe function.
         /// </summary>
         public const int NMPWAIT_USE_DEFAULT_WAIT = 0x00000000;
+
         /// <summary>
         /// The function does not return until an instance of the named pipe is available.
         /// </summary>
@@ -793,13 +845,11 @@ namespace DataTools.Win32
             ref OVERLAPPED lpOverlapped
         );
 
-
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool DisconnectNamedPipe(
             IntPtr hNamedPipe
         );
-        
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -809,7 +859,6 @@ namespace DataTools.Win32
           ref int lpMaxCollectionCount,
           ref int lpCollectDataTimeout
         );
-
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -821,7 +870,6 @@ namespace DataTools.Win32
           ref int lpTotalBytesAvail,
           ref int lpBytesLeftThisMessage
         );
-
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -859,8 +907,5 @@ namespace DataTools.Win32
           [MarshalAs(UnmanagedType.Bool)]
           bool bAlertable
         );
-
     }
-
-
 }

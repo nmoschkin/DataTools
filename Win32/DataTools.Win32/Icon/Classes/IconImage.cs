@@ -24,6 +24,9 @@
 
 using DataTools.Win32.Memory;
 
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace DataTools.Desktop
@@ -36,7 +39,7 @@ namespace DataTools.Desktop
     {
         private readonly List<IconImageEntry> entries = new List<IconImageEntry>();
         private ICONDIR icondir;
-        private string? filename;
+        private string filename;
 
         /// <summary>
         /// Gets or sets the filename of the icon file.
@@ -44,7 +47,7 @@ namespace DataTools.Desktop
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string? FileName
+        public string FileName
         {
             get => filename;
             set
@@ -74,7 +77,7 @@ namespace DataTools.Desktop
         /// <param name="StandardIconType"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public IconImageEntry? FindIcon(StandardIcons StandardIconType)
+        public IconImageEntry FindIcon(StandardIcons StandardIconType)
         {
             foreach (var e in entries)
             {

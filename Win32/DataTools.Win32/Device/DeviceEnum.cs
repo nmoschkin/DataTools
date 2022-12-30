@@ -15,6 +15,7 @@ using DataTools.Shell.Native;
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -188,7 +189,7 @@ namespace DataTools.Win32
         /// <param name="useClassId">Optional alternate class Id or interface Id to use.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static object? GetDeviceProperty(
+        public static object GetDeviceProperty(
             DeviceInfo info,
             DEVPROPKEY prop,
             DevPropTypes type,

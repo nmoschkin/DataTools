@@ -20,7 +20,9 @@ using DataTools.Win32;
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;

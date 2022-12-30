@@ -17,6 +17,7 @@ using DataTools.Text;
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -35,13 +36,13 @@ namespace DataTools.Win32.Network
     /// <remarks></remarks>
     public class NetworkAdapter : IDisposable, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private IP_ADAPTER_ADDRESSES Source;
 
-        private DeviceInfo? deviceInfo;
+        private DeviceInfo deviceInfo;
         private bool canShowNet;
-        private System.Drawing.Bitmap? deviceIcon;
+        private System.Drawing.Bitmap deviceIcon;
 
         private List<MIB_IFROW> physifaces = new List<MIB_IFROW>();
         private static readonly PropertyInfo[] allProps = typeof(NetworkAdapter).GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -129,7 +130,7 @@ namespace DataTools.Win32.Network
             }
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string? e = null)
+        protected void OnPropertyChanged([CallerMemberName] string e = null)
         {
             if (e == null) return;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(e));
@@ -156,7 +157,7 @@ namespace DataTools.Win32.Network
         /// <returns></returns>
         /// <remarks></remarks>
         [Browsable(false)]
-        public virtual System.Drawing.Bitmap? DeviceIcon
+        public virtual System.Drawing.Bitmap DeviceIcon
         {
             get
             {
@@ -247,7 +248,7 @@ namespace DataTools.Win32.Network
         /// <remarks></remarks>
         [Browsable(true)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public DeviceInfo? DeviceInfo
+        public DeviceInfo DeviceInfo
         {
             get
             {
@@ -297,7 +298,7 @@ namespace DataTools.Win32.Network
         }
 
         [Browsable(true)]
-        public IPAddress? IPV4Address
+        public IPAddress IPV4Address
         {
             get
             {
@@ -318,7 +319,7 @@ namespace DataTools.Win32.Network
         }
 
         [Browsable(true)]
-        public IPAddress? IPV6Address
+        public IPAddress IPV6Address
         {
             get
             {

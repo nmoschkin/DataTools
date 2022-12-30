@@ -1,34 +1,29 @@
 // *************************************************
-// DataTools C# Native Utility Library For Windows 
+// DataTools C# Native Utility Library For Windows
 //
 // Module: SystemInfo
 //         Provides basic information about the
 //         current computer.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using static DataTools.Win32.DeviceEnum;
-
-using DataTools.Text;
 using DataTools.Win32;
 using DataTools.Win32.Memory;
 
+using System;
+using System.Linq;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+
+using static DataTools.Win32.DeviceEnum;
+
 namespace DataTools.SystemInformation
 {
-    
-    
     /// <summary>
     /// System information.
     /// </summary>
@@ -112,8 +107,6 @@ namespace DataTools.SystemInformation
         /// </summary>
         public static string PingAddress { get; set; } = "208.67.222.222";
 
-
-
         internal static NativeEnvironment nativeEnv;
 
         /// <summary>
@@ -156,7 +149,7 @@ namespace DataTools.SystemInformation
                 Ping ping = new Ping();
 
                 var reply = await ping.SendPingAsync(PingAddress, timeout);
-                
+
                 if (reply.Status == IPStatus.Success)
                 {
                     return true;
@@ -165,7 +158,6 @@ namespace DataTools.SystemInformation
                 {
                     return false;
                 }
-
             }
             catch
             {
@@ -189,7 +181,6 @@ namespace DataTools.SystemInformation
 
         static SysInfo()
         {
-
             // let's get some version information!
             var mm = new MemPtr();
 
@@ -200,9 +191,9 @@ namespace DataTools.SystemInformation
 
             // now let's figure out how many processors we have on this system
             MemPtr org;
-            
+
             var lp = new SystemLogicalProcessorInformation();
-            
+
             SystemLogicalProcessorInformation[] rets;
 
             int i;
@@ -263,7 +254,7 @@ namespace DataTools.SystemInformation
 
                 int cb = int.Parse((string)key.GetValue("CurrentBuildNumber"));
                 int build = cb;
-                
+
                 dispVer = (string)key.GetValue("DisplayVersion");
 
                 //string name = (string)(key.GetValue("ProductName"));
@@ -277,7 +268,6 @@ namespace DataTools.SystemInformation
 
             return new OSVersionInfo(lpOS, dispVer);
         }
-
 
         /// <summary>
         /// Enumerate COM Ports
@@ -300,7 +290,5 @@ namespace DataTools.SystemInformation
             Array.Sort(p, new Comparison<DeviceInfo>((x, y) => { if (x.FriendlyName is object && y.FriendlyName is object) { return string.Compare(x.FriendlyName, y.FriendlyName); } else { return string.Compare(x.Description, y.Description); } }));
             return p;
         }
-
-
     }
 }

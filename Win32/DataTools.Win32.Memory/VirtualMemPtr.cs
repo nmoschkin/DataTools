@@ -37,7 +37,7 @@ namespace DataTools
 
             var nhandle = Native.VirtualAlloc(IntPtr.Zero, (IntPtr)newsize, VMemAllocFlags.MEM_COMMIT | VMemAllocFlags.MEM_RESERVE, MemoryProtectionFlags.PAGE_READWRITE);
 
-            if (nhandle == IntPtr.Zero) return 0;
+            if (nhandle == IntPtr.Zero) return IntPtr.Zero;
 
             Native.MemCpy(oldptr, nhandle, cpysize);
             Native.VirtualFree(oldptr);
@@ -61,7 +61,7 @@ namespace DataTools
             return true;
         }
 
-        protected override DataTools.Win32.Memory.WinPtrBase Clone()
+        protected override SafePtrBase Clone()
         {
             var cm = new VirtualMemPtr();
             if (handle == IntPtr.Zero) return cm;

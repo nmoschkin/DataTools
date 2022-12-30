@@ -1,16 +1,17 @@
 // *************************************************
-// DataTools C# Native Utility Library For Windows 
+// DataTools C# Native Utility Library For Windows
 //
 // Module: SystemInfo
 //         Provides basic information about the
 //         current computer.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
+using System;
 using System.Runtime.InteropServices;
 
 namespace DataTools.SystemInformation
@@ -21,7 +22,6 @@ namespace DataTools.SystemInformation
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct NativeEnvironment
     {
-
         /// <summary>
         /// Processor Architecture Type enumeration value.
         /// </summary>

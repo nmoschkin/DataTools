@@ -1,31 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DataTools.Win32.Usb
 {
     public interface ICaps : ICloneable
     {
-        public byte ReportID { get; }
+        byte ReportID { get; }
 
-        public ushort Usage { get; }
+        ushort Usage { get; }
 
-        public ushort LinkCollection { get; }
+        ushort LinkCollection { get; }
 
-        public ushort LinkUsage { get; }
+        ushort LinkUsage { get; }
 
-        public HidUsagePage UsagePage { get; }
+        HidUsagePage UsagePage { get; }
 
-        public HidUsagePage LinkUsagePage { get; }
+        HidUsagePage LinkUsagePage { get; }
 
-        public bool IsRange { get; }
+        bool IsRange { get; }
 
-        public ushort UsageMin { get; }
+        ushort UsageMin { get; }
 
-        public ushort UsageMax { get; }
+        ushort UsageMax { get; }
 
-        public bool IsButton { get; }
+        bool IsButton { get; }
     }
 }

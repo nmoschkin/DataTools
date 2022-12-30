@@ -11,8 +11,11 @@ using DataTools.Memory;
 using DataTools.Shell.Native;
 using DataTools.Win32;
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

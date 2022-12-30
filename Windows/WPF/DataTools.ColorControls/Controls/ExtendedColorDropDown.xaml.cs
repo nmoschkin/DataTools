@@ -1,19 +1,11 @@
 ﻿using DataTools.Graphics;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DataTools.ColorControls
 {
@@ -27,9 +19,6 @@ namespace DataTools.ColorControls
             InitializeComponent();
         }
 
-
-
-
         public Color SelectedColor
         {
             get { return (Color)GetValue(SelectedColorProperty); }
@@ -38,7 +27,7 @@ namespace DataTools.ColorControls
 
         // Using a DependencyProperty as the backing store for SelectedColor.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty SelectedColorProperty =
-            DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ExtendedColorDropDown), new PropertyMetadata(Colors.Transparent  , OnSelectedColorChanged));
+            DependencyProperty.Register("SelectedColor", typeof(Color), typeof(ExtendedColorDropDown), new PropertyMetadata(Colors.Transparent, OnSelectedColorChanged));
 
         private static void OnSelectedColorChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -46,13 +35,9 @@ namespace DataTools.ColorControls
             {
                 if (e.NewValue is Color value)
                 {
-
                 }
             }
         }
-
-
-
 
         public CatalogOptions CatalogType
         {
@@ -64,10 +49,8 @@ namespace DataTools.ColorControls
         public static readonly DependencyProperty CatalogTypeProperty =
             DependencyProperty.Register("CatalogType", typeof(CatalogOptions), typeof(ExtendedColorDropDown), new PropertyMetadata(CatalogOptions.Extended, OnCatalogTypeChanged));
 
-
         private static void OnCatalogTypeChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-
             if (sender is ExtendedColorDropDown exd && e.NewValue is CatalogOptions co)
             {
                 exd.Ncp.vm.ChangeCatalog(co);
@@ -76,8 +59,7 @@ namespace DataTools.ColorControls
 
         private void BtnMore_Click(object sender, RoutedEventArgs e)
         {
-
-            NamedColorViewModel? current = Ncp.SelectedItem as NamedColorViewModel;
+            NamedColorViewModel current = Ncp.SelectedItem as NamedColorViewModel;
 
             var color = ColorDialog.OpenDialog(current?.Source.Color.GetWPFColor());
 

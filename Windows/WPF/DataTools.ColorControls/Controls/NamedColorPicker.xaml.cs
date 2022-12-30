@@ -1,32 +1,19 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Dynamic;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace DataTools.ColorControls
 {
-
     /// <summary>
     /// Interaction logic for NamedColorPicker.xaml
     /// </summary>
     public partial class NamedColorPicker : ComboBox
     {
-
-        internal protected NamedColorViewModel vm;
+        protected internal NamedColorViewModel vm;
 
         public CatalogOptions CatalogType
         {
@@ -38,26 +25,23 @@ namespace DataTools.ColorControls
         public static readonly DependencyProperty CatalogTypeProperty =
             DependencyProperty.Register("CatalogType", typeof(CatalogOptions), typeof(NamedColorPicker), new PropertyMetadata(CatalogOptions.Extended, OnCatalogTypeChanged));
 
-
         private static void OnCatalogTypeChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-
             if (sender is NamedColorPicker ncp && e.NewValue is CatalogOptions co)
             {
                 ncp.vm.ChangeCatalog(co);
             }
         }
 
-        new public NamedColorViewModel SelectedItem
+        public new NamedColorViewModel SelectedItem
         {
             get { return (NamedColorViewModel)GetValue(SelectedItemProperty); }
             set { SetValue(SelectedItemProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for SelectedItem.  This enables animation, styling, binding, etc...
-        new public static readonly DependencyProperty SelectedItemProperty =
+        public new static readonly DependencyProperty SelectedItemProperty =
             DependencyProperty.Register("SelectedItem", typeof(NamedColorViewModel), typeof(NamedColorPicker), new PropertyMetadata(null, OnSelectedItemChanged));
-
 
         protected static void OnSelectedItemChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
@@ -67,7 +51,7 @@ namespace DataTools.ColorControls
             }
         }
 
-        new public IEnumerable ItemsSource
+        public new IEnumerable ItemsSource
         {
             get
             {
@@ -77,8 +61,7 @@ namespace DataTools.ColorControls
 
         private static readonly DependencyPropertyKey ItemsSourcePropertyKey = DependencyProperty.RegisterReadOnly("ItemsSource", typeof(IEnumerable), typeof(NamedColorPicker), new PropertyMetadata(null));
 
-
-        new public static readonly DependencyProperty ItemsSourceProperty = ItemsSourcePropertyKey.DependencyProperty;
+        public new static readonly DependencyProperty ItemsSourceProperty = ItemsSourcePropertyKey.DependencyProperty;
 
         public NamedColorPicker()
         {
@@ -93,6 +76,5 @@ namespace DataTools.ColorControls
                 SelectedItem = (NamedColorViewModel)base.SelectedItem;
             });
         }
-
     }
 }

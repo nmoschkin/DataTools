@@ -16,6 +16,7 @@
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;

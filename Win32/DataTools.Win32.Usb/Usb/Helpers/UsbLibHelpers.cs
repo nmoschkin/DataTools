@@ -13,6 +13,8 @@
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -159,7 +161,7 @@ namespace DataTools.Win32.Usb
 
             hhid = device.DangerousGetHidDeviceHandle();
 
-            if (hhid == 0)
+            if ((int)hhid == 0)
             {
                 return new (ushort, ushort)[0];
             }
@@ -236,7 +238,7 @@ namespace DataTools.Win32.Usb
 
             hhid = device.DangerousGetHidDeviceHandle();
 
-            if (hhid == 0)
+            if ((int)hhid == 0)
             {
                 return new (ushort, ushort, HidFeatureValue)[0];
             }
@@ -356,7 +358,7 @@ namespace DataTools.Win32.Usb
             try
             {
                 var hhid = hHid ?? HidFeatures.OpenHid(device);
-                if (hhid == 0) return false;
+                if ((int)hhid == 0) return false;
 
                 HidAttributes attr;
 
@@ -371,21 +373,21 @@ namespace DataTools.Win32.Usb
 
                     device.HidCaps = caps;
 
-                    HidPButtonCaps[]? featBtn;
-                    HidPButtonCaps[]? inBtn;
-                    HidPButtonCaps[]? outBtn;
+                    HidPButtonCaps[] featBtn;
+                    HidPButtonCaps[] inBtn;
+                    HidPButtonCaps[] outBtn;
 
-                    HidPValueCaps[]? featVal;
-                    HidPValueCaps[]? inVal;
-                    HidPValueCaps[]? outVal;
+                    HidPValueCaps[] featVal;
+                    HidPValueCaps[] inVal;
+                    HidPValueCaps[] outVal;
 
-                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? fbmap = null;
-                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? ibmap = null;
-                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>>? obmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> fbmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> ibmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPButtonCaps>> obmap = null;
 
-                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? fvmap = null;
-                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? ivmap = null;
-                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>>? ovmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> fvmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> ivmap = null;
+                    Dictionary<(HidUsagePage, int), IList<HidPValueCaps>> ovmap = null;
 
                     featBtn = GetButtonCaps(HidReportType.Feature, ppd);
                     inBtn = GetButtonCaps(HidReportType.Input, ppd);
@@ -477,7 +479,7 @@ namespace DataTools.Win32.Usb
             return true;
         }
 
-        private static void ExpandCaps(ref HidPValueCaps[]? data)
+        private static void ExpandCaps(ref HidPValueCaps[] data)
         {
             if (data == null) return;
 
@@ -505,7 +507,7 @@ namespace DataTools.Win32.Usb
             data = l.ToArray();
         }
 
-        private static void ExpandCaps(ref HidPButtonCaps[]? data)
+        private static void ExpandCaps(ref HidPButtonCaps[] data)
         {
             if (data == null) return;
 
