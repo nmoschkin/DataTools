@@ -2,17 +2,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1037</AssemblyVersion>
-    <FileVersion>8.0.0.1037</FileVersion>
+    <AssemblyVersion>8.0.0.1038</AssemblyVersion>
+    <FileVersion>8.0.0.1038</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1037</Version>
+    <Version>8.0.0.1038</Version>
     <Product>DataTools Xamarin.Forms Color Controls Library</Product>
     <Description>DataTools Xamarin.Forms Color Controls Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PreviousVersion>8.0.0.1036</PreviousVersion>
+    <PreviousVersion>8.0.0.1037</PreviousVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

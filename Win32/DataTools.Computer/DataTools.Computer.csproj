@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks>net7.0-windows;net48</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
-    <AssemblyVersion>8.0.0.1037</AssemblyVersion>
-    <FileVersion>8.0.0.1037</FileVersion>
+    <AssemblyVersion>8.0.0.1038</AssemblyVersion>
+    <FileVersion>8.0.0.1038</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1037</Version>
+    <Version>8.0.0.1038</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - Aggregated Computer-Wide Hardware Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -22,7 +22,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1036</PreviousVersion>
+    <PreviousVersion>8.0.0.1037</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
