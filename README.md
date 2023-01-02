@@ -1,6 +1,8 @@
 # DataTools Utility Libraries #
 ## Version 8.0 Development ##
 
+__Note__: Active development is occurring in the __dev-8.0__ branch. It is merged to main from time to time.
+
 ## Updates ##
 
 **January 2, 2023**
@@ -22,7 +24,7 @@ I have split up the main DataTools library and grouped classes by function:
   - __DataTools.Console__ _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
      <br>_Color Console_
     
-Additionally, I have multi-targetted the Windows and Win-32 specific libraries, as well, to .NET 7.0 and .NET Framework 4.8.
+Additionally, I have multi-targeted the Windows and Win-32 specific libraries, as well, to .NET 7.0 and .NET Framework 4.8.
  
 **December 23, 2022**
 
@@ -30,8 +32,6 @@ __I have decided that I'm going to skip what would have been version 7.0, becaus
 
 _Migrated to .NET 7.0, preparing to create NuGet packages._
 _All references to __IntPtr__ have been replaced with __nint__ except in the .NET Standard 2.0 projects._
-
-__Note__: Active development is occurring in the __dev-8.0__ branch. It is merged to main from time to time.
 
 
 ### Going Forward
