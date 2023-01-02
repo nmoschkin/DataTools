@@ -10,17 +10,17 @@ Change of plans. I have decided to go multi-platform with the core libraries.
 I have split up the main DataTools library and grouped classes by function:
 
   - __DataTools.Text__ _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
-    _Text tools_
-  - DataTools.MathTools _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
-    _Miscellaneous Math Tools_
-  - DataTools.Essentials _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
-    _DataTools App Essentials_
-  - DataTools.Memory _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
-    _Cross-platform memory tools_
-  - DataTools.Graphics _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
-    _Miscellaneous graphics tools_
-  - DataTools.Console _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
-    _Color Console_
+      <br>_Text tools_
+  - __DataTools.MathTools__ _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+     <br>_Miscellaneous Math Tools_
+  - __DataTools.Essentials__ _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+     <br>_DataTools App Essentials_
+  - __DataTools.Memory__ _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+     <br>_Cross-platform memory tools_
+  - __DataTools.Graphics__ _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+     <br>_Miscellaneous graphics tools_
+  - __DataTools.Console__ _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+     <br>_Color Console_
     
 Additionally, I have multi-targetted the Windows and Win-32 specific libraries, as well, to .NET 7.0 and .NET Framework 4.8.
  
