@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -14,6 +13,8 @@ using DataTools.Win32.Memory;
 using Newtonsoft.Json;
 
 using SkiaSharp;
+
+using static DataTools.Essentials.SortedLists.BinarySearch;
 
 namespace CoreTestOne
 {
@@ -421,77 +422,6 @@ namespace CoreTestOne
                     ScanDir(dobj, fileTypes, skipDirs);
                 }
             }
-        }
-
-        public static int Search<TList, TItem>(
-           Func<TItem, int> compare,
-           TList source,
-           out TItem retobj,
-           bool first = false,
-           CompareOptions options = CompareOptions.None,
-           bool insertIndex = false)
-
-           where TList : IList<TItem>
-        {
-            if (source == null || source.Count == 0)
-            {
-                retobj = default;
-                return insertIndex ? 0 : -1;
-            }
-
-            int lo = 0, hi = source.Count - 1;
-
-            TItem comp;
-            TItem elem = default;
-
-            while (true)
-            {
-                if (lo > hi) break;
-
-                int p = (hi + lo) / 2;
-
-                comp = source[p];
-
-                int c = compare(comp);
-                if (c == 0)
-                {
-                    if (first && p > 0)
-                    {
-                        p--;
-
-                        do
-                        {
-                            comp = source[p];
-
-                            c = compare(comp);
-
-                            if (c != 0)
-                            {
-                                break;
-                            }
-
-                            p--;
-                        } while (p >= 0);
-
-                        ++p;
-                        comp = source[p];
-                    }
-
-                    retobj = comp;
-                    return p;
-                }
-                else if (c < 0)
-                {
-                    hi = p - 1;
-                }
-                else
-                {
-                    lo = p + 1;
-                }
-            }
-
-            retobj = default;
-            return insertIndex ? lo : -1;
         }
 
         private static List<string> MakeNS(string ns)
