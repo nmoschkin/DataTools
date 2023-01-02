@@ -12,6 +12,99 @@ namespace DataTools.Essentials.SortedLists
         #region Public Methods
 
         /// <summary>
+        /// Perform an assisted binary walk to look for something.
+        /// </summary>
+        /// <typeparam name="TList">The type of list to search.</typeparam>
+        /// <typeparam name="TItem">The type of item to search.</typeparam>
+        /// <param name="compare">A function that will take the right-hand object as a parameter and return a comparison integer.</param>
+        /// <param name="source">The source list.</param>
+        /// <param name="retobj">The optional return object.</param>
+        /// <param name="first">True to return the index of the first match in a list with duplicate keys.</param>
+        /// <param name="insertIndex">True to return an insert index instead of -1.<br />
+        /// If set to true, match success must be tested by checking if the <paramref name="retobj"/> parameter contains an object or is default.</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// The assumption is made that the caller already has the criteria they are looking for.<br />
+        /// They can implement a lambda or method to compare their data to the object passed<br /> into the lambda.
+        /// <br /><br />
+        /// In this use case, the method will be called with the right-hand parameter.<br />
+        /// The data the caller has would be treated as the left-hand parameter.
+        /// <br /><br />
+        /// If <paramref name="insertIndex"/> is true, an insert index will be returned instead of -1, and match<br />
+        /// success must be tested by checking if the <paramref name="retobj"/> parameter contains an object<br />
+        /// or is default.
+        /// <br /><br />
+        /// If <typeparamref name="TItem"/> is a structure or value type, consider using <see cref="Nullable{TItem}"/>, instead.
+        /// </remarks>
+        public static int Search<TList, TItem>(
+           Func<TItem, int> compare,
+           TList source,
+           out TItem retobj,
+           bool first = false,
+           bool insertIndex = false)
+           where TList : IList<TItem>
+        {
+            if (source == null || source.Count == 0)
+            {
+                retobj = default;
+                return insertIndex ? 0 : -1;
+            }
+
+            int lo = 0, hi = source.Count - 1;
+
+            TItem comp;
+
+            while (true)
+            {
+                if (lo > hi) break;
+
+                int p = (hi + lo) / 2;
+
+                comp = source[p];
+
+                int c = compare(comp);
+                if (c == 0)
+                {
+                    if (first && p > 0)
+                    {
+                        p--;
+
+                        do
+                        {
+                            comp = source[p];
+
+                            c = compare(comp);
+
+                            if (c != 0)
+                            {
+                                break;
+                            }
+
+                            p--;
+                        } while (p >= 0);
+
+                        ++p;
+                        comp = source[p];
+                    }
+
+                    retobj = comp;
+                    return p;
+                }
+                else if (c < 0)
+                {
+                    hi = p - 1;
+                }
+                else
+                {
+                    lo = p + 1;
+                }
+            }
+
+            retobj = default;
+            return insertIndex ? lo : -1;
+        }
+
+        /// <summary>
         /// Sorts an array and find an object in the specified sorted array of objects that implement <see cref="IComparable{T}"/>.
         /// </summary>
         /// <typeparam name="T">The type of the object to sort and search.</typeparam>
