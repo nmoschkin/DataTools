@@ -3,6 +3,27 @@
 
 ## Updates ##
 
+**January 2, 2023**
+
+Change of plans. I have decided to go multi-platform with the core libraries. 
+
+I have split up the main DataTools library and grouped classes by function:
+
+  - __DataTools.Text__ _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+    _Text tools_
+  - DataTools.MathTools _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+    _Miscellaneous Math Tools_
+  - DataTools.Essentials _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+    _DataTools App Essentials_
+  - DataTools.Memory _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+    _Cross-platform memory tools_
+  - DataTools.Graphics _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+    _Miscellaneous graphics tools_
+  - DataTools.Console _(.NET Standard 2.0, .NET 7.0, .NET Framework 4.8)_
+    _Color Console_
+    
+Additionally, I have multi-targetted the Windows and Win-32 specific libraries, as well, to .NET 7.0 and .NET Framework 4.8.
+ 
 **December 23, 2022**
 
 __I have decided that I'm going to skip what would have been version 7.0, because version 7.0 would have been based on the old project organization scheme, and I am reorganizing the project in dramatic ways (including some major core deprecations.) I realized I could not sensibly call this project version 7.0, anymore, and so welcome to Version 8.0 Development Phase 1!__
