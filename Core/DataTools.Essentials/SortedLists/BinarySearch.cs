@@ -12,26 +12,29 @@ namespace DataTools.Essentials.SortedLists
         #region Public Methods
 
         /// <summary>
-        /// Perform an assisted tree walk to look for something.
+        /// Perform an assisted binary walk to look for something.
         /// </summary>
         /// <typeparam name="TList">The type of list to search.</typeparam>
         /// <typeparam name="TItem">The type of item to search.</typeparam>
         /// <param name="compare">A function that will take the right-hand object as a parameter and return a comparison integer.</param>
         /// <param name="source">The source list.</param>
         /// <param name="retobj">The optional return object.</param>
-        /// <param name="first">True to return the first match in a list with repeating elements.</param>
+        /// <param name="first">True to return the index of the first match in a list with duplicate keys.</param>
         /// <param name="insertIndex">True to return an insert index instead of -1.<br />
-        /// If set to true, match success must be tested by checking if the <paramref name="retobj"/> parameter contains an object or is null.</param>
+        /// If set to true, match success must be tested by checking if the <paramref name="retobj"/> parameter contains an object or is default.</param>
         /// <returns></returns>
         /// <remarks>
         /// The assumption is made that the caller already has the criteria they are looking for.<br />
-        /// They can implement a lambda or method to compare their data to the object passed into the lambda.
+        /// They can implement a lambda or method to compare their data to the object passed<br /> into the lambda.
         /// <br /><br />
         /// In this use case, the method will be called with the right-hand parameter.<br />
         /// The data the caller has would be treated as the left-hand parameter.
         /// <br /><br />
-        /// If <paramref name="insertIndex"/> is true, an insert index will be returned instead of -1,<br />
-        /// and match success must be tested by checking if the <paramref name="retobj"/> parameter contains an object or is null.
+        /// If <paramref name="insertIndex"/> is true, an insert index will be returned instead of -1, and match<br />
+        /// success must be tested by checking if the <paramref name="retobj"/> parameter contains an object<br />
+        /// or is default.
+        /// <br /><br />
+        /// If <typeparamref name="TItem"/> is a structure or value type, consider using <see cref="Nullable{TItem}"/>, instead.
         /// </remarks>
         public static int Search<TList, TItem>(
            Func<TItem, int> compare,
@@ -39,7 +42,6 @@ namespace DataTools.Essentials.SortedLists
            out TItem retobj,
            bool first = false,
            bool insertIndex = false)
-
            where TList : IList<TItem>
         {
             if (source == null || source.Count == 0)
