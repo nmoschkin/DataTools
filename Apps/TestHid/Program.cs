@@ -1,4 +1,8 @@
-﻿using DataTools.Text;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+using DataTools.Text;
 using DataTools.Win32;
 using DataTools.Win32.Usb;
 using DataTools.Win32.Usb.Power;
@@ -24,7 +28,6 @@ namespace TestHid
 
             Console.Clear();
             Console.CursorVisible = false;
-            Console.WindowHeight = 100;
 
             Task.Delay(1000).Wait();
 
@@ -36,10 +39,14 @@ namespace TestHid
 
             //Environment.Exit(0);
 
+            Console.WriteLine("Press any key to begin...");
+            Console.Read();
+
+            Console.WriteLine("\x1b[2J\x1b[H");
+
             while (true)
             {
-                Console.CursorLeft = 0;
-                Console.CursorTop = 0;
+                Console.WriteLine("\x1b[H");
 
                 if (Console.KeyAvailable) break;
 
@@ -161,7 +168,7 @@ namespace TestHid
                     printed = true;
                 }
 
-                Task.Delay(500);
+                Task.Delay(500).Wait();
             }
 
             batt2.CloseHid();
