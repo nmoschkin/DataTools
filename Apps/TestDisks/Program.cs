@@ -1,12 +1,7 @@
-﻿
+﻿using System;
 
-
-using DataTools.Win32.Disk.Partition.Mbr;
 using DataTools.Win32.Disk.Partition.Gpt;
-using DataTools.Win32;
-using DataTools.Win32.Disk;
-
-using static DataTools.Text.TextTools;
+using DataTools.Win32.Disk.Partition.Mbr;
 
 namespace TestNetwork
 {
@@ -16,7 +11,7 @@ namespace TestNetwork
         public static void Main(string[] args)
         {
             var disks = DataTools.Win32.Disk.DiskDeviceInfo.EnumDisks();
-            
+
             foreach (var disk in disks)
             {
                 Console.WriteLine("Physical Disk: " + disk.BusReportedDeviceDesc);
@@ -42,7 +37,6 @@ namespace TestNetwork
                             RawMbrDisk.ReadRawMbrDisk(disk.DevicePath, disk.SectorSize, out mbrInfo);
 
                             Console.WriteLine("Successfully read raw MBR disk.  Total logical partitions: " + mbrInfo?.PartitionCount.ToString());
-
                         }
                         catch { }
                     }
