@@ -27,9 +27,9 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         /// <returns></returns>
         public static IEnumDescriptionProvider<T> ResolveDefaultProvider()
         {
-            var attr = typeof(T).GetCustomAttributes(true)
-                .Where(x => x is DescriptionProviderAttribute)
-                .Select(x => x as DescriptionProviderAttribute)
+            var attr = typeof(T).GetCustomAttributes(true)?
+                .Where(x => x is DescriptionProviderAttribute)?
+                .Select(x => x as DescriptionProviderAttribute)?
                 .FirstOrDefault();
 
             if (attr != null && attr.CreateInstance() is IEnumDescriptionProvider pro && pro.CanConvertType(typeof(T)))
