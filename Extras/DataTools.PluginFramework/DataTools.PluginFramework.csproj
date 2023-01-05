@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <Nullable>disable</Nullable>
     <LangVersion>preview</LangVersion>
-    <AssemblyVersion>8.0.0.1037</AssemblyVersion>
-    <FileVersion>8.0.0.1037</FileVersion>
+    <AssemblyVersion>8.0.0.1042</AssemblyVersion>
+    <FileVersion>8.0.0.1042</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1037</Version>
+    <Version>8.0.0.1042</Version>
     <Product>DataTools Plugin Framework</Product>
     <Description>DataTools Plugin Framework</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -18,7 +18,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1036</PreviousVersion>
+    <PreviousVersion>8.0.0.1041</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
@@ -34,7 +34,7 @@
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
     <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
-    <Exec Command="nuget add $(OutputPath)..\$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
     <!-- <Exec Command="post-build-tool /d ." /> -->
   </Target>
 </Project>

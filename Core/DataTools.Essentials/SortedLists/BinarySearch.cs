@@ -20,8 +20,7 @@ namespace DataTools.Essentials.SortedLists
         /// <param name="source">The source list.</param>
         /// <param name="retobj">The optional return object.</param>
         /// <param name="first">True to return the index of the first match in a list with duplicate keys.</param>
-        /// <param name="insertIndex">True to return an insert index instead of -1.<br />
-        /// If set to true, match success must be tested by checking if the <paramref name="retobj"/> parameter contains an object or is default.</param>
+        /// <param name="insertIndex">True to return an insert index instead of -1 if an item is not found.</param>
         /// <returns></returns>
         /// <remarks>
         /// The assumption is made that the caller already has the criteria they are looking for.<br />
@@ -30,11 +29,8 @@ namespace DataTools.Essentials.SortedLists
         /// In this use case, the method will be called with the right-hand parameter.<br />
         /// The data the caller has would be treated as the left-hand parameter.
         /// <br /><br />
-        /// If <paramref name="insertIndex"/> is true, an insert index will be returned instead of -1, and match<br />
-        /// success must be tested by checking if the <paramref name="retobj"/> parameter contains an object<br />
-        /// or is default.
-        /// <br /><br />
-        /// If <typeparamref name="TItem"/> is a structure or value type, consider using <see cref="Nullable{TItem}"/>, instead.
+        /// If <paramref name="insertIndex"/> is true, and an item is not found,
+        /// an insert index will be returned instead of -1, and <paramref name="retobj"/> will be default.
         /// </remarks>
         public static int Search<TList, TItem>(
            Func<TItem, int> compare,

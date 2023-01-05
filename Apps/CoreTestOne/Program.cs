@@ -1,10 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 using DataTools.Desktop;
 using DataTools.Graphics;
@@ -14,6 +17,8 @@ using DataTools.Win32.Memory;
 using Newtonsoft.Json;
 
 using SkiaSharp;
+
+using static DataTools.Essentials.SortedLists.BinarySearch;
 
 namespace CoreTestOne
 {
@@ -423,77 +428,6 @@ namespace CoreTestOne
             }
         }
 
-        public static int Search<TList, TItem>(
-           Func<TItem, int> compare,
-           TList source,
-           out TItem retobj,
-           bool first = false,
-           CompareOptions options = CompareOptions.None,
-           bool insertIndex = false)
-
-           where TList : IList<TItem>
-        {
-            if (source == null || source.Count == 0)
-            {
-                retobj = default;
-                return insertIndex ? 0 : -1;
-            }
-
-            int lo = 0, hi = source.Count - 1;
-
-            TItem comp;
-            TItem elem = default;
-
-            while (true)
-            {
-                if (lo > hi) break;
-
-                int p = (hi + lo) / 2;
-
-                comp = source[p];
-
-                int c = compare(comp);
-                if (c == 0)
-                {
-                    if (first && p > 0)
-                    {
-                        p--;
-
-                        do
-                        {
-                            comp = source[p];
-
-                            c = compare(comp);
-
-                            if (c != 0)
-                            {
-                                break;
-                            }
-
-                            p--;
-                        } while (p >= 0);
-
-                        ++p;
-                        comp = source[p];
-                    }
-
-                    retobj = comp;
-                    return p;
-                }
-                else if (c < 0)
-                {
-                    hi = p - 1;
-                }
-                else
-                {
-                    lo = p + 1;
-                }
-            }
-
-            retobj = default;
-            return insertIndex ? lo : -1;
-        }
-
         private static List<string> MakeNS(string ns)
         {
             var sp = ns.Split('.');
@@ -722,11 +656,17 @@ namespace CoreTestOne
                         dtype = dm.Groups[1].Value;
                         dname = dm.Groups[2].Value;
 
-                        if (lines[i].Contains("public ") && currvis == "public") currvis = "public";
-                        else if (lines[i].Contains("internal ")) currvis = "internal";
-                        else if (lines[i].Contains("private ")) currvis = "private";
-                        else if (lines[i].Contains("protected ")) currvis = "protected";
-                        else if (lines[i].Contains("protected internal ")) currvis = "protected internal";
+                        if (lines[i].Contains("public ") && currvis == "public")
+                        {
+                            currvis = "public";
+                        }
+                        else if (currvis != "public")
+                        {
+                            if (lines[i].Contains("protected internal ")) currvis = "protected internal";
+                            else if (lines[i].Contains("internal ")) currvis = "internal";
+                            else if (lines[i].Contains("private ")) currvis = "private";
+                            else if (lines[i].Contains("protected ")) currvis = "protected";
+                        }
 
                         var mtypes = rtypes.Match(lines[i]);
 
@@ -813,8 +753,11 @@ namespace CoreTestOne
             return results ?? nsextern;
         }
 
+        [STAThread]
         public static void Main(string[] args)
         {
+            var frm = new frmExterns();
+            Application.Run(frm);
         }
 
         public static List<ExternInfo> ScanForExterns(string path)

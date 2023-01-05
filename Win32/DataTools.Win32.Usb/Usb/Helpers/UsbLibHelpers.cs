@@ -40,9 +40,6 @@ namespace DataTools.Win32.Usb
         [DllImport("hid.dll")]
         internal static extern bool HidD_GetFeature(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
 
-        [DllImport("hid.dll", EntryPoint = "HidD_GetFeature")]
-        internal static extern bool HidD_GetFeatureL(IntPtr HidDeviceObject, ref long Buffer, int BufferLength);
-
         [DllImport("hid.dll")]
         internal static extern bool HidD_SetFeature(IntPtr HidDeviceObject, IntPtr Buffer, int BufferLength);
 

@@ -26,6 +26,11 @@ namespace DataTools.Memory
         {
         }
 
+        public SafePtr(byte[] data) : this(IntPtr.Zero, true, true)
+        {
+            FromByteArray(data);
+        }
+
         public SafePtr(long size) : this(IntPtr.Zero, true, true)
         {
             Alloc(size);

@@ -1,22 +1,20 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
-using DataTools.Extras.Expressions;
+using DataTools.Extras.AdvancedLists;
 using DataTools.Extras.Conversion;
-using DataTools.MathTools;
+using DataTools.Extras.Expressions;
 using DataTools.Text;
 
 using Newtonsoft.Json;
 
-using System.IO;
-using System.Text.Json.Nodes;
+//using System.Text.Json.Nodes;
 
 using static DataTools.MathTools.MathLib;
-using DataTools.Extras.AdvancedLists;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Text.Json;
 
 namespace TestExtras
 {
@@ -33,7 +31,6 @@ namespace TestExtras
 
         public static void TestBufferList(string[] args)
         {
-
             var ltest = new RedBlackCollection<string>();
             int strcount = 64;
             var ch = 'A';
@@ -98,8 +95,6 @@ namespace TestExtras
             {
                 if (icomp[x - 1] < icomp[x]) throw new Exception();
             }
-
-
         }
 
         [Flags]
@@ -114,70 +109,138 @@ namespace TestExtras
 
         public class Marker<T> where T : Marker<T>
         {
+            public AccessModifiers AccessModifiers
+            {
+                get; set;
+            }
 
-            public AccessModifiers AccessModifiers { get; set; }
+            public bool IsVirtual
+            {
+                get; set;
+            }
 
-            public bool IsVirtual { get; set; }
+            public bool IsAbstract
+            {
+                get; set;
+            }
 
-            public bool IsAbstract { get; set; }
+            public bool IsExtern
+            {
+                get; set;
+            }
 
-            public bool IsExtern { get; set; }
+            public bool IsReadOnly
+            {
+                get; set;
+            }
 
-            public bool IsReadOnly { get; set; }
+            public bool IsOverride
+            {
+                get; set;
+            }
 
-            public bool IsOverride { get; set; }
+            public bool IsNew
+            {
+                get; set;
+            }
 
-            public bool IsNew { get; set; }
+            public bool IsStatic
+            {
+                get; set;
+            }
 
-            public bool IsStatic { get; set; }
+            public string Namespace
+            {
+                get; set;
+            }
 
-            public string Namespace { get; set; }
+            public string Content
+            {
+                get; set;
+            }
 
-            public string Content { get; set; }
+            public string ScanHit
+            {
+                get; set;
+            }
 
-            public string ScanHit { get; set; }
+            public string MethodParamsString
+            {
+                get; set;
+            }
 
-            public string MethodParamsString { get; set; }
+            public List<string> MethodParams
+            {
+                get; set;
+            }
 
-            public List<string> MethodParams { get; set; }
+            public int StartPos
+            {
+                get; set;
+            }
 
-            public int StartPos { get; set; }   
+            public int EndPos
+            {
+                get; set;
+            }
 
-            public int EndPos { get; set; }
+            public int StartLine
+            {
+                get; set;
+            }
 
-            public int StartLine { get; set; }
+            public int EndLine
+            {
+                get; set;
+            }
 
-            public int EndLine { get; set; }
+            public int StartColumn
+            {
+                get; set;
+            }
 
-            public int StartColumn { get; set; }
+            public int EndColumn
+            {
+                get; set;
+            }
 
-            public int EndColumn { get; set; }
+            public string Kind
+            {
+                get; set;
+            }
 
-            public string Kind { get; set; }
+            public string Name
+            {
+                get; set;
+            }
 
-            public string Name { get; set; }
+            public string Generics
+            {
+                get; set;
+            }
 
-            public string Generics { get; set; }
+            public int Level
+            {
+                get; set;
+            }
 
-            public int Level { get; set; }
-
-            public List<T> Markers { get; set; }
+            public List<T> Markers
+            {
+                get; set;
+            }
 
             public override string ToString()
             {
                 return "(" + Kind + ") " + (Name ?? Content ?? "");
             }
-
         }
 
         public class Marker : Marker<Marker>
         {
         }
 
-
         public static List<T> TestCParse<T>(string[] args) where T : Marker<T>, new()
         {
-
             //var dlg = new OpenFileDialog()
             //{
             //    Filter = "C# Files (*.cs)|*.cs",
@@ -194,7 +257,7 @@ namespace TestExtras
             var filename = "C:\\Users\\theim\\Desktop\\Projects\\Personal Projects\\Repos\\DataTools\\DataTools\\Observable\\ObservableBase.cs";
 
             var exp = BlockLevelExpressionSegment.LoadFile(filename);
-            
+
             PrintExpression(exp);
 
             var chars = File.ReadAllText(filename).ToCharArray();
@@ -202,9 +265,8 @@ namespace TestExtras
             return ParseCSCode<T>(chars);
         }
 
-        public static List<T> ParseCSCode<T>(char[] chars) where T : Marker<T>, new()  
+        public static List<T> ParseCSCode<T>(char[] chars) where T : Marker<T>, new()
         {
-
             int i, j, c = chars.Length;
 
             List<T> markers = new List<T>();
@@ -229,16 +291,16 @@ namespace TestExtras
             string currNS = "";
 
             Dictionary<string, Regex> patterns = new Dictionary<string, Regex>();
-            
+
             patterns.Add("Using", new Regex(@"using (.+)\s*;"));
             patterns.Add("Namespace", new Regex(@"namespace (.+)"));
             patterns.Add("This", new Regex(@".*(this)\s*\[.+\].*"));
             patterns.Add("Class", new Regex(@".*class\s+([A-Za-z0-9_@.]+).*"));
-            patterns.Add("Interface", new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*")); 
-            patterns.Add("Struct", new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*")); 
-            patterns.Add("Enum", new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*")); 
-            patterns.Add("Record", new Regex(@".*record\s+([A-Za-z0-9_@.]+).*")); 
-            patterns.Add("Delegate", new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;")); 
+            patterns.Add("Interface", new Regex(@".*interface\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add("Struct", new Regex(@".*struct\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add("Enum", new Regex(@".*enum\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add("Record", new Regex(@".*record\s+([A-Za-z0-9_@.]+).*"));
+            patterns.Add("Delegate", new Regex(@".*delegate\s+.+\s+([A-Za-z0-9_@.]+)\(.*\)\s*;"));
             patterns.Add("Event", new Regex(@".*event\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
             patterns.Add("Const", new Regex(@".*const\s+.+\s+([A-Za-z0-9_@.]+)\s*"));
             patterns.Add("Operator", new Regex(@".*operator\s+(\S+)\(.*\)"));
@@ -445,7 +507,6 @@ namespace TestExtras
                                         currMarker.IsOverride = activas["override"];
                                         currMarker.IsNew = activas["new"];
 
-
                                         var genScan = genericPatt.Match(lookback);
                                         if (genScan.Success)
                                         {
@@ -524,7 +585,6 @@ namespace TestExtras
                         }
                     }
 
-
                     --currLevel;
                     currPatt = strack.Pop();
 
@@ -552,7 +612,6 @@ namespace TestExtras
                         startLine = currLine;
                     }
                     ResetActivas(activas);
-
                 }
                 else if ((i < c - 1) && (chars[i] == '/' && chars[i + 1] == '/'))
                 {
@@ -568,7 +627,7 @@ namespace TestExtras
 
                     sb.Append(chars[i]);
                     sb.Append(chars[i + 1]);
-                        
+
                     bool docs = false;
                     for (j = i + 2; j < c; j++)
                     {
@@ -585,7 +644,7 @@ namespace TestExtras
                             currMarker.EndPos = j - 1;
                             currMarker.Content = sb.ToString();
                             currMarker.Kind = docs ? "XMLDoc" : "LineComment";
-                                
+
                             markers.Add(currMarker);
 
                             currLine++;
@@ -597,7 +656,6 @@ namespace TestExtras
                             }
                             break;
                         }
-
                     }
 
                     if (j >= c) break;
@@ -611,7 +669,6 @@ namespace TestExtras
                         StartLine = currLine,
                         StartPos = i,
                         Namespace = currNS
-
                     };
 
                     sb = new StringBuilder();
@@ -652,7 +709,6 @@ namespace TestExtras
 
                             continue;
                         }
-
                     }
 
                     if (j >= c) break;
@@ -682,7 +738,7 @@ namespace TestExtras
             return markers;
         }
 
-        private static void PostScanTasks<T, U>(T markers) where T : List<U> where U: Marker<U>, new()
+        private static void PostScanTasks<T, U>(T markers) where T : List<U> where U : Marker<U>, new()
         {
             int c = markers.Count;
             int i;
@@ -691,7 +747,6 @@ namespace TestExtras
             {
                 if (markers[i].Markers != null) PostScanTasks<List<U>, U>(markers[i].Markers);
 
-               
                 if (i < c - 1)
                 {
                     if (markers[i].Kind == "Do" && markers[i + 1].Kind == "DoWhile")
@@ -732,10 +787,9 @@ namespace TestExtras
                             mknew.StartPos = markers[x].StartPos;
                             mknew.StartLine = markers[x].StartLine;
                             mknew.StartColumn = markers[x].StartColumn;
-                            
+
                             mknew.Markers = new List<U>();
                             mknew.Content = "";
-
 
                             for (int z = x; z <= i; z++)
                             {
@@ -767,7 +821,6 @@ namespace TestExtras
                             i = x;
                         }
                     }
-
                 }
 
                 if (i < c)
@@ -818,7 +871,6 @@ namespace TestExtras
                     if (sb.Length > 0) sb.Append(",");
                     sb.Append(TextTools.TitleCase(t));
                 }
-
             }
 
             if (Enum.TryParse<AccessModifiers>(sb.ToString(), out AccessModifiers result))
@@ -827,7 +879,6 @@ namespace TestExtras
             }
 
             return AccessModifiers.None;
-
         }
 
         public static void ResetActivas(Dictionary<string, bool> activas)
@@ -852,13 +903,11 @@ namespace TestExtras
 
         public static int ColumnFromHere(char[] chars, int pos)
         {
-
             int c = 0;
             int i;
 
             for (i = pos - 1; i >= 0; i--)
             {
-
                 var ch = chars[i];
                 if (ch == '\n') return c;
 
@@ -870,7 +919,6 @@ namespace TestExtras
 
         public static void TestParsing(string[] args)
         {
-
             //var u1 = MetricTool.GetUnitByName("Fahrenheit");
             var jcfg = new JsonSerializerSettings()
             {
@@ -880,8 +928,6 @@ namespace TestExtras
             var tss = "Hey roberts roberts gemini falcon \"Hot extra sauce\" derecho derecho agnes";
 
             var tb = TextTools.TextBetween(tss, 0, "roberts", "derecho", out int? is1, out int? is2);
-
-
 
             Console.WriteLine($"\"{tb}\"");
 
@@ -893,9 +939,8 @@ namespace TestExtras
 
             Console.WriteLine($"\"{tb}\"");
 
-
             //MetricTool.GetBaseValue(39d, u1, out double? baseValue, out MetricUnit baseUnit);
-            //if (baseValue != null) 
+            //if (baseValue != null)
             //{
             //    var u2 = MetricTool.GetUnitByName("Celsius");
             //    MetricTool.GetDerivedValue((double)baseValue, u2, out double? cTemp);
@@ -907,7 +952,7 @@ namespace TestExtras
             //var dstr = "tanh(v)";
 
             //var dstr = "max(v, 44 * 0.32, 95 / 5)";
-            
+
             var dstr = "5 m^2 = x ft^2";
 
             var dstr3 = "abs((19 + 2)^u / 6 * 5 / (4 sqrt (sqrt (v * 5))) + (4 - 6 * 10))";
@@ -921,7 +966,6 @@ namespace TestExtras
 
             Console.WriteLine($"Input Expression:  {dstr3}");
 
-
             var zExp3 = new ExpressionSegment(dstr, "");
             var zExp1 = new ExpressionSegment(dstr3, "");
             var zExp2 = new ExpressionSegment(dstr2, "");
@@ -934,10 +978,6 @@ namespace TestExtras
 
             foreach (var res in expList)
             {
-
-
-
-
                 res.StorageMode = StorageMode.AsDouble;
 
                 var v = 119.74d;
@@ -956,7 +996,6 @@ namespace TestExtras
 
                 if (!res.HasUnits)
                 {
-
                     Console.WriteLine();
                     Console.WriteLine("Variables:\r\n" + JsonConvert.SerializeObject(res.Variables, jcfg));
                     Console.WriteLine();
@@ -993,7 +1032,6 @@ namespace TestExtras
                     Console.WriteLine();
 
                     PrintExpression(res.Clone(true));
-
                 }
 
                 if (res.IsEquation)
@@ -1003,11 +1041,8 @@ namespace TestExtras
                     Console.WriteLine();
 
                     PrintExpression(res.Solve());
-
                 }
-
             }
-
         }
 
         public static void PrintExpression(ExpressionSegment es, int level = 0, bool[] keepPattern = null)
@@ -1038,7 +1073,6 @@ namespace TestExtras
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write($": ");
 
-
             Console.ResetColor();
 
             switch (es.PartType)
@@ -1063,7 +1097,6 @@ namespace TestExtras
 
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     break;
-
             }
 
             Console.Write($"{es}");
@@ -1079,8 +1112,7 @@ namespace TestExtras
                     Console.Write($" ({TextTools.Separate(es.Unit.Name)})");
                 }
             }
-            
-            else if ((es.PartType & PartType.Variable) == PartType.Variable && es.Value != null && es[es.Value.ToString()] != null) 
+            else if ((es.PartType & PartType.Variable) == PartType.Variable && es.Value != null && es[es.Value.ToString()] != null)
             {
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(" (");
@@ -1091,7 +1123,7 @@ namespace TestExtras
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(")");
             }
-            
+
             Console.ResetColor();
             Console.Write("\r\n");
             var litems = es.Components;
@@ -1103,7 +1135,7 @@ namespace TestExtras
             foreach (var item in litems)
             {
                 keepPattern[level] = !object.Equals(litem, item);
-                PrintExpression(item, level + 1, keepPattern);                
+                PrintExpression(item, level + 1, keepPattern);
             }
         }
 
@@ -1123,9 +1155,9 @@ namespace TestExtras
 
             int mfaster = 0;
             int sfaster = 0;
-            
+
             int notfounds = 0;
-            
+
             TimeSpan? bestA = null, bestB = null, worstA = null, worstB = null;
 
             f = PrintFraction(0.00909, 4, 20);
@@ -1237,13 +1269,10 @@ namespace TestExtras
                 Console.WriteLine($"M Times - Worst:    {worstB} ");
                 Console.WriteLine();
                 Console.WriteLine();
-
             }
 
             Console.CursorVisible = true;
-
         }
-
 
         public static string RandomString(int lenMin = 1, int lenMax = 10)
         {
@@ -1254,7 +1283,7 @@ namespace TestExtras
             char ch;
             int p;
             var strLen = rnd.Next(lenMin, lenMax);
-            
+
             var sb = new StringBuilder();
 
             for (int i = 0; i < strLen; i++)
@@ -1279,13 +1308,13 @@ namespace TestExtras
             }
 
             return sb.ToString();
-
         }
     }
 
-    public class NullableValueTypeComparer<T> : IComparer<T?> where T: struct, IComparable<T>
+    public class NullableValueTypeComparer<T> : IComparer<T?> where T : struct, IComparable<T>
     {
-        bool desc = false;
+        private bool desc = false;
+
         public NullableValueTypeComparer(bool descending)
         {
             desc = descending;
@@ -1293,7 +1322,6 @@ namespace TestExtras
 
         public NullableValueTypeComparer()
         {
-
         }
 
         public int Compare(T? x, T? y)
@@ -1317,5 +1345,4 @@ namespace TestExtras
             }
         }
     }
-
 }
