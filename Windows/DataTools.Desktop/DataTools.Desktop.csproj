@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0-windows;net48</TargetFrameworks>
+    <TargetFrameworks>net6.0-windows;net7.0-windows;net472;net48;net481</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1040</AssemblyVersion>
-    <FileVersion>8.0.0.1040</FileVersion>
+    <AssemblyVersion>8.0.0.1041</AssemblyVersion>
+    <FileVersion>8.0.0.1041</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1040</Version>
+    <Version>8.0.0.1041</Version>
     <Product>DataTools Desktop Base Library</Product>
     <Description>DataTools Desktop Base Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -22,7 +22,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1039</PreviousVersion>
+    <PreviousVersion>8.0.0.1040</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>

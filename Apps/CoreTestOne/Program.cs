@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 using DataTools.Desktop;
 using DataTools.Graphics;
@@ -655,11 +656,17 @@ namespace CoreTestOne
                         dtype = dm.Groups[1].Value;
                         dname = dm.Groups[2].Value;
 
-                        if (lines[i].Contains("public ") && currvis == "public") currvis = "public";
-                        else if (lines[i].Contains("internal ")) currvis = "internal";
-                        else if (lines[i].Contains("private ")) currvis = "private";
-                        else if (lines[i].Contains("protected ")) currvis = "protected";
-                        else if (lines[i].Contains("protected internal ")) currvis = "protected internal";
+                        if (lines[i].Contains("public ") && currvis == "public")
+                        {
+                            currvis = "public";
+                        }
+                        else if (currvis != "public")
+                        {
+                            if (lines[i].Contains("protected internal ")) currvis = "protected internal";
+                            else if (lines[i].Contains("internal ")) currvis = "internal";
+                            else if (lines[i].Contains("private ")) currvis = "private";
+                            else if (lines[i].Contains("protected ")) currvis = "protected";
+                        }
 
                         var mtypes = rtypes.Match(lines[i]);
 
@@ -746,8 +753,11 @@ namespace CoreTestOne
             return results ?? nsextern;
         }
 
+        [STAThread]
         public static void Main(string[] args)
         {
+            var frm = new frmExterns();
+            Application.Run(frm);
         }
 
         public static List<ExternInfo> ScanForExterns(string path)

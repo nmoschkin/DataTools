@@ -319,13 +319,10 @@ namespace DataTools.Console
             };
         }
 
-#if NETSTANDARD2_0
-
-        public override bool Equals(object obj)
-#elif NET48_OR_GREATER
-        public override bool Equals(object obj)
-#else
+#if NET5_0_OR_GREATER
         public override bool Equals([NotNullWhen(true)] object obj)
+#else
+        public override bool Equals(object obj)
 #endif
         {
             if (obj is TableContext rc)
