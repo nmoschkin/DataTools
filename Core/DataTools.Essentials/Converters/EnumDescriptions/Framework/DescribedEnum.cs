@@ -11,11 +11,21 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
     /// <typeparam name="T">The type of Enum to serve</typeparam>
     public struct DescribedEnum<T> : IEquatable<DescribedEnum<T>>, IEquatable<T> where T : struct, Enum
     {
+        private static IEnumDescriptionProvider<T> _defaultProvider;
         private string _description;
         private IEnumDescriptionProvider<T> _descriptionProvider;
         private T _value;
 
         static DescribedEnum()
+        {
+            _defaultProvider = ResolveDefaultProvider();
+        }
+
+        /// <summary>
+        /// Resolves the default description provider for the specified type.
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumDescriptionProvider<T> ResolveDefaultProvider()
         {
             var attr = typeof(T).GetCustomAttributes(true)
                 .Where(x => x is DescriptionProviderAttribute)
@@ -26,16 +36,16 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
             {
                 if (pro is IEnumDescriptionProvider<T> defpro)
                 {
-                    DefaultProvider = defpro;
+                    return defpro;
                 }
                 else
                 {
-                    DefaultProvider = new DefaultProviderWrapper(pro);
+                    return new DefaultProviderWrapper(pro);
                 }
             }
             else
             {
-                DefaultProvider = new AttributeDescriptionProvider<T>();
+                return new AttributeDescriptionProvider<T>();
             }
         }
 
@@ -68,10 +78,24 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         /// <summary>
         /// Gets or sets the default description provider for the current enum type <typeparamref name="T"/>.
         /// </summary>
-        public static IEnumDescriptionProvider<T> DefaultProvider { get; set; }
+        public static IEnumDescriptionProvider<T> DefaultProvider
+        {
+            get => _defaultProvider;
+            set
+            {
+                if (value == null)
+                {
+                    _defaultProvider = ResolveDefaultProvider();
+                }
+                else
+                {
+                    _defaultProvider = value;
+                }
+            }
+        }
 
         /// <summary>
-        /// Gets the description for this instance
+        /// Gets or sets the description for this instance
         /// </summary>
         /// <remarks>
         /// If the resolved <see cref="IEnumDescriptionProvider{T}"/> is lazy loaded, it will be invoked, at this time.
@@ -95,6 +119,10 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
                 }
 
                 return _description;
+            }
+            set
+            {
+                _description = value;
             }
         }
 
