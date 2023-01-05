@@ -4,10 +4,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1042</AssemblyVersion>
-    <FileVersion>8.0.0.1042</FileVersion>
+    <AssemblyVersion>8.0.0.1043</AssemblyVersion>
+    <FileVersion>8.0.0.1043</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1042</Version>
+    <Version>8.0.0.1043</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - Disk Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -23,7 +23,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1041</PreviousVersion>
+    <PreviousVersion>8.0.0.1042</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>

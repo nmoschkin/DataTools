@@ -20,7 +20,7 @@ using System.ComponentModel;
 namespace DataTools.Win32.Usb
 {
     [Flags]
-    [JsonConverter(typeof(EnumToStringConverter<HidUsageType>))]
+    [JsonConverter(typeof(EnumToStringJsonConverter<HidUsageType>))]
     public enum HidUsageType
     {
         /// <summary>

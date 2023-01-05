@@ -8,7 +8,16 @@ using System.Text;
 
 namespace DataTools.Essentials.Converters
 {
-    public class EnumToStringConverter<T> : JsonConverter<T> where T : struct, Enum
+    [Obsolete("Use EnumToStringJsonConverter<T> instead.")]
+    public class EnumToStringConverter<T> : EnumToStringJsonConverter<T> where T : struct, Enum
+    {
+    }
+
+    /// <summary>
+    /// Converts an enum to and from string for JSON parsing.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class EnumToStringJsonConverter<T> : JsonConverter<T> where T : struct, Enum
     {
         public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer)
         {

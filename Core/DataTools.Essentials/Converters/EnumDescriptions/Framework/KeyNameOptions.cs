@@ -41,6 +41,11 @@
         /// <summary>
         /// There is a custom suffix
         /// </summary>
-        CustomSuffix = 0x20
+        CustomSuffix = 0x20,
+
+        /// <summary>
+        /// The resource keys are provided explicitly
+        /// </summary>
+        Explicit = 0xff
     }
 }
