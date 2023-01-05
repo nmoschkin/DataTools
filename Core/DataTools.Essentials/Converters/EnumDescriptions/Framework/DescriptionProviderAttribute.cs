@@ -23,7 +23,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         }
 
         /// <summary>
-        /// Specifies how a description might be provided for a set of enumeration values.
+        /// Specifies how a description is provided for a set of enumeration values.
         /// </summary>
         /// <param name="providerType">The provider type (must implement <see cref="IEnumDescriptionProvider"/>.</param>
         /// <param name="parameters">Optional instantiation parameters for the <paramref name="providerType"/>.</param>

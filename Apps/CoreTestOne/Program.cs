@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 using DataTools.Desktop;
+using DataTools.Essentials.Converters.EnumDescriptions;
+using DataTools.Essentials.Converters.EnumDescriptions.Framework;
 using DataTools.Graphics;
 using DataTools.Streams;
 using DataTools.Win32.Memory;
@@ -22,6 +24,17 @@ using static DataTools.Essentials.SortedLists.BinarySearch;
 
 namespace CoreTestOne
 {
+    [DescriptionProvider(typeof(GlobalizedDescriptionProvider<ExampleEnum>), "CoreTestOne.Resources.AppResources")]
+    public enum ExampleEnum
+    {
+        Gold,
+        Silver,
+        Blue,
+        Green,
+        Red,
+        Purple
+    }
+
     public class ExternInfo : IEquatable<ExternInfo>
     {
         private static readonly PropertyInfo[] props = typeof(ExternInfo).GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -377,6 +390,29 @@ namespace CoreTestOne
 
     public static class Program
     {
+        [DllImport("kernel32.dll")]
+        private static extern bool AllocConsole();
+
+        [STAThread]
+        public static void Main(string[] args)
+        {
+            AllocConsole();
+            var eval = new DescribedEnum<ExampleEnum>(ExampleEnum.Silver);
+
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Blue;
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Red;
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Purple;
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Green;
+            Console.WriteLine(eval.ToString());
+
+            var frm = new frmExterns();
+            Application.Run(frm);
+        }
+
         private static Dictionary<FoundStruct, List<string>> MatchedFiles = new Dictionary<FoundStruct, List<string>>();
         private static int max = 100;
 
@@ -751,13 +787,6 @@ namespace CoreTestOne
             }
 
             return results ?? nsextern;
-        }
-
-        [STAThread]
-        public static void Main(string[] args)
-        {
-            var frm = new frmExterns();
-            Application.Run(frm);
         }
 
         public static List<ExternInfo> ScanForExterns(string path)

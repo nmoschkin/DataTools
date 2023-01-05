@@ -36,6 +36,8 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// </remarks>
         public GlobalizedDescriptionProvider(KeyNameOptions nameOptions, string resourceTypeName, Assembly assembly, CultureInfo cultureInfo = null, string customPrefix = null, string customSuffix = null, string customSeparator = "_") : base()
         {
+            loadType = TextLoadType.Lazy;
+
             if (nameOptions == KeyNameOptions.Explicit)
             {
                 nameOptions = KeyNameOptions.TypePrefix;
@@ -67,6 +69,8 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// </remarks>
         public GlobalizedDescriptionProvider(IEnumerable<KeyValuePair<T, string>> resourceKeys, string resourceTypeName, Assembly assembly, CultureInfo cultureInfo) : base()
         {
+            loadType = TextLoadType.Lazy;
+
             NameOptions = KeyNameOptions.Explicit;
 
             this.resourceKeys = new Dictionary<T, string>();
@@ -151,6 +155,17 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         }
 
         /// <summary>
+        /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}" />
+        /// </summary>
+        /// <param name="resourceTypeName">The fully qualified type name of the resource class.</param>
+        /// <remarks>
+        /// In this usage, the assembly is taken from <typeparamref name="T"/>.
+        /// </remarks>
+        public GlobalizedDescriptionProvider(string resourceTypeName) : this(KeyNameOptions.TypePrefix, resourceTypeName, (Assembly)null)
+        {
+        }
+
+        /// <summary>
         /// Gets or sets the CultureInfo associated with this instance.
         /// </summary>
         public CultureInfo CultureInfo
@@ -159,7 +174,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
             set => ci = value;
         }
 
-        public virtual TextLoadType LoadType { get; } = TextLoadType.Lazy;
+        public virtual TextLoadType LoadType => loadType;
 
         /// <summary>
         /// Describe how the resource name is computed before looking up the string value.
