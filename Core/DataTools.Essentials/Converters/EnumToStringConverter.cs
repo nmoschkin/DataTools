@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 using System;
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
@@ -42,6 +43,13 @@ namespace DataTools.Essentials.Converters
                         return jp.PropertyName;
                     }
 
+                    var de = fi.GetCustomAttribute<DescriptionAttribute>();
+
+                    if (de != null)
+                    {
+                        return de.Description;
+                    }
+
                     return fi.Name;
                 }
             }
@@ -75,7 +83,15 @@ namespace DataTools.Essentials.Converters
                 }
 
                 var jp = fi.GetCustomAttribute<JsonPropertyAttribute>();
+
                 if (jp != null && jp.PropertyName?.ToLower() == obj?.ToLower())
+                {
+                    return sampleValue;
+                }
+
+                var de = fi.GetCustomAttribute<DescriptionAttribute>();
+
+                if (de != null && de.Description?.ToLower() == obj?.ToLower())
                 {
                     return sampleValue;
                 }
