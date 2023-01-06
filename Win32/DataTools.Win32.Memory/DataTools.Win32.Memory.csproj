@@ -4,10 +4,10 @@
     <Platforms>AnyCPU;x64</Platforms>
     <LangVersion>preview</LangVersion>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1047</AssemblyVersion>
-    <FileVersion>8.0.0.1047</FileVersion>
+    <AssemblyVersion>8.0.0.1049</AssemblyVersion>
+    <FileVersion>8.0.0.1049</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1047</Version>
+    <Version>8.0.0.1049</Version>
     <Product>DataTools Win32 Core Memory Library</Product>
     <Description>DataTools Win32 Core Memory Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -20,7 +20,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1046</PreviousVersion>
+    <PreviousVersion>8.0.0.1048</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
