@@ -31,26 +31,39 @@ namespace DataTools.Essentials.Helpers
             where T : class
             where U : class, T
         {
-            var pinfo = typeof(T).GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+            var pinfo = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
             foreach (var pi in pinfo)
             {
-                if (!pi.CanWrite) continue;
-
-                if (requiredAttributes != null && requiredAttributes.Length > 0)
+                try
                 {
-                    foreach (var req in requiredAttributes)
+                    if (!pi.CanWrite) continue;
+
+                    if (requiredAttributes != null && requiredAttributes.Length > 0)
                     {
-                        var attrTest = pi.GetCustomAttribute(req);
-                        if (attrTest == null) continue;
+                        foreach (var req in requiredAttributes)
+                        {
+                            var attrTest = pi.GetCustomAttribute(req);
+                            if (attrTest == null) continue;
+                        }
+                    }
+
+                    object obj = pi.GetValue(baseObj);
+
+                    if (obj != null)
+                    {
+                        pi.SetValue(derivedObj, obj);
                     }
                 }
-
-                object obj = pi.GetValue(baseObj);
-
-                if (obj != null)
+                catch (Exception ex)
                 {
-                    pi.SetValue(derivedObj, obj);
+                    try
+                    {
+                        Console.WriteLine(ex);
+                    }
+                    catch
+                    {
+                    }
                 }
             }
         }
