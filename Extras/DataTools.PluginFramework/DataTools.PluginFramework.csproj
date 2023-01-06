@@ -3,10 +3,10 @@
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <Nullable>disable</Nullable>
     <LangVersion>preview</LangVersion>
-    <AssemblyVersion>8.0.0.1050</AssemblyVersion>
-    <FileVersion>8.0.0.1050</FileVersion>
+    <AssemblyVersion>8.0.0.1052</AssemblyVersion>
+    <FileVersion>8.0.0.1052</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1050</Version>
+    <Version>8.0.0.1052</Version>
     <Product>DataTools Plugin Framework</Product>
     <Description>DataTools Plugin Framework</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -18,7 +18,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1049</PreviousVersion>
+    <PreviousVersion>8.0.0.1051</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>

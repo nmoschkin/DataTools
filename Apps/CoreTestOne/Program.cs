@@ -7,7 +7,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 
 using DataTools.Desktop;
 using DataTools.Essentials.Converters.EnumDescriptions;
@@ -188,7 +187,7 @@ namespace CoreTestOne
         }
     }
 
-    public class MySampleThing : IEquatable<MySampleThing>
+    public class SampleBaseClass : IEquatable<SampleBaseClass>
     {
         public string ValueA
         {
@@ -200,13 +199,13 @@ namespace CoreTestOne
             get; set;
         }
 
-        public MySampleThing(string valueA, int valueI)
+        public SampleBaseClass(string valueA, int valueI)
         {
             ValueA = valueA;
             ValueI = valueI;
         }
 
-        public bool Equals(MySampleThing other)
+        public bool Equals(SampleBaseClass other)
         {
             if (other is null) return false;
             return ValueA == other.ValueA && ValueI == other.ValueI;
@@ -214,7 +213,7 @@ namespace CoreTestOne
 
         public override bool Equals(object obj)
         {
-            if (obj is MySampleThing m) return Equals(m);
+            if (obj is SampleBaseClass m) return Equals(m);
             return false;
         }
 
@@ -223,7 +222,7 @@ namespace CoreTestOne
             return (ValueA, ValueI).GetHashCode();
         }
 
-        public static bool operator !=(MySampleThing a, MySampleThing b)
+        public static bool operator !=(SampleBaseClass a, SampleBaseClass b)
         {
             if (a is object)
             {
@@ -239,7 +238,7 @@ namespace CoreTestOne
             }
         }
 
-        public static bool operator ==(MySampleThing a, MySampleThing b)
+        public static bool operator ==(SampleBaseClass a, SampleBaseClass b)
         {
             if (a is object)
             {
@@ -265,27 +264,27 @@ namespace CoreTestOne
             return Crc32.Hash(b.ToArray());
         }
 
-        public RGBDATA TheBless
+        public RGBDATA ColorCode
         {
             get; set;
         }
 
-        public static implicit operator string(MySampleThing obj)
+        public static implicit operator string(SampleBaseClass obj)
         {
             return obj.ValueA;
         }
 
-        public static implicit operator MySampleThing(string obj)
+        public static implicit operator SampleBaseClass(string obj)
         {
-            return new MySampleThing(obj, 0);
+            return new SampleBaseClass(obj, 0);
         }
 
-        public static implicit operator MySampleThing(int obj)
+        public static implicit operator SampleBaseClass(int obj)
         {
-            return new MySampleThing(obj.ToString(), obj);
+            return new SampleBaseClass(obj.ToString(), obj);
         }
 
-        public static implicit operator int(MySampleThing obj)
+        public static implicit operator int(SampleBaseClass obj)
         {
             return obj.ValueI;
         }
@@ -293,6 +292,158 @@ namespace CoreTestOne
         public override string ToString()
         {
             return $"{ValueI}: {ValueA}";
+        }
+    }
+
+    public class DescendantA : SampleBaseClass
+    {
+        public DescendantA(string valueA, int valueI) : base(valueA, valueI)
+        {
+            Lanana = DateTime.Now;
+            Fanalala = Lanana.TimeOfDay;
+        }
+
+        public DateTime Lanana
+        {
+            get; set;
+        }
+
+        public TimeSpan Fanalala
+        {
+            get; set;
+        }
+    }
+
+    public class DescendantA1 : DescendantA
+    {
+        public string SkipNeeds
+        {
+            get; set;
+        }
+
+        public DescendantA1(string skipNeeds, string valueA, int valueI) : base(valueA, valueI)
+        {
+            SkipNeeds = skipNeeds;
+        }
+    }
+
+    public class DescendantA2 : DescendantA
+    {
+        public DescendantA2(short flowers, string valueA, int valueI) : base(valueA, valueI)
+        {
+            Flowers = flowers;
+        }
+
+        public short Flowers
+        {
+            get; set;
+        }
+    }
+
+    public class DescendantB : SampleBaseClass
+    {
+        public decimal ValueDe
+        {
+            get; set;
+        }
+
+        public DescendantB(decimal valueDe, string valueA, int valueI) : base(valueA, valueI)
+        {
+            ValueDe = valueDe;
+        }
+
+        public override string ToString()
+        {
+            return ValueDe.ToString() + " @ " + base.ToString();
+        }
+    }
+
+    public class DescendantB1 : DescendantB
+    {
+        public Guid HippieCode { get; set; } = Guid.NewGuid();
+
+        public DescendantB1(decimal valueDe, string valueA, int valueI, Guid? hippieCode = null) : base(valueDe, valueA, valueI)
+        {
+            HippieCode = hippieCode ?? HippieCode;
+        }
+
+        public override string ToString()
+        {
+            return HippieCode.ToString() + " %% " + base.ToString();
+        }
+    }
+
+    public class DescendantB1A : DescendantB1
+    {
+        public List<string> MarketNoodles
+        {
+            get; set;
+        }
+
+        public DescendantB1A(decimal valueDe, string valueA, int valueI, IEnumerable<string> preNoodles = null, Guid? hippieCode = null) : base(valueDe, valueA, valueI, hippieCode)
+        {
+            MarketNoodles = new List<string>
+            {
+                valueDe.ToString(),
+                valueA.ToString(),
+                valueI.ToString(),
+                HippieCode.ToString("d")
+            };
+
+            if (preNoodles != null) MarketNoodles.AddRange(preNoodles);
+        }
+
+        public override string ToString() => $"{string.Join("!", MarketNoodles)} {base.ToString()}";
+    }
+
+    public class DescendantB1B : DescendantB1
+    {
+        public string Balloons
+        {
+            get; set;
+        }
+
+        public DescendantB1B(string balloons, decimal valueDe, string valueA, int valueI, Guid? hippieCode = null) : base(valueDe, valueA, valueI, hippieCode)
+        {
+        }
+
+        public override string ToString() => $"{Balloons} float: {base.ToString()}";
+    }
+
+    public class DescendantB2B : DescendantB2<bool>
+    {
+        public double ForTe
+        {
+            get; set;
+        }
+
+        public DescendantB2B(bool aardvulnis, decimal valueDe, string valueA, int valueI) : base(aardvulnis, valueDe, valueA, valueI)
+        {
+            ForTe = (double)valueI / valueA.Length;
+        }
+
+        public override string ToString() => $"ForTe {ForTe} @ {base.ToString()}";
+    }
+
+    public abstract class DescendantB2<T> : DescendantB
+    {
+        public T Aardvulnis
+        {
+            get; set;
+        }
+
+        protected DescendantB2(T aardvulnis, decimal valueDe, string valueA, int valueI) : base(valueDe, valueA, valueI)
+        {
+            Aardvulnis = aardvulnis;
+        }
+
+        public override string ToString() => $"{Aardvulnis} :// {base.ToString()}";
+    }
+
+    public class DescendantB2A : DescendantB2<MemoryStream>
+    {
+        public DescendantB2A(decimal valueDe, string valueA, int valueI) : base(new MemoryStream(), valueDe, valueA, valueI)
+        {
         }
     }
 
@@ -397,20 +548,43 @@ namespace CoreTestOne
         public static void Main(string[] args)
         {
             AllocConsole();
-            var eval = new DescribedEnum<ExampleEnum>(ExampleEnum.Silver);
 
-            Console.WriteLine(eval.ToString());
-            eval = ExampleEnum.Blue;
-            Console.WriteLine(eval.ToString());
-            eval = ExampleEnum.Red;
-            Console.WriteLine(eval.ToString());
-            eval = ExampleEnum.Purple;
-            Console.WriteLine(eval.ToString());
-            eval = ExampleEnum.Green;
-            Console.WriteLine(eval.ToString());
+            var b1 = new DescendantB1(5.4949944444M, "Volleyball", 10, Guid.NewGuid());
+
+            var a1 = new DescendantA1("Hork filled", "smash", 400);
+
+            var b2a = new DescendantB2A(69M, "Becknus", 5);
+
+            var a = new DescendantA("Becknus", 5)
+            {
+                ColorCode = new RGBDATA()
+                {
+                    Red = 255,
+                    Green = 255,
+                    Blue = 0
+                }
+            };
+
+            var b2b = new DescendantB2B(true, 551.33M, "thirty two men", 5)
+            {
+                ColorCode = new RGBDATA()
+                {
+                    Red = 253,
+                    Green = 135,
+                    Blue = 25
+                }
+            };
+
+            DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2b, b2a);
+
+            DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b1, a1);
+
+            DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2a, b1);
+
+            DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(a, a1);
 
             var frm = new frmExterns();
-            Application.Run(frm);
+            System.Windows.Forms.Application.Run(frm);
         }
 
         private static Dictionary<FoundStruct, List<string>> MatchedFiles = new Dictionary<FoundStruct, List<string>>();
@@ -1060,6 +1234,21 @@ namespace CoreTestOne
 
             modules = modout.ToArray();
             return projname;
+        }
+
+        public static void DescribedEnumDemo()
+        {
+            var eval = new DescribedEnum<ExampleEnum>(ExampleEnum.Silver);
+
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Blue;
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Red;
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Purple;
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Green;
+            Console.WriteLine(eval.ToString());
         }
 
         public static void HuntForDuplicateFiles()
