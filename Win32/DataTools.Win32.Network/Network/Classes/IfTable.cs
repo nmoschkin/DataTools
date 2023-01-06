@@ -8,7 +8,7 @@ using System.Text;
 
 namespace DataTools.Win32.Network
 {
-    public static class IfTable
+    internal static class IfTable
     {
         public const int ERROR_INSUFFICIENT_BUFFER = 0x7A;
 

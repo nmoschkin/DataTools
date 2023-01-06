@@ -51,7 +51,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
             Separator = customSeparator;
             NameOptions = nameOptions;
             ResourceTypeName = resourceTypeName;
-            assembly = assembly ?? typeof(T).Assembly;
+            assembly = assembly ?? Type.GetType(resourceTypeName)?.Assembly ?? typeof(T).Assembly;
             resmgr = new ResourceManager(ResourceTypeName, assembly);
             ci = cultureInfo ?? CultureInfo.CurrentCulture;
         }

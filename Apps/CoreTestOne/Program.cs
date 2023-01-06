@@ -633,6 +633,7 @@ namespace CoreTestOne
 
             int i, c = lines.Length;
             string classname = null;
+            string classvis = "internal";
             string nns = null;
             var currvis = "private";
 
@@ -661,8 +662,9 @@ namespace CoreTestOne
                     if (m.Success)
                     {
                         classname = m.Groups[1].Value;
-                        if (lines[i].Contains("public ")) currvis = "public";
-                        else if (lines[i].Contains("internal ")) currvis = "internal";
+                        if (lines[i].Contains("public ")) classvis = "public";
+                        else if (lines[i].Contains("private ")) classvis = "private";
+                        else classvis = "internal";
                     }
                 }
                 else
@@ -692,11 +694,11 @@ namespace CoreTestOne
                         dtype = dm.Groups[1].Value;
                         dname = dm.Groups[2].Value;
 
-                        if (lines[i].Contains("public ") && currvis == "public")
+                        if (lines[i].Contains("public ") && classvis == "public")
                         {
                             currvis = "public";
                         }
-                        else if (currvis != "public")
+                        else if (classvis != "public")
                         {
                             if (lines[i].Contains("protected internal ")) currvis = "protected internal";
                             else if (lines[i].Contains("internal ")) currvis = "internal";

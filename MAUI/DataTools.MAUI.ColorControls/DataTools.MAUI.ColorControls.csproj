@@ -14,17 +14,17 @@
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <AssemblyVersion>8.0.0.1046</AssemblyVersion>
-    <FileVersion>8.0.0.1046</FileVersion>
+    <AssemblyVersion>8.0.0.1047</AssemblyVersion>
+    <FileVersion>8.0.0.1047</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1046</Version>
+    <Version>8.0.0.1047</Version>
     <Product>DataTools MAUI Color Controls</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PreviousVersion>8.0.0.1045</PreviousVersion>
+    <PreviousVersion>8.0.0.1046</PreviousVersion>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Platforms\Android\" />
