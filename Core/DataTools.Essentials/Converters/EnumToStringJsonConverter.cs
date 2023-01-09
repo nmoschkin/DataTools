@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using DataTools.Essentials.Converters.EnumDescriptions.Framework;
+
+using Newtonsoft.Json;
 
 using System;
 using System.ComponentModel;
@@ -26,44 +28,7 @@ namespace DataTools.Essentials.Converters
 
         public override void WriteJson(JsonWriter writer, T value, JsonSerializer serializer)
         {
-            writer.WriteValue(GetEnumName(value));
-        }
-
-        public static string GetEnumName(Enum obj)
-        {
-            var fis = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Static);
-
-            foreach (var fi in fis)
-            {
-                var sampleValue = fi.GetValue(null);
-
-                if (sampleValue.Equals(obj))
-                {
-                    var ema = fi.GetCustomAttribute<EnumMemberAttribute>();
-                    if (ema != null)
-                    {
-                        return ema.Value;
-                    }
-
-                    var jp = fi.GetCustomAttribute<JsonPropertyAttribute>();
-
-                    if (jp != null)
-                    {
-                        return jp.PropertyName;
-                    }
-
-                    var de = fi.GetCustomAttribute<DescriptionAttribute>();
-
-                    if (de != null)
-                    {
-                        return de.Description;
-                    }
-
-                    return fi.Name;
-                }
-            }
-
-            return null;
+            writer.WriteValue(EnumInfo.GetEnumName(value));
         }
 
         public static U GetEnumValue<U>(string obj) where U : struct, Enum

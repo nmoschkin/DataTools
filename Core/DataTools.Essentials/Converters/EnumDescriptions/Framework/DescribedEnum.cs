@@ -18,35 +18,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
 
         static DescribedEnum()
         {
-            _defaultProvider = ResolveDefaultProvider();
-        }
-
-        /// <summary>
-        /// Resolves the default description provider for the specified type.
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumDescriptionProvider<T> ResolveDefaultProvider()
-        {
-            var attr = typeof(T).GetCustomAttributes(true)?
-                .Where(x => x is DescriptionProviderAttribute)?
-                .Select(x => x as DescriptionProviderAttribute)?
-                .FirstOrDefault();
-
-            if (attr != null && attr.CreateInstance() is IEnumDescriptionProvider pro && pro.CanConvertType(typeof(T)))
-            {
-                if (pro is IEnumDescriptionProvider<T> defpro)
-                {
-                    return defpro;
-                }
-                else
-                {
-                    return new DefaultProviderWrapper(pro);
-                }
-            }
-            else
-            {
-                return new AttributeDescriptionProvider<T>();
-            }
+            _defaultProvider = EnumInfo.ResolveDefaultProvider<T>();
         }
 
         public DescribedEnum(T value) : this(value, DefaultProvider)
@@ -85,7 +57,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
             {
                 if (value == null)
                 {
-                    _defaultProvider = ResolveDefaultProvider();
+                    _defaultProvider = EnumInfo.ResolveDefaultProvider<T>();
                 }
                 else
                 {
@@ -201,36 +173,6 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         public override string ToString()
         {
             return Description;
-        }
-
-        /// <summary>
-        /// This is a class to wrap non-generic <see cref="IEnumDescriptionProvider"/> instances into their generic form.
-        /// </summary>
-        private class DefaultProviderWrapper : IEnumDescriptionProvider<T>
-        {
-            private IEnumDescriptionProvider baseprovider;
-
-            public bool CanConvertType(Type enumType)
-            {
-                return enumType == typeof(T);
-            }
-
-            public DefaultProviderWrapper(IEnumDescriptionProvider baseprovider)
-            {
-                this.baseprovider = baseprovider;
-            }
-
-            public TextLoadType LoadType => baseprovider.LoadType;
-
-            public string ProvideDescription(T value)
-            {
-                return baseprovider.ProvideDescription(value);
-            }
-
-            public string ProvideDescription(Enum value)
-            {
-                return baseprovider.ProvideDescription(value);
-            }
         }
     }
 }
