@@ -4,10 +4,10 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <nullable>disable</nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1053</AssemblyVersion>
-    <FileVersion>8.0.0.1053</FileVersion>
+    <AssemblyVersion>8.0.0.1054</AssemblyVersion>
+    <FileVersion>8.0.0.1054</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1053</Version>
+    <Version>8.0.0.1054</Version>
     <Product>DataTools HID Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -17,7 +17,7 @@
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1052</PreviousVersion>
+    <PreviousVersion>8.0.0.1053</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
