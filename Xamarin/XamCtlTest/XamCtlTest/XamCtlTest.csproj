@@ -2,17 +2,17 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
-    <AssemblyVersion>8.0.0.1051</AssemblyVersion>
-    <FileVersion>8.0.0.1051</FileVersion>
+    <AssemblyVersion>8.0.0.1053</AssemblyVersion>
+    <FileVersion>8.0.0.1053</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1051</Version>
+    <Version>8.0.0.1053</Version>
     <Product>DataTools Xamarin Controls Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PreviousVersion>8.0.0.1050</PreviousVersion>
+    <PreviousVersion>8.0.0.1052</PreviousVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="TouchTracking.Forms" Version="1.1.0" />

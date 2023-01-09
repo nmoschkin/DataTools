@@ -1,10 +1,151 @@
-﻿using System;
+﻿using DataTools.Essentials.Observable;
+
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
 namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
 {
+    /// <summary>
+    /// Provides a mutable, observable way to provide descriptive text for enums.
+    /// </summary>
+    public class DescribedEnum : ObservableBase
+    {
+        private Enum value;
+        private Type enumType;
+        private string _description;
+        private IEnumDescriptionProvider _descriptionProvider;
+
+        /// <summary>
+        /// Create a new mutable, observable <see cref="Enum"/> described enum.
+        /// </summary>
+        /// <param name="enumType">The type of the enum</param>
+        /// <param name="descriptionProvider">The optional description provider.</param>
+        /// <exception cref="ArgumentException"></exception>
+        /// <remarks>
+        /// If <paramref name="descriptionProvider"/> is null, the default <see cref="IEnumDescriptionProvider"/> for the enum is retrieved.
+        /// </remarks>
+        public DescribedEnum(Type enumType, IEnumDescriptionProvider descriptionProvider = null)
+        {
+            if (!enumType.IsEnum) throw new ArgumentException("Must be enum");
+
+            _descriptionProvider = descriptionProvider ?? EnumInfo.ResolveDefaultProvider(enumType);
+
+            var fif = enumType.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static).First();
+            Value = (Enum)fif.GetValue(null);
+        }
+
+        /// <summary>
+        /// Create a new mutable, observable <see cref="Enum"/> described enum.
+        /// </summary>
+        /// <param name="value">The initial value.</param>
+        /// <param name="descriptionProvider">The optional description provider.</param>
+        /// <remarks>
+        /// If <paramref name="descriptionProvider"/> is null, the default <see cref="IEnumDescriptionProvider"/> for the enum is retrieved.
+        /// </remarks>
+        public DescribedEnum(Enum value, IEnumDescriptionProvider descriptionProvider = null)
+        {
+            _descriptionProvider = descriptionProvider ?? EnumInfo.ResolveDefaultProvider(enumType);
+            Value = value;
+        }
+
+        /// <summary>
+        /// Create a new mutable, observable <see cref="Enum"/> described enum.
+        /// </summary>
+        /// <param name="descriptionProvider">The optional description provider.</param>
+        /// <remarks>
+        /// If <paramref name="descriptionProvider"/> is null, the default <see cref="IEnumDescriptionProvider"/> for the enum is retrieved.
+        /// </remarks>
+        public DescribedEnum(IEnumDescriptionProvider descriptionProvider = null)
+        {
+            this.enumType = value.GetType();
+            _descriptionProvider = descriptionProvider ?? EnumInfo.ResolveDefaultProvider(enumType);
+        }
+
+        /// <summary>
+        /// Gets the enum type for this instance. This is automatically detected.
+        /// </summary>
+        public Type EnumType => enumType;
+
+        /// <summary>
+        /// Gets or sets the value for this enum.
+        /// </summary>
+        /// <remarks>
+        /// This property is mutable and observable.
+        /// </remarks>
+        public Enum Value
+        {
+            get => value;
+            set
+            {
+                if (SetProperty(ref this.value, value))
+                {
+                    if (value == null)
+                    {
+                        _description = null;
+                        enumType = null;
+                        OnPropertyChanged(nameof(Description));
+                        OnPropertyChanged(nameof(EnumType));
+
+                        return;
+                    }
+
+                    if (enumType != value.GetType())
+                    {
+                        enumType = value.GetType();
+                        OnPropertyChanged(nameof(EnumType));
+                    }
+
+                    if (_descriptionProvider.LoadType != TextLoadType.Lazy)
+                    {
+                        _description = _descriptionProvider.ProvideDescription(value);
+                    }
+                    else
+                    {
+                        _description = null;
+                    }
+
+                    OnPropertyChanged(nameof(Description));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the description for this instance
+        /// </summary>
+        /// <remarks>
+        /// If the resolved <see cref="IEnumDescriptionProvider{T}"/> is lazy loaded, it will be invoked, at this time.
+        /// <br /><br />
+        /// This property is mutable and observable.
+        /// </remarks>
+        public string Description
+        {
+            get
+            {
+                if (_description != null) return _description;
+
+                if (_descriptionProvider != null)
+                {
+                    if (_descriptionProvider.LoadType == TextLoadType.Lazy)
+                    {
+                        return _descriptionProvider.ProvideDescription(value);
+                    }
+                    else
+                    {
+                        _description = _descriptionProvider.ProvideDescription(value);
+                    }
+                }
+
+                return _description;
+            }
+            set
+            {
+                SetProperty(ref _description, value);
+            }
+        }
+    }
+
     /// <summary>
     /// Provides a durable way to provide descriptive text for enums.
     /// </summary>
