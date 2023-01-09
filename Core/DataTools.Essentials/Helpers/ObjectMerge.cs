@@ -59,6 +59,14 @@ namespace DataTools.Essentials.Helpers
 
             var commonTypes = res1.Distinct().Intersect(res2.Distinct()).ToList();
 
+            if (commonTypes.Count < 2)
+            {
+                res1 = srcObj.GetType().GetInterfaces();
+                res2 = destObj.GetType().GetInterfaces();
+
+                commonTypes = res1.Distinct().Intersect(res2.Distinct()).ToList();
+            }
+
             if (commonTypes.Count > 1)
             {
                 var mostRecent = commonTypes[0];
