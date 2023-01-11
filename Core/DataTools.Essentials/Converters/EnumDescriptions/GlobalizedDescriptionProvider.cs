@@ -25,6 +25,39 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}" />
         /// </summary>
         /// <param name="nameOptions">Describe how the resource name is computed before looking up the string value.</param>
+        /// <param name="resourceType">The type of the resource class.</param>
+        /// <param name="cultureInfo">CultureInfo to reference when rendering a string.</param>
+        /// <param name="customPrefix">The custom prefix to specify for the resource name values.</param>
+        /// <param name="customSuffix">The custom suffix to specify for the resource name values.</param>
+        /// <param name="customSeparator">The string that will separate parts of the computed resource key name.</param>
+        /// <remarks>
+        /// If <paramref name="assembly"/> is null, the assembly is taken from <typeparamref name="T"/>.
+        /// </remarks>
+        public GlobalizedDescriptionProvider(KeyNameOptions nameOptions, Type resourceType, CultureInfo cultureInfo = null, string customPrefix = null, string customSuffix = null, string customSeparator = "_") : base()
+        {
+            loadType = TextLoadType.Lazy;
+
+            if (nameOptions == KeyNameOptions.Explicit)
+            {
+                nameOptions = KeyNameOptions.TypePrefix;
+#if DEBUG
+                System.Diagnostics.Debug.WriteLine("KeyNameOptions.Explicit is invalid for this constructor. Using default TypePrefix, instead.", "Warning");
+#endif
+            }
+
+            Prefix = customPrefix;
+            Suffix = customSuffix;
+            Separator = customSeparator;
+            NameOptions = nameOptions;
+            resmgr = new ResourceManager(resourceType);
+            ResourceTypeName = resourceType.FullName;
+            ci = cultureInfo ?? CultureInfo.CurrentCulture;
+        }
+
+        /// <summary>
+        /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}" />
+        /// </summary>
+        /// <param name="nameOptions">Describe how the resource name is computed before looking up the string value.</param>
         /// <param name="resourceTypeName">The fully qualified type name of the resource class.</param>
         /// <param name="assembly">The assembly that contains the resource class.</param>
         /// <param name="cultureInfo">CultureInfo to reference when rendering a string.</param>
@@ -60,6 +93,35 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}" />
         /// </summary>
         /// <param name="resourceKeys">The keys that will be used to look up globalized resources.</param>
+        /// <param name="resourceType">The type of the resource class.</param>
+        /// <param name="cultureInfo">CultureInfo to reference when rendering a string.</param>
+        /// <remarks>
+        /// The <paramref name="resourceKeys"/> must contain exactly one description for each unique field in the <see cref="Enum"/> type.<br /><br />
+        /// Flag combinations are not checked. It's up to the consumer to provide the correct values for expected flag combinations.
+        /// </remarks>
+        public GlobalizedDescriptionProvider(IEnumerable<KeyValuePair<T, string>> resourceKeys, Type resourceType, CultureInfo cultureInfo) : base()
+        {
+            loadType = TextLoadType.Lazy;
+            NameOptions = KeyNameOptions.Explicit;
+
+            this.resourceKeys = new Dictionary<T, string>();
+
+            foreach (var kv in resourceKeys)
+            {
+                this.resourceKeys.Add(kv.Key, kv.Value);
+            }
+
+            resmgr = new ResourceManager(resourceType);
+            ci = cultureInfo ?? CultureInfo.CurrentCulture;
+            ResourceTypeName = resourceType.FullName;
+
+            ExplicitDescriptionProvider<T>.CheckSource(this.resourceKeys);
+        }
+
+        /// <summary>
+        /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}" />
+        /// </summary>
+        /// <param name="resourceKeys">The keys that will be used to look up globalized resources.</param>
         /// <param name="resourceTypeName">The fully qualified type name of the resource class.</param>
         /// <param name="assembly">The assembly that contains the resource class.</param>
         /// <param name="cultureInfo">CultureInfo to reference when rendering a string.</param>
@@ -70,7 +132,6 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         public GlobalizedDescriptionProvider(IEnumerable<KeyValuePair<T, string>> resourceKeys, string resourceTypeName, Assembly assembly, CultureInfo cultureInfo) : base()
         {
             loadType = TextLoadType.Lazy;
-
             NameOptions = KeyNameOptions.Explicit;
 
             this.resourceKeys = new Dictionary<T, string>();
@@ -125,7 +186,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// <remarks>
         /// If <paramref name="assembly"/> is null, the assembly is taken from <typeparamref name="T"/>.
         /// </remarks>
-        public GlobalizedDescriptionProvider(string customPrefix, string resourceTypeName, Assembly assembly, CultureInfo cultureInfo = null) : this(KeyNameOptions.CustomPrefix, resourceTypeName, assembly, customPrefix: customPrefix, cultureInfo: cultureInfo)
+        public GlobalizedDescriptionProvider(string customPrefix, Type resourceType, CultureInfo cultureInfo = null) : this(KeyNameOptions.CustomPrefix, resourceType, customPrefix: customPrefix, cultureInfo: cultureInfo)
         {
         }
 
@@ -137,20 +198,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// <remarks>
         /// In this usage, the assembly is taken from <typeparamref name="T"/>.
         /// </remarks>
-        public GlobalizedDescriptionProvider(string resourceTypeName, CultureInfo cultureInfo = null) : this(KeyNameOptions.TypePrefix, resourceTypeName, (Assembly)null, cultureInfo: cultureInfo)
-        {
-        }
-
-        /// <summary>
-        /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}" />
-        /// </summary>
-        /// <param name="customPrefix">The custom prefix to specify for the resource name values.</param>
-        /// <param name="resourceTypeName">The fully qualified type name of the resource class.</param>
-        /// <param name="cultureInfo">CultureInfo to reference when rendering a string.</param>
-        /// <remarks>
-        /// In this usage, the assembly is taken from <typeparamref name="T"/>.
-        /// </remarks>
-        public GlobalizedDescriptionProvider(string customPrefix, string resourceTypeName, CultureInfo cultureInfo = null) : this(KeyNameOptions.CustomPrefix, resourceTypeName, (Assembly)null, cultureInfo: cultureInfo, customPrefix: customPrefix)
+        public GlobalizedDescriptionProvider(Type resourceType, CultureInfo cultureInfo = null) : this(KeyNameOptions.TypePrefix, resourceType, cultureInfo: cultureInfo)
         {
         }
 
@@ -161,7 +209,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// <remarks>
         /// In this usage, the assembly is taken from <typeparamref name="T"/>.
         /// </remarks>
-        public GlobalizedDescriptionProvider(string resourceTypeName) : this(KeyNameOptions.TypePrefix, resourceTypeName, (Assembly)null)
+        public GlobalizedDescriptionProvider(Type resourceType) : this(KeyNameOptions.TypePrefix, resourceType)
         {
         }
 

@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using DataTools.Essentials.Converters.ClassDescriptions.Framework;
+
+using Newtonsoft.Json;
 
 using System;
 using System.ComponentModel;
@@ -18,8 +20,8 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         public static IEnumDescriptionProvider ResolveDefaultProvider(Type enumType)
         {
             var attr = enumType.GetCustomAttributes(true)?
-                .Where(x => x is DescriptionProviderAttribute)?
-                .Select(x => x as DescriptionProviderAttribute)?
+                .Where(x => x is EnumDescriptionProviderAttribute)?
+                .Select(x => x as EnumDescriptionProviderAttribute)?
                 .FirstOrDefault();
 
             if (attr != null && attr.CreateInstance() is IEnumDescriptionProvider pro && pro.CanConvertType(enumType))
@@ -40,8 +42,8 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         public static IEnumDescriptionProvider<T> ResolveDefaultProvider<T>() where T : struct, Enum
         {
             var attr = typeof(T).GetCustomAttributes(true)?
-                 .Where(x => x is DescriptionProviderAttribute)?
-                 .Select(x => x as DescriptionProviderAttribute)?
+                 .Where(x => x is EnumDescriptionProviderAttribute)?
+                 .Select(x => x as EnumDescriptionProviderAttribute)?
                  .FirstOrDefault();
 
             if (attr != null && attr.CreateInstance() is IEnumDescriptionProvider pro && pro.CanConvertType(typeof(T)))
@@ -138,6 +140,8 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
             {
                 return baseprovider.ProvideDescription(value);
             }
+
+            string IDescriptionAncestor.ProvideDescription(params object[] args) => ProvideDescription((Enum)args[0]);
         }
     }
 }

@@ -1,29 +1,27 @@
-﻿using DataTools.Essentials.Converters.ClassDescriptions.Framework;
-
-using System;
+﻿using System;
 using System.Text;
 
-namespace DataTools.Essentials.Converters
+namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
 {
     /// <summary>
-    /// An interface for an object that can provide descriptions for enum values.
+    /// An interface for an object that can provide descriptions for object properties.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IEnumDescriptionProvider : IDescriptionAncestor
+    public interface IDescriptionProvider : IDescriptionAncestor
     {
         /// <summary>
         /// Provide the description for the specified value.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        string ProvideDescription(Enum value);
+        string ProvideDescription(object value);
     }
 
     /// <summary>
-    /// An interface for an object that can provide descriptions for enum values of type <typeparamref name="T"/>.
+    /// An interface for an object that can provide descriptions for object properties of type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IEnumDescriptionProvider<T> : IEnumDescriptionProvider where T : struct, Enum
+    public interface IDescriptionProvider<T> : IDescriptionProvider
     {
         /// <summary>
         /// Provide the description for the specified value.

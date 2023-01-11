@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DataTools.Essentials.Converters.ClassDescriptions.Framework;
+
+using System;
 using System.Text;
 
 namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
@@ -23,7 +25,9 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
             if (enumType.IsEnum == false) throw new ArgumentException("Type must be an enumeration!");
         }
 
-        TextLoadType IEnumDescriptionProvider.LoadType => loadType;
+        TextLoadType IDescriptionAncestor.LoadType => loadType;
+
+        string IDescriptionAncestor.ProvideDescription(params object[] args) => ProvideDescription((Enum)args[0]);
 
         public abstract string ProvideDescription(Enum value);
 
