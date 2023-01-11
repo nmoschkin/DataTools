@@ -190,7 +190,7 @@ namespace CoreTestOne
         }
     }
 
-    [DescriptionProvider(typeof(GlobalizedDescriptionProvider<SampleBaseClass>), typeof(AppResources))]
+    [Globalized(typeof(SampleBaseClass), typeof(AppResources))]
     public class SampleBaseClass : IEquatable<SampleBaseClass>
     {
         public string ValueA
@@ -381,15 +381,15 @@ namespace CoreTestOne
     public class DescendantB1A : DescendantB1
     {
         [JsonProperty("staysNoodles")]
-        [DescriptionProvider(typeof(CallbackDescriptionProvider<DescendantB1A>), nameof(GrizzlyJones))]
+        [DescriptionProvider(typeof(CallbackDescriptionProvider<List<string>>), nameof(GrizzlyJones), typeof(DescendantB1A))]
         public List<string> MarketNoodles
         {
             get; set;
         }
 
-        private static string GrizzlyJones(DescendantB1A pappy, string sisterDaughter)
+        private static string GrizzlyJones(List<string> pappy, string sisterDaughter)
         {
-            return string.Join(", ", pappy.MarketNoodles);
+            return string.Join(", ", pappy);
         }
 
         public DescendantB1A(decimal valueDe, string valueA, int valueI, IEnumerable<string> preNoodles = null, Guid? hippieCode = null) : base(valueDe, valueA, valueI, hippieCode)
