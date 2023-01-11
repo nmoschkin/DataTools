@@ -48,7 +48,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// <param name="cultureInfo"></param>
         /// <param name="resourceKey"></param>
         /// <param name="contextName"></param>
-        public GlobalizedDescriptionProvider(Type resourceType, CultureInfo cultureInfo = null, string resourceKey = null, string contextName = null, string separator = "_") : base()
+        public GlobalizedDescriptionProvider(Type resourceType, string resourceKey, string contextName = null, string separator = "_", CultureInfo cultureInfo = null) : base()
         {
             LoadType = TextLoadType.Lazy;
             this.contextName = contextName ?? typeof(T).Name;
@@ -57,6 +57,17 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             resmgr = new ResourceManager(resourceType);
             ResourceTypeName = resourceType.FullName;
             ci = cultureInfo ?? CultureInfo.CurrentCulture;
+        }
+
+        /// <summary>
+        /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}"/>.
+        /// </summary>
+        /// <param name="resourceType"></param>
+        /// <param name="cultureInfo"></param>
+        /// <param name="resourceKey"></param>
+        /// <param name="contextName"></param>
+        public GlobalizedDescriptionProvider(Type resourceType) : this(resourceType, null)
+        {
         }
 
         /// <summary>
@@ -90,7 +101,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
 
         private string ProvideDescription(T value, string propertyName)
         {
-            var resourceKey = ComputeKeyName(propertyName);
+            var resourceKey = ComputeKeyName(propertyName, value);
 
             if (resourceKey == null)
                 return string.Empty;
@@ -150,7 +161,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        protected virtual string ComputeKeyName(string altProp = null)
+        protected virtual string ComputeKeyName(string altProp = null, T value = default)
         {
             if (altProp != null)
             {
@@ -161,6 +172,10 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
                         return tattr.Key;
                     }
                     else return tprop.Item1.DeclaringType.Name + Separator + altProp;
+                }
+                else if (value is object && (value.GetType().GetProperty(altProp) is PropertyInfo spe) && spe.GetCustomAttribute<TranslationKeyAttribute>() is TranslationKeyAttribute matt)
+                {
+                    return matt.Key;
                 }
             }
 

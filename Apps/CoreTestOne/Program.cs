@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using CoreTestOne.Resources;
 
 using DataTools.Desktop;
+using DataTools.Essentials.Converters.ClassDescriptions;
 using DataTools.Essentials.Converters.ClassDescriptions.Framework;
 using DataTools.Essentials.Converters.EnumDescriptions.Framework;
 using DataTools.Graphics;
@@ -189,6 +190,7 @@ namespace CoreTestOne
         }
     }
 
+    [DescriptionProvider(typeof(GlobalizedDescriptionProvider<SampleBaseClass>), typeof(AppResources))]
     public class SampleBaseClass : IEquatable<SampleBaseClass>
     {
         public string ValueA
@@ -378,9 +380,16 @@ namespace CoreTestOne
 
     public class DescendantB1A : DescendantB1
     {
+        [JsonProperty("staysNoodles")]
+        [DescriptionProvider(typeof(CallbackDescriptionProvider<DescendantB1A>), nameof(GrizzlyJones))]
         public List<string> MarketNoodles
         {
             get; set;
+        }
+
+        private static string GrizzlyJones(DescendantB1A pappy, string sisterDaughter)
+        {
+            return string.Join(", ", pappy.MarketNoodles);
         }
 
         public DescendantB1A(decimal valueDe, string valueA, int valueI, IEnumerable<string> preNoodles = null, Guid? hippieCode = null) : base(valueDe, valueA, valueI, hippieCode)
@@ -552,15 +561,15 @@ namespace CoreTestOne
         {
             AllocConsole();
 
-            var provider = new DataTools.Essentials.Converters.ClassDescriptions.GlobalizedDescriptionProvider<DescendantB1>(typeof(AppResources));
-
             var b1 = new DescendantB1(5.4949944444M, "Volleyball", 10, Guid.NewGuid());
-
-            var allprovs = ClassInfo.GetDescriptions(b1, provider: provider);
 
             var a1 = new DescendantA1("Hork filled", "smash", 400);
 
             var b2a = new DescendantB2A(69M, "Becknus", 5);
+
+            var b1a = new DescendantB1A(45.5912933M, "Glissful Blissoms", 55, new List<string> { "Glances", "Common Noodles", "Weeds" });
+
+            var allprovs = ClassInfo.GetDescriptions(b1a);
 
             var a = new DescendantA("Becknus", 5)
             {

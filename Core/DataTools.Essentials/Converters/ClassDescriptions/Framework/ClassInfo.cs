@@ -111,7 +111,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
                 {
                     return ppd;
                 }
-                else if (attr.CreateInstance() is IDescriptionAncestor pro && pro.CanConvertType(prop.PropertyType))
+                else if (attr.CreateInstance() is IDescriptionAncestor pro && (pro.CanConvertType(prop.PropertyType) || pro.CanConvertType(prop.DeclaringType)))
                 {
                     if (pro is IDescriptionAncestor defpro)
                     {
@@ -138,7 +138,16 @@ namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
             {
                 foreach (var prop in props)
                 {
-                    desc.Add(ppd.ProvidePropertyDescription(obj, prop.Name));
+                    var proprov = ResolveProvider(prop, explicitOnly: true);
+
+                    if (proprov != null)
+                    {
+                        desc.Add(proprov.ProvideDescription(obj, prop.Name));
+                    }
+                    else
+                    {
+                        desc.Add(ppd.ProvidePropertyDescription(obj, prop.Name));
+                    }
                 }
             }
             else if (provider != null)
