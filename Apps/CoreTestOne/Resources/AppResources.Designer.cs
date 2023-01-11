@@ -113,5 +113,41 @@ namespace CoreTestOne.Resources {
                 return ResourceManager.GetString("ExampleEnum_Silver", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prop Tens.
+        /// </summary>
+        internal static string Proptens {
+            get {
+                return ResourceManager.GetString("Proptens", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Classy 20&apos;s Style.
+        /// </summary>
+        internal static string SampleBaseClass {
+            get {
+                return ResourceManager.GetString("SampleBaseClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is mythological.
+        /// </summary>
+        internal static string SampleBaseClass_ValueA {
+            get {
+                return ResourceManager.GetString("SampleBaseClass_ValueA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This is Integral.
+        /// </summary>
+        internal static string SampleBaseClass_ValueI {
+            get {
+                return ResourceManager.GetString("SampleBaseClass_ValueI", resourceCulture);
+            }
+        }
     }
 }

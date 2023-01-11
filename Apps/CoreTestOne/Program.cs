@@ -8,8 +8,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using CoreTestOne.Resources;
+
 using DataTools.Desktop;
-using DataTools.Essentials.Converters.EnumDescriptions;
+using DataTools.Essentials.Converters.ClassDescriptions.Framework;
 using DataTools.Essentials.Converters.EnumDescriptions.Framework;
 using DataTools.Graphics;
 using DataTools.Streams;
@@ -23,7 +25,7 @@ using static DataTools.Essentials.SortedLists.BinarySearch;
 
 namespace CoreTestOne
 {
-    [DescriptionProvider(typeof(GlobalizedDescriptionProvider<ExampleEnum>), "CoreTestOne.Resources.AppResources")]
+    [EnumDescriptionProvider(typeof(DataTools.Essentials.Converters.EnumDescriptions.GlobalizedDescriptionProvider<ExampleEnum>), typeof(AppResources))]
     public enum ExampleEnum
     {
         Gold,
@@ -360,6 +362,7 @@ namespace CoreTestOne
 
     public class DescendantB1 : DescendantB
     {
+        [TranslationKey("Proptens")]
         public Guid HippieCode { get; set; } = Guid.NewGuid();
 
         public DescendantB1(decimal valueDe, string valueA, int valueI, Guid? hippieCode = null) : base(valueDe, valueA, valueI)
@@ -549,7 +552,11 @@ namespace CoreTestOne
         {
             AllocConsole();
 
+            var provider = new DataTools.Essentials.Converters.ClassDescriptions.GlobalizedDescriptionProvider<DescendantB1>(typeof(AppResources));
+
             var b1 = new DescendantB1(5.4949944444M, "Volleyball", 10, Guid.NewGuid());
+
+            var allprovs = ClassInfo.GetDescriptions(b1, provider: provider);
 
             var a1 = new DescendantA1("Hork filled", "smash", 400);
 

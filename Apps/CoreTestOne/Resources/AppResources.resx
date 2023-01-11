@@ -135,4 +135,16 @@
   <data name="ExampleEnum_Silver" xml:space="preserve">
     <value>Silver Sheen</value>
   </data>
+  <data name="Proptens" xml:space="preserve">
+    <value>Prop Tens</value>
+  </data>
+  <data name="SampleBaseClass" xml:space="preserve">
+    <value>Classy 20's Style</value>
+  </data>
+  <data name="SampleBaseClass_ValueA" xml:space="preserve">
+    <value>This is mythological</value>
+  </data>
+  <data name="SampleBaseClass_ValueI" xml:space="preserve">
+    <value>This is Integral</value>
+  </data>
 </root>
