@@ -17,7 +17,6 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
     {
         private CultureInfo ci = null;
         private ResourceManager resmgr;
-        private Dictionary<T, string> resourceKeys = null;
         private string contextName;
         private string resourceKey;
         protected static readonly Dictionary<string, (PropertyInfo, TranslationKeyAttribute)> classProperties;
@@ -33,26 +32,31 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             }
         }
 
+        /// <summary>
+        /// Gets the context name for the globalized resolver (usually the class name)
+        /// </summary>
         public string ContextName => contextName;
 
+        /// <summary>
+        /// Gets an optional explicit resource key
+        /// </summary>
         public string ResourceKey => resourceKey;
 
         public override TextLoadType LoadType { get; }
 
-        public IReadOnlyDictionary<T, string> ResourceKeys => resourceKeys;
-
         /// <summary>
         /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}"/>.
         /// </summary>
-        /// <param name="resourceType"></param>
-        /// <param name="cultureInfo"></param>
-        /// <param name="resourceKey"></param>
-        /// <param name="contextName"></param>
+        /// <param name="resourceType">The resource manager type</param>
+        /// <param name="resourceKey">The explicit resource key (can be null)</param>
+        /// <param name="contextName">The optional context name (usually name of <typeparamref name="T"/>)</param>
+        /// <param name="separator">The separator (can be null)</param>
+        /// <param name="cultureInfo">Alternative culture info</param>
         public GlobalizedDescriptionProvider(Type resourceType, string resourceKey, string contextName = null, string separator = "_", CultureInfo cultureInfo = null) : base()
         {
             LoadType = TextLoadType.Lazy;
             this.contextName = contextName ?? typeof(T).Name;
-            this.Separator = separator;
+            this.Separator = separator ?? "";
             this.resourceKey = resourceKey;
             resmgr = new ResourceManager(resourceType);
             ResourceTypeName = resourceType.FullName;
@@ -62,10 +66,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// <summary>
         /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}"/>.
         /// </summary>
-        /// <param name="resourceType"></param>
-        /// <param name="cultureInfo"></param>
-        /// <param name="resourceKey"></param>
-        /// <param name="contextName"></param>
+        /// <param name="resourceType">The resource manager type</param>
         public GlobalizedDescriptionProvider(Type resourceType) : this(resourceType, null)
         {
         }
@@ -99,7 +100,13 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             return ProvideDescription(obj, propertyName);
         }
 
-        private string ProvideDescription(T value, string propertyName)
+        /// <summary>
+        /// Provide the description for the specified value and property name
+        /// </summary>
+        /// <param name="value">The target object</param>
+        /// <param name="propertyName">The property name</param>
+        /// <returns></returns>
+        protected virtual string ProvideDescription(T value, string propertyName)
         {
             var resourceKey = ComputeKeyName(propertyName, value);
 
@@ -127,21 +134,6 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             if (translation == null)
             {
                 return resourceKey;
-                //                ArgumentException ex = new ArgumentException(
-                //                    string.Format("Key '{0}' was not found in resources '{1}' for culture '{2}'.", resourceKey, ResourceTypeName, ci.Name),
-                //                    "Text");
-                //#if DEBUG
-                //                throw ex;
-                //#else
-                //                try
-                //                {
-                //                    translation = resmgr.GetString(resourceKey, new CultureInfo("en")); // default to English
-                //                }
-                //                catch
-                //                {
-                //                    translation = resourceKey; // HACK: returns the key, which GETS DISPLAYED TO THE USER
-                //                }
-                //#endif
             }
             return translation;
         }
@@ -169,13 +161,13 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
                 {
                     if (tprop.Item2 is TranslationKeyAttribute tattr)
                     {
-                        return tattr.Key;
+                        return tattr.ResourceKey;
                     }
                     else return tprop.Item1.DeclaringType.Name + Separator + altProp;
                 }
                 else if (value is object && (value.GetType().GetProperty(altProp) is PropertyInfo spe) && spe.GetCustomAttribute<TranslationKeyAttribute>() is TranslationKeyAttribute matt)
                 {
-                    return matt.Key;
+                    return matt.ResourceKey;
                 }
             }
 

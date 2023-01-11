@@ -9,6 +9,9 @@ using System.Text;
 
 namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
 {
+    /// <summary>
+    /// Static utility class for interacting with the description framework
+    /// </summary>
     public static class ClassInfo
     {
         /// <summary>
@@ -124,14 +127,64 @@ namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
             return parentProvider ?? new AttributeDescriptionProvider(prop.Name);
         }
 
-        public static string[] GetDescriptions(object obj, string[] excludeProps = null, IPropertyDescriptionProvider provider = null)
+        /// <summary>
+        /// Gets the description for the specified property from the specified object.
+        /// </summary>
+        /// <param name="obj">The target object</param>
+        /// <param name="propertyName">The target property</param>
+        /// <returns></returns>
+        public static string GetDescription(object obj, string propertyName)
         {
+            var dict = new Dictionary<string, string>();
+
+            var provider = (ResolveProvider(obj.GetType()) as IPropertyDescriptionProvider);
+            var prop = obj.GetType().GetProperty(propertyName);
+
+            if (provider is IPropertyDescriptionProvider ppd)
+            {
+                var proprov = ResolveProvider(prop, explicitOnly: true);
+
+                if (proprov != null)
+                {
+                    return proprov.ProvideDescription(prop.GetValue(obj), prop.Name);
+                }
+                else
+                {
+                    return ppd.ProvidePropertyDescription(obj, prop.Name);
+                }
+            }
+            else if (provider != null)
+            {
+                return provider.ProvideDescription(obj);
+            }
+            else if (provider == null)
+            {
+                var proprov = ResolveProvider(prop);
+                return proprov.ProvideDescription(prop.GetValue(obj));
+            }
+
+            return propertyName;
+        }
+
+        /// <summary>
+        /// Gets all descriptions for all public properties in a class.
+        /// </summary>
+        /// <param name="obj">The object whose descriptions to fetch.</param>
+        /// <param name="excludeProps">Any properties we wish to not fetch.</param>
+        /// <param name="provider">If we already have a provider, we can use that, here.</param>
+        /// <returns>A dictionary of property names and their descriptions.</returns>
+        /// <remarks>
+        /// This method resolves the <see cref="IDescriptionAncestor"/> for the class, as a whole, as well as for each property, if they are available.
+        /// </remarks>
+        public static Dictionary<string, string> GetDescriptions(object obj, string[] excludeProps = null, IPropertyDescriptionProvider provider = null)
+        {
+            var dict = new Dictionary<string, string>();
+
             var props = obj.GetType()
                 .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(x => excludeProps == null || !excludeProps.Contains(x.Name))
                 .ToList();
 
-            var desc = new List<string>();
             provider = provider ?? (ResolveProvider(obj.GetType()) as IPropertyDescriptionProvider);
 
             if (provider is IPropertyDescriptionProvider ppd)
@@ -142,28 +195,28 @@ namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
 
                     if (proprov != null)
                     {
-                        desc.Add(proprov.ProvideDescription(obj, prop.Name));
+                        dict.Add(prop.Name, proprov.ProvideDescription(prop.GetValue(obj), prop.Name));
                     }
                     else
                     {
-                        desc.Add(ppd.ProvidePropertyDescription(obj, prop.Name));
+                        dict.Add(prop.Name, ppd.ProvidePropertyDescription(obj, prop.Name));
                     }
                 }
             }
             else if (provider != null)
             {
-                return new string[] { provider.ProvideDescription(obj) };
+                dict.Add(obj.GetType().Name, provider.ProvideDescription(obj));
             }
             else if (provider == null)
             {
                 foreach (var prop in props)
                 {
                     var proprov = ResolveProvider(prop);
-                    desc.Add(proprov.ProvideDescription(prop.GetValue(obj)));
+                    dict.Add(prop.Name, proprov.ProvideDescription(prop.GetValue(obj)));
                 }
             }
 
-            return desc.ToArray();
+            return dict;
         }
     }
 }

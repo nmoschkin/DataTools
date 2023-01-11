@@ -11,6 +11,10 @@ namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
     public class DescriptionProviderAttribute : Attribute
     {
         private readonly object[] parameters;
+
+        /// <summary>
+        /// Gets the type that implements <see cref="IDescriptionAncestor"/>
+        /// </summary>
         public Type ProviderType { get; }
 
         /// <summary>

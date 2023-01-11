@@ -7,7 +7,7 @@ using System.Text;
 namespace DataTools.Essentials.Converters.ClassDescriptions
 {
     /// <summary>
-    /// Provide <see cref="Enum"/> descriptions on-demand using a consumer-provided callback method.
+    /// Provide property descriptions on-demand using a consumer-provided callback method.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class CallbackDescriptionProvider<T> : PropertyDescriptionProviderBase<T>
@@ -20,6 +20,10 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// Instantiate a new <see cref="CallbackDescriptionProvider{T}"/>
         /// </summary>
         /// <param name="callback">The provider method.</param>
+        /// <remarks>
+        /// The callback takes <typeparamref name="T"/> and <see cref="string"/> as an argument, where <see cref="string"/> is the property name.<br />
+        /// The return value for the callback is the description <see cref="string"/>.
+        /// </remarks>
         public CallbackDescriptionProvider(Func<T, string, string> callback) : base()
         {
             this.callback = callback;
@@ -28,11 +32,26 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// <summary>
         /// Instantiate a new <see cref="CallbackDescriptionProvider{T}"/>
         /// </summary>
-        /// <param name="callback">The provider method.</param>
-        public CallbackDescriptionProvider(string callbackMethodName) : base()
+        /// <param name="callbackMethodName">The name of the callback method in <typeparamref name="T"/>.</param>
+        /// <remarks>
+        /// The callback takes <typeparamref name="T"/> and <see cref="string"/> as an argument, where <see cref="string"/> is the property name.<br />
+        /// The return value for the callback is the description <see cref="string"/>.
+        /// </remarks>
+        public CallbackDescriptionProvider(string callbackMethodName) : this(callbackMethodName, null) { }
+
+        /// <summary>
+        /// Instantiate a new <see cref="CallbackDescriptionProvider{T}"/>
+        /// </summary>
+        /// <param name="callbackMethodName">The name of the callback method in <paramref name="methodType"/>.</param>
+        /// <param name="methodType">The type in which the <paramref name="callbackMethodName"/> is located.</param>
+        /// <remarks>
+        /// The callback takes <typeparamref name="T"/> and <see cref="string"/> as an argument, where <see cref="string"/> is the property name.<br />
+        /// The return value for the callback is the description <see cref="string"/>.
+        /// </remarks>
+        public CallbackDescriptionProvider(string callbackMethodName, Type methodType) : base()
         {
             this.callbackMethodName = callbackMethodName;
-            mtd = typeof(T).GetMethod(callbackMethodName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            mtd = (methodType ?? typeof(T)).GetMethod(callbackMethodName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
             if (!ValidateMethod(mtd)) throw new ArgumentException("Method " + callbackMethodName + " not found or has an incorrect signature");
 
@@ -59,7 +78,12 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             return callback(value, propertyName);
         }
 
-        private bool ValidateMethod(MethodInfo method)
+        /// <summary>
+        /// Validate that the specified method meets the criteria for the callback.
+        /// </summary>
+        /// <param name="method">The method to validate</param>
+        /// <returns>True if the method meets the criteria.</returns>
+        protected virtual bool ValidateMethod(MethodInfo method)
         {
             if (method == null) return false;
 

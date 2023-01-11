@@ -18,8 +18,15 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
     {
         public TextLoadType LoadType { get; set; } = TextLoadType.NoPreference;
 
+        /// <summary>
+        /// Gets the property name associated with this description provider.
+        /// </summary>
         public string PropertyName { get; }
 
+        /// <summary>
+        /// Create a new attribute-based description provider
+        /// </summary>
+        /// <param name="propertyName"></param>
         public AttributeDescriptionProvider([CallerMemberName] string propertyName = null)
         {
             PropertyName = propertyName;
@@ -43,8 +50,15 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
     {
         public TextLoadType LoadType { get; set; } = TextLoadType.NoPreference;
 
+        /// <summary>
+        /// Gets the property name associated with this description provider.
+        /// </summary>
         public string PropertyName { get; }
 
+        /// <summary>
+        /// Create a new attribute-based description provider
+        /// </summary>
+        /// <param name="propertyName"></param>
         public AttributeDescriptionProvider([CallerMemberName] string propertyName = null)
         {
             PropertyName = propertyName;
@@ -57,7 +71,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
 
         public override bool CanConvertType(Type type)
         {
-            return type.IsEnum;
+            return true;
         }
     }
 }

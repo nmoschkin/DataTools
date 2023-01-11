@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -12,6 +13,8 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
     /// </summary>
     public class ClassPropertyDescriptionProvider : PropertyDescriptionProviderBase
     {
+        private IPropertyDescriptionProvider custass;
+
         /// <summary>
         /// Explicit providers discovered for specific properties.
         /// </summary>
@@ -31,6 +34,12 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         public ClassPropertyDescriptionProvider(Type objType)
         {
             ClassType = objType;
+
+            var custass = (IPropertyDescriptionProvider)objType.GetCustomAttributes().Where(x => x is IPropertyDescriptionProvider).FirstOrDefault();
+            if (custass != null)
+            {
+                this.custass = custass;
+            }
 
             var props = objType.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
 
@@ -56,6 +65,8 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
 
         public override string ProvidePropertyDescription(object value, string propertyName)
         {
+            if (custass != null) return custass.ProvideDescription(value, propertyName);
+
             if (propertyProviders.TryGetValue(propertyName, out var desc) && desc.Item2 != null)
             {
                 return desc.Item2.ProvideDescription(desc.Item1.GetValue(value), propertyName);
