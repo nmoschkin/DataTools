@@ -4,10 +4,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1056</AssemblyVersion>
-    <FileVersion>8.0.0.1056</FileVersion>
+    <AssemblyVersion>8.0.0.1057</AssemblyVersion>
+    <FileVersion>8.0.0.1057</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1056</Version>
+    <Version>8.0.0.1057</Version>
     <Product>DataTools Win32 File System and Shell Library</Product>
     <Description>DataTools Win32 File System and Shell Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -21,7 +21,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1055</PreviousVersion>
+    <PreviousVersion>8.0.0.1056</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
