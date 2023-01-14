@@ -2,13 +2,13 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net7.0;net472;net48;net481</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1057</AssemblyVersion>
-    <FileVersion>8.0.0.1057</FileVersion>
+    <AssemblyVersion>8.0.0.1058</AssemblyVersion>
+    <FileVersion>8.0.0.1058</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <PreviousVersion>8.0.0.1056</PreviousVersion>
+    <PreviousVersion>8.0.0.1057</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
-    <Version>8.0.0.1057</Version>
+    <Version>8.0.0.1058</Version>
     <Product>DataTools Text Library</Product>
     <Description>DataTools Text Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>

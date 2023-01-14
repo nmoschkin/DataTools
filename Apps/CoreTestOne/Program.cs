@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 using CoreTestOne.Resources;
 
@@ -14,6 +15,7 @@ using DataTools.Desktop;
 using DataTools.Essentials.Converters.ClassDescriptions;
 using DataTools.Essentials.Converters.ClassDescriptions.Framework;
 using DataTools.Essentials.Converters.EnumDescriptions.Framework;
+using DataTools.Essentials.Observable;
 using DataTools.Graphics;
 using DataTools.Streams;
 using DataTools.Win32.Memory;
@@ -35,6 +37,41 @@ namespace CoreTestOne
         Green,
         Red,
         Purple
+    }
+
+    public class GetButtonEventArgs : EventArgs
+    {
+        public string ButtonText
+        {
+            get; set;
+        }
+    }
+
+    public class SamViewModel : SyncObservableBase
+    {
+        public event EventHandler<GetButtonEventArgs> GetButtonRequest;
+
+        private string title;
+
+        public string Title
+        {
+            get => title;
+            set => SetProperty(ref title, value);
+        }
+
+        public Task<string> GetButtonText()
+        {
+            return InvokeAsync(() =>
+            {
+                var s = "";
+                var e = new GetButtonEventArgs()
+                {
+                    ButtonText = s
+                };
+                GetButtonRequest?.Invoke(this, e);
+                return e.ButtonText;
+            });
+        }
     }
 
     public class ExternInfo : IEquatable<ExternInfo>
@@ -561,43 +598,43 @@ namespace CoreTestOne
         {
             AllocConsole();
 
-            var b1 = new DescendantB1(5.4949944444M, "Volleyball", 10, Guid.NewGuid());
+            //var b1 = new DescendantB1(5.4949944444M, "Volleyball", 10, Guid.NewGuid());
 
-            var a1 = new DescendantA1("Hork filled", "smash", 400);
+            //var a1 = new DescendantA1("Hork filled", "smash", 400);
 
-            var b2a = new DescendantB2A(69M, "Becknus", 5);
+            //var b2a = new DescendantB2A(69M, "Becknus", 5);
 
-            var b1a = new DescendantB1A(45.5912933M, "Glissful Blissoms", 55, new List<string> { "Glances", "Common Noodles", "Weeds" });
+            //var b1a = new DescendantB1A(45.5912933M, "Glissful Blissoms", 55, new List<string> { "Glances", "Common Noodles", "Weeds" });
 
-            var allprovs = ClassInfo.GetDescriptions(b1a);
+            //var allprovs = ClassInfo.GetDescriptions(b1a);
 
-            var a = new DescendantA("Becknus", 5)
-            {
-                ColorCode = new RGBDATA()
-                {
-                    Red = 255,
-                    Green = 255,
-                    Blue = 0
-                }
-            };
+            //var a = new DescendantA("Becknus", 5)
+            //{
+            //    ColorCode = new RGBDATA()
+            //    {
+            //        Red = 255,
+            //        Green = 255,
+            //        Blue = 0
+            //    }
+            //};
 
-            var b2b = new DescendantB2B(true, 551.33M, "thirty two men", 5)
-            {
-                ColorCode = new RGBDATA()
-                {
-                    Red = 253,
-                    Green = 135,
-                    Blue = 25
-                }
-            };
+            //var b2b = new DescendantB2B(true, 551.33M, "thirty two men", 5)
+            //{
+            //    ColorCode = new RGBDATA()
+            //    {
+            //        Red = 253,
+            //        Green = 135,
+            //        Blue = 25
+            //    }
+            //};
 
-            DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2b, b2a);
+            //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2b, b2a);
 
-            DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b1, a1);
+            //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b1, a1);
 
-            DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2a, b1);
+            //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2a, b1);
 
-            DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(a, a1);
+            //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(a, a1);
 
             var frm = new frmExterns();
             System.Windows.Forms.Application.Run(frm);
