@@ -128,7 +128,7 @@ namespace DataTools.Essentials.Observable
         /// </summary>
         /// <param name="propertyName"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -139,7 +139,7 @@ namespace DataTools.Essentials.Observable
         /// <param name="propertyName"></param>
         /// <returns>True if the event was cancelled.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected bool OnPropertyChanging([CallerMemberName] string propertyName = null)
+        protected virtual bool OnPropertyChanging([CallerMemberName] string propertyName = null)
         {
             if (invokerList1.Count == 0 && invokerList2.Count == 0) return false;
 
