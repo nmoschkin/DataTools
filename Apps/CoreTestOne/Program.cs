@@ -53,6 +53,10 @@ namespace CoreTestOne
 
         private string title;
 
+        public SamViewModel() : base(Synchronizer.Default)
+        {
+        }
+
         public string Title
         {
             get => title;
@@ -61,7 +65,7 @@ namespace CoreTestOne
 
         public Task<string> GetButtonText()
         {
-            return InvokeAsync(() =>
+            return (sync as Synchronizer).InvokeAsync(() =>
             {
                 var s = "";
                 var e = new GetButtonEventArgs()

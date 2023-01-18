@@ -20,7 +20,7 @@ namespace CoreTestOne
 
         public frmExterns()
         {
-            SyncObservableBase.Initialize();
+            Synchronizer.Initialize();
             InitializeComponent();
             //AllocConsole();
             Load += FrmExterns_Load;
