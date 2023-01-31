@@ -80,6 +80,12 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             Separator = separator ?? "";
         }
 
+        /// <summary>
+        /// Provides the description for the specified value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
         public string ProvidePropertyDescription(object value, string propertyName)
         {
             var resourceKey = ComputeKeyName(propertyName, value);

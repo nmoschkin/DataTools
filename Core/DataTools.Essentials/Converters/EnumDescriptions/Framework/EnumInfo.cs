@@ -48,6 +48,13 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
                 }
             }
 
+            var attr3 = enumType.GetCustomAttributes(true)?
+                .Where(x => x is IDescriptionAncestor)?
+                .Select(x => x as IDescriptionAncestor)?
+                .FirstOrDefault();
+
+            if (attr3 != null) return attr3;
+
             return new AttributeDescriptionProvider(enumType);
         }
 
