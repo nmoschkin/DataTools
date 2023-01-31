@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net7.0;net472;net48;net481</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1060</AssemblyVersion>
-    <FileVersion>8.0.0.1060</FileVersion>
+    <AssemblyVersion>8.0.0.1061</AssemblyVersion>
+    <FileVersion>8.0.0.1061</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1060</Version>
+    <Version>8.0.0.1061</Version>
     <Product>DataTools Miscellaneous Math Tools</Product>
     <Description>DataTools Miscellaneous Math Tools</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -13,15 +13,17 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <SignAssembly>True</SignAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>DataTools.MathTools</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1059</PreviousVersion>
+    <PreviousVersion>8.0.0.1060</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
     <Optimize>True</Optimize>
