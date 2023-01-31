@@ -1,4 +1,5 @@
-﻿using DataTools.Essentials.Observable;
+﻿using DataTools.Essentials.Converters.ClassDescriptions.Framework;
+using DataTools.Essentials.Observable;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +16,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         private Enum value;
         private Type enumType;
         private string _description;
-        private IEnumDescriptionProvider _descriptionProvider;
+        private IDescriptionAncestor _descriptionProvider;
 
         /// <summary>
         /// Create a new mutable, observable <see cref="Enum"/> described enum.

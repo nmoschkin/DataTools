@@ -11,13 +11,16 @@ using System.Text;
 
 namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
 {
+    /// <summary>
+    /// Gets description information about an enumeration.
+    /// </summary>
     public class EnumInfo
     {
         /// <summary>
         /// Resolves the default description provider for the specified type.
         /// </summary>
         /// <returns></returns>
-        public static IEnumDescriptionProvider ResolveDefaultProvider(Type enumType)
+        public static IDescriptionAncestor ResolveDefaultProvider(Type enumType)
         {
             var attr = enumType.GetCustomAttributes(true)?
                 .Where(x => x is EnumDescriptionProviderAttribute)?
@@ -27,6 +30,19 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
             if (attr != null && attr.CreateInstance() is IEnumDescriptionProvider pro && pro.CanConvertType(enumType))
             {
                 if (pro is IEnumDescriptionProvider defpro)
+                {
+                    return defpro;
+                }
+            }
+
+            var attr2 = enumType.GetCustomAttributes(true)?
+                .Where(x => x is DescriptionProviderAttribute)?
+                .Select(x => x as DescriptionProviderAttribute)?
+                .FirstOrDefault();
+
+            if (attr2 != null && attr2.CreateInstance() is IDescriptionProvider pro2 && pro2.CanConvertType(enumType))
+            {
+                if (pro2 is IDescriptionProvider defpro)
                 {
                     return defpro;
                 }
@@ -46,6 +62,11 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
                  .Select(x => x as EnumDescriptionProviderAttribute)?
                  .FirstOrDefault();
 
+            var attr2 = typeof(T).GetCustomAttributes(true)?
+                 .Where(x => x is DescriptionProviderAttribute)?
+                 .Select(x => x as DescriptionProviderAttribute)?
+                 .FirstOrDefault();
+
             if (attr != null && attr.CreateInstance() is IEnumDescriptionProvider pro && pro.CanConvertType(typeof(T)))
             {
                 if (pro is IEnumDescriptionProvider<T> defpro)
@@ -56,6 +77,10 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
                 {
                     return new DefaultProviderWrapper<T>(pro);
                 }
+            }
+            else if (attr2 != null && attr2.CreateInstance() is IDescriptionProvider pro2 && pro2.CanConvertType(typeof(T)))
+            {
+                return new DefaultProviderWrapper<T>(pro2);
             }
             else
             {
@@ -117,14 +142,14 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         /// </summary>
         private class DefaultProviderWrapper<T> : IEnumDescriptionProvider<T> where T : struct, Enum
         {
-            private IEnumDescriptionProvider baseprovider;
+            private IDescriptionAncestor baseprovider;
 
             public bool CanConvertType(Type enumType)
             {
                 return enumType == typeof(T);
             }
 
-            public DefaultProviderWrapper(IEnumDescriptionProvider baseprovider)
+            public DefaultProviderWrapper(IDescriptionAncestor baseprovider)
             {
                 this.baseprovider = baseprovider;
             }

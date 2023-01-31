@@ -6,10 +6,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
-    <AssemblyVersion>8.0.0.1061</AssemblyVersion>
-    <FileVersion>8.0.0.1061</FileVersion>
+    <AssemblyVersion>8.0.0.1062</AssemblyVersion>
+    <FileVersion>8.0.0.1062</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1061</Version>
+    <Version>8.0.0.1062</Version>
     <Product>DataTools Desktop WPF Base Library</Product>
     <Description>DataTools Desktop WPF Base Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -25,7 +25,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1060</PreviousVersion>
+    <PreviousVersion>8.0.0.1061</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
