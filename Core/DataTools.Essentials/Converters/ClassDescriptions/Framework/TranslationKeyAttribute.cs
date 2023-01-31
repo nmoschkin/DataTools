@@ -6,6 +6,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
     /// <summary>
     /// Specifies an explicit resource lookup key name for translation
     /// </summary>
+    [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
     public class TranslationKeyAttribute : Attribute
     {
         /// <summary>
