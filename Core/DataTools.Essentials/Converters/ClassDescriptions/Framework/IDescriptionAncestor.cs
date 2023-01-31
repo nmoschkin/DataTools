@@ -5,9 +5,13 @@ namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
     /// <summary>
     /// The ancestor interface for objects that can provide descriptions.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public interface IDescriptionAncestor
     {
+        /// <summary>
+        /// Gets the number of parameters required to call <see cref="ProvideDescription(object[])"/>.
+        /// </summary>
+        int RequiredParameters { get; }
+
         /// <summary>
         /// Check if this interface can convert the specified type.
         /// </summary>

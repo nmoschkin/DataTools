@@ -191,5 +191,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
 
             return re;
         }
+
+        int IDescriptionAncestor.RequiredParameters => 1;
     }
 }

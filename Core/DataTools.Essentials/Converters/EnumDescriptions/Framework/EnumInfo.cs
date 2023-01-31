@@ -190,6 +190,13 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
             }
 
             string IDescriptionAncestor.ProvideDescription(params object[] args) => ProvideDescription((Enum)args[0]);
+
+            string IDescriptionProvider.ProvideDescription(object value)
+            {
+                return baseprovider.ProvideDescription(value);
+            }
+
+            int IDescriptionAncestor.RequiredParameters => 1;
         }
     }
 }

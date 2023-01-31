@@ -245,60 +245,112 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         /// </summary>
         public T Value => _value;
 
+        /// <summary>
+        /// Cast an enum of type <typeparamref name="T"/> to a <see cref="DescribedEnum"/>.
+        /// </summary>
+        /// <param name="value"></param>
         public static implicit operator DescribedEnum<T>(T value)
         {
             return new DescribedEnum<T>(value);
         }
 
+        /// <summary>
+        /// Cast a <see cref="DescribedEnum"/> to an enum of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="descriptor"></param>
         public static implicit operator T(DescribedEnum<T> descriptor)
         {
             return descriptor._value;
         }
 
+        /// <summary>
+        /// Return true if enum values are not equal
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator !=(DescribedEnum<T> lhs, DescribedEnum<T> rhs)
         {
             return !lhs.Equals(rhs);
         }
 
+        /// <summary>
+        /// Return true if enum values are not equal
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator !=(T lhs, DescribedEnum<T> rhs)
         {
             return !lhs.Equals(rhs._value);
         }
 
+        /// <summary>
+        /// Returns true if enum values are not equal
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator !=(DescribedEnum<T> lhs, T rhs)
         {
             return !lhs._value.Equals(rhs);
         }
 
+        /// <summary>
+        /// Returns true if enum values are equal
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator ==(DescribedEnum<T> lhs, DescribedEnum<T> rhs)
         {
             return lhs.Equals(rhs);
         }
 
+        /// <summary>
+        /// Returns true if enum values are equal
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator ==(T lhs, DescribedEnum<T> rhs)
         {
             return lhs.Equals(rhs._value);
         }
 
+        /// <summary>
+        /// Returns true if enum values are equal
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator ==(DescribedEnum<T> lhs, T rhs)
         {
             return lhs._value.Equals(rhs);
         }
 
+        /// <summary>
+        /// Returns true if enum values are equal
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(DescribedEnum<T> other)
         {
             return _value.Equals(other._value) && _descriptionProvider == other._descriptionProvider && _description == other._description;
         }
 
+        /// <inheritdoc/>
         public bool Equals(T other)
         {
             return _value.Equals(other);
         }
 
 #if NET5_0_OR_GREATER
+        /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object obj)
 #else
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
 #endif
         {
