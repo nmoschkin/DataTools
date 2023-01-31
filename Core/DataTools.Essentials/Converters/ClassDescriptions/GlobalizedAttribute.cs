@@ -35,6 +35,8 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// </summary>
         public string Separator { get; }
 
+        /// <inheritdoc/>
+
         public TextLoadType LoadType { get; }
 
         /// <summary>
@@ -118,12 +120,27 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             return translation;
         }
 
+        /// <inheritdoc/>
         public bool CanConvertType(Type type)
         {
             return type == DeclaringType;
         }
 
-        string IDescriptionAncestor.ProvideDescription(params object[] args) => ProvidePropertyDescription(args[0], (string)args[1]);
+        string IDescriptionAncestor.ProvideDescription(params object[] args)
+        {
+            if (args.Length == 2)
+            {
+                return ProvidePropertyDescription(args[0], (string)args[1]);
+            }
+            else if (args.Length == 1)
+            {
+                return ProvidePropertyDescription(null, args[0].ToString());
+            }
+            else
+            {
+                throw new ArgumentException("Incorrect combination of arguments. For properties, an instance and property name is required. For enums, the enum value is required.");
+            }
+        }
 
         /// <summary>
         /// Compute the key name for the specified property
