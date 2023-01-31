@@ -19,7 +19,7 @@ namespace DataTools.Extras.Expressions
     /// Flags for the type of <see cref="ExpressionSegment"/>.
     /// </summary>
     [Flags]
-    [JsonConverter(typeof(EnumToStringConverter<PartType>))]
+    [JsonConverter(typeof(EnumToStringJsonConverter<PartType>))]
     public enum PartType
     {
         /// <summary>
@@ -28,7 +28,7 @@ namespace DataTools.Extras.Expressions
         Simple = 0,
 
         /// <summary>
-        /// Inidicates the expression segment is a composite of two or more subordinate expressions.
+        /// Indicates the expression segment is a composite of two or more subordinate expressions.
         /// </summary>
         Composite = 0x1,
 
@@ -147,7 +147,7 @@ namespace DataTools.Extras.Expressions
     /// <summary>
     /// Positional indicator for an <see cref="ExpressionSegment"/>.
     /// </summary>
-    [JsonConverter(typeof(EnumToStringConverter<Position>))]
+    [JsonConverter(typeof(EnumToStringJsonConverter<Position>))]
     public enum Position
     {
         /// <summary>
@@ -169,7 +169,7 @@ namespace DataTools.Extras.Expressions
     /// <summary>
     /// Indicates how literal values are stored in an <see cref="ExpressionSegment"/>.
     /// </summary>
-    [JsonConverter(typeof(EnumToStringConverter<StorageMode>))]
+    [JsonConverter(typeof(EnumToStringJsonConverter<StorageMode>))]
     public enum StorageMode
     {
         /// <summary>

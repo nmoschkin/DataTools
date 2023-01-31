@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using DataTools.Essentials.Observable;
+
 namespace CoreTestOne
 {
     public partial class frmExterns : Form
@@ -14,12 +16,35 @@ namespace CoreTestOne
         private int vis = 0;
 
         private List<ExternInfo> results;
+        private SamViewModel vm = new SamViewModel();
 
         public frmExterns()
         {
+            Synchronizer.Initialize();
             InitializeComponent();
             //AllocConsole();
             Load += FrmExterns_Load;
+            vm.PropertyChanged += Vm_PropertyChanged;
+            vm.Title = Text;
+            vm.GetButtonRequest += Vm_GetButtonRequest;
+        }
+
+        private void Vm_GetButtonRequest(object sender, GetButtonEventArgs e)
+        {
+            e.ButtonText = button1.Text;
+            textBox2.Text = button1.Text;
+        }
+
+        private void Vm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(SamViewModel.Title))
+            {
+                this.Text = vm.Title;
+                if (textBox2.Text != vm.Title)
+                {
+                    textBox2.Text = vm.Title;
+                }
+            }
         }
 
         private void FrmExterns_Load(object sender, EventArgs e)
@@ -221,6 +246,16 @@ namespace CoreTestOne
         {
             vis = checkBox1.Checked ? 1 : 0;
             FilterItems();
+        }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            vm.Title = textBox2.Text;
+        }
+
+        private async void button2_Click(object sender, EventArgs e)
+        {
+            var str = await vm.GetButtonText();
         }
     }
 }

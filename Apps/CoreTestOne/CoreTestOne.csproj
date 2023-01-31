@@ -5,10 +5,10 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1041</AssemblyVersion>
-    <FileVersion>8.0.0.1041</FileVersion>
+    <AssemblyVersion>8.0.0.1061</AssemblyVersion>
+    <FileVersion>8.0.0.1061</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1041</Version>
+    <Version>8.0.0.1061</Version>
     <Product>DataTools Core 8 Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -17,9 +17,10 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1040</PreviousVersion>
+    <PreviousVersion>8.0.0.1060</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
@@ -29,5 +30,18 @@
     <ProjectReference Include="..\..\Win32\DataTools.Win32.FileSystem\DataTools.Win32.FileSystem.csproj" />
     <ProjectReference Include="..\..\Win32\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
     <ProjectReference Include="..\..\Win32\DataTools.Win32\DataTools.Win32.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Resources\AppResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AppResources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\AppResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

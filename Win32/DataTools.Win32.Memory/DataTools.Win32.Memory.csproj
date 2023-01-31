@@ -4,10 +4,10 @@
     <Platforms>AnyCPU;x64</Platforms>
     <LangVersion>preview</LangVersion>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1041</AssemblyVersion>
-    <FileVersion>8.0.0.1041</FileVersion>
+    <AssemblyVersion>8.0.0.1061</AssemblyVersion>
+    <FileVersion>8.0.0.1061</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1041</Version>
+    <Version>8.0.0.1061</Version>
     <Product>DataTools Win32 Core Memory Library</Product>
     <Description>DataTools Win32 Core Memory Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -15,14 +15,16 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <SignAssembly>True</SignAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>DataTools.Win32.Memory</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1040</PreviousVersion>
+    <PreviousVersion>8.0.0.1060</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

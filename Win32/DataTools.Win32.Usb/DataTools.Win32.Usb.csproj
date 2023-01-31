@@ -3,10 +3,10 @@
     <TargetFrameworks>net6.0-windows;net7.0-windows;net472;net48;net481</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
-    <AssemblyVersion>8.0.0.1041</AssemblyVersion>
-    <FileVersion>8.0.0.1041</FileVersion>
+    <AssemblyVersion>8.0.0.1061</AssemblyVersion>
+    <FileVersion>8.0.0.1061</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1041</Version>
+    <Version>8.0.0.1061</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - USB and USB HID Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -16,15 +16,17 @@
     <Platforms>AnyCPU;x64</Platforms>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <SignAssembly>True</SignAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>DataTools.Win32.Usb</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1040</PreviousVersion>
+    <PreviousVersion>8.0.0.1060</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Resources\_01.dat" />

@@ -1,13 +1,25 @@
-﻿using Newtonsoft.Json;
+﻿using DataTools.Essentials.Converters.EnumDescriptions.Framework;
+
+using Newtonsoft.Json;
 
 using System;
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 
 namespace DataTools.Essentials.Converters
 {
-    public class EnumToStringConverter<T> : JsonConverter<T> where T : struct, Enum
+    [Obsolete("Use EnumToStringJsonConverter<T> instead.")]
+    public class EnumToStringConverter<T> : EnumToStringJsonConverter<T> where T : struct, Enum
+    {
+    }
+
+    /// <summary>
+    /// Converts an enum to and from string for JSON parsing.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class EnumToStringJsonConverter<T> : JsonConverter<T> where T : struct, Enum
     {
         public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
@@ -16,37 +28,7 @@ namespace DataTools.Essentials.Converters
 
         public override void WriteJson(JsonWriter writer, T value, JsonSerializer serializer)
         {
-            writer.WriteValue(GetEnumName(value));
-        }
-
-        public static string GetEnumName(Enum obj)
-        {
-            var fis = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Static);
-
-            foreach (var fi in fis)
-            {
-                var sampleValue = fi.GetValue(null);
-
-                if (sampleValue.Equals(obj))
-                {
-                    var ema = fi.GetCustomAttribute<EnumMemberAttribute>();
-                    if (ema != null)
-                    {
-                        return ema.Value;
-                    }
-
-                    var jp = fi.GetCustomAttribute<JsonPropertyAttribute>();
-
-                    if (jp != null)
-                    {
-                        return jp.PropertyName;
-                    }
-
-                    return fi.Name;
-                }
-            }
-
-            return null;
+            writer.WriteValue(EnumInfo.GetEnumName(value));
         }
 
         public static U GetEnumValue<U>(string obj) where U : struct, Enum
@@ -75,7 +57,15 @@ namespace DataTools.Essentials.Converters
                 }
 
                 var jp = fi.GetCustomAttribute<JsonPropertyAttribute>();
+
                 if (jp != null && jp.PropertyName?.ToLower() == obj?.ToLower())
+                {
+                    return sampleValue;
+                }
+
+                var de = fi.GetCustomAttribute<DescriptionAttribute>();
+
+                if (de != null && de.Description?.ToLower() == obj?.ToLower())
                 {
                     return sampleValue;
                 }
