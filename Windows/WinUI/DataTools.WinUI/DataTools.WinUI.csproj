@@ -8,17 +8,17 @@
     <LangVersion>preview</LangVersion>
     <Platforms>AnyCPU;x64</Platforms>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1065</AssemblyVersion>
-    <FileVersion>8.0.0.1065</FileVersion>
+    <AssemblyVersion>8.0.0.1066</AssemblyVersion>
+    <FileVersion>8.0.0.1066</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1065</Version>
+    <Version>8.0.0.1066</Version>
     <Product>DataTools WinUI Base Library</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2022 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PreviousVersion>8.0.0.1064</PreviousVersion>
+    <PreviousVersion>8.0.0.1065</PreviousVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.ProjectReunion" Version="0.8.12" />
