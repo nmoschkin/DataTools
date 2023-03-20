@@ -5,10 +5,10 @@
     <Nullable>disable</Nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1066</AssemblyVersion>
-    <FileVersion>8.0.0.1066</FileVersion>
+    <AssemblyVersion>8.0.0.1067</AssemblyVersion>
+    <FileVersion>8.0.0.1067</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1066</Version>
+    <Version>8.0.0.1067</Version>
     <Product>DataTools WPF Color Control Library</Product>
     <Description>DataTools WPF Color Control Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -23,7 +23,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1065</PreviousVersion>
+    <PreviousVersion>8.0.0.1066</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
