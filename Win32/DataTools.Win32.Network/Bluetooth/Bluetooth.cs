@@ -2612,7 +2612,7 @@ namespace DataTools.Win32
                     }
                     catch { }
                     BluetoothFindRadioClose(radFind);
-                    bl.ToArray();
+                    return bl.ToArray();
                 }
 
                 bl.Add(brInfo);
