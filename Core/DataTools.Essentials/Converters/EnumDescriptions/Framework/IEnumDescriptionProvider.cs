@@ -8,8 +8,7 @@ namespace DataTools.Essentials.Converters
     /// <summary>
     /// An interface for an object that can provide descriptions for enum values.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface IEnumDescriptionProvider : IDescriptionAncestor
+    public interface IEnumDescriptionProvider : IDescriptionProvider
     {
         /// <summary>
         /// Provide the description for the specified value.
@@ -23,13 +22,7 @@ namespace DataTools.Essentials.Converters
     /// An interface for an object that can provide descriptions for enum values of type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IEnumDescriptionProvider<T> : IEnumDescriptionProvider where T : struct, Enum
+    public interface IEnumDescriptionProvider<T> : IEnumDescriptionProvider, IDescriptionProvider<T> where T : struct, Enum
     {
-        /// <summary>
-        /// Provide the description for the specified value.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        string ProvideDescription(T value);
     }
 }

@@ -4,9 +4,8 @@ using System.Text;
 namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
 {
     /// <summary>
-    /// An interface for an object that can provide descriptions for object properties.
+    /// An interface for an object that can provide descriptions for objects.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public interface IDescriptionProvider : IDescriptionAncestor
     {
         /// <summary>
@@ -18,7 +17,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions.Framework
     }
 
     /// <summary>
-    /// An interface for an object that can provide descriptions for object properties of type <typeparamref name="T"/>.
+    /// An interface for an object that can provide descriptions for objects of type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface IDescriptionProvider<T> : IDescriptionProvider
