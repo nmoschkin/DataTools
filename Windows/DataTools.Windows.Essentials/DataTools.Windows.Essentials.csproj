@@ -1,37 +1,37 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net6.0;net7.0;net472;net48;net481</TargetFrameworks>
-    <Nullable>disable</Nullable>
+    <TargetFrameworks>net6.0-windows;net7.0-windows;net472;net48;net481</TargetFrameworks>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <nullable>disable</nullable>
+    <UseWindowsForms>true</UseWindowsForms>
     <AssemblyVersion>8.0.0.1068</AssemblyVersion>
     <FileVersion>8.0.0.1068</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
     <Version>8.0.0.1068</Version>
-    <Product>DataTools App Essentials</Product>
-    <Description>DataTools App Essentials</Description>
+    <Product>DataTools Windows Essentials</Product>
+    <Description>DataTools Windows Essentials</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
+    <Platforms>AnyCPU;x64</Platforms>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Title>DataTools.Essentials</Title>
+    <Title>DataTools.Windows.Essentials</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
+    <Nullable>disable</Nullable>
     <PreviousVersion>8.0.0.1067</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Converters\NewFolder\**" />
-    <EmbeddedResource Remove="Converters\NewFolder\**" />
-    <None Remove="Converters\NewFolder\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>  </PropertyGroup>
+
+  <ItemGroup> 
+    <ProjectReference Include="..\..\Core\DataTools.Essentials\DataTools.Essentials.csproj" />
+    <ProjectReference Include="..\..\Core\DataTools.Text\DataTools.Text.csproj" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
     <Optimize>True</Optimize>
