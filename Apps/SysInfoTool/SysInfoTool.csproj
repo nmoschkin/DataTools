@@ -4,10 +4,10 @@
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1067</AssemblyVersion>
-    <FileVersion>8.0.0.1067</FileVersion>
+    <AssemblyVersion>8.0.0.1068</AssemblyVersion>
+    <FileVersion>8.0.0.1068</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1067</Version>
+    <Version>8.0.0.1068</Version>
     <Product>DataTools Sample Program</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -17,7 +17,7 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1066</PreviousVersion>
+    <PreviousVersion>8.0.0.1067</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
