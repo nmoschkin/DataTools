@@ -26,19 +26,9 @@ namespace DataTools.Essentials.Settings
         /// </summary>
         /// <param name="fileName">The name of the file that contains persisted storage</param>
         /// <param name="load">True to load the data from persistence on instantiation</param>
-        public JsonSettings(string fileName, bool load) : base(new Uri("file:///" + Path.GetFullPath(fileName)), true)
+        public JsonSettings(string fileName, bool load) : base(Path.GetFullPath(fileName), true)
         {            
             if (load) this.LoadSettings(fileName);
-        }
-
-        /// <summary>
-        /// Create a new JSON settings object
-        /// </summary>
-        /// <param name="location">The location of the resource that contains persisted storage</param>
-        /// <param name="load">True to load the data from persistence on instantiation</param>
-        public JsonSettings(Uri location, bool load) : base(location, true)
-        {
-            if (load) this.LoadSettings(location);
         }
 
         /// <summary>
@@ -46,24 +36,10 @@ namespace DataTools.Essentials.Settings
         /// </summary>
         public string Filename
         {
-            get => location.AbsolutePath;
+            get => location;
             set
             {
-                if (Uri.TryCreate(value, UriKind.Absolute, out var location))
-                {
-                    this.location = location;
-                }
-                else if (File.Exists(value))
-                {
-                    if (value.StartsWith("\\\\") || value.StartsWith("//"))
-                    {
-                        this.location = new Uri("file://" + Path.GetFullPath(value));
-                    }
-                    else
-                    {
-                        this.location = new Uri("file:///" + Path.GetFullPath(value));
-                    }
-                }
+                location = value;
             }
         }
 
@@ -132,20 +108,6 @@ namespace DataTools.Essentials.Settings
         }
 
         /// <summary>
-        /// Loads settings from the specified file
-        /// </summary>
-        /// <param name="fileName">The name of the file to load</param>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="IOException"></exception>
-        public virtual void LoadSettings(string fileName)
-        {
-            if (File.Exists(fileName))
-            {
-                LoadSettings(new Uri("file:///" + fileName));
-            }
-        }
-
-        /// <summary>
         /// Loads settings from the specified resource
         /// </summary>
         /// <param name="location">The name of the resource to load</param>
@@ -153,23 +115,12 @@ namespace DataTools.Essentials.Settings
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="IOException"></exception>
         /// <exception cref="NotSupportedException"></exception>
-        public virtual void LoadSettings(Uri location, Encoding encoding = null)
+        public virtual void LoadSettings(string location, Encoding encoding = null)
         {
             encoding = encoding ?? Encoding.UTF8;
             string json;
 
-            if (location.IsFile)
-            {
-                json = File.ReadAllText(location.LocalPath);
-            }
-            else if (location.IsUnc)
-            {
-                json = File.ReadAllText(location.AbsolutePath);
-            }
-            else
-            {
-                throw new NotSupportedException("For off-site resources, you must override this method");
-            }
+            json = File.ReadAllText(location);
 
             InternalLoadJson(json);
             this.location = location;
@@ -181,41 +132,11 @@ namespace DataTools.Essentials.Settings
         /// <param name="location">The location of the resource to save to</param>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="IOException"></exception>
-        public virtual void SaveSettings(Uri location)
+        public virtual void SaveSettings(string location)
         {
             var json = InternalSaveJson();
-
-            if (location.IsFile)
-            {
-                File.WriteAllText(location.LocalPath, json);
-            }
-            else if (location.IsUnc)
-            {
-                File.WriteAllText(location.AbsolutePath, json);
-            }
-            else
-            {
-                throw new NotSupportedException("For off-site resources, you must override this method");
-            }
+            File.WriteAllText(location, json);
         }
-
-        /// <summary>
-        /// Saves settings to the specified file
-        /// </summary>
-        /// <param name="fileName">The filename of the resource to save to</param>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="IOException"></exception>
-        public virtual void SaveSettings(string fileName)
-        {
-            if (File.Exists(fileName))
-            {
-                File.Delete(fileName);
-            }
-
-            Filename = fileName;
-            SaveSettings(location);
-        }
-
 
         /// <summary>
         /// Saves settings to the last known location

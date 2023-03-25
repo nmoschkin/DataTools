@@ -16,21 +16,18 @@ namespace DataTools.Essentials.Settings
         /// Create a new serializable settings class
         /// </summary>
         /// <param name="settings"></param>
-        /// <param name="location"></param>
-        public ProgramSerializableBase(ISettings settings, Uri location = null)
+        public ProgramSerializableBase(ISettings settings)
         {
-            this.settings = settings;
-            Location = location;
+            this.settings = settings;                        
         }
+
+        string IProgramSerializable.Location => settings?.Location;
 
         /// <inheritdoc/>
         public virtual ISettings GetProgramSettings() => settings;
 
         /// <inheritdoc/>
         public virtual bool SupportsProgramSettings => true;
-
-        /// <inheritdoc/>
-        public abstract Uri Location { get; protected set; }
 
         /// <inheritdoc/>
         public abstract bool DeleteFromPersistence();

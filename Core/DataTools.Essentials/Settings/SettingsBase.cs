@@ -9,9 +9,9 @@ namespace DataTools.Essentials.Settings
     public abstract class SettingsBase : ISettings
     {
         /// <summary>
-        /// The <see cref="Uri"/> for the location of storage persistence
+        /// The <see cref="string"/> for the location of storage persistence
         /// </summary>
-        protected Uri location;
+        protected string location;
 
         /// <summary>
         /// Gets or sets the list of converters that will be used.
@@ -24,7 +24,7 @@ namespace DataTools.Essentials.Settings
         /// <param name="location">The location of the persisted storage</param>
         /// <param name="atomic">True if the settings can be read and written individually.</param>
         /// <param name="converters">Optional list of converters that will be used.</param>
-        public SettingsBase(Uri location, bool atomic, IEnumerable<SettingsTypeConverter> converters = null)
+        public SettingsBase(string location, bool atomic, IEnumerable<SettingsTypeConverter> converters = null)
         {            
             this.location = location;
             if (converters != null) Converters = new List<SettingsTypeConverter>(converters);
@@ -60,7 +60,7 @@ namespace DataTools.Essentials.Settings
         public abstract bool CanClearSettings { get; }
 
         /// <inheritdoc/>
-        public virtual Uri Location => location;
+        public virtual string Location => location;
 
         /// <inheritdoc/>
         public abstract object this[string key] { get; set; }

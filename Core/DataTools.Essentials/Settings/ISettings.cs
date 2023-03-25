@@ -147,9 +147,9 @@ namespace DataTools.Essentials.Settings
         bool Atomic { get; }
 
         /// <summary>
-        /// Gets a <see cref="Uri"/> instance that specifies the persisted location for settings
+        /// Gets a <see cref="string"/> that represents the persisted location for settings
         /// </summary>
-        Uri Location { get; }
+        string Location { get; }
     }
 
 }

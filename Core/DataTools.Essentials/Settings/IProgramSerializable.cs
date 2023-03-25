@@ -22,7 +22,7 @@ namespace DataTools.Essentials.Settings
         /// <summary>
         /// Gets the location of the persisted data
         /// </summary>
-        Uri Location { get; }
+        string Location { get; }
 
         /// <summary>
         /// Save settings
