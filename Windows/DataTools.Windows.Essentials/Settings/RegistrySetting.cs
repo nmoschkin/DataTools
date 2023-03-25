@@ -36,7 +36,7 @@ namespace DataTools.Windows.Essentials.Settings
         }
     }
 
-    // <summary>
+    /// <summary>
     /// Represents a registry setting
     /// </summary>
     public class RegistrySetting<T> : ProgramSetting<T>

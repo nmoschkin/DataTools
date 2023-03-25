@@ -80,7 +80,7 @@ namespace DataTools.Windows.Essentials.Settings
             Hive = openHive;
 
             this.baseKey = baseKey;
-            this.location = new Uri($"resource://{Hive.Name}\\{baseKey}");
+            this.location = $"{Hive.Name}\\{baseKey}";
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace DataTools.Windows.Essentials.Settings
         /// <inheritdoc/>
         public override object GetValue(string key, object defaultValue = default)
         {
-            return OpenGetRegValue<object>(key, defaultValue);
+            return OpenGetRegValue(key, defaultValue);
         }
 
         /// <inheritdoc/>
@@ -295,9 +295,9 @@ namespace DataTools.Windows.Essentials.Settings
             {
                 var key = k;
 
-                if (key.StartsWith(BaseKey))
+                if (key.StartsWith(BaseKey + "\\"))
                 {
-                    key = key.Substring(BaseKey.Length);
+                    key = key.Substring(BaseKey.Length + 1);
 
                 }
                 
@@ -418,6 +418,10 @@ namespace DataTools.Windows.Essentials.Settings
                 GetArgb(str, out a, out r, out g, out b);
                 c = System.Drawing.Color.FromArgb(a, r, g, b);
                 return c;
+            }
+            else if (type == typeof(string) || defaultValue is string s)
+            {
+                return (string)regKey.GetValue(valueName, (string)(defaultValue ?? ""));
             }
             else if (type.GetInterfaces().Where(x => x.Name.Contains("ICollection`1")).Any() || type.GetInterfaces().Where(x => x.Name.Contains("IList`1")).Any())
             {
@@ -548,6 +552,22 @@ namespace DataTools.Windows.Essentials.Settings
             }
         }
 
+
+        /// <summary>
+        /// Opens and gets the value for the specified <paramref name="valueName"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to get</typeparam>
+        /// <param name="valueName">The name of the registry value</param>
+        /// <param name="defaultValue">Default value (optional)</param>
+        /// <returns></returns>
+        protected object OpenGetRegValue(string valueName, object defaultValue = default)
+        {
+            using (var regKey = OpenKeyForSetting(valueName, out var useKey))
+            {
+                return GetRegValue(defaultValue?.GetType() ?? typeof(object), regKey, useKey, defaultValue);
+            }
+        }
+
         /// <summary>
         /// Opens the key for the setting at the specified <paramref name="path"/>
         /// </summary>
@@ -572,6 +592,7 @@ namespace DataTools.Windows.Essentials.Settings
                 return Hive.CreateSubKey(BaseKey + "\\" + pt);
             }
         }
+
         /// <summary>
         /// Opens and sets the registry <paramref name="value"/> for the specified <paramref name="valuePath"/>.
         /// </summary>
@@ -585,6 +606,23 @@ namespace DataTools.Windows.Essentials.Settings
                 SetRegValue(typeof(T), regKey, useKey, value);
             }
         }
+
+        /// <summary>
+        /// Opens and sets the registry <paramref name="value"/> for the specified <paramref name="valuePath"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to set</typeparam>
+        /// <param name="valuePath">The relative path of the registry value</param>
+        /// <param name="value">The value</param>
+        protected void OpenSetRegValue(string valuePath, object value)
+        {
+            if (value == null) return;
+
+            using (var regKey = OpenKeyForSetting(valuePath, out var useKey))
+            {
+                SetRegValue(value.GetType(), regKey, useKey, value);
+            }
+        }
+
 
         /// <summary>
         /// Sets the <paramref name="value"/> for the specified <paramref name="regKey"/> to the specified <paramref name="value"/>.
@@ -615,6 +653,10 @@ namespace DataTools.Windows.Essentials.Settings
             else if (value is IEnumerable<string> strlist)
             {
                 regKey.SetValue(valueName, strlist.ToArray());
+            }
+            else if (value is string s)
+            {
+                regKey.SetValue(valueName, s);
             }
             else if (value is IEnumerable b)
             {
