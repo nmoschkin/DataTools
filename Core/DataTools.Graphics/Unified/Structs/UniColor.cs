@@ -30,7 +30,14 @@ namespace DataTools.Graphics
     [StructLayout(LayoutKind.Explicit, CharSet = CharSet.Unicode, Size = 4)]
     public struct UniColor : IComparable<UniColor>, IEquatable<UniColor>, IFormattable
     {
+        /// <summary>
+        /// Represents an empty color value
+        /// </summary>
         public static readonly UniColor Empty = new UniColor(0, 0, 0, 0);
+
+        /// <summary>
+        /// Represents Transparent
+        /// </summary>
         public static readonly UniColor Transparent = new UniColor(0, 0, 0, 0);
 
         [FieldOffset(0)]
@@ -245,11 +252,13 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <inheritdoc/>
         public bool Equals(UniColor other)
         {
             return other._Value == _Value;
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             if (obj is UniColor other)
@@ -278,6 +287,7 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return _Value.GetHashCode();
@@ -388,17 +398,19 @@ namespace DataTools.Graphics
         /// Initialize a new UniColor structure with a color of the given name.
         /// If the name is not found, an argument exception is throw.
         /// </summary>
-        /// <param name="Color">The name of the color to create.</param>
+        /// <param name="color">The name of the color to create.</param>
+        /// <param name="succeed">Is set to true if initialization from color name succeeded</param>
         /// <remarks></remarks>
-        public UniColor(string Color, ref bool succeed)
+        public UniColor(string color, ref bool succeed)
         {
-            var nc = NamedColor.SearchAll(Color);
+            var nc = NamedColor.SearchAll(color);
 
             if (nc == null || nc.Count == 0)
             {
                 _A = _R = _G = _B = 0;
                 _Value = 0;
                 _intvalue = 0;
+                succeed = false;
 
                 return;
             }
@@ -407,6 +419,8 @@ namespace DataTools.Graphics
                 _A = _R = _G = _B = 0;
                 _Value = 0;
                 _intvalue = ((UniColor)nc[0]).ToArgb();
+
+                succeed = true;
             }
         }
 
@@ -431,8 +445,16 @@ namespace DataTools.Graphics
             SetValue(a, r, g, b);
         }
 
+        /// <summary>
+        /// Get the HSV data for this color value
+        /// </summary>
+        /// <returns></returns>
         public HSVDATA ToHSV() => ColorMath.ColorToHSV(this);
 
+        /// <summary>
+        /// Get the CMY(K) data for this color value
+        /// </summary>
+        /// <returns></returns>
         public CMYDATA ToCMY()
         {
             var cmy = new CMYDATA();
@@ -1036,6 +1058,7 @@ namespace DataTools.Graphics
         /// Attempt to retrieve a color name for a specific color.
         /// </summary>
         /// <param name="color"></param>
+        /// <param name="closest">True to get a close match</param>
         /// <returns></returns>
         /// <remarks></remarks>
         public static string TryGetColorName(UniColor color, bool closest = false)
@@ -1061,6 +1084,7 @@ namespace DataTools.Graphics
             return s;
         }
 
+        /// <inheritdoc/>
         public int CompareTo(UniColor other)
         {
             HSVDATA hsv1 = ColorMath.ColorToHSV(this);
@@ -1177,11 +1201,13 @@ namespace DataTools.Graphics
             return new UniColor(*((int*)ptr));
         }
 
+        /// <inheritdoc/>
         public static explicit operator byte[](UniColor value)
         {
             return BitConverter.GetBytes(value._intvalue);
         }
 
+        /// <inheritdoc/>
         public static explicit operator UniColor(byte[] value)
         {
             if (value == null || value.Length < 4) throw new InvalidCastException("Not enough bytes in the array to compose a 32-bit value.");
@@ -1191,76 +1217,91 @@ namespace DataTools.Graphics
             return clr;
         }
 
+        /// <inheritdoc/>
         public static unsafe explicit operator UniColor(void* ptr)
         {
             return FromPointer(ptr);
         }
 
+        /// <inheritdoc/>
         public static unsafe explicit operator UniColor(byte* ptr)
         {
             return FromPointer(ptr);
         }
 
+        /// <inheritdoc/>
         public static unsafe explicit operator UniColor(int* ptr)
         {
             return FromPointer(ptr);
         }
 
+        /// <inheritdoc/>
         public static implicit operator Color(UniColor value)
         {
             return Color.FromArgb(value.IntValue);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniColor(Color value)
         {
             return new UniColor(value);
         }
 
+        /// <inheritdoc/>
         public static implicit operator int(UniColor value)
         {
             return value.IntValue;
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniColor(int value)
         {
             return new UniColor(value);
         }
 
+        /// <inheritdoc/>
         public static implicit operator uint(UniColor value)
         {
             return value._Value;
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniColor(uint value)
         {
             return new UniColor(value);
         }
 
+        /// <inheritdoc/>
         public static explicit operator UniColor(string value)
         {
             return Parse(value);
         }
 
+        /// <inheritdoc/>
         public static implicit operator string(UniColor value)
         {
             return value.ToString();
         }
 
+        /// <inheritdoc/>
         public static implicit operator SKColor(UniColor value)
         {
             return (SKColor)value._Value;
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniColor(SKColor value)
         {
             return new UniColor(value);
         }
 
+        /// <inheritdoc/>
         public static bool operator ==(UniColor val1, UniColor val2)
         {
             return val1._intvalue == val2._intvalue;
         }
 
+        /// <inheritdoc/>
         public static bool operator !=(UniColor val1, UniColor val2)
         {
             return val1._intvalue != val2._intvalue;

@@ -11,8 +11,15 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
     /// <typeparam name="T"></typeparam>
     public class CallbackDescriptionProvider<T> : EnumDescriptionProviderBase<T> where T : struct, Enum
     {
+        
+        /// <summary>
+        /// Callback method
+        /// </summary>
         protected Func<T, string> callback;
 
+        /// <summary>
+        /// Callback method
+        /// </summary>
         public virtual Func<T, string> Callback => callback;
 
         /// <summary>
@@ -24,6 +31,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
             this.callback = callback;
         }
 
+        /// <inheritdoc/>
         public override string ProvideDescription(T value)
         {
             return callback(value);

@@ -16,13 +16,20 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
     /// </remarks>
     public class AttributeDescriptionProvider<T> : EnumDescriptionProviderBase<T> where T : struct, Enum
     {
+        /// <summary>
+        /// Gets or sets the <see cref="TextLoadType"/> for the current attribute description provider.
+        /// </summary>
         public TextLoadType LoadType { get; set; } = TextLoadType.NoPreference;
 
+        /// <inheritdoc/>
         public override string ProvideDescription(T value)
         {
             return EnumInfo.GetEnumName(value, true);
         }
 
+        /// <summary>
+        /// Create a new attribute description provider
+        /// </summary>
         public AttributeDescriptionProvider() : base()
         {
         }
@@ -39,18 +46,26 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
     /// </remarks>
     public class AttributeDescriptionProvider : EnumDescriptionProviderBase
     {
+        /// <summary>
+        /// Gets or sets the <see cref="TextLoadType"/> for the current attribute description provider.
+        /// </summary>
         public TextLoadType LoadType { get; set; } = TextLoadType.NoPreference;
 
+        /// <inheritdoc/>
         public override string ProvideDescription(Enum value)
         {
             return EnumInfo.GetEnumName(value, true);
         }
 
+        /// <inheritdoc/>
         public override bool CanConvertType(Type type)
         {
             return type.IsEnum;
         }
 
+        /// <summary>
+        /// Create a new attribute description provider
+        /// </summary>
         public AttributeDescriptionProvider(Type enumType) : base(enumType)
         {
         }

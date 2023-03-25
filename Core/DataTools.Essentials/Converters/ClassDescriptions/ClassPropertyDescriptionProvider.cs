@@ -20,6 +20,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// </summary>
         protected readonly Dictionary<string, (PropertyInfo, IDescriptionAncestor)> propertyProviders = new Dictionary<string, (PropertyInfo, IDescriptionAncestor)>();
 
+        /// <inheritdoc/>
         public override TextLoadType LoadType { get; }
 
         /// <summary>
@@ -58,11 +59,13 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             }
         }
 
+        /// <inheritdoc/>
         public override bool CanConvertType(Type type)
         {
             return (type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)?.Length ?? 0) > 0;
         }
 
+        /// <inheritdoc/>
         public override string ProvidePropertyDescription(object value, string propertyName)
         {
             if (custass != null) return custass.ProvideDescription(value, propertyName);

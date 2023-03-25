@@ -22,9 +22,24 @@ namespace DataTools.MathTools.Polar
     [StructLayout(LayoutKind.Sequential)]
     public struct PolarCoordinates //: IFormattable
     {
+        /// <summary>
+        /// The Greek Phi (φ) symbol for radians
+        /// </summary>
         public const string PolarSymbol = "φ";
+
+        /// <summary>
+        /// The Greek Pi (π) symbol
+        /// </summary>
         public const string PiSymbol = "π";
+
+        /// <summary>
+        /// The degrees (°) symbol
+        /// </summary>
         public const string DegreeSymbol = "°";
+
+        /// <summary>
+        /// The radians constant 180/π
+        /// </summary>
         public const double RadianConst = 180.0d / 3.1415926535897931d;
 
         /// <summary>
@@ -125,6 +140,7 @@ namespace DataTools.MathTools.Polar
             return s;
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return ToString(PolarCoordinatesFormattingFlags.Standard);
@@ -259,6 +275,7 @@ namespace DataTools.MathTools.Polar
             return p.Radius <= rad;
         }
 
+        /// <inheritdoc/>
         public static explicit operator PolarCoordinates(LinearCoordinates operand)
         {
             return ToPolarCoordinates(operand);

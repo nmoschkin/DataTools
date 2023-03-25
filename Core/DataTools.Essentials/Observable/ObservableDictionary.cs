@@ -18,6 +18,9 @@ namespace DataTools.Essentials.Observable
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
     public class KeyPropertyAttribute : Attribute
     {
+        /// <summary>
+        /// Gets the property name of the key property
+        /// </summary>
         public string PropertyName { get; private set; }
 
         /// <summary>
@@ -32,6 +35,7 @@ namespace DataTools.Essentials.Observable
             PropertyName = propertyName;
         }
 
+        /// <inheritdoc/>
         public override string ToString() => PropertyName;
 
         /// <summary>
@@ -63,24 +67,52 @@ namespace DataTools.Essentials.Observable
     /// <typeparam name="TValue">The value type.</typeparam>
     public class ObservableDictionary<TKey, TValue> : KeyedCollection<TKey, TValue>, INotifyCollectionChanged, INotifyPropertyChanged where TValue : class
     {
+        /// <summary>
+        /// Sync Lock object
+        /// </summary>
         protected object lockObject = new object();
 
+
+        /// <inheritdoc/>
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
+        /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Random ID
+        /// </summary>
         protected string id = Guid.NewGuid().ToString("d");
 
+        /// <summary>
+        /// The key property
+        /// </summary>
         protected string keyProperty = null;
 
+        /// <summary>
+        /// Key property info
+        /// </summary>
         protected PropertyInfo keyPropInfo = null;
 
+        /// <summary>
+        /// List sort direction
+        /// </summary>
         protected ListSortDirection direction;
 
+        
+        /// <summary>
+        /// The current generated or provided comparer
+        /// </summary>
         protected Comparison<TValue> comparer;
 
+        /// <summary>
+        /// True if sorted
+        /// </summary>
         protected bool sorted;
 
+        /// <summary>
+        /// True if events are surpressed
+        /// </summary>
         protected bool noevent;
 
         /// <summary>
@@ -206,6 +238,12 @@ namespace DataTools.Essentials.Observable
             AddRange(values);
         }
 
+        /// <summary>
+        /// Create a new dictionary with the specified sort configuration.
+        /// </summary>
+        /// <param name="sortPropertyName">The property to sort on</param>
+        /// <param name="direction">Sort direction</param>
+        /// <param name="values">Items to initialize the collection with</param>
         public ObservableDictionary(string sortPropertyName, ListSortDirection direction, IEnumerable<TValue> values) : this(sortPropertyName, direction)
         {
             AddRange(values);
@@ -226,7 +264,7 @@ namespace DataTools.Essentials.Observable
         /// <summary>
         /// Create a new observable dictionary of class objects using the specified property as the key.
         /// </summary>
-        /// <param name="keyPropertyName">The name of the key property inside the <see cref="TKey"/> class type.</param>
+        /// <param name="keyPropertyName">The name of the key property inside the <typeparamref name="TKey"/> class type.</param>
         public ObservableDictionary(string keyPropertyName) : base()
         {
             var prop = typeof(TValue).GetProperty(keyPropertyName);
@@ -241,40 +279,79 @@ namespace DataTools.Essentials.Observable
         /// <summary>
         /// Create a new observable dictionary of class objects using the specified property as the key.
         /// </summary>
-        /// <param name="keyPropertyName">The name of the key property inside the <see cref="TKey"/> class type.</param>
-        /// <param name="values">A sequence of items of type <see cref="TValue"/>.</param>
+        /// <param name="keyPropertyName">The name of the key property inside the <typeparamref name="TKey"/> class type.</param>
+        /// <param name="values">A sequence of items of type <typeparamref name="TValue"/>.</param>
         public ObservableDictionary(string keyPropertyName, IEnumerable<TValue> values) : this(keyPropertyName)
         {
             AddRange(values);
         }
 
+        /// <summary>
+        /// Create a new observable dictionary of class objects using the specified property and sort options
+        /// </summary>
+        /// <param name="keyPropertyName">The name of the key property inside the <typeparamref name="TKey"/> class type.</param>
+        /// <param name="sortPropertyName">The property to sort on</param>
+        /// <param name="direction">Sort direction</param>
         public ObservableDictionary(string keyPropertyName, string sortPropertyName, ListSortDirection direction) : this(keyPropertyName)
         {
             ChangeSort(sortPropertyName, direction);
         }
 
+        /// <summary>
+        /// Create a new observable dictionary of class objects using the specified property and comparison options
+        /// </summary>
+        /// <param name="keyPropertyName">The name of the key property inside the <typeparamref name="TKey"/> class type.</param>
+        /// <param name="valueComparer">The value comparer</param>
+        /// <param name="direction">Sort direction</param>
         public ObservableDictionary(string keyPropertyName, IComparer<TValue> valueComparer, ListSortDirection direction) : this(keyPropertyName)
         {
             ChangeSort(valueComparer, direction);
         }
 
+        /// <summary>
+        /// Create a new observable dictionary of class objects using the specified property and comparison options
+        /// </summary>
+        /// <param name="keyPropertyName">The name of the key property inside the <typeparamref name="TKey"/> class type.</param>
+        /// <param name="valueComparison">The value comparison</param>
+        /// <param name="direction">Sort direction</param>
         public ObservableDictionary(string keyPropertyName, Comparison<TValue> valueComparison, ListSortDirection direction) : this(keyPropertyName)
         {
             ChangeSort(valueComparison, direction);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keyPropertyName">The name of the key property inside the <typeparamref name="TKey"/> class type.</param>
+        /// <param name="sortPropertyName">The property to sort on</param>
+        /// <param name="direction">Sort direction</param>
+        /// <param name="values">A sequence of items of type <typeparamref name="TValue"/>.</param>
         public ObservableDictionary(string keyPropertyName, string sortPropertyName, ListSortDirection direction, IEnumerable<TValue> values) : this(keyPropertyName)
         {
             ChangeSort(sortPropertyName, direction);
             AddRange(values);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keyPropertyName">The name of the key property inside the <typeparamref name="TKey"/> class type.</param>
+        /// <param name="valueComparer">The value comparer</param>
+        /// <param name="direction">Sort direction</param>
+        /// <param name="values">A sequence of items of type <typeparamref name="TValue"/>.</param>
         public ObservableDictionary(string keyPropertyName, IComparer<TValue> valueComparer, ListSortDirection direction, IEnumerable<TValue> values) : this(keyPropertyName)
         {
             ChangeSort(valueComparer, direction);
             AddRange(values);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keyPropertyName">The name of the key property inside the <typeparamref name="TKey"/> class type.</param>
+        /// <param name="valueComparison">The value comparison</param>
+        /// <param name="direction">Sort direction</param>
+        /// <param name="values">A sequence of items of type <typeparamref name="TValue"/>.</param>
         public ObservableDictionary(string keyPropertyName, Comparison<TValue> valueComparison, ListSortDirection direction, IEnumerable<TValue> values) : this(keyPropertyName)
         {
             ChangeSort(valueComparison, direction);
@@ -345,16 +422,21 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+#if NETSTANDARD
         /// <summary>
         /// Try to get the value with the specified key.
         /// </summary>
         /// <param name="key">The key to search for.</param>
         /// <param name="value">Receives the item that was found, or null/default.</param>
         /// <returns>True if the item was found.</returns>
-#if NETSTANDARD
         public bool TryGetValue(TKey key, out TValue value)
 #else
-
+        /// <summary>
+        /// Try to get the value with the specified key.
+        /// </summary>
+        /// <param name="key">The key to search for.</param>
+        /// <param name="value">Receives the item that was found, or null/default.</param>
+        /// <returns>True if the item was found.</returns>
         public new bool TryGetValue(TKey key, out TValue value)
 #endif
         {
@@ -398,11 +480,13 @@ namespace DataTools.Essentials.Observable
 
         #region KeyedCollection overrides
 
+        /// <inheritdoc/>
         protected override TKey GetKeyForItem(TValue item)
         {
             return (TKey)keyPropInfo.GetValue(item);
         }
 
+        /// <inheritdoc/>
         protected override void ClearItems()
         {
             lock (lockObject)
@@ -412,6 +496,7 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <inheritdoc/>
         protected override void InsertItem(int index, TValue item)
         {
             lock (lockObject)
@@ -423,6 +508,7 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <inheritdoc/>
         protected override void RemoveItem(int index)
         {
             TValue oldItem;
@@ -436,6 +522,7 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <inheritdoc/>
         protected override void SetItem(int index, TValue item)
         {
             TValue oldItem;
@@ -470,6 +557,10 @@ namespace DataTools.Essentials.Observable
 
         #region INotifyCollectionChanged
 
+        /// <summary>
+        /// Fires the <see cref="CollectionChanged"/> event
+        /// </summary>
+        /// <param name="e"></param>
         protected void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             if (!noevent) CollectionChanged?.Invoke(this, e);
@@ -602,6 +693,9 @@ namespace DataTools.Essentials.Observable
             direction = ListSortDirection.Ascending;
         }
 
+        /// <summary>
+        /// Sort the contents of the collection
+        /// </summary>
         protected virtual void Sort()
         {
             if (!sorted) return;
@@ -625,6 +719,13 @@ namespace DataTools.Essentials.Observable
 
         #region Comparison
 
+        /// <summary>
+        /// Create a comparison method for the current <typeparamref name="TValue"/> type.
+        /// </summary>
+        /// <returns>A new comparison.</returns>
+        /// <remarks>
+        /// <typeparamref name="TValue"/> must implement <see cref="IComparable{T}"/> for this method to succeed.
+        /// </remarks>
         protected virtual Comparison<TValue> MakeComparison()
         {
             if (typeof(IComparable<TValue>).IsAssignableFrom(typeof(TValue)))
@@ -719,6 +820,14 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <summary>
+        /// Create a comparison method for the current <typeparamref name="TValue"/> type from the specified <paramref name="destProp"/> information.
+        /// </summary>
+        /// <param name="destProp">The destination property information.</param>
+        /// <returns></returns>
+        /// <remarks>
+        /// <typeparamref name="TValue"/> must implement <see cref="IComparable{T}"/> for this method to succeed.
+        /// </remarks>
         protected virtual Comparison<TValue> MakeComparison(PropertyInfo destProp)
         {
             var gt = typeof(IComparable).MakeGenericType(destProp.PropertyType);
@@ -782,6 +891,11 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <summary>
+        /// Make a comparison from an existing comparer
+        /// </summary>
+        /// <param name="comp">The comparer to convert</param>
+        /// <returns>A new comparison based on the existing comparer</returns>
         protected virtual Comparison<TValue> MakeComparison(IComparer<TValue> comp)
         {
             if (direction == ListSortDirection.Ascending)
@@ -800,6 +914,12 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <summary>
+        /// Gets the insert index for the specified item
+        /// </summary>
+        /// <param name="item">The item to calculate</param>
+        /// <param name="mustExist">True if the item must exist</param>
+        /// <returns>The index that the item most belongs at</returns>
         protected virtual int GetInsertIndex(TValue item, bool mustExist = false)
         {
             if (Count == 0) return 0;

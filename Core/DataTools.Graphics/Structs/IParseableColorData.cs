@@ -4,6 +4,9 @@ using System.Text;
 
 namespace DataTools.Graphics.Structs
 {
+    /// <summary>
+    /// Implements an interface for parseable color data
+    /// </summary>
     public interface IParseableColorData
     {
 #if NET7_0_OR_GREATER
@@ -11,6 +14,7 @@ namespace DataTools.Graphics.Structs
         /// <summary>
         /// Invoke the <see cref="Parse(string)"/> method for the specified object.
         /// </summary>
+        /// <param name="t">The type to parse</param>
         /// <param name="value"></param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
@@ -45,6 +49,7 @@ namespace DataTools.Graphics.Structs
         /// <summary>
         /// Invoke the <see cref="FromColor(UniColor)"/> method for the specified object.
         /// </summary>
+        /// <param name="t">The type of data to parse</param>
         /// <param name="value"></param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>

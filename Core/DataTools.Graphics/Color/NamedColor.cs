@@ -10,6 +10,9 @@ using static DataTools.Essentials.SortedLists.QuickSort;
 
 namespace DataTools.Graphics
 {
+    /// <summary>
+    /// Represents a named color that is present in one of the in-use catalogs
+    /// </summary>
     public class NamedColor
     {
         private static NamedColor[] catalog;
@@ -25,8 +28,17 @@ namespace DataTools.Graphics
         private string nidxstr;
         private string eidxstr;
 
+        /// <summary>
+        /// The default maximum deviation for fuzzy color matching
+        /// </summary>
         public static double DefaultMaxDeviation { get; set; } = 0.013;
 
+        /// <summary>
+        /// Find a named color that exactly matches the input color
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public static NamedColor FindColor(UniColor value, out int index)
         {
             NamedColor r;
@@ -35,6 +47,13 @@ namespace DataTools.Graphics
             return r;
         }
 
+        /// <summary>
+        /// Find a named color that exactly or inexactly matches the input color
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="closest">Closest named color within the threshold of <see cref="DefaultMaxDeviation"/>.</param>
+        /// <param name="useWebCatalog">True to use only the standard web-safe color catalog (and not the extended catalog)</param>
+        /// <returns></returns>
         public static NamedColor FindColor(UniColor value, bool closest = false, bool useWebCatalog = true)
         {
             var r = FindColor(value, out _);
@@ -47,6 +66,16 @@ namespace DataTools.Graphics
             return r;
         }
 
+        /// <summary>
+        /// Find a named color that exactly or inexactly matches the input color
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="maxDeviation">The maximum deviation for fuzzy color matching</param>
+        /// <param name="ignoreValue">True to ignore the Value component of HSV color data</param>
+        /// <param name="ignoreSaturation">True to ignore the Saturation component of HSV color data</param>
+        /// <param name="ignoreHue">True to ignore the Hue component of HSV color data</param>
+        /// <param name="useWebCatalog">True to use only the standard web-safe color catalog (and not the extended catalog)</param>
+        /// <returns>The closest matched color within the <paramref name="maxDeviation"/> threshold.</returns>
         public static NamedColor GetClosestColor(UniColor value, double? maxDeviation = null, bool ignoreValue = true, bool ignoreSaturation = false, bool ignoreHue = false, bool useWebCatalog = false)
         {
             var maxDev = maxDeviation ?? DefaultMaxDeviation;
@@ -106,6 +135,12 @@ namespace DataTools.Graphics
             return closest;
         }
 
+        /// <summary>
+        /// Search all catalogs for the specified named color
+        /// </summary>
+        /// <param name="search">The text to search for in the color catalogs</param>
+        /// <param name="includeWebCat">True to include the standard web-safe color catalog</param>
+        /// <returns>A list of possible matches</returns>
         public static List<NamedColor> SearchAll(string search, bool includeWebCat = true)
         {
             List<NamedColor> output = new List<NamedColor>();
@@ -135,6 +170,13 @@ namespace DataTools.Graphics
             return output;
         }
 
+        /// <summary>
+        /// Search all catalogs for the specified named color
+        /// </summary>
+        /// <param name="search">The text to search for in the color catalogs</param>
+        /// <param name="anywhere">True to search anywhere in the text of the color names (otherwise a starts-with strategy is used)</param>
+        /// <param name="includeWebCat">True to include the standard web-safe color catalog</param>
+        /// <returns>A list of possible matches</returns>
         public static List<NamedColor> SearchByName(string search, bool anywhere = false, bool includeWebCat = true)
         {
             List<NamedColor> output = new List<NamedColor>();
@@ -182,6 +224,16 @@ namespace DataTools.Graphics
             return output;
         }
 
+        /// <summary>
+        /// Search all catalogs for the specified text anywhere in extra data
+        /// </summary>
+        /// <param name="search">The text to search for in extra data</param>
+        /// <param name="anywhere">True to search anywhere in the text of the color names (otherwise a starts-with strategy is used)</param>
+        /// <param name="includeWebCat">True to include the standard web-safe color catalog</param>
+        /// <returns>A list of possible matches</returns>
+        /// <remarks>
+        /// Search extra data to limit matches to a specific color source or type
+        /// </remarks>
         public static List<NamedColor> SearchByExtra(string search, bool anywhere = false, bool includeWebCat = true)
         {
             List<NamedColor> output = new List<NamedColor>();
@@ -234,7 +286,7 @@ namespace DataTools.Graphics
         }
 
         /// <summary>
-        /// Gets the extensive catalog.
+        /// Gets the complete catalog of colors known to this application.
         /// </summary>
         public static IReadOnlyList<NamedColor> Catalog
         {
@@ -245,7 +297,7 @@ namespace DataTools.Graphics
         }
 
         /// <summary>
-        /// Gets the Web Color extended catalog.
+        /// Gets the standard web-safe color catalog.
         /// </summary>
         public static IReadOnlyList<NamedColor> WebCatalog
         {
@@ -261,6 +313,12 @@ namespace DataTools.Graphics
             if (webCatalog == null) webCatalog = LoadColors(AppResources.WebPalette, false);
         }
 
+        /// <summary>
+        /// Load colors from a string resoruces
+        /// </summary>
+        /// <param name="resource"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
         public static NamedColor[] LoadColors(string resource, bool sort)
         {
             NamedColor[] newcat;
@@ -305,6 +363,9 @@ namespace DataTools.Graphics
             return newcat;
         }
 
+        /// <summary>
+        /// Gets the color value of this named color
+        /// </summary>
         public UniColor Color
         {
             get => color;
@@ -314,6 +375,9 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets the name of this color
+        /// </summary>
         public string Name
         {
             get => name;
@@ -323,6 +387,9 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// Gets extra info and metadata for this color
+        /// </summary>
         public string ExtraInfo
         {
             get => extraInfo;
@@ -332,6 +399,7 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             if (extraInfo != null)
@@ -344,6 +412,12 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// Create a new named color
+        /// </summary>
+        /// <param name="name">The color name</param>
+        /// <param name="color">The color value</param>
+        /// <param name="extra">Extra data and metadata</param>
         public NamedColor(string name, UniColor color, string extra = null)
         {
             Name = name;
@@ -351,6 +425,11 @@ namespace DataTools.Graphics
             ExtraInfo = extra;
         }
 
+        /// <summary>
+        /// Create a new color without a name
+        /// </summary>
+        /// <param name="color">The color value</param>
+        /// <param name="extra">Extra data and metadata</param>
         public NamedColor(UniColor color, string extra = null)
         {
             Name = color.ToString("whr");
@@ -358,11 +437,19 @@ namespace DataTools.Graphics
             extraInfo = extra;
         }
 
+        /// <summary>
+        /// Cast this object to a <see cref="System.Drawing.Color"/> structure
+        /// </summary>
+        /// <param name="c"></param>
         public static implicit operator System.Drawing.Color(NamedColor c)
         {
             return c.Color;
         }
 
+        /// <summary>
+        /// Cast this object to a <see cref="UniColor"/> structure.
+        /// </summary>
+        /// <param name="c"></param>
         public static implicit operator UniColor(NamedColor c)
         {
             return c.Color;

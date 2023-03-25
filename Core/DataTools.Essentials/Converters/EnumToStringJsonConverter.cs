@@ -10,6 +10,10 @@ using System.Text;
 
 namespace DataTools.Essentials.Converters
 {
+    /// <summary>
+    /// Converts an enum to and from string for JSON parsing.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     [Obsolete("Use EnumToStringJsonConverter<T> instead.")]
     public class EnumToStringConverter<T> : EnumToStringJsonConverter<T> where T : struct, Enum
     {
@@ -21,21 +25,29 @@ namespace DataTools.Essentials.Converters
     /// <typeparam name="T"></typeparam>
     public class EnumToStringJsonConverter<T> : JsonConverter<T> where T : struct, Enum
     {
+        /// <inheritdoc/>
         public override T ReadJson(JsonReader reader, Type objectType, T existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             return GetEnumValue<T>((string)reader.Value);
         }
 
+        /// <inheritdoc/>
         public override void WriteJson(JsonWriter writer, T value, JsonSerializer serializer)
         {
             writer.WriteValue(EnumInfo.GetEnumName(value));
         }
 
-        public static U GetEnumValue<U>(string obj) where U : struct, Enum
+        /// <summary>
+        /// Parse an enum value from the specified string
+        /// </summary>
+        /// <typeparam name="U">The type of the enum to parse.</typeparam>
+        /// <param name="text">The string to parse</param>
+        /// <returns></returns>
+        public static U GetEnumValue<U>(string text) where U : struct, Enum
         {
             var fis = typeof(U).GetFields(BindingFlags.Public | BindingFlags.Static);
 
-            if (Enum.TryParse<U>(obj, out var answer))
+            if (Enum.TryParse<U>(text, out var answer))
             {
                 return answer;
             }
@@ -44,28 +56,28 @@ namespace DataTools.Essentials.Converters
             {
                 var sampleValue = (U)fi.GetValue(null);
 
-                if (fi.Name?.ToLower() == obj?.ToLower())
+                if (fi.Name?.ToLower() == text?.ToLower())
                 {
                     return sampleValue;
                 }
 
                 var ema = fi.GetCustomAttribute<EnumMemberAttribute>();
 
-                if (ema != null && ema.Value?.ToLower() == obj?.ToLower())
+                if (ema != null && ema.Value?.ToLower() == text?.ToLower())
                 {
                     return sampleValue;
                 }
 
                 var jp = fi.GetCustomAttribute<JsonPropertyAttribute>();
 
-                if (jp != null && jp.PropertyName?.ToLower() == obj?.ToLower())
+                if (jp != null && jp.PropertyName?.ToLower() == text?.ToLower())
                 {
                     return sampleValue;
                 }
 
                 var de = fi.GetCustomAttribute<DescriptionAttribute>();
 
-                if (de != null && de.Description?.ToLower() == obj?.ToLower())
+                if (de != null && de.Description?.ToLower() == text?.ToLower())
                 {
                     return sampleValue;
                 }

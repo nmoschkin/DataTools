@@ -11,11 +11,29 @@ using System.Threading.Tasks;
 
 namespace DataTools.Graphics
 {
+    /// <summary>
+    /// Origin corner
+    /// </summary>
     public enum StartCorner
     {
+        /// <summary>
+        /// North west quadrant
+        /// </summary>
         NorthWest,
+
+        /// <summary>
+        /// Northeast quadrant
+        /// </summary>
         NorthEast,
+
+        /// <summary>
+        /// Southwest quadrant
+        /// </summary>
         SouthWest,
+
+        /// <summary>
+        /// Southeast quadrant
+        /// </summary>
         SouthEast
     }
 
@@ -59,8 +77,14 @@ namespace DataTools.Graphics
         /// </summary>
         HueBarVertical = 6,
 
+        /// <summary>
+        /// A 2D hue-only color gamut (no saturation gradient)
+        /// </summary>
         HueBoxHorizontal = 7,
 
+        /// <summary>
+        /// A 2D hue-only color gamut (no saturation gradient)
+        /// </summary>
         HueBoxVertical = 8
     }
 
@@ -142,13 +166,6 @@ namespace DataTools.Graphics
         /// <remarks>
         /// This image should never be resized, stretched or transformed in any way.</remarks>
         public SKImage Bitmap { get; private set; }
-
-        public async Task Render()
-        {
-            await Task.Run(() =>
-            {
-            });
-        }
 
         private void ToBitmap()
         {

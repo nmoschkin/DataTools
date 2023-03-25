@@ -8,13 +8,21 @@ namespace DataTools.Essentials.Observable
     /// </summary>
     public abstract class SyncObservableBase : ObservableBase
     {
+        /// <summary>
+        /// The current synchronizer
+        /// </summary>
         protected readonly ISynchronizer sync;
 
+        /// <summary>
+        /// Create a new synchronizer from the specified synchronizer
+        /// </summary>
+        /// <param name="sync"></param>
         public SyncObservableBase(ISynchronizer sync)
         {
             this.sync = sync;
         }
 
+        /// <inheritdoc/>
         protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             if (sync != null && sync.CanPost)
@@ -30,6 +38,7 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <inheritdoc/>
         protected override bool OnPropertyChanging([CallerMemberName] string propertyName = null)
         {
             if (sync != null && sync.CanSend)

@@ -69,6 +69,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
             }
         }
 
+        /// <inheritdoc/>
         public override string ProvideDescription(T value)
         {
             descriptions.TryGetValue(value, out var description);

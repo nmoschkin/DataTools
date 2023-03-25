@@ -271,7 +271,7 @@ namespace DataTools.Console
         /// <remarks>
         /// This function works best if you know about how long to expect your strings are going to be, with regularity.<br />
         /// <br />
-        /// If the input <paramref name="str"/> is longer than <paramref name="length"/>, and <paramref name="truncate"/> is not set to <see cref="true"/>, then the string will not be truncated, and will be returned unaltered.
+        /// If the input <paramref name="str"/> is longer than <paramref name="length"/>, and <paramref name="truncate"/> is not set to true, then the string will not be truncated, and will be returned unaltered.
         /// </remarks>
         public static string FixedText(string str, int length, bool truncate = false)
         {
@@ -320,8 +320,10 @@ namespace DataTools.Console
         }
 
 #if NET5_0_OR_GREATER
+        /// <inheritdoc/>
         public override bool Equals([NotNullWhen(true)] object obj)
 #else
+        /// <inheritdoc/>
         public override bool Equals(object obj)
 #endif
         {
@@ -336,31 +338,37 @@ namespace DataTools.Console
             return base.Equals(obj);
         }
 
+        /// <inheritdoc/>
         public bool Equals(TableContext obj)
         {
             return obj.Guid == Guid;
         }
 
+        /// <inheritdoc/>
         public int CompareTo(TableContext other)
         {
             return Guid.CompareTo(other.Guid);
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return Guid.GetHashCode();
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return Guid.ToString("d");
         }
 
+        /// <inheritdoc/>
         public static bool operator ==(TableContext left, TableContext right)
         {
             return left.Equals(right);
         }
 
+        /// <inheritdoc/>
         public static bool operator !=(TableContext left, TableContext right)
         {
             return !left.Equals(right);

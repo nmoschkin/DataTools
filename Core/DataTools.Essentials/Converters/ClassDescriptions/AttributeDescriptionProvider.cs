@@ -16,6 +16,9 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
     /// </remarks>
     public class AttributeDescriptionProvider<T> : DescriptionProviderBase<T>
     {
+        /// <summary>
+        /// Gets or sets the <see cref="TextLoadType"/> for the current attribute description provider.
+        /// </summary>
         public TextLoadType LoadType { get; set; } = TextLoadType.NoPreference;
 
         /// <summary>
@@ -32,6 +35,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             PropertyName = propertyName;
         }
 
+        /// <inheritdoc/>
         public override string ProvideDescription(T value)
         {
             return ClassInfo.GetPropertyDescription(value, PropertyName);
@@ -48,6 +52,9 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
     /// </remarks>
     public class AttributeDescriptionProvider : DescriptionProviderBase
     {
+        /// <summary>
+        /// Gets or sets the <see cref="TextLoadType"/> for the current attribute description provider.
+        /// </summary>
         public TextLoadType LoadType { get; set; } = TextLoadType.NoPreference;
 
         /// <summary>
@@ -64,11 +71,13 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             PropertyName = propertyName;
         }
 
+        /// <inheritdoc/>
         public override string ProvideDescription(object value)
         {
             return ClassInfo.GetPropertyDescription(value, PropertyName);
         }
 
+        /// <inheritdoc/>
         public override bool CanConvertType(Type type)
         {
             return true;

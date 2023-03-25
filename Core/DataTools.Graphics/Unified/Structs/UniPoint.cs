@@ -19,6 +19,9 @@ namespace DataTools.Graphics
         private double _x;
         private double _y;
 
+        /// <summary>
+        /// The X (horizontal) coordinate
+        /// </summary>
         public double X
         {
             get
@@ -32,6 +35,9 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// The Y (vertical) coordinate
+        /// </summary>
         public double Y
         {
             get
@@ -45,24 +51,43 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// Initialize a new <see cref="UniPoint"/> structure
+        /// </summary>
+        /// <param name="p"></param>
         public UniPoint(Point p)
         {
             _x = p.X;
             _y = p.Y;
         }
 
+        /// <summary>
+        /// Initialize a new <see cref="UniPoint"/> structure
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public UniPoint(int x, int y)
         {
             _x = x;
             _y = y;
         }
 
+        /// <summary>
+        /// Initialize a new <see cref="UniPoint"/> structure
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public UniPoint(float x, float y)
         {
             _x = x;
             _y = y;
         }
 
+        /// <summary>
+        /// Initialize a new <see cref="UniPoint"/> structure
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public UniPoint(double x, double y)
         {
             _x = x;
@@ -307,66 +332,79 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return string.Format("{0}, {1}", X, Y);
         }
 
+        /// <inheritdoc/>
         public static explicit operator PointF(UniPoint operand)
         {
             return new PointF((float)operand.X, (float)operand.Y);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniPoint(PointF operand)
         {
             return new UniPoint(operand.X, operand.Y);
         }
 
+        /// <inheritdoc/>
         public static explicit operator Point(UniPoint operand)
         {
             return new Point((int)operand.X, (int)operand.Y);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniPoint(Point operand)
         {
             return new UniPoint(operand);
         }
 
+        /// <inheritdoc/>
         public static implicit operator (double, double)(UniPoint operand)
         {
             return (operand._x, operand._y);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniPoint((double, double) operand)
         {
             return new UniPoint(operand.Item1, operand.Item2);
         }
 
+        /// <inheritdoc/>
         public static explicit operator (float, float)(UniPoint operand)
         {
             return ((float)operand._x, (float)operand._y);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniPoint((float, float) operand)
         {
             return new UniPoint(operand.Item1, operand.Item2);
         }
 
+        /// <inheritdoc/>
         public static explicit operator (int, int)(UniPoint operand)
         {
             return ((int)operand._x, (int)operand._y);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniPoint((int, int) operand)
         {
             return new UniPoint(operand.Item1, operand.Item2);
         }
 
+        /// <inheritdoc/>
         public static implicit operator LinearCoordinates(UniPoint point)
         {
             return new LinearCoordinates(point._x, point._y);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniPoint(LinearCoordinates coordinates)
         {
             return new UniPoint(coordinates.X, coordinates.Y);
