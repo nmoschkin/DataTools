@@ -119,6 +119,12 @@ namespace DataTools.Windows.Essentials.Settings
             return $"Software\\{author}\\{program}" + (version != null ? "\\" + version : "");
         }        
         
+        /// <summary>
+        /// Generate a base key name from an author and <see cref="Assembly"/> information
+        /// </summary>
+        /// <param name="author">The author/company</param>
+        /// <param name="assembly">The assembly</param>
+        /// <returns></returns>
         public static string GenerateBaseKeyName(string author, Assembly assembly)
         {
             var nm = AssemblyName.GetAssemblyName(assembly.Location);
@@ -151,7 +157,12 @@ namespace DataTools.Windows.Essentials.Settings
             return settings.ToList();
         }
 
-        private List<string> GetSettings(string key = null)
+        /// <summary>
+        /// Enumerate the settings for the specified relative key (no paths)
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        protected List<string> GetSettings(string key = null)
         {
             key = key ?? BaseKey;
             var l = new List<string>();
@@ -181,7 +192,13 @@ namespace DataTools.Windows.Essentials.Settings
             return l;
         }
 
-        private RegistryKey OpenKeyForSetting(string path, out string keyName)
+        /// <summary>
+        /// Opens the key for the setting at the specified <paramref name="path"/>
+        /// </summary>
+        /// <param name="path">The key of the registry key to open (relative to <see cref="BaseKey"/>)</param>
+        /// <param name="keyName">Receives the name of the key to use to read and write the value</param>
+        /// <returns>A <see cref="RegistryKey"/> object</returns>
+        protected RegistryKey OpenKeyForSetting(string path, out string keyName)
         {
             path = path.Replace("/", "\\");
 
@@ -219,6 +236,11 @@ namespace DataTools.Windows.Essentials.Settings
         {
         }
 
+        /// <summary>
+        /// Create a new registry settings object
+        /// </summary>
+        /// <param name="author">The author/company name</param>
+        /// <param name="assembly">The assembly</param>
         public RegistrySettings(string author, Assembly assembly) : this(GenerateBaseKeyName(author, assembly))
         {
         }
@@ -478,7 +500,7 @@ namespace DataTools.Windows.Essentials.Settings
         /// <param name="regKey">The registry key instance (must be open for write)</param>
         /// <param name="valueName">The name of the value to write (no paths allowed)</param>
         /// <param name="value">The value to write</param>
-        protected void SetRegValue(Type type, RegistryKey regKey, string valueName, object value)
+        protected virtual void SetRegValue(Type type, RegistryKey regKey, string valueName, object value)
         {
             if (value != default && value.GetType() != type) throw new ArgumentException("Type of value parameter does not match type parameter");
 
@@ -549,7 +571,7 @@ namespace DataTools.Windows.Essentials.Settings
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="ArgumentException"></exception>
-        protected object GetRegValue(Type type, RegistryKey reg, string valueName, object defaultValue = default) 
+        protected virtual object GetRegValue(Type type, RegistryKey reg, string valueName, object defaultValue = default) 
         {
             if (defaultValue != default && defaultValue.GetType() != type) throw new ArgumentException("Type of defaultValue parameter does not match type parameter");
 
