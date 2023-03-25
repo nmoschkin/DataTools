@@ -4,10 +4,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1069</AssemblyVersion>
-    <FileVersion>8.0.0.1069</FileVersion>
+    <AssemblyVersion>8.0.0.1070</AssemblyVersion>
+    <FileVersion>8.0.0.1070</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1069</Version>
+    <Version>8.0.0.1070</Version>
     <Product>DataTools Win32 TrueType Font Reader Library</Product>
     <Description>DataTools Win32 TrueType Font Reader Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -23,7 +23,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1068</PreviousVersion>
+    <PreviousVersion>8.0.0.1069</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
