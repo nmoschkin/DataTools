@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DataTools.Essentials.Settings
 {
@@ -7,6 +8,10 @@ namespace DataTools.Essentials.Settings
     /// </summary>
     public abstract class SettingsBase : ISettings
     {
+        /// <summary>
+        /// The <see cref="Uri"/> for the location of storage persistence
+        /// </summary>
+        protected Uri location;
 
         /// <summary>
         /// Gets or sets the list of converters that will be used.
@@ -16,10 +21,24 @@ namespace DataTools.Essentials.Settings
         /// <summary>
         /// Create a new settings class
         /// </summary>
+        /// <param name="location">The location of the persisted storage</param>
+        /// <param name="atomic">True if the settings can be read and written individually.</param>
+        /// <param name="converters">Optional list of converters that will be used.</param>
+        public SettingsBase(Uri location, bool atomic, IEnumerable<SettingsTypeConverter> converters = null)
+        {            
+            this.location = location;
+            if (converters != null) Converters = new List<SettingsTypeConverter>(converters);
+            Atomic = atomic;
+        }
+
+        /// <summary>
+        /// Create a new settings class
+        /// </summary>
         /// <param name="atomic">True if the settings can be read and written individually.</param>
         /// <param name="converters">Optional list of converters that will be used.</param>
         public SettingsBase(bool atomic, IEnumerable<SettingsTypeConverter> converters = null)
-        {            
+        {
+            this.location = null;
             if (converters != null) Converters = new List<SettingsTypeConverter>(converters);
             Atomic = atomic;
         }
@@ -39,6 +58,9 @@ namespace DataTools.Essentials.Settings
 
         /// <inheritdoc/>
         public abstract bool CanClearSettings { get; }
+
+        /// <inheritdoc/>
+        public virtual Uri Location => location;
 
         /// <inheritdoc/>
         public abstract object this[string key] { get; set; }
@@ -81,6 +103,12 @@ namespace DataTools.Essentials.Settings
 
         /// <inheritdoc/>
         public abstract bool ClearSettings();
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            return Location?.ToString() ?? base.ToString();
+        }
     }
 
 }

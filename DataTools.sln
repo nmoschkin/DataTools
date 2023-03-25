@@ -86,7 +86,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		bump_version.bat = bump_version.bat
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataTools.Windows.Essentials", "Windows\DataTools.Windows.Essentials\DataTools.Windows.Essentials.csproj", "{C552569F-D6F5-47FD-846A-46BA2BF3A341}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataTools.Windows.Essentials", "Windows\DataTools.Windows.Essentials\DataTools.Windows.Essentials.csproj", "{C552569F-D6F5-47FD-846A-46BA2BF3A341}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1286,7 +1286,7 @@ Global
 		{D8A9413D-9EB8-40B6-95C1-72889F881FD5} = {7E237DD5-AFD8-4B9A-A6EC-5698E712BD8D}
 		{B95DAAF1-52CF-4B53-B80D-406ACE01400B} = {7E237DD5-AFD8-4B9A-A6EC-5698E712BD8D}
 		{765E0DA6-6403-4A96-AE3E-507C9DAE7852} = {7E237DD5-AFD8-4B9A-A6EC-5698E712BD8D}
-		{C552569F-D6F5-47FD-846A-46BA2BF3A341} = {E76B6661-6CD2-4FC3-ABEF-D16BC49E1922}
+		{C552569F-D6F5-47FD-846A-46BA2BF3A341} = {F99203B8-03CA-4FB4-8879-AB0C0CA72D33}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {230C9A7B-0389-4BB4-990E-B2CC865D8DFD}

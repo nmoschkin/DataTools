@@ -145,6 +145,11 @@ namespace DataTools.Essentials.Settings
         /// True if the settings can be read and written individually.
         /// </summary>
         bool Atomic { get; }
+
+        /// <summary>
+        /// Gets a <see cref="Uri"/> instance that specifies the persisted location for settings
+        /// </summary>
+        Uri Location { get; }
     }
 
 }

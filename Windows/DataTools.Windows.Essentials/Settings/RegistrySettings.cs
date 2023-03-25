@@ -16,87 +16,14 @@ namespace DataTools.Windows.Essentials.Settings
 {
 
     /// <summary>
-    /// Represents a registry setting
-    /// </summary>
-    public class RegistrySetting : ProgramSetting
-    {
-
-        /// <inheritdoc/>
-        public RegistrySetting(string key, object value, ISettings parent) : base(key, value, parent)
-        {
-        }
-
-        /// <inheritdoc/>
-        public override object Value
-        {
-            get
-            {
-                if (TryGetParent(out var parent))
-                {
-                    base.Value = parent.GetValue<object>(Key);
-                }
-                return base.Value;
-            }
-            set
-            {
-                base.Value = value;
-
-                if (TryGetParent(out var parent))
-                {
-                    parent.SetSetting(this);
-                }
-            }
-        }
-
-    }
-
-    /// <summary>
-    /// Represents a registry setting
-    /// </summary>
-    public class RegistrySetting<T> : ProgramSetting<T>
-    {
-
-        /// <inheritdoc/>
-        public RegistrySetting(string key, T value, ISettings parent) : base(key, value, parent)
-        {
-        }
-
-        /// <inheritdoc/>
-        public override T Value
-        {
-            get
-            {
-                if (base.Value == null)
-                {
-                    if (TryGetParent(out var parent))
-                    {
-                        base.Value = parent.GetValue<T>(Key);
-                    }
-                }
-
-                return base.Value;
-            }
-            set
-            {
-                base.Value = value;
-
-                if (TryGetParent(out var parent))
-                {
-                    parent.SetValue(Key, base.Value);
-                }
-            }
-        }
-
-    }
-
-    /// <summary>
     /// Registry-based application settings
     /// </summary>
     public class RegistrySettings : SettingsBase
     {
-        private string baseKey;
-
-        private List<ISetting> settings = new List<ISetting>();
+        /// <summary>
+        /// Gets the current working Registry Hive
+        /// </summary>
+        protected readonly RegistryKey Hive;
 
         private readonly Type[] parseables = new Type[]
         {
@@ -107,123 +34,53 @@ namespace DataTools.Windows.Essentials.Settings
             typeof(decimal)
         };
 
+        private string baseKey;
+        private List<ISetting> settings = new List<ISetting>();
         /// <summary>
-        /// Generate a base key name based on the specified information.
+        /// Create a new registry settings object
         /// </summary>
-        /// <param name="author">The author/company name</param>
-        /// <param name="program">The application name</param>
-        /// <param name="version">Optional version</param>
-        /// <returns></returns>
-        public static string GenerateBaseKeyName(string author, string program, string version = null)
+        /// <param name="baseKey">The base key</param>
+        public RegistrySettings(string baseKey) : this(RegistryHive.CurrentUser, baseKey)
         {
-            return $"Software\\{author}\\{program}" + (version != null ? "\\" + version : "");
-        }        
-        
-        /// <summary>
-        /// Generate a base key name from an author and <see cref="Assembly"/> information
-        /// </summary>
-        /// <param name="author">The author/company</param>
-        /// <param name="assembly">The assembly</param>
-        /// <returns></returns>
-        public static string GenerateBaseKeyName(string author, Assembly assembly)
-        {
-            var nm = AssemblyName.GetAssemblyName(assembly.Location);
-            return GenerateBaseKeyName(author, nm.Name, nm.Version?.ToString());
-        }
-
-        /// <summary>
-        /// Refresh the settings list from the registry.
-        /// </summary>
-        /// <returns></returns>
-        public IList<ISetting> Refresh()
-        {
-            var regsets = GetSettings();
-            settings.Clear();
-
-            foreach (var k in regsets)
-            {
-                var key = k;
-
-                if (key.StartsWith(BaseKey))
-                {
-                    key = key.Substring(BaseKey.Length);
-
-                }
-                
-                var s = new RegistrySetting(key, null, this);
-                settings.Add(s);
-            }
-
-            return settings.ToList();
-        }
-
-        /// <summary>
-        /// Enumerate the settings for the specified relative key (no paths)
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <returns></returns>
-        protected List<string> GetSettings(string key = null)
-        {
-            key = key ?? BaseKey;
-            var l = new List<string>();
-            var r = new List<string>();
-
-            using (var reg = Registry.CurrentUser.CreateSubKey(key))
-            {
-                var sks = reg.GetSubKeyNames();
-                var vals = reg.GetValueNames();
-
-                foreach (var val in vals)
-                {
-                    l.Add($"{key}\\{val}");
-                }
-
-                foreach (var sk in sks)
-                {
-                    r.Add($"{key}\\{sk}");
-                }
-            }
-
-            foreach (var k in r)
-            {
-                l.AddRange(GetSettings(k));  
-            }
-
-            return l;
-        }
-
-        /// <summary>
-        /// Opens the key for the setting at the specified <paramref name="path"/>
-        /// </summary>
-        /// <param name="path">The key of the registry key to open (relative to <see cref="BaseKey"/>)</param>
-        /// <param name="keyName">Receives the name of the key to use to read and write the value</param>
-        /// <returns>A <see cref="RegistryKey"/> object</returns>
-        protected RegistryKey OpenKeyForSetting(string path, out string keyName)
-        {
-            path = path.Replace("/", "\\");
-
-            var kn = Path.GetFileName(path);
-            var pt = Path.GetDirectoryName(path);
-
-            keyName = kn;
-
-            if (string.IsNullOrEmpty(pt))
-            {
-                return Registry.CurrentUser.CreateSubKey(BaseKey);
-            }
-            else
-            {
-                return Registry.CurrentUser.CreateSubKey(BaseKey + "\\" + pt);
-            }
         }
 
         /// <summary>
         /// Create a new registry settings object
         /// </summary>
+        /// <param name="hive">The desired hive</param>
         /// <param name="baseKey">The base key</param>
-        public RegistrySettings(string baseKey) : base(true)
+        public RegistrySettings(RegistryHive hive, string baseKey) : base(true)
         {
+            RegistryKey openHive;
+
+            switch (hive)
+            {
+                case RegistryHive.LocalMachine:
+                    openHive = Registry.LocalMachine;
+                    break;
+
+                case RegistryHive.CurrentConfig:
+                    openHive = Registry.CurrentConfig;
+                    break;
+
+                case RegistryHive.ClassesRoot:
+                    openHive = Registry.ClassesRoot;
+                    break;
+
+                case RegistryHive.Users:
+                    openHive = Registry.Users;
+                    break;
+
+                case RegistryHive.CurrentUser:
+                default:
+                    openHive = Registry.CurrentUser;
+                    break;
+            }
+
+            Hive = openHive;
+
             this.baseKey = baseKey;
+            this.location = new Uri($"resource://{Hive.Name}\\{baseKey}");
         }
 
         /// <summary>
@@ -251,15 +108,6 @@ namespace DataTools.Windows.Essentials.Settings
         public string BaseKey => baseKey;
 
         /// <inheritdoc/>
-        public override object this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-        /// <inheritdoc/>
-        public override bool CanRemoveSettings => true;
-
-        /// <inheritdoc/>
-        public override bool CanCreateSettings => true;
-
-        /// <inheritdoc/>
         public override bool CanAddSettings => true;
 
         /// <inheritdoc/>
@@ -268,22 +116,59 @@ namespace DataTools.Windows.Essentials.Settings
         /// <inheritdoc/>
         public override bool CanClearSettings => true;
 
+        /// <inheritdoc/>
+        public override bool CanCreateSettings => true;
+
+        /// <inheritdoc/>
+        public override bool CanRemoveSettings => true;
+
+        /// <summary>
+        /// Gets the name of the current registry hive
+        /// </summary>
+        public string CurrentHive => Hive.Name;
+
+        /// <inheritdoc/>
+        public override object this[string key] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        /// <summary>
+        /// Generate a base key name based on the specified information.
+        /// </summary>
+        /// <param name="author">The author/company name</param>
+        /// <param name="program">The application name</param>
+        /// <param name="version">Optional version</param>
+        /// <returns></returns>
+        public static string GenerateBaseKeyName(string author, string program, string version = null)
+        {
+            return $"Software\\{author}\\{program}" + (version != null ? "\\" + version : "");
+        }        
+        
+        /// <summary>
+        /// Generate a base key name from an author and <see cref="Assembly"/> information
+        /// </summary>
+        /// <param name="author">The author/company</param>
+        /// <param name="assembly">The assembly</param>
+        /// <returns></returns>
+        public static string GenerateBaseKeyName(string author, Assembly assembly)
+        {
+            var nm = AssemblyName.GetAssemblyName(assembly.Location);
+            return GenerateBaseKeyName(author, nm.Name, nm.Version?.ToString());
+        }
 
         /// <inheritdoc/>
         public override bool ClearSettings()
         {
             var settings = GetSettings();
-            
+
             settings.Clear();
 
             try
-            {                
-                using (var reg = Registry.CurrentUser.OpenSubKey(BaseKey, true))
+            {
+                using (var regKey = Hive.OpenSubKey(BaseKey, true))
                 {
-                    DeleteKey(reg);
+                    DeleteKey(regKey);
                 }
 
-                Registry.CurrentUser.DeleteSubKey(BaseKey);
+                Hive.DeleteSubKey(BaseKey);
                 return true;
             }
             catch
@@ -292,27 +177,12 @@ namespace DataTools.Windows.Essentials.Settings
             }
         }
 
-        private void DeleteKey(RegistryKey regKey)
-        {
-            var sks = regKey.GetSubKeyNames();
-
-            foreach (var sk in sks)
-            {
-                using (var ssb = regKey.OpenSubKey(sk, true))
-                {
-                    DeleteKey(ssb);
-                }
-                
-                regKey.DeleteSubKey(sk);
-            }
-        }
-
         /// <inheritdoc/>
         public override bool ContainsKey(string key)
         {
-            using (var reg = OpenKeyForSetting(key, out var useKey))
+            using (var regKey = OpenKeyForSetting(key, out var useKey))
             {
-                var vals = reg.GetValueNames();
+                var vals = regKey.GetValueNames();
                 return vals.Contains(useKey);
             }
         }
@@ -379,7 +249,7 @@ namespace DataTools.Windows.Essentials.Settings
         public override ISetting<T> GetSetting<T>(string key)
         {
             var ts = settings.Where(x => x.Key == key).FirstOrDefault();
-            
+
             if (ts != null)
             {
                 if (ts is RegistrySetting<T> rtz)
@@ -412,6 +282,32 @@ namespace DataTools.Windows.Essentials.Settings
             return OpenGetRegValue<T>(key, defaultValue);
         }
 
+        /// <summary>
+        /// Refresh the settings list from the registry.
+        /// </summary>
+        /// <returns></returns>
+        public IList<ISetting> Refresh()
+        {
+            var regsets = GetSettings();
+            settings.Clear();
+
+            foreach (var k in regsets)
+            {
+                var key = k;
+
+                if (key.StartsWith(BaseKey))
+                {
+                    key = key.Substring(BaseKey.Length);
+
+                }
+                
+                var s = new RegistrySetting(key, null, this);
+                settings.Add(s);
+            }
+
+            return settings.ToList();
+        }
+
         /// <inheritdoc/>
         public override bool Remove(ISetting setting)
         {
@@ -437,11 +333,11 @@ namespace DataTools.Windows.Essentials.Settings
         /// <inheritdoc/>
         public override bool RemoveKey(string key)
         {
-            using(var reg = OpenKeyForSetting(key, out var useKey))
+            using (var regKey = OpenKeyForSetting(key, out var useKey))
             {
                 try
                 {
-                    reg.DeleteValue(useKey, true);
+                    regKey.DeleteValue(useKey, true);
                     var ts = settings.Where(x => x.Key == key).FirstOrDefault();
 
                     if (ts != null)
@@ -451,7 +347,7 @@ namespace DataTools.Windows.Essentials.Settings
 
                     return true;
                 }
-                catch { return false; }                
+                catch { return false; }
             }
         }
 
@@ -479,6 +375,203 @@ namespace DataTools.Windows.Essentials.Settings
             OpenSetRegValue(key, value);
         }
 
+        /// <inheritdoc/>
+        public override string ToString() => Location.ToString();
+
+        /// <summary>
+        /// Get the registry value from the specified open registry key with the specified type
+        /// </summary>
+        /// <param name="type">The type of value to retrieve</param>
+        /// <param name="regKey">The open registry key to read the value from</param>
+        /// <param name="valueName">The value name (no paths)</param>
+        /// <param name="defaultValue">An optional default value to return if no value is found</param>
+        /// <returns>A value if found, or <paramref name="defaultValue"/>.</returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        protected virtual object GetRegValue(Type type, RegistryKey regKey, string valueName, object defaultValue = default)
+        {
+            if (defaultValue != default && defaultValue.GetType() != type) throw new ArgumentException("Type of defaultValue parameter does not match type parameter");
+
+            if (type == typeof(Guid))
+            {
+                Guid gu = (Guid)(defaultValue ?? Guid.Empty);
+                var str = gu.ToString("d");
+                gu = Guid.Parse((string)regKey.GetValue(valueName, str));
+                return gu;
+            }
+            else if (type == typeof(DateTime))
+            {
+                DateTime dt = (DateTime)(defaultValue ?? DateTime.MinValue);
+
+                var str = dt.ToString("O");
+                dt = DateTime.Parse((string)regKey.GetValue(valueName, str));
+                return dt;
+            }
+            else if (type == typeof(System.Drawing.Color))
+            {
+                System.Drawing.Color c = (System.Drawing.Color)(defaultValue ?? System.Drawing.Color.Empty);
+
+                var str = PrintArgb(c.A, c.R, c.G, c.B);
+                byte a, r, g, b;
+
+                str = (string)regKey.GetValue(valueName, str);
+                GetArgb(str, out a, out r, out g, out b);
+                c = System.Drawing.Color.FromArgb(a, r, g, b);
+                return c;
+            }
+            else if (type.GetInterfaces().Where(x => x.Name.Contains("ICollection`1")).Any() || type.GetInterfaces().Where(x => x.Name.Contains("IList`1")).Any())
+            {
+                var it = type.GetInterfaces().Where(x => x.Name.Contains("IEnumerable`1")).First();
+                var gt = it.GetGenericArguments().FirstOrDefault();
+
+                if (gt == typeof(string))
+                {
+                    string[] data = null;
+
+                    if (defaultValue is IEnumerable<string> isu)
+                    {
+                        data = isu.ToArray();
+                    }
+
+                    data = (string[])regKey.GetValue(valueName, data);
+
+                    if (type == typeof(string[])) return data;
+                    object outlist;
+
+                    try
+                    {
+                        outlist = Activator.CreateInstance(type, new object[] { data });
+                        if (outlist != null) return outlist;
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            outlist = Activator.CreateInstance(type);
+                        }
+                        catch
+                        {
+                            outlist = null;
+                        }
+                    }
+
+                    if (outlist == null) throw new InvalidOperationException("Cannot create instance of " + type.FullName);
+
+                    var amt = type.GetMethod("Add", new Type[] { it.GetGenericArguments()[0] });
+
+                    if (amt != null)
+                    {
+                        foreach (var obj in data)
+                        {
+                            amt.Invoke(outlist, new object[] { obj });
+                        }
+                    }
+
+                    return outlist;
+                }
+                else
+                {
+                    return RegReadEnumerable(regKey, valueName, type, gt, (IEnumerable)defaultValue);
+                }
+            }
+            else
+            {
+                if (parseables.Contains(type))
+                {
+                    var str = defaultValue?.ToString() ?? "0";
+                    str = (string)regKey.GetValue(valueName, str);
+
+                    var mtd = type.GetMethod("Parse", new Type[] { typeof(string) });
+                    if (mtd != null)
+                    {
+                        var res = mtd.Invoke(null, new object[] { str });
+                        if (res != null)
+                        {
+                            return res;
+                        }
+                    }
+
+                    return defaultValue;
+                }
+
+                return regKey.GetValue(valueName, defaultValue);
+            }
+        }
+
+        /// <summary>
+        /// Enumerate the settings for the specified relative key (no paths)
+        /// </summary>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        protected List<string> GetSettings(string key = null)
+        {
+            key = key ?? BaseKey;
+            var l = new List<string>();
+            var r = new List<string>();
+
+            using (var regKey = Hive.CreateSubKey(key))
+            {
+                var sks = regKey.GetSubKeyNames();
+                var vals = regKey.GetValueNames();
+
+                foreach (var val in vals)
+                {
+                    l.Add($"{key}\\{val}");
+                }
+
+                foreach (var sk in sks)
+                {
+                    r.Add($"{key}\\{sk}");
+                }
+            }
+
+            foreach (var k in r)
+            {
+                l.AddRange(GetSettings(k));  
+            }
+
+            return l;
+        }
+
+        /// <summary>
+        /// Opens and gets the value for the specified <paramref name="valueName"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to get</typeparam>
+        /// <param name="valueName">The name of the registry value</param>
+        /// <param name="defaultValue">Default value (optional)</param>
+        /// <returns></returns>
+        protected T OpenGetRegValue<T>(string valueName, T defaultValue = default)
+        {
+            using (var regKey = OpenKeyForSetting(valueName, out var useKey))
+            {
+                return (T)GetRegValue(typeof(T), regKey, useKey, defaultValue);
+            }
+        }
+
+        /// <summary>
+        /// Opens the key for the setting at the specified <paramref name="path"/>
+        /// </summary>
+        /// <param name="path">The key of the registry key to open (relative to <see cref="BaseKey"/>)</param>
+        /// <param name="keyName">Receives the name of the key to use to read and write the value</param>
+        /// <returns>A <see cref="RegistryKey"/> object</returns>
+        protected RegistryKey OpenKeyForSetting(string path, out string keyName)
+        {
+            path = path.Replace("/", "\\");
+
+            var kn = Path.GetFileName(path);
+            var pt = Path.GetDirectoryName(path);
+
+            keyName = kn;
+
+            if (string.IsNullOrEmpty(pt))
+            {
+                return Hive.CreateSubKey(BaseKey);
+            }
+            else
+            {
+                return Hive.CreateSubKey(BaseKey + "\\" + pt);
+            }
+        }
         /// <summary>
         /// Opens and sets the registry <paramref name="value"/> for the specified <paramref name="valuePath"/>.
         /// </summary>
@@ -487,9 +580,9 @@ namespace DataTools.Windows.Essentials.Settings
         /// <param name="value">The value</param>
         protected void OpenSetRegValue<T>(string valuePath, T value)
         {
-            using (var reg = OpenKeyForSetting(valuePath, out var useKey))
+            using (var regKey = OpenKeyForSetting(valuePath, out var useKey))
             {
-                SetRegValue(typeof(T), reg, useKey, value);
+                SetRegValue(typeof(T), regKey, useKey, value);
             }
         }
 
@@ -541,227 +634,6 @@ namespace DataTools.Windows.Essentials.Settings
                 else
                 {
                     regKey.SetValue(valueName, value);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Opens and gets the registry <paramref name="value"/> for the specified <paramref name="valName"/>.
-        /// </summary>
-        /// <typeparam name="T">The type of the value to get</typeparam>
-        /// <param name="valName">The name of the registry value</param>
-        /// <param name="defaultValue">Default value (optional)</param>
-        /// <returns></returns>
-        protected T OpenGetRegValue<T>(string valName, T defaultValue = default)
-        {
-            using (var reg = OpenKeyForSetting(valName, out var useKey))
-            {
-                return (T)GetRegValue(typeof(T), reg, useKey, defaultValue);
-            }
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="reg"></param>
-        /// <param name="valueName"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <exception cref="ArgumentException"></exception>
-        protected virtual object GetRegValue(Type type, RegistryKey reg, string valueName, object defaultValue = default) 
-        {
-            if (defaultValue != default && defaultValue.GetType() != type) throw new ArgumentException("Type of defaultValue parameter does not match type parameter");
-
-            if (type == typeof(Guid))
-            {
-                Guid gu = (Guid)(defaultValue ?? Guid.Empty);
-                var str = gu.ToString("d");
-                gu = Guid.Parse((string)reg.GetValue(valueName, str));
-                return gu;
-            }
-            else if (type == typeof(DateTime))
-            {
-                DateTime dt = (DateTime)(defaultValue ?? DateTime.MinValue);
-
-                var str = dt.ToString("O");
-                dt = DateTime.Parse((string)reg.GetValue(valueName, str));
-                return dt;
-            }
-            else if (type == typeof(System.Drawing.Color))
-            {
-                System.Drawing.Color c = (System.Drawing.Color)(defaultValue ?? System.Drawing.Color.Empty);
-
-                var str = PrintArgb(c.A, c.R, c.G, c.B);
-                byte a, r, g, b;
-
-                str = (string)reg.GetValue(valueName, str);
-                GetArgb(str, out a, out r, out g, out b);
-                c = System.Drawing.Color.FromArgb(a, r, g, b);
-                return c;
-            }                
-            else if (type.GetInterfaces().Where(x => x.Name.Contains("ICollection`1")).Any() || type.GetInterfaces().Where(x => x.Name.Contains("IList`1")).Any())
-            {
-                var it = type.GetInterfaces().Where(x => x.Name.Contains("IEnumerable`1")).First();
-                var gt = it.GetGenericArguments().FirstOrDefault();
-
-                if (gt == typeof(string))
-                {
-                    string[] data = null;
-
-                    if (defaultValue is IEnumerable<string> isu)
-                    {
-                        data = isu.ToArray();
-                    }
-
-                    data = (string[])reg.GetValue(valueName, data);
-
-                    if (type == typeof(string[])) return data;
-                    object outlist;
-                    
-                    try
-                    {
-                        outlist = Activator.CreateInstance(type, new object[] { data });
-                        if (outlist != null) return outlist;
-                    }
-                    catch
-                    {
-                        try
-                        {
-                            outlist = Activator.CreateInstance(type);
-                        }
-                        catch
-                        {
-                            outlist = null;
-                        }
-                    }
-
-                    if (outlist == null) throw new InvalidOperationException("Cannot create instance of " + type.FullName);
-
-                    var amt = type.GetMethod("Add", new Type[] { it.GetGenericArguments()[0] });
-
-                    if (amt != null)
-                    {
-                        foreach (var obj in data)
-                        {
-                            amt.Invoke(outlist, new object[] { obj });
-                        }
-                    }
-
-                    return outlist;
-                }
-                else
-                {
-                    return RegReadEnumerable(reg, valueName, type, gt, (IEnumerable)defaultValue);
-                }
-            }
-            else
-            {
-                if (parseables.Contains(type))
-                {
-                    var str = defaultValue.ToString();
-                    str = (string)reg.GetValue(valueName, str);
-
-                    var mtd = type.GetMethod("Parse", new Type[] { typeof (string) });
-                    if (mtd != null)
-                    {
-                        var res = mtd.Invoke(null, new object[] { str });
-                        if (res != null)
-                        {
-                            return res;
-                        }
-                    }
-
-                    return defaultValue;
-                }
-
-                return reg.GetValue(valueName, defaultValue);
-            }
-        }
-               
-        private RegistryKey OpenEnumerableKey(RegistryKey currentKey, string valueName, bool writable = true)
-        {
-            return currentKey.CreateSubKey(valueName, writable);
-        }
-
-        private object RegReadEnumerable(RegistryKey currentKey, string valueName, Type type, Type dataType, IEnumerable defaultValue = null)
-        {
-            using(var reg = OpenEnumerableKey(currentKey, valueName))
-            {
-
-                var kvs = reg.GetValueNames();
-                var ints = new List<int>();
-                var objs = new List<object>();
-
-                if (kvs != null && kvs.Length > 0)
-                {
-                    foreach (var k in kvs)
-                    {
-                        if (int.TryParse(k, out int y))
-                        {
-                            ints.Add(y);
-                        }
-                    }
-                }
-
-                if (ints.Count > 0)
-                {
-                    foreach (var i in ints)
-                    {
-                        var s = i.ToString();
-                        var obj = GetRegValue(dataType, reg, s);
-                        if (obj != null)
-                        {
-                            objs.Add(obj);
-                        }
-                    }
-                }
-                else if (defaultValue != null)
-                {
-                    int i = 0;
-
-                    foreach (var obj in defaultValue)
-                    {
-                        SetRegValue(dataType, reg, (i++).ToString(), obj);
-                        objs.Add(obj);
-                    }
-                }
-                else
-                {
-                    return null;
-                }
-
-                return CreateEnumerable(type, dataType, objs);
-            }
-        }
-
-        private void RegWriteEnumerable(RegistryKey currentKey, string valueName, Type dataType, IEnumerable data)
-        {
-            using (var reg = OpenEnumerableKey(currentKey, valueName))
-            {
-                var kvs = reg.GetValueNames();
-                
-                var ints = new List<int>();
-                var objs = new List<object>();
-
-                if (kvs != null && kvs.Length > 0)
-                {
-                    foreach (var k in kvs)
-                    {
-                        if (int.TryParse(k, out int y))
-                        {
-                            reg.DeleteValue(k);
-                        }
-                    }
-                }
-
-                int i = 0;
-
-                foreach (var obj in data)
-                {
-                    SetRegValue(dataType, reg, (i++).ToString(), obj);
                 }
             }
         }
@@ -826,12 +698,20 @@ namespace DataTools.Windows.Essentials.Settings
             return retobj;
         }
 
-
-        private string PrintArgb(byte a, byte r, byte g, byte b)
+        private void DeleteKey(RegistryKey regKey)
         {
-            return $"#{a:X2}{r:X2}{g:X2}{b:X2}";
-        }
+            var sks = regKey.GetSubKeyNames();
 
+            foreach (var sk in sks)
+            {
+                using (var ssb = regKey.OpenSubKey(sk, true))
+                {
+                    DeleteKey(ssb);
+                }
+                
+                regKey.DeleteSubKey(sk);
+            }
+        }
         private void GetArgb(string str, out byte a, out byte r, out byte g, out byte b)
         {
             if (str[0] == '#') str = str.Substring(1);
@@ -843,5 +723,94 @@ namespace DataTools.Windows.Essentials.Settings
             b = (byte)(parsed);
         }
 
+        private RegistryKey OpenEnumerableKey(RegistryKey currentKey, string valueName, bool writable = true)
+        {
+            return currentKey.CreateSubKey(valueName, writable);
+        }
+
+        private string PrintArgb(byte a, byte r, byte g, byte b)
+        {
+            return $"#{a:X2}{r:X2}{g:X2}{b:X2}";
+        }
+
+        private object RegReadEnumerable(RegistryKey currentKey, string valueName, Type type, Type dataType, IEnumerable defaultValue = null)
+        {
+            using(var regKey = OpenEnumerableKey(currentKey, valueName))
+            {
+
+                var kvs = regKey.GetValueNames();
+                var ints = new List<int>();
+                var objs = new List<object>();
+
+                if (kvs != null && kvs.Length > 0)
+                {
+                    foreach (var k in kvs)
+                    {
+                        if (int.TryParse(k, out int y))
+                        {
+                            ints.Add(y);
+                        }
+                    }
+                }
+
+                if (ints.Count > 0)
+                {
+                    foreach (var i in ints)
+                    {
+                        var s = i.ToString();
+                        var obj = GetRegValue(dataType, regKey, s);
+                        if (obj != null)
+                        {
+                            objs.Add(obj);
+                        }
+                    }
+                }
+                else if (defaultValue != null)
+                {
+                    int i = 0;
+
+                    foreach (var obj in defaultValue)
+                    {
+                        SetRegValue(dataType, regKey, (i++).ToString(), obj);
+                        objs.Add(obj);
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+
+                return CreateEnumerable(type, dataType, objs);
+            }
+        }
+
+        private void RegWriteEnumerable(RegistryKey currentKey, string valueName, Type dataType, IEnumerable data)
+        {
+            using (var regKey = OpenEnumerableKey(currentKey, valueName))
+            {
+                var kvs = regKey.GetValueNames();
+                
+                var ints = new List<int>();
+                var objs = new List<object>();
+
+                if (kvs != null && kvs.Length > 0)
+                {
+                    foreach (var k in kvs)
+                    {
+                        if (int.TryParse(k, out int y))
+                        {
+                            regKey.DeleteValue(k);
+                        }
+                    }
+                }
+
+                int i = 0;
+
+                foreach (var obj in data)
+                {
+                    SetRegValue(dataType, regKey, (i++).ToString(), obj);
+                }
+            }
+        }
     }
 }
