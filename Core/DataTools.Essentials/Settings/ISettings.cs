@@ -27,12 +27,19 @@ namespace DataTools.Essentials.Settings
         /// </summary>
         bool CanChangeSettings { get; }
 
+
+        /// <summary>
+        /// True if the settings can be cleared.
+        /// </summary>
+        bool CanClearSettings { get; }
+
         /// <summary>
         /// Gets the value for the specified key
         /// </summary>
         /// <param name="key">The key to retrieve</param>
+        /// <param name="defaultValue">Optional default value</param>
         /// <returns></returns>
-        object GetValue(string key);
+        object GetValue(string key, object defaultValue = default);
 
         /// <summary>
         /// Sets the value for the specified key
@@ -46,8 +53,16 @@ namespace DataTools.Essentials.Settings
         /// </summary>
         /// <typeparam name="T">The return type</typeparam>
         /// <param name="key">The key to retrieve</param>
+        /// <param name="defaultValue">Optional default value</param>
         /// <returns></returns>
-        T GetValue<T>(string key);
+        T GetValue<T>(string key, T defaultValue = default);
+
+        /// <summary>
+        /// Clear all settings (if supported)
+        /// </summary>
+        /// <returns>True if the settings were cleared.</returns>
+        bool ClearSettings();
+
 
         /// <summary>
         /// Sets the value for the specified key
@@ -125,7 +140,6 @@ namespace DataTools.Essentials.Settings
         /// <param name="key"></param>
         /// <returns></returns>
         object this[string key] { get; set; }
-
 
         /// <summary>
         /// True if the settings can be read and written individually.

@@ -30,6 +30,9 @@ namespace DataTools.Essentials.Settings
         public abstract bool CanChangeSettings { get; }
 
         /// <inheritdoc/>
+        public abstract bool CanClearSettings { get; }
+
+        /// <inheritdoc/>
         public abstract object this[string key] { get; set; }
 
         /// <inheritdoc/>
@@ -51,9 +54,10 @@ namespace DataTools.Essentials.Settings
         /// <inheritdoc/>
         public abstract ISetting<T> GetSetting<T>(string key);
         /// <inheritdoc/>
-        public abstract object GetValue(string key);
+        public abstract object GetValue(string key, object defaultValue = default);
         /// <inheritdoc/>
-        public abstract T GetValue<T>(string key);
+        public abstract T GetValue<T>(string key, T defaultValue = default);
+
         /// <inheritdoc/>
         public abstract bool Remove(ISetting setting);
         /// <inheritdoc/>
@@ -67,6 +71,8 @@ namespace DataTools.Essentials.Settings
         /// <inheritdoc/>
         public abstract void SetValue<T>(string key, T value);
 
+        /// <inheritdoc/>
+        public abstract bool ClearSettings();
     }
 
 }

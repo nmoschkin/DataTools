@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
@@ -30,6 +30,7 @@
     <ProjectReference Include="..\..\Win32\DataTools.Win32.FileSystem\DataTools.Win32.FileSystem.csproj" />
     <ProjectReference Include="..\..\Win32\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
     <ProjectReference Include="..\..\Win32\DataTools.Win32\DataTools.Win32.csproj" />
+    <ProjectReference Include="..\..\Windows\DataTools.Windows.Essentials\DataTools.Windows.Essentials.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\AppResources.Designer.cs">

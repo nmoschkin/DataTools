@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,7 @@ using DataTools.Essentials.Observable;
 using DataTools.Graphics;
 using DataTools.Streams;
 using DataTools.Win32.Memory;
-
+using DataTools.Windows.Essentials.Settings;
 using Newtonsoft.Json;
 
 using SkiaSharp;
@@ -639,6 +640,11 @@ namespace CoreTestOne
             //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2a, b1);
 
             //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(a, a1);
+
+
+            var settings = new RegistrySettings("Nathaniel Moschkin", typeof(Program).Assembly);
+
+            settings.ClearSettings();
 
             var frm = new frmExterns();
             System.Windows.Forms.Application.Run(frm);

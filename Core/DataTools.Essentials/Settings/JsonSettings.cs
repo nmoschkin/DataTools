@@ -36,6 +36,27 @@ namespace DataTools.Essentials.Settings
             LoadSettings(fileName);
         }
 
+        /// <inheritdoc/>
+        public override bool ClearSettings()
+        {
+            settings.Clear();
+
+            try
+            {
+                if (!string.IsNullOrEmpty(Filename) && File.Exists(Filename))
+                {
+                    File.Delete(Filename);
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+        }
+
         /// <summary>
         /// Loads settings from the specified file
         /// </summary>
@@ -131,6 +152,9 @@ namespace DataTools.Essentials.Settings
         public override bool CanChangeSettings => true;
 
         /// <inheritdoc/>
+        public override bool CanClearSettings => true;
+
+        /// <inheritdoc/>
         public override bool ContainsKey(string key)
         {
             return settings.ContainsKey(key);
@@ -193,14 +217,24 @@ namespace DataTools.Essentials.Settings
         }
 
         /// <inheritdoc/>
-        public override object GetValue(string key)
+        public override object GetValue(string key, object defaultValue = default)
         {
+            if (!settings.TryGetValue(key, out var v))
+            {
+                CreateSetting(key, defaultValue);
+            }
+
             return settings[key].Value;
         }
 
         /// <inheritdoc/>
-        public override T GetValue<T>(string key)
+        public override T GetValue<T>(string key, T defaultValue = default)
         {
+            if (!settings.TryGetValue(key, out var v))
+            {
+                CreateSetting(key, defaultValue);
+            }
+
             return (T)settings[key].Value;
         }
 

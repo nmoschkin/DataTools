@@ -86,7 +86,7 @@ namespace DataTools.Essentials.Settings
         /// <param name="parent">The parent object</param>
         public ProgramSetting(string key, T value, ISettings parent)
         {
-            if (Key == null) throw new ArgumentNullException("key");
+            if (key == null) throw new ArgumentNullException("key");
 
             Key = key;
             Value = value;
