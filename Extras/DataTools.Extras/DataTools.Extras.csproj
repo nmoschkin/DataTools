@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net7.0;net472;net48;net481</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1073</AssemblyVersion>
-    <FileVersion>8.0.0.1073</FileVersion>
+    <AssemblyVersion>8.0.0.1074</AssemblyVersion>
+    <FileVersion>8.0.0.1074</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1073</Version>
+    <Version>8.0.0.1074</Version>
     <Product>DataTools Extras</Product>
     <Description>DataTools Extras</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -18,7 +18,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1072</PreviousVersion>
+    <PreviousVersion>8.0.0.1073</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
