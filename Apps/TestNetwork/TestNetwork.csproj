@@ -5,10 +5,10 @@
     <nullable>disable</nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1070</AssemblyVersion>
-    <FileVersion>8.0.0.1070</FileVersion>
+    <AssemblyVersion>8.0.0.1071</AssemblyVersion>
+    <FileVersion>8.0.0.1071</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1070</Version>
+    <Version>8.0.0.1071</Version>
     <Product>DataTools Network Adapters Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -18,7 +18,7 @@
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1069</PreviousVersion>
+    <PreviousVersion>8.0.0.1070</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>

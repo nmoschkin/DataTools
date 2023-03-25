@@ -3,10 +3,10 @@
     <TargetFrameworks>netstandard2.0;net6.0;net7.0;net472;net48;net481</TargetFrameworks>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyVersion>8.0.0.1070</AssemblyVersion>
-    <FileVersion>8.0.0.1070</FileVersion>
+    <AssemblyVersion>8.0.0.1071</AssemblyVersion>
+    <FileVersion>8.0.0.1071</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1070</Version>
+    <Version>8.0.0.1071</Version>
     <Product>DataTools Memory Objects</Product>
     <Description>DataTools Memory Objects</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -21,7 +21,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1069</PreviousVersion>
+    <PreviousVersion>8.0.0.1070</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
