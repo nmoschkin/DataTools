@@ -7,12 +7,20 @@ namespace DataTools.Essentials.Settings
     /// </summary>
     public abstract class SettingsBase : ISettings
     {
+
+        /// <summary>
+        /// Gets or sets the list of converters that will be used.
+        /// </summary>
+        public virtual IList<SettingsTypeConverter> Converters { get; set; } = null;
+
         /// <summary>
         /// Create a new settings class
         /// </summary>
         /// <param name="atomic">True if the settings can be read and written individually.</param>
-        public SettingsBase(bool atomic)
-        {
+        /// <param name="converters">Optional list of converters that will be used.</param>
+        public SettingsBase(bool atomic, IEnumerable<SettingsTypeConverter> converters = null)
+        {            
+            if (converters != null) Converters = new List<SettingsTypeConverter>(converters);
             Atomic = atomic;
         }
 
