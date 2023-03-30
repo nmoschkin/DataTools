@@ -2778,7 +2778,7 @@ namespace DataTools.Text
         public static string PrintFriendlyAmount(ulong value, string numFmt = null, bool speed = false, bool binary = true, bool displayBinary = false, bool bits = false, int rounding = 2)
         {
             double fs = value;
-            double spd = value;
+            double amt = value;
 
             int i;
 
@@ -2839,20 +2839,20 @@ namespace DataTools.Text
             {
                 for (i = 0; i < 6; i++)
                 {
-                    if (spd >= BinValues[i])
+                    if (amt >= BinValues[i])
                     {
-                        fs = spd / BinValues[i];
+                        fs = amt / BinValues[i];
                         break;
                     }
                 }
             }
             else
             {
-                for (i = 0; i < 7; i++)
+                for (i = 0; i < 6; i++)
                 {
-                    if (spd >= DecValues[i])
+                    if (amt >= DecValues[i])
                     {
-                        fs = spd / DecValues[i];
+                        fs = amt / DecValues[i];
                         break;
                     }
                 }

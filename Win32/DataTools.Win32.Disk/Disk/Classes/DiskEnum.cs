@@ -21,198 +21,194 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public static DiskDeviceInfo[] _internalEnumDisks(Guid DiskClass = default)
         {
-            var hHeap = new SafePtr();
-            // hHeap.IsString = True
-
-            try
+            using (var hHeap = new SafePtr())
             {
-                DiskDeviceInfo[] info = null;
+                // hHeap.IsString = True
 
-                if (DiskClass == Guid.Empty)
-                    DiskClass = DevProp.GUID_DEVINTERFACE_DISK;
-
-                var disk = DevProp.INVALID_HANDLE_VALUE;
-                var diskNumber = new NativeDisk.STORAGE_DEVICE_NUMBER();
-
-                uint bytesReturned = 0U;
-
-                info = DeviceEnum.EnumerateDevices<DiskDeviceInfo>(DiskClass);
-
-                if (info is null || info.Count() == 0)
-                    return Array.Empty<DiskDeviceInfo>();
-
-                foreach (var inf in info)
+                try
                 {
-                    object caps = GetDeviceProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32);
+                    DiskDeviceInfo[] info = null;
 
-                    if (caps != null)
+                    if (DiskClass == Guid.Empty) DiskClass = DevProp.GUID_DEVINTERFACE_DISK;
+
+                    DiskHandle disk = null;
+
+                    var diskNumber = new NativeDisk.STORAGE_DEVICE_NUMBER();
+
+                    uint bytesReturned = 0U;
+
+                    info = DeviceEnum.EnumerateDevices<DiskDeviceInfo>(DiskClass);
+
+                    if (info is null || info.Count() == 0) return Array.Empty<DiskDeviceInfo>();
+
+                    foreach (var inf in info)
                     {
-                        inf.Capabilities = (DeviceCapabilities)(int)caps;
-                    }
-                    if (inf.Capabilities == DeviceCapabilities.None)
-                    {
-                        caps = (GetDeviceProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32, useClassId: true));
+                        object caps = GetDeviceProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32);
 
                         if (caps != null)
                         {
                             inf.Capabilities = (DeviceCapabilities)(int)caps;
                         }
-                    }
-
-                    if (inf.DeviceClass == DeviceClassEnum.CdRom)
-                    {
-                        inf.Type = StorageType.Optical;
-                    }
-                    else if (inf.RemovalPolicy != DeviceRemovalPolicy.ExpectNoRemoval)
-                    {
-                        // this is a conundrum because these values are not predictable in some cases.
-                        // we'll leave it this way, for now.
-                        inf.Type = StorageType.Removable;
-
-                        // If inf.Capabilities And DeviceCapabilities.Removable Then
-                        // inf.Type = StorageType.RemovableHardDisk
-                        // Else
-                        // inf.Type = StorageType.Removable
-                        // End If
-                    }
-
-                    if (DiskClass == DevProp.GUID_DEVINTERFACE_VOLUME || DiskClass == DevProp.GUID_DEVCLASS_VOLUME)
-                    {
-                        inf.IsVolume = true;
-
-                        disk = IO.CreateFile(inf.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
-
-                        if (disk != DevProp.INVALID_HANDLE_VALUE)
+                        if (inf.Capabilities == DeviceCapabilities.None)
                         {
-                            PopulateVolumeInfo(inf, disk);
+                            caps = (GetDeviceProperty(inf, DevProp.DEVPKEY_Device_Capabilities, DevPropTypes.Int32, useClassId: true));
 
-                            hHeap.Length = Marshal.SizeOf(diskNumber);
-                            hHeap.ZeroMemory();
-
-                            bytesReturned = 0U;
-
-                            NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_STORAGE_GET_DEVICE_NUMBER, default, 0U, hHeap.DangerousGetHandle(), (uint)hHeap.Length, ref bytesReturned, default);
-
-                            if (bytesReturned > 0L)
+                            if (caps != null)
                             {
-                                diskNumber = hHeap.ToStruct<NativeDisk.STORAGE_DEVICE_NUMBER>();
-                                inf.PhysicalDevice = (int)diskNumber.DeviceNumber;
-                                if (diskNumber.PartitionNumber < 1024L)
+                                inf.Capabilities = (DeviceCapabilities)(int)caps;
+                            }
+                        }
+
+                        if (inf.DeviceClass == DeviceClassEnum.CdRom)
+                        {
+                            inf.Type = StorageType.Optical;
+                        }
+                        else if (inf.RemovalPolicy != DeviceRemovalPolicy.ExpectNoRemoval)
+                        {
+                            // this is a conundrum because these values are not predictable in some cases.
+                            // we'll leave it this way, for now.
+                            inf.Type = StorageType.Removable;
+
+                            // If inf.Capabilities And DeviceCapabilities.Removable Then
+                            // inf.Type = StorageType.RemovableHardDisk
+                            // Else
+                            // inf.Type = StorageType.Removable
+                            // End If
+                        }
+
+                        if (DiskClass == DevProp.GUID_DEVINTERFACE_VOLUME || DiskClass == DevProp.GUID_DEVCLASS_VOLUME)
+                        {
+                            inf.IsVolume = true;
+                            disk = DiskHandle.OpenDisk(inf.DevicePath, false);
+
+                            if (disk != null)
+                            {
+                                PopulateVolumeInfo(inf, disk);
+
+                                hHeap.Length = Marshal.SizeOf(diskNumber);
+                                hHeap.ZeroMemory();
+
+                                bytesReturned = 0U;
+
+                                NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_STORAGE_GET_DEVICE_NUMBER, default, 0U, hHeap.DangerousGetHandle(), (uint)hHeap.Length, ref bytesReturned, default);
+
+                                if (bytesReturned > 0L)
                                 {
-                                    inf.PartitionNumber = (int)diskNumber.PartitionNumber;
+                                    diskNumber = hHeap.ToStruct<NativeDisk.STORAGE_DEVICE_NUMBER>();
+                                    inf.PhysicalDevice = (int)diskNumber.DeviceNumber;
+                                    if (diskNumber.PartitionNumber < 1024L)
+                                    {
+                                        inf.PartitionNumber = (int)diskNumber.PartitionNumber;
+                                    }
                                 }
+
+                                disk.Close();
                             }
-
-                            User32.CloseHandle(disk);
-                        }
-                        else
-                        {
-                            PopulateVolumeInfo(inf);
-                        }
-                    }
-                    else if (inf.Type != StorageType.Optical)
-                    {
-                        disk = IO.CreateFile(inf.DevicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
-
-                        if (disk != DevProp.INVALID_HANDLE_VALUE)
-                        {
-                            hHeap.Length = 128L;
-                            hHeap.ZeroMemory();
-
-                            NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_DISK_GET_LENGTH_INFO, default, 0U, hHeap.DangerousGetHandle(), (uint)hHeap.Length, ref bytesReturned, default);
-
-                            inf.DiskLayout = DiskLayoutInfo.CreateLayout(disk);
-                            inf.Size = hHeap.LongAt(0L);
-
-                            hHeap.Length = Marshal.SizeOf(diskNumber);
-                            hHeap.ZeroMemory();
-
-                            bytesReturned = 0U;
-
-                            NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_STORAGE_GET_DEVICE_NUMBER, default, 0U, hHeap.DangerousGetHandle(), (uint)hHeap.Length, ref bytesReturned, default);
-
-                            var res = DiskGeometry.GetDiskGeometry(null, disk, out DISK_GEOMETRY_EX? georet);
-
-                            if (res && georet is DISK_GEOMETRY_EX geometry)
+                            else
                             {
-                                inf.SectorSize = (int)geometry.Geometry.BytesPerSector;
+                                PopulateVolumeInfo(inf);
                             }
-
-                            if (bytesReturned > 0L)
-                            {
-                                diskNumber = hHeap.ToStruct<NativeDisk.STORAGE_DEVICE_NUMBER>();
-                                inf.PhysicalDevice = (int)diskNumber.DeviceNumber;
-                            }
-
-                            User32.CloseHandle(disk);
-                            disk = DevProp.INVALID_HANDLE_VALUE;
                         }
-                    }
-
-                    if (inf.FriendlyName == "Microsoft Virtual Disk")
-                    {
-                        inf.Type = StorageType.Virtual;
-                        disk = IO.CreateFile(@"\\.\PhysicalDrive" + inf.PhysicalDevice, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
-                        if (disk == DevProp.INVALID_HANDLE_VALUE)
-                            continue;
-                        var sdi = default(STORAGE_DEPENDENCY_INFO_V2);
-                        var mm = new SafePtr();
-                        uint su = 0U;
-                        uint r;
-                        int sdic = Marshal.SizeOf(sdi);
-                        mm.Length = sdic;
-                        sdi.Version = STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
-                        mm.IntAt(0L) = (int)STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
-                        mm.IntAt(1L) = 1;
-                        r = VirtDisk.GetStorageDependencyInformation(disk, GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_HOST_VOLUMES | GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_DISK_HANDLE, (uint)mm.Length, mm, ref su);
-                        if (su != sdic)
+                        else if (inf.Type != StorageType.Optical)
                         {
-                            mm.Length = su;
+                            disk = DiskHandle.OpenDisk(inf.DevicePath);
+
+                            if (disk != null)
+                            {
+                                hHeap.Length = 128L;
+                                hHeap.ZeroMemory();
+
+                                NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_DISK_GET_LENGTH_INFO, default, 0U, hHeap.DangerousGetHandle(), (uint)hHeap.Length, ref bytesReturned, default);
+
+                                inf.DiskLayout = DiskLayoutInfo.CreateLayout(disk);
+                                inf.Size = hHeap.LongAt(0L);
+
+                                hHeap.Length = Marshal.SizeOf(diskNumber);
+                                hHeap.ZeroMemory();
+
+                                bytesReturned = 0U;
+
+                                NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_STORAGE_GET_DEVICE_NUMBER, default, 0U, hHeap.DangerousGetHandle(), (uint)hHeap.Length, ref bytesReturned, default);
+
+                                var res = DiskGeometry.GetDiskGeometry(null, disk, out DISK_GEOMETRY_EX? georet);
+
+                                if (res && georet is DISK_GEOMETRY_EX geometry)
+                                {
+                                    inf.SectorSize = (int)geometry.Geometry.BytesPerSector;
+                                }
+
+                                if (bytesReturned > 0L)
+                                {
+                                    diskNumber = hHeap.ToStruct<NativeDisk.STORAGE_DEVICE_NUMBER>();
+                                    inf.PhysicalDevice = (int)diskNumber.DeviceNumber;
+                                }
+
+                                disk.Close();
+                            }
+                        }
+
+                        if (inf.FriendlyName == "Microsoft Virtual Disk")
+                        {
+                            inf.Type = StorageType.Virtual;
+                            disk = DiskHandle.OpenDisk(@"\\.\PhysicalDrive" + inf.PhysicalDevice);
+                            if (disk == null) continue;
+
+                            var sdi = default(STORAGE_DEPENDENCY_INFO_V2);
+                            var mm = new SafePtr();
+                            uint su = 0U;
+                            uint r;
+                            int sdic = Marshal.SizeOf(sdi);
+                            mm.Length = sdic;
+                            sdi.Version = STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
+                            mm.IntAt(0L) = (int)STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
+                            mm.IntAt(1L) = 1;
                             r = VirtDisk.GetStorageDependencyInformation(disk, GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_HOST_VOLUMES | GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_DISK_HANDLE, (uint)mm.Length, mm, ref su);
-                        }
-
-                        if (r != 0L)
-                        {
-                            //Interaction.MsgBox(NativeError.FormatLastError(), Constants.vbExclamation);
-                        }
-                        else
-                        {
-                            sdi.NumberEntries = mm.UIntAt(1L);
-                            inf.BackingStore = new string[((int)sdi.NumberEntries)];
-
-                            var sne = sdi.NumberEntries;
-
-                            for (long d = 0; d < sne; d++)
+                            if (su != sdic)
                             {
-                                sdi.Version2Entries = mm.ToStruct<STORAGE_DEPENDENCY_INFO_TYPE_2>();
-                                try
+                                mm.Length = su;
+                                r = VirtDisk.GetStorageDependencyInformation(disk, GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_HOST_VOLUMES | GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_DISK_HANDLE, (uint)mm.Length, mm, ref su);
+                            }
+
+                            if (r != 0L)
+                            {
+                                //Interaction.MsgBox(NativeError.FormatLastError(), Constants.vbExclamation);
+                            }
+                            else
+                            {
+                                sdi.NumberEntries = mm.UIntAt(1L);
+                                inf.BackingStore = new string[((int)sdi.NumberEntries)];
+
+                                var sne = sdi.NumberEntries;
+
+                                for (long d = 0; d < sne; d++)
                                 {
-                                    var relpath = sdi.Version2Entries.DependentVolumeRelativePath.ToString();
-                                    inf.BackingStore[(int)d] = Path.GetFullPath(relpath);
-                                }
-                                catch (Exception ex)
-                                {
-                                    Console.Error.WriteLine(ex.Message);
+                                    sdi.Version2Entries = mm.ToStruct<STORAGE_DEPENDENCY_INFO_TYPE_2>();
+                                    try
+                                    {
+                                        var relpath = sdi.Version2Entries.DependentVolumeRelativePath.ToString();
+                                        inf.BackingStore[(int)d] = Path.GetFullPath(relpath);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.Error.WriteLine(ex.Message);
+                                    }
                                 }
                             }
+
+                            mm.Free();
+                            disk.Close();
+
+                            inf.VirtualDisk = new VirtualDisk(inf, false);
+
                         }
-
-                        mm.Dispose();
-                        User32.CloseHandle(disk);
-                        inf.VirtualDisk = new VirtualDisk(inf, false);
-                        disk = DevProp.INVALID_HANDLE_VALUE;
                     }
-                }
 
-                if (hHeap is object)
-                    hHeap.Dispose();
-                return info;
-            }
-            catch // (Exception ex)
-            {
-                if (hHeap is object)
-                    hHeap.Dispose();
-                return null;
+                    return info;
+                }
+                catch // (Exception ex)
+                {
+                    return null;
+                }
             }
         }
 

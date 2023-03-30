@@ -556,7 +556,6 @@ namespace DataTools.Windows.Essentials.Settings
         /// <summary>
         /// Opens and gets the value for the specified <paramref name="valueName"/>.
         /// </summary>
-        /// <typeparam name="T">The type of the value to get</typeparam>
         /// <param name="valueName">The name of the registry value</param>
         /// <param name="defaultValue">Default value (optional)</param>
         /// <returns></returns>
@@ -610,7 +609,6 @@ namespace DataTools.Windows.Essentials.Settings
         /// <summary>
         /// Opens and sets the registry <paramref name="value"/> for the specified <paramref name="valuePath"/>.
         /// </summary>
-        /// <typeparam name="T">The type of the value to set</typeparam>
         /// <param name="valuePath">The relative path of the registry value</param>
         /// <param name="value">The value</param>
         protected void OpenSetRegValue(string valuePath, object value)
