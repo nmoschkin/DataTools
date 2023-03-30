@@ -275,22 +275,19 @@ namespace DataTools.Win32.Disk
                     return _Size;
                     
                 }
-                var a = default(ulong);
-                var b = default(ulong);
-                var c = default(ulong);
+
                 try
                 {
                     if (!IsVolumeMounted)
                         return new FriendlySizeLong(0);
 
-                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, ref a, ref b, ref c);
+                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, out _, out ulong size, out _);
+                    return (FriendlySizeLong)(long)size;
                 }
                 catch
                 {
                     return new FriendlySizeLong(0);
                 }
-
-                return b;
             }
 
             internal set
@@ -309,24 +306,18 @@ namespace DataTools.Win32.Disk
         {
             get
             {
-                if (Type != StorageType.Volume || string.IsNullOrEmpty(VolumeGuidPath))
-                    return _Size;
-                var a = default(ulong);
-                var b = default(ulong);
-                var c = default(ulong);
+                if (Type != StorageType.Volume || string.IsNullOrEmpty(VolumeGuidPath)) return _Size;
+
                 try
                 {
-                    if (!IsVolumeMounted)
-                        return new FriendlySizeLong(0);
-
-                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, ref a, ref b, ref c);
+                    if (!IsVolumeMounted) return new FriendlySizeLong(0);
+                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, out _, out _, out ulong sizeFree);
+                    return sizeFree;
                 }
                 catch
                 {
                     return new FriendlySizeLong(0);
                 }
-
-                return c;
             }
         }
 
@@ -342,17 +333,12 @@ namespace DataTools.Win32.Disk
             {
                 if (Type != StorageType.Volume || string.IsNullOrEmpty(VolumeGuidPath))
                     return _Size;
-                var a = default(ulong);
-                var b = default(ulong);
-                var c = default(ulong);
+
                 try
                 {
-                    if (!IsVolumeMounted)
-                        return new FriendlySizeLong(0);
-
-                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, ref a, ref b, ref c);
-
-                    return b - c;
+                    if (!IsVolumeMounted) return new FriendlySizeLong(0);
+                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, out _, out ulong size, out ulong free);
+                    return size - free;
                 }
                 catch
                 {

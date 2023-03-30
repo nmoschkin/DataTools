@@ -46,7 +46,6 @@ namespace DataTools.Win32
             if (file == IO.INVALID_HANDLE_VALUE)
             {
                 if (throwOnError) throw new NativeException();
-
                 return null;
             }
             
@@ -64,8 +63,9 @@ namespace DataTools.Win32
         /// <exception cref="NativeException"></exception>
         public static DiskHandle OpenDisk(DiskDeviceInfo disk) => OpenDisk(disk.DevicePath); 
 
-        private DiskHandle(IntPtr handle) : base(handle, true)
+        private DiskHandle(IntPtr handle) : base(IO.INVALID_HANDLE_VALUE, true)
         {
+            this.handle = handle;
         }
 
         /// <inheritdoc/>
@@ -74,11 +74,12 @@ namespace DataTools.Win32
         /// <inheritdoc/>
         protected override bool ReleaseHandle()
         {
-            if (!IsInvalid)
-            {
-                return User32.CloseHandle(handle);
-            }
-            return false;
+            if (IsInvalid) return true;
+
+            var b = User32.CloseHandle(handle);
+            if (b) handle = IO.INVALID_HANDLE_VALUE;
+
+            return b;
         }
 
         /// <summary>

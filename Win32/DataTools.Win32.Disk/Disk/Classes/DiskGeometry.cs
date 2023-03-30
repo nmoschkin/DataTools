@@ -48,7 +48,7 @@ namespace DataTools.Win32.Disk
                     {
                         int xErr = User32.GetLastError();
 
-                        if (xErr != NativeDisk.ERROR_MORE_DATA & xErr != NativeDisk.ERROR_INSUFFICIENT_BUFFER)
+                        if (xErr != NativeDisk.ERROR_MORE_DATA && xErr != NativeDisk.ERROR_INSUFFICIENT_BUFFER)
                         {
                             succeed = false;
                             break;
