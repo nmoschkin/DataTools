@@ -2,6 +2,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
     <nullable>disable</nullable>
     <AssemblyVersion>8.0.0.1074</AssemblyVersion>
     <FileVersion>8.0.0.1074</FileVersion>
