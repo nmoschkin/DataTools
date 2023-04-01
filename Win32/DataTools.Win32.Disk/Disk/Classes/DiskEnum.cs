@@ -1,7 +1,9 @@
-﻿using DataTools.Win32.Disk.Partition;
+﻿using DataTools.Shell.Native;
+using DataTools.Win32.Disk.Partition;
 using DataTools.Win32.Memory;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -143,65 +145,67 @@ namespace DataTools.Win32.Disk
                                     }
 
                                 }
-                            }
 
-                            if (inf.FriendlyName == "Microsoft Virtual Disk")
-                            {
-                                inf.Type = StorageType.Virtual;
-                                
-                                var disk = DiskHandle.OpenDisk(@"\\.\PhysicalDrive" + inf.PhysicalDevice, false);
-                                if (disk == null) continue;
-
-                                var sdi = new STORAGE_DEPENDENCY_INFO_V2();
-                                int sdic = Marshal.SizeOf(sdi);
-
-                                using (var mm = new SafePtr(sdic))
+                                if (inf.DevicePath.Contains("disk&ven_msft&prod_virtual_disk"))
                                 {
-                                    uint su = 0U;
-                                    uint r;
-
-                                    sdi.Version = STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
-                                    mm.IntAt(0L) = (int)STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
-                                    mm.IntAt(1L) = 1;
-
-                                    r = VirtDisk.GetStorageDependencyInformation(disk, GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_HOST_VOLUMES | GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_DISK_HANDLE, (uint)mm.Length, mm, ref su);
-
-                                    if (su != sdic)
+                                    using (var disk = DiskHandle.OpenDisk(inf.DevicePath, false))
                                     {
-                                        mm.Length = su;
-                                        r = VirtDisk.GetStorageDependencyInformation(disk, GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_HOST_VOLUMES | GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_DISK_HANDLE, (uint)mm.Length, mm, ref su);
-                                    }
+                                        if (disk == null) continue;
 
-                                    if (r != 0L)
-                                    {
-                                        //Interaction.MsgBox(NativeError.FormatLastError(), Constants.vbExclamation);
-                                    }
-                                    else
-                                    {
-                                        sdi.NumberEntries = mm.UIntAt(1L);
-                                        inf.BackingStore = new string[((int)sdi.NumberEntries)];
+                                        STORAGE_DEPENDENCY_INFO_V2 sdi;
+                                        int sdisize = Marshal.SizeOf<STORAGE_DEPENDENCY_INFO_V2>();
 
-                                        var sne = sdi.NumberEntries;
-
-                                        for (long d = 0; d < sne; d++)
+                                        using (var mm = new SafePtr(sdisize))
                                         {
-                                            sdi.Version2Entries = mm.ToStruct<STORAGE_DEPENDENCY_INFO_TYPE_2>();
-                                            try
+                                            uint realsize = 0U;
+                                            HResult r;
+
+                                            sdi.Version = STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
+                                            
+                                            mm.IntAt(0L) = (int)STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
+                                            mm.IntAt(1L) = 1;
+
+                                            r = (HResult)VirtDisk.GetStorageDependencyInformation(disk, GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_HOST_VOLUMES | GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_DISK_HANDLE, (uint)mm.Length, mm, out realsize);
+
+                                            if (realsize != sdisize && r != 0)
                                             {
-                                                var relpath = sdi.Version2Entries.DependentVolumeRelativePath.ToString();
-                                                inf.BackingStore[(int)d] = Path.GetFullPath(relpath);
+                                                mm.Length = realsize;
+                                                r = (HResult)VirtDisk.GetStorageDependencyInformation(disk, GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_HOST_VOLUMES | GET_STORAGE_DEPENDENCY_FLAG.GET_STORAGE_DEPENDENCY_FLAG_DISK_HANDLE, (uint)mm.Length, mm, out realsize);
                                             }
-                                            catch (Exception ex)
+                                            if (r == 0)
                                             {
-                                                Console.Error.WriteLine(ex.Message);
+                                                sdi.Version = (STORAGE_DEPENDENCY_INFO_VERSION)mm.IntAt(0);
+
+                                                if (sdi.Version == STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2)
+                                                {
+                                                    sdi.NumberEntries = mm.UIntAt(1L);
+
+                                                    var bls = new List<string>();
+                                                    var d = sdi.NumberEntries;
+
+                                                    sdi.Version2Entries = mm.ToStructAt<STORAGE_DEPENDENCY_INFO_TYPE_2>(8);
+                                                    for (var j = 0; j < d; j++)
+                                                    {
+                                                        var relpath = sdi.Version2Entries.DependentVolumeRelativePath.ToString();
+                                                        if (!string.IsNullOrEmpty(relpath))
+                                                        {
+                                                            bls.Add(Path.GetFullPath(relpath));
+                                                        }
+                                                    }
+
+                                                    if (bls.Count > 0)
+                                                    {
+                                                        inf.BackingStore = bls.ToArray();
+                                                        inf.Type = StorageType.Virtual;
+                                                        inf.VirtualDisk = new VirtualDisk(inf, false);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-
-                                    disk.Close();
-                                    inf.VirtualDisk = new VirtualDisk(inf, false);
                                 }
                             }
+
                         }
                         catch(Exception ex)
                         {
