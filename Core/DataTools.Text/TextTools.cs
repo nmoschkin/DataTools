@@ -256,7 +256,15 @@ namespace DataTools.Text
                     var txt = QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: quoteChar, escChar: escChar, withQuotes: true);
                     if (sqEnd != null)
                     {
-                        sb.Append(txt);
+                        if (unquote)
+                        {
+                            sb.Append(txt.Substring(1, txt.Length - 2));
+                        }
+                        else
+                        {
+                            sb.Append(txt);
+                        }
+                        
                         i = (int)sqEnd;
                     }
                     else
@@ -269,7 +277,15 @@ namespace DataTools.Text
                     var txt = QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: '\"', withQuotes: true);
                     if (sqEnd != null)
                     {
-                        sb.Append(txt);
+                        if (unquote)
+                        {
+                            sb.Append(txt.Substring(1, txt.Length - 2));
+                        }
+                        else
+                        {
+                            sb.Append(txt);
+                        }
+
                         i = (int)sqEnd;
                     }
                     else
@@ -282,7 +298,15 @@ namespace DataTools.Text
                     var txt = QuoteFromHere(chrs, i, ref line, out int? sqStart, out int? sqEnd, quoteChar: '\'', withQuotes: true);
                     if (sqEnd != null)
                     {
-                        sb.Append(txt);
+                        if (unquote)
+                        {
+                            sb.Append(txt.Substring(1, txt.Length - 2));
+                        }
+                        else
+                        {
+                            sb.Append(txt);
+                        }
+
                         i = (int)sqEnd;
                     }
                     else
@@ -349,11 +373,14 @@ namespace DataTools.Text
                             if (withToken) sOut.Add(separator);
                             sb.Clear();
 
-                            i = y;
+                            i = y - 1;
                         }
                     }
 
-                    sb.Append(chrs[i]);
+                    else
+                    {
+                        sb.Append(chrs[i]);
+                    }
                 }
             }
 
