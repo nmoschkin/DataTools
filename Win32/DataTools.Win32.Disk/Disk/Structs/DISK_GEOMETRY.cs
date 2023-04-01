@@ -15,8 +15,8 @@ namespace DataTools.Win32.Disk
     internal struct DISK_GEOMETRY
     {
 
-        public LARGE_INTEGER Cylinders;
-        public MEDIA_TYPE MediaType;
+        public LargeInteger Cylinders;
+        public MediaType MediaType;
         public uint TracksPerCylinder;
         public uint SectorsPerTrack;
         public uint BytesPerSector;

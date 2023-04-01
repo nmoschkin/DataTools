@@ -28,7 +28,7 @@ namespace DataTools.Win32.Disk.Partition
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        IDiskPartition this[int index] { get; set; }
+        IDiskPartition this[int index] { get; }
 
         /// <summary>
         /// Returns an array of <see cref="IDiskPartition"/> objects associated with this disk layout.

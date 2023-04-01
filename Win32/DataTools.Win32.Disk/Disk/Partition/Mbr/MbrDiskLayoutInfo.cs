@@ -34,7 +34,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
         {
             get
             {
-                return _Layout.Mbr.Signature;
+                return layout.Mbr.Signature;
             }
         }
     }

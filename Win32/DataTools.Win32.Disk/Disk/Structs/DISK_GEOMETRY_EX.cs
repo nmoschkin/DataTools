@@ -13,7 +13,7 @@ namespace DataTools.Win32.Disk
     internal struct DISK_GEOMETRY_EX
     {
         public DISK_GEOMETRY Geometry;
-        public LARGE_INTEGER DiskSize;
+        public LargeInteger DiskSize;
         public byte Data;
     }
 }

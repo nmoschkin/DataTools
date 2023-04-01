@@ -20,7 +20,7 @@ namespace DataTools.Win32.Disk
         /// <param name="DiskClass">The disk-type class Id or interface Id to use.</param>
         /// <returns>An array of DiskDeviceInfo objects.</returns>
         /// <remarks></remarks>
-        public static DiskDeviceInfo[] _internalEnumDisks(Guid DiskClass = default)
+        public static DiskDeviceInfo[] InternalEnumDisks(Guid DiskClass = default)
         {
             using (var hHeap = new SafePtr())
             {
