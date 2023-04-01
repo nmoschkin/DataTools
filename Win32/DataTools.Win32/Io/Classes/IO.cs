@@ -44,7 +44,7 @@ namespace DataTools.Win32
         /// <param name="values">The comma-separated list of strings to parse.</param>
         /// <returns>An array of T</returns>
         /// <remarks></remarks>
-        public static int FlagsParse<T>(string values)
+        public static T FlagsParse<T>(string values) where T: Enum
         {
             int x;
 
@@ -78,7 +78,7 @@ namespace DataTools.Win32
                 }
             }
 
-            return vOut;
+            return (T)(object)vOut;
         }
 
         [DllImport("kernel32", EntryPoint = "RtlSecureZeroMemory", CharSet = CharSet.Unicode)]
