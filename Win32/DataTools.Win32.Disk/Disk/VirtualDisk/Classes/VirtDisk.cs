@@ -35,22 +35,22 @@ namespace DataTools.Win32.Disk
 
         // Functions
         [DllImport("VirtDisk.dll")]
-        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V1 Parameters, IntPtr Overlapped, ref IntPtr Handle);
+        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V1 Parameters, IntPtr Overlapped, out IntPtr Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, IntPtr Overlapped, ref IntPtr Handle);
+        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, SecurityDescriptor.SECURITY_DESCRIPTOR SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, IntPtr Overlapped, out IntPtr Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, IntPtr SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V1 Parameters, IntPtr Overlapped, ref IntPtr Handle);
+        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, IntPtr SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V1 Parameters, IntPtr Overlapped, out IntPtr Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, IntPtr SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, IntPtr Overlapped, ref IntPtr Handle);
+        public static extern uint CreateVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, IntPtr SecurityDescriptor, CREATE_VIRTUAL_DISK_FLAGS Flags, uint ProviderSpecificFlags, CREATE_VIRTUAL_DISK_PARAMETERS_V2 Parameters, IntPtr Overlapped, out IntPtr Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, IntPtr Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, ref IntPtr Handle);
+        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, IntPtr Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, out IntPtr Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, ref IntPtr Handle);
+        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, out IntPtr Handle);
         [DllImport("VirtDisk.dll")]
-        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, ref long Handle);
+        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V1 Paramaters, out long Handle);
         [DllImport("VirtDisk.dll", EntryPoint = "OpenVirtualDisk")]
 
-        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V2 Paramaters, ref IntPtr Handle);
+        public static extern uint OpenVirtualDisk(VIRTUAL_STORAGE_TYPE VirtualStorageType, [MarshalAs(UnmanagedType.LPWStr)] string Path, VIRTUAL_DISK_ACCESS_MASK VirtualDiskAccessMask, OPEN_VIRTUAL_DISK_FLAG Flags, OPEN_VIRTUAL_DISK_PARAMETERS_V2 Paramaters, out IntPtr Handle);
 
         //
         // This value causes the implementation defaults to be used for block size:

@@ -58,25 +58,213 @@ namespace DataTools.Win32.Disk
     /// Encapsulates a virtual disk device (iso, vhd, or vhdx).
     /// </summary>
     /// <remarks></remarks>
-    public sealed class VirtualDisk
+    public sealed class VirtualDisk : SafeHandle
     {
-        internal DiskDeviceInfo _info;
-        internal IntPtr _Handle = IntPtr.Zero;
+        internal DiskDeviceInfo diskInfo;
         private string imageFile;
 
         /// <summary>
-        /// Indicates whether the virtual drive is attached.
+        /// Initialize the virtual disk object with an existing virtual disk.
+        /// </summary>
+        /// <param name="imageFile">The disk image file to load.</param>
+        /// <remarks></remarks>
+        public VirtualDisk(string imageFile) : this(imageFile, true, false)
+        {
+        }
+
+        /// <summary>
+        /// Initialize the virtual disk object with an existing virtual disk, and optionally open the disk.
+        /// </summary>
+        /// <param name="imageFile">The disk image file to load.</param>
+        /// <param name="openDisk">Whether or not to open the disk.</param>
+        /// <remarks></remarks>
+        public VirtualDisk(string imageFile, bool openDisk) : this(imageFile, openDisk, false)
+        {
+        }
+
+        /// <summary>
+        /// Initialize the virtual disk object with an existing virtual disk, and optionally open the disk.
+        /// </summary>
+        /// <param name="imageFile">The disk image file to load.</param>
+        /// <param name="openDisk">Whether or not to open the disk.</param>
+        /// <param name="openReadOnly">Whether or not to open the disk read-only.</param>
+        /// <remarks></remarks>
+        public VirtualDisk(string imageFile, bool openDisk, bool openReadOnly) : this()
+        {
+            this.imageFile = imageFile;
+            if (openDisk) Open(openReadOnly);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of a virtual drive with the specified DiskDeviceInfo object.
+        /// </summary>
+        /// <param name="inf">DiskDeviceInfo object.</param>
+        /// <param name="open">Whether or not to open the drive.</param>
+        /// <remarks></remarks>
+        internal VirtualDisk(DiskDeviceInfo inf, bool open) : this(inf.BackingStore[0], open)
+        {
+            diskInfo = inf;
+        }
+
+        private VirtualDisk() : base(IntPtr.Zero, true)
+        {
+        }
+
+        /// <summary>
+        /// Indicates whether the virtual drive is mounted.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool Attached
+        public bool Mounted
         {
             get
             {
                 return !string.IsNullOrEmpty(DevicePath);
             }
         }
+
+        /// <summary>
+        /// Returns the backing store paths.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public string[] BackingStore
+        {
+            get
+            {
+                return diskInfo.BackingStore;
+            }
+        }
+
+        /// <summary>
+        /// Returns the DeviceCapabilities enumeration.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public DeviceCapabilities Capabilities
+        {
+            get
+            {
+                return diskInfo.Capabilities;
+            }
+        }
+
+        /// <summary>
+        /// Returns the device path.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public string DevicePath
+        {
+            get
+            {
+                return diskInfo.DevicePath;
+            }
+        }
+
+        /// <summary>
+        /// Returns the device type.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public DeviceType DeviceType
+        {
+            get
+            {
+                return DeviceType.Disk;
+            }
+        }
+
+        /// <summary>
+        /// Returns the device friendly name.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public string FriendlyName
+        {
+            get
+            {
+                return diskInfo.FriendlyName;
+            }
+        }
+
+        /// <summary>
+        /// Returns the unique Guid identifier of the virtual drive.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public Guid Identifier
+        {
+            get
+            {
+                var info = new GET_VIRTUAL_DISK_INFO_SIZE();
+                uint iSize;
+                uint sizeUsed = 0;
+
+                using (var mm = new SafePtr())
+                {
+
+                    info.Version = GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_IDENTIFIER;
+                    iSize = (uint)Marshal.SizeOf<GET_VIRTUAL_DISK_INFO_SIZE>();
+
+                    mm.FromStruct(info);
+                    HResult r = (HResult)VirtDisk.GetVirtualDiskInformation(handle, ref iSize, mm, ref sizeUsed);
+
+                    if (r == HResult.Ok)
+                    {
+                        return mm.GuidAtAbsolute(8L);
+                    }
+                    else
+                    {
+                        return Guid.Empty;
+                    }
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the VHD/VHDX/ISO image file for the current object.
+        /// If set, any current image is closed.
+        /// </summary>
+        /// <returns></returns>
+        public string ImageFile
+        {
+            get
+            {
+                return imageFile;
+            }
+
+            set
+            {
+                if (IsOpen) Close();
+                imageFile = value;
+            }
+        }
+
+        /// <summary>
+        /// Returns the hardware instance id.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public string InstanceId
+        {
+            get
+            {
+                return diskInfo.InstanceId;
+            }
+        }
+
+        /// <inheritdoc/>
+        public override bool IsInvalid => handle == IntPtr.Zero;
 
         /// <summary>
         /// Indicates whether the virtual drive is open.
@@ -88,18 +276,41 @@ namespace DataTools.Win32.Disk
         {
             get
             {
-                return _Handle != IntPtr.Zero;
+                return handle != IntPtr.Zero;
             }
         }
 
         /// <summary>
-        /// Displays drive information.
+        /// Returns the PhysicalDriveX number.
         /// </summary>
+        /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public override string ToString()
+        public int PhysicalDevice
         {
-            return $"{TextTools.PrintFriendlySize(Size)} Virtual Drive [{(Attached ? "Attached" : "Not Attached")}]";
+            get
+            {
+                return diskInfo.PhysicalDevice;
+            }
+        }
+
+        /// <summary>
+        /// Returns the physical hardware path of the device.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public string PhysicalPath
+        {
+            get
+            {
+                uint szpath = IO.MAX_PATH;
+                using (var mm = new SafePtr(szpath * 2))
+                {
+                    var r = VirtDisk.GetVirtualDiskPhysicalPath(handle, ref szpath, mm);
+                    return mm.ToString();
+                }
+            }
         }
 
         /// <summary>
@@ -130,105 +341,22 @@ namespace DataTools.Win32.Disk
             }
         }
 
-        private GET_VIRTUAL_DISK_INFO_SIZE GetSizeInfo()
-        {
-            if (_Handle == IntPtr.Zero) return default;
-
-            GET_VIRTUAL_DISK_INFO_SIZE info;
-            uint iSize;
-            uint sizeUsed = 0;
-
-            using (var mm = new SafePtr())
-            {
-                info = new GET_VIRTUAL_DISK_INFO_SIZE();
-                info.Version = GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_SIZE;
-
-                iSize = (uint)Marshal.SizeOf<GET_VIRTUAL_DISK_INFO_SIZE>();
-
-                mm.FromStruct(info);
-
-                uint r = VirtDisk.GetVirtualDiskInformation(_Handle, ref iSize, mm, ref sizeUsed);
-                info = mm.ToStruct<GET_VIRTUAL_DISK_INFO_SIZE>();
-
-                return info;
-            }
-        }
+        /// <summary>
+        /// Miscellaneous data
+        /// </summary>
+        public object Tag { get; set; }
 
         /// <summary>
-        /// Returns the physical hardware path of the device.
+        /// Returns the storage device type.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string PhysicalPath
+        public StorageType Type
         {
             get
             {
-                uint szpath = IO.MAX_PATH;
-                using (var mm = new SafePtr(szpath * 2))
-                {
-                    var r = VirtDisk.GetVirtualDiskPhysicalPath(_Handle, ref szpath, mm);
-                    return mm.ToString();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns the unique Guid identifier of the virtual drive.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public Guid Identifier
-        {
-            get
-            {
-                Guid IdentifierRet = default;
-                var info = default(GET_VIRTUAL_DISK_INFO_SIZE);
-                uint iSize;
-                var sizeUSed = default(uint);
-                var mm = new MemPtr();
-                info.Version = GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_IDENTIFIER;
-                iSize = (uint)Marshal.SizeOf<GET_VIRTUAL_DISK_INFO_SIZE>();
-                mm.FromStruct(info);
-                uint r = VirtDisk.GetVirtualDiskInformation(_Handle, ref iSize, mm, ref sizeUSed);
-                IdentifierRet = mm.GuidAtAbsolute(8L);
-                mm.Free();
-                return IdentifierRet;
-            }
-        }
-
-        /// <summary>
-        /// Returns the handle to the open virtual disk.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public IntPtr Handle
-        {
-            get
-            {
-                return _Handle;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the VHD/VHDX/ISO image file for the current object.
-        /// If set, any current image is closed.
-        /// </summary>
-        /// <returns></returns>
-        public string ImageFile
-        {
-            get
-            {
-                return imageFile;
-            }
-
-            set
-            {
-                if (Open())
-                    Close();
-                imageFile = value;
+                return StorageType.Virtual;
             }
         }
 
@@ -248,84 +376,123 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public static VirtualDisk Create(string imageFile, long diskSize, bool fixedSize, ref Guid id, ref Guid resiliencyId, int blockSize = 2097152, int sectorSize = 512, string sourcePath = null, VirtualStorageType sourceDiskType = VirtualStorageType.Unknown)
         {
-            VirtualDisk CreateRet = default;
-
             string ext = Path.GetExtension(imageFile).ToLower();
-
-            var cp2 = new CREATE_VIRTUAL_DISK_PARAMETERS_V2();
-            var cp1 = new CREATE_VIRTUAL_DISK_PARAMETERS_V1();
 
             VIRTUAL_STORAGE_TYPE vst;
 
             var r = default(uint);
-            IntPtr handleNew = new IntPtr();
+            IntPtr handleNew = IntPtr.Zero;
 
             vst.VendorId = VirtDisk.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
 
             switch (ext ?? "")
             {
                 case ".vhd":
+
+                    var cp1 = new CREATE_VIRTUAL_DISK_PARAMETERS_V1
                     {
-                        cp1.BlockSizeInBytes = (uint)blockSize;
-                        cp1.Version = CREATE_VIRTUAL_DISK_VERSION.CREATE_VIRTUAL_DISK_VERSION_1;
-                        cp1.MaximumSize = (ulong)diskSize;
-                        cp1.UniqueId = id;
-                        cp1.SourcePath = sourcePath;
-                        cp1.SectorSizeInBytes = 512;
-                        vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
+                        BlockSizeInBytes = (uint)blockSize,
+                        Version = CREATE_VIRTUAL_DISK_VERSION.CREATE_VIRTUAL_DISK_VERSION_1,
+                        MaximumSize = (ulong)diskSize,
+                        UniqueId = id,
+                        SourcePath = sourcePath,
+                        SectorSizeInBytes = 512
+                    };
+                    vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
 
-                        r = VirtDisk.CreateVirtualDisk(vst, imageFile, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ALL, IntPtr.Zero, fixedSize ? CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION : CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_NONE, 0U, cp1, IntPtr.Zero, ref handleNew);
+                    r = VirtDisk.CreateVirtualDisk(vst, imageFile, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ALL, IntPtr.Zero, fixedSize ? CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION : CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_NONE, 0U, cp1, IntPtr.Zero, out handleNew);
 
-                        break;
-                    }
+                    break;
 
                 case ".vhdx":
+
+                    var cp2 = new CREATE_VIRTUAL_DISK_PARAMETERS_V2
                     {
-                        cp2.BlockSizeInBytes = (uint)blockSize;
-                        cp2.Version = CREATE_VIRTUAL_DISK_VERSION.CREATE_VIRTUAL_DISK_VERSION_2;
-                        cp2.MaximumSize = (ulong)diskSize;
-                        cp2.UniqueId = id;
-                        cp2.SourcePath = sourcePath;
-                        if (sourcePath is object)
-                        {
-                            cp2.SourceVirtualStorageType.DeviceId = (uint)sourceDiskType;
-                            cp2.SourceVirtualStorageType.VendorId = VirtDisk.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
-                        }
+                        BlockSizeInBytes = (uint)blockSize,
+                        Version = CREATE_VIRTUAL_DISK_VERSION.CREATE_VIRTUAL_DISK_VERSION_2,
+                        MaximumSize = (ulong)diskSize,
+                        UniqueId = id,
+                        SourcePath = sourcePath
+                    };
 
-                        int x = Marshal.SizeOf(cp2);
-
-                        cp2.SectorSizeInBytes = sectorSize;
-
-                        if (resiliencyId != Guid.Empty)
-                        {
-                            cp2.ResiliencyGuid = resiliencyId;
-                            // Else
-                            // cp2.ResiliencyGuid = Guid.NewGuid
-                            // resiliencyId = cp2.ResiliencyGuid
-                        }
-
-                        cp2.OpenFlags = OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE;
-                        vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
-
-                        r = VirtDisk.CreateVirtualDisk(vst, imageFile, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_NONE, IntPtr.Zero, fixedSize ? CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION : CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_NONE, 0U, cp2, IntPtr.Zero, ref handleNew);
-                        break;
+                    if (sourcePath != null)
+                    {
+                        cp2.SourceVirtualStorageType.DeviceId = (uint)sourceDiskType;
+                        cp2.SourceVirtualStorageType.VendorId = VirtDisk.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
                     }
+
+                    cp2.SectorSizeInBytes = sectorSize;
+
+                    if (resiliencyId != Guid.Empty)
+                    {
+                        cp2.ResiliencyGuid = resiliencyId;
+                        // Else
+                        // cp2.ResiliencyGuid = Guid.NewGuid
+                        // resiliencyId = cp2.ResiliencyGuid
+                    }
+
+                    cp2.OpenFlags = OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE;
+                    vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
+
+                    r = VirtDisk.CreateVirtualDisk(vst, imageFile, VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_NONE, IntPtr.Zero, fixedSize ? CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_FULL_PHYSICAL_ALLOCATION : CREATE_VIRTUAL_DISK_FLAGS.CREATE_VIRTUAL_DISK_FLAG_NONE, 0U, cp2, IntPtr.Zero, out handleNew);
+                    break;
             }
 
             if (r != 0L)
             {
-                CreateRet = null;
+                return null;
             }
             else
             {
-                CreateRet = new VirtualDisk
+                return new VirtualDisk
                 {
-                    _Handle = handleNew,
+                    handle = handleNew,
                     imageFile = imageFile
                 };
             }
 
-            return CreateRet;
+        }
+
+        /// <summary>
+        /// Mount the virtual drive.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public bool Mount()
+        {
+            return Mount(true);
+        }
+
+        /// <summary>
+        /// Mount the virtual drive, permanently.  The virtual drive will stay mounted beyond the lifetime of this instance.
+        /// </summary>
+        /// <param name="makePermanent"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public bool Mount(bool makePermanent)
+        {
+            if (handle == IntPtr.Zero || Mounted) return false;
+
+            using (var mm = new SafePtr(8L))
+            {
+                mm.ByteAt(0L) = 1;
+                uint r = VirtDisk.AttachVirtualDisk(handle, IntPtr.Zero, makePermanent ? ATTACH_VIRTUAL_DISK_FLAG.ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME : ATTACH_VIRTUAL_DISK_FLAG.ATTACH_VIRTUAL_DISK_FLAG_NONE, 0U, mm, IntPtr.Zero);
+
+                return r == 0L;
+            }
+        }
+
+        /// <summary>
+        /// Dismount the drive.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public bool Unmount()
+        {
+            if (!Mounted) return false;
+
+            uint r = VirtDisk.DetachVirtualDisk(handle, DETACH_VIRTUAL_DISK_FLAG.DETACH_VIRTUAL_DISK_FLAG_NONE, 0U);
+            return r == 0L;
         }
 
         /// <summary>
@@ -333,12 +500,7 @@ namespace DataTools.Win32.Disk
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool Open()
-        {
-            bool OpenRet = default;
-            OpenRet = Open(false);
-            return OpenRet;
-        }
+        public bool Open() => Open(false);
 
         /// <summary>
         /// Open the virtual disk.
@@ -346,12 +508,7 @@ namespace DataTools.Win32.Disk
         /// <param name="openReadOnly">Open as read-only.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool Open(bool openReadOnly)
-        {
-            bool OpenRet = default;
-            OpenRet = Open(imageFile, openReadOnly);
-            return OpenRet;
-        }
+        public bool Open(bool openReadOnly) => Open(imageFile, openReadOnly);
 
         /// <summary>
         /// Open the specified virtual disk image file.
@@ -359,12 +516,7 @@ namespace DataTools.Win32.Disk
         /// <param name="imageFile">The vhd or vhdx file to open.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool Open(string imageFile)
-        {
-            bool OpenRet = default;
-            OpenRet = Open(imageFile, false);
-            return OpenRet;
-        }
+        public bool Open(string imageFile) => Open(imageFile, false);
 
         /// <summary>
         /// Open the specified disk image file.
@@ -375,11 +527,10 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public bool Open(string imageFile, bool openReadOnly)
         {
+            if (handle != IntPtr.Zero) Close();
+
             string ext = Path.GetExtension(imageFile).ToLower();
             VIRTUAL_STORAGE_TYPE vst;
-            if (_Handle != IntPtr.Zero)
-                Close();
-
 
             HResult r;
 
@@ -410,12 +561,12 @@ namespace DataTools.Win32.Disk
             {
                 case ".vhd":
                     vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
-                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp1, ref _Handle);
+                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp1, out handle);
                     break;
 
                 case ".vhdx":
                     vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
-                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp2, ref _Handle);
+                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp2, out handle);
                     break;
 
                 default:
@@ -431,260 +582,45 @@ namespace DataTools.Win32.Disk
         }
 
         /// <summary>
-        /// Mount the virtual drive.
+        /// Displays drive information.
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool Attach()
+        public override string ToString()
         {
-            return Attach(true);
+            return $"{TextTools.PrintFriendlySize(Size)} Virtual Drive [{(Mounted ? "Attached" : "Not Attached")}]";
         }
-
-        /// <summary>
-        /// Mount the virtual drive, permanently.  The virtual drive will stay mounted beyond the lifetime of this instance.
-        /// </summary>
-        /// <param name="makePermanent"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool Attach(bool makePermanent)
+        /// <inheritdoc/>
+        protected override bool ReleaseHandle()
         {
-            if (_Handle == IntPtr.Zero || Attached)
-                return false;
-
-            var mm = new MemPtr(8L);
-
-            mm.ByteAt(0L) = 1;
-
-            uint r = VirtDisk.AttachVirtualDisk(_Handle, IntPtr.Zero, makePermanent ? ATTACH_VIRTUAL_DISK_FLAG.ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME : ATTACH_VIRTUAL_DISK_FLAG.ATTACH_VIRTUAL_DISK_FLAG_NONE, 0U, mm.Handle, IntPtr.Zero);
-
-            mm.Free();
-
-            return r == 0L;
-        }
-
-        /// <summary>
-        /// Dismount the drive.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool Detach()
-        {
-            if (!Attached) return false;
-
-            uint r = VirtDisk.DetachVirtualDisk(_Handle, DETACH_VIRTUAL_DISK_FLAG.DETACH_VIRTUAL_DISK_FLAG_NONE, 0U);
-
-            return r == 0L;
-        }
-
-        /// <summary>
-        /// Close the disk instance.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool Close()
-        {
-            if (_Handle == IntPtr.Zero)
-                return false;
-
-            bool r = User32.CloseHandle(_Handle);
-
-            if (r)
-                _Handle = IntPtr.Zero;
-
+            if (IsInvalid) return true;
+            var r = User32.CloseHandle(handle);
+            if (r) handle = IntPtr.Zero;
             return r;
         }
 
-        /// <summary>
-        /// Initialize the virtual disk object with an existing virtual disk.
-        /// </summary>
-        /// <param name="imageFile">The disk image file to load.</param>
-        /// <remarks></remarks>
-        public VirtualDisk(string imageFile) : this(imageFile, false, false)
+        private GET_VIRTUAL_DISK_INFO_SIZE GetSizeInfo()
         {
-        }
+            if (handle == IntPtr.Zero) return default;
 
-        /// <summary>
-        /// Initialize the virtual disk object with an existing virtual disk, and optionally open the disk.
-        /// </summary>
-        /// <param name="imageFile">The disk image file to load.</param>
-        /// <param name="openDisk">Whether or not to open the disk.</param>
-        /// <remarks></remarks>
-        public VirtualDisk(string imageFile, bool openDisk) : this(imageFile, openDisk, false)
-        {
-        }
+            GET_VIRTUAL_DISK_INFO_SIZE info;
+            uint iSize;
+            uint sizeUsed = 0;
 
-        /// <summary>
-        /// Initialize the virtual disk object with an existing virtual disk, and optionally open the disk.
-        /// </summary>
-        /// <param name="imageFile">The disk image file to load.</param>
-        /// <param name="openDisk">Whether or not to open the disk.</param>
-        /// <param name="openReadOnly">Whether or not to open the disk read-only.</param>
-        /// <remarks></remarks>
-        public VirtualDisk(string imageFile, bool openDisk, bool openReadOnly)
-        {
-            this.imageFile = imageFile;
-            if (openDisk) Open(openReadOnly);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of a virtual drive with the specified DiskDeviceInfo object.
-        /// </summary>
-        /// <param name="inf">DiskDeviceInfo object.</param>
-        /// <param name="open">Whether or not to open the drive.</param>
-        /// <remarks></remarks>
-        public VirtualDisk(DiskDeviceInfo inf, bool open) : this(inf.BackingStore[0], open)
-        {
-            _info = inf;
-        }
-
-        /// <summary>
-        /// Returns the DeviceCapabilities enumeration.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public DeviceCapabilities Capabilities
-        {
-            get
+            using (var mm = new SafePtr())
             {
-                return _info.Capabilities;
+                info = new GET_VIRTUAL_DISK_INFO_SIZE();
+                info.Version = GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_SIZE;
+
+                iSize = (uint)Marshal.SizeOf<GET_VIRTUAL_DISK_INFO_SIZE>();
+
+                mm.FromStruct(info);
+
+                uint r = VirtDisk.GetVirtualDiskInformation(handle, ref iSize, mm, ref sizeUsed);
+                info = mm.ToStruct<GET_VIRTUAL_DISK_INFO_SIZE>();
+
+                return info;
             }
-        }
-
-        /// <summary>
-        /// Returns the device friendly name.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public string FriendlyName
-        {
-            get
-            {
-                return _info.FriendlyName;
-            }
-        }
-
-        /// <summary>
-        /// Returns the PhysicalDriveX number.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public int PhysicalDevice
-        {
-            get
-            {
-                return _info.PhysicalDevice;
-            }
-        }
-
-        /// <summary>
-        /// Returns the device path.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public string DevicePath
-        {
-            get
-            {
-                return _info.DevicePath;
-            }
-        }
-
-        /// <summary>
-        /// Returns the backing store paths.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public string[] BackingStore
-        {
-            get
-            {
-                return _info.BackingStore;
-            }
-        }
-
-        public object Tag { get; set; }
-
-        /// <summary>
-        /// Returns the storage device type.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public StorageType Type
-        {
-            get
-            {
-                return StorageType.Virtual;
-            }
-        }
-
-        /// <summary>
-        /// Returns the hardware instance id.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public string InstanceId
-        {
-            get
-            {
-                return _info.InstanceId;
-            }
-        }
-
-        /// <summary>
-        /// Returns the device type.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public DeviceType DeviceType
-        {
-            get
-            {
-                return DeviceType.Disk;
-            }
-        }
-
-        private bool disposedValue;
-
-        /// <summary>
-        /// Dispose of the current instance and close all handles.
-        /// </summary>
-        /// <param name="disposing"></param>
-        /// <remarks></remarks>
-        private void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                }
-
-                Close();
-            }
-
-            disposedValue = true;
-        }
-
-        ~VirtualDisk()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private VirtualDisk()
-        {
         }
     }
 }
