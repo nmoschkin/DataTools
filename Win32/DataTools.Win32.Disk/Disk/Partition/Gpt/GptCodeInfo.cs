@@ -80,8 +80,6 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             return null;
         }
 
-        
-
         static GptCodeInfo()
         {
             _Col.Add(new GptCodeInfo("MBR partition scheme", "024DEE41-33E7-11D3-9D69-0008C781F39F"));

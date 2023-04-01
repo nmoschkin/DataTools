@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
 using static DataTools.Win32.DeviceEnum;
 
@@ -38,7 +37,7 @@ namespace DataTools.Win32.Disk
 
                     uint bytesReturned = 0U;
 
-                    info = DeviceEnum.EnumerateDevices<DiskDeviceInfo>(DiskClass);
+                    info = EnumerateDevices<DiskDeviceInfo>(DiskClass);
 
                     if (info is null || info.Count() == 0) return Array.Empty<DiskDeviceInfo>();
 
@@ -114,7 +113,7 @@ namespace DataTools.Win32.Disk
                             }
                             else if (inf.Type != StorageType.Optical)
                             {
-                                using (var disk = DiskHandle.OpenDisk(inf.DevicePath)) 
+                                using (var disk = DiskHandle.OpenDisk(inf.DevicePath))
                                 {
                                     hHeap.Length = 128L;
                                     hHeap.ZeroMemory();
@@ -143,7 +142,6 @@ namespace DataTools.Win32.Disk
                                         diskNumber = hHeap.ToStruct<NativeDisk.STORAGE_DEVICE_NUMBER>();
                                         inf.PhysicalDevice = (int)diskNumber.DeviceNumber;
                                     }
-
                                 }
 
                                 if (inf.DevicePath.Contains("disk&ven_msft&prod_virtual_disk"))
@@ -161,7 +159,7 @@ namespace DataTools.Win32.Disk
                                             HResult r;
 
                                             sdi.Version = STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
-                                            
+
                                             mm.IntAt(0L) = (int)STORAGE_DEPENDENCY_INFO_VERSION.STORAGE_DEPENDENCY_INFO_VERSION_2;
                                             mm.IntAt(1L) = 1;
 
@@ -205,9 +203,8 @@ namespace DataTools.Win32.Disk
                                     }
                                 }
                             }
-
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             Debug.WriteLine(ex);
                         }
@@ -285,7 +282,6 @@ namespace DataTools.Win32.Disk
 
                     disk.VolumeGuidPath = guidpath;
                     disk.SectorSize = sectorSize;
-
                 }
             }
         }

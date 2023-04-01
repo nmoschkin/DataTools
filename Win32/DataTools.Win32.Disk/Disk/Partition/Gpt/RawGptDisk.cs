@@ -12,9 +12,11 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Principal;
+using System.Text;
 using DataTools.Text;
 using DataTools.Win32.Disk.Partition;
 using DataTools.Win32.Memory;
@@ -66,16 +68,18 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                 var geo = (DISK_GEOMETRY_EX)outGeo;
 
                 // sector size (usually 512 bytes)
-                uint bps = geo.Geometry.BytesPerSector;
+                long bps = geo.Geometry.BytesPerSector;
                 uint br = 0U;
                 long lp = 0L;
                 long lp2 = 0L;
+                var ptypes = new List<string>();
 
+                var ntfs = BitConverter.ToUInt64(System.Text.Encoding.UTF8.GetBytes("NTFS    "), 0);
 
                 using (var mm = new SafePtr(bps * 2L))
                 {
                     IO.SetFilePointerEx(hfile, 0L, ref lp, IO.FilePointerMoveMethod.Begin);
-                    IO.ReadFile(hfile, mm, bps * 2, ref br, IntPtr.Zero);
+                    IO.ReadFile(hfile, mm, (uint)(bps * 2L), ref br, IntPtr.Zero);
                     var mbr = new RAW_MBR();
                     var gpt = new RAW_GPT_HEADER();
                     RAW_GPT_PARTITION[] gpp = null;
@@ -92,7 +96,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                         long lr = br;
 
                         // seek to the LBA of the partition information.
-                        IO.SetFilePointerEx(hfile, (uint)(bps * gpt.PartitionEntryLBA), ref lr, IO.FilePointerMoveMethod.Begin);
+                        IO.SetFilePointerEx(hfile, (long)((ulong)bps * gpt.PartitionEntryLBA), ref lr, IO.FilePointerMoveMethod.Begin);
                         br = (uint)lr;
 
                         // calculate the size of the partition table buffer.
@@ -130,6 +134,24 @@ namespace DataTools.Win32.Disk.Partition.Gpt
 
                                 // break on empty GUID, we are past the last partition.
                                 if (gpp[i].PartitionTypeGuid == Guid.Empty) break;
+
+                                IO.SetFilePointerEx(hfile, (long)((ulong)bps * gpp[i].StartingLBA), ref lr, IO.FilePointerMoveMethod.Begin);
+                                br = (uint)lr;
+
+                                using (var expt = new SafePtr(bps))
+                                {                                    
+                                    IO.ReadFile(hfile, expt, (uint)bps, ref br, IntPtr.Zero);
+                                    var xf = expt.GetUTF8String(3).Trim();
+                                    if (!string.IsNullOrEmpty(xf))
+                                    {
+                                        ptypes.Add(xf);
+                                    }
+                                    else
+                                    {
+                                        ptypes.Add("Unknown");
+                                    }
+                                }
+
                                 lp2 += lp;
                             }
 
@@ -156,7 +178,8 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                     gptInfo = new RAW_GPT_DISK()
                     {
                         Header = gpt,
-                        Partitions = gpp
+                        Partitions = gpp,
+                        PartitionTypes = ptypes.ToArray()
                     };
 
                     // we have succeeded.
@@ -269,6 +292,19 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U2, SizeConst = 36)]
             private char[] _Name;
 
+            public ulong GetByteOffset(ulong sectorSize = 512)
+            {
+                return StartingLBA * sectorSize;
+            }
+
+            public ulong Size
+            {
+                get
+                {
+                    return (EndingLBA - StartingLBA) * 512;
+                }
+            }
+
             /// <summary>
             /// Returns the name of this partition (if any).
             /// </summary>
@@ -330,6 +366,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         {
             public RAW_GPT_HEADER Header;
             public RAW_GPT_PARTITION[] Partitions;
+            public string[] PartitionTypes;
         }
     }
 }

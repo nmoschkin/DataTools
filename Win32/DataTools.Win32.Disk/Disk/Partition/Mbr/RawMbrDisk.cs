@@ -59,6 +59,11 @@ namespace DataTools.Win32.Disk.Partition.Mbr
             /// Linear address of last sector in partition. Multiply by sector size (usually 512) for real offset
             /// </summary>
             public uint EndLBA;
+
+            /// <summary>
+            /// Gets the size based on 512 sector size
+            /// </summary>
+            public long Size => (EndLBA * 512L);
         }
 
         /// <summary>
