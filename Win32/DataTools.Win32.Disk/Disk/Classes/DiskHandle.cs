@@ -12,7 +12,6 @@
 
 
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using DataTools.Win32.Disk;
 

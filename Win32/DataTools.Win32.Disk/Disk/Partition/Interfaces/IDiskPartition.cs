@@ -39,20 +39,12 @@ namespace DataTools.Win32.Disk.Partition
         long Size { get; }
 
         /// <summary>
-        /// Returns the friendly name of the partition type.
+        /// Get information about the partition type.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        string TypeName { get; }
-
-        /// <summary>
-        /// Represents a technical type identifier.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        string TypeString { get; }
+        IPartitionType PartitionType { get; }
 
         /// <summary>
         /// Returns the style of the disk or partition (MBR or GPT).

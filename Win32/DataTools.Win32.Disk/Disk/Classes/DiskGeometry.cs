@@ -10,24 +10,30 @@ namespace DataTools.Win32.Disk
     internal static class DiskGeometry
     {
         /// <summary>
-        /// Enumerates all the partitions on a physical device.
+        /// Get the disk geometry for the specified device
         /// </summary>
         /// <param name="devicePath">The disk device path to query.</param>
-        /// <param name="hfile">Optional valid disk handle.</param>
+        /// <param name="disk">The valid disk handle.</param>
         /// <param name="geometry">Receives disk geometry information.</param>
         /// <returns>An array of PARTITION_INFORMATION_EX structures.</returns>
-        /// <remarks></remarks>
-        public static bool GetDiskGeometry(string devicePath, DiskHandle hfile, out DISK_GEOMETRY_EX? geometry)
+        /// <remarks>Use either <paramref name="devicePath"/> or <paramref name="disk"/>, but not both. Set the other to null.</remarks>
+        public static bool GetDiskGeometry(string devicePath, DiskHandle disk, out DISK_GEOMETRY_EX? geometry)
         {
+            bool owndisk;
             geometry = null;
 
-            if (devicePath != null && hfile == null)
+            if (devicePath != null && disk == null)
             {
-                hfile = DiskHandle.OpenDisk(devicePath);
+                disk = DiskHandle.OpenDisk(devicePath);
+                owndisk = true;
             }
-            else if (hfile == null)
+            else if (disk == null)
             {
                 return false;
+            }
+            else
+            {
+                owndisk = false;
             }
 
             using (var pex = new SafePtr())
@@ -42,7 +48,7 @@ namespace DataTools.Win32.Disk
                 do
                 {
                     pex.ReAlloc(sbs);
-                    succeed = NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, IntPtr.Zero, 0U, pex, (uint)pex.Length, ref cb, IntPtr.Zero);
+                    succeed = NativeDisk.DeviceIoControl(disk, NativeDisk.IOCTL_DISK_GET_DRIVE_GEOMETRY_EX, IntPtr.Zero, 0U, pex, (uint)pex.Length, ref cb, IntPtr.Zero);
 
                     if (!succeed)
                     {
@@ -68,10 +74,10 @@ namespace DataTools.Win32.Disk
                 }
 
                 if (succeed) geometry = pex.ToStruct<DISK_GEOMETRY_EX>();
+
+                if (owndisk) disk.Close();
                 return succeed;
             }
-
-
         }
     }
 }

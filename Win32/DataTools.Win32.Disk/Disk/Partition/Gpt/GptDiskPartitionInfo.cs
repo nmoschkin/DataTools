@@ -15,6 +15,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
     /// <remarks></remarks>
     public class GptDiskPartitionInfo : DiskPartitionInfo, IGuid
     {
+        private GptCodeInfo partInfo;
 
         /// <summary>
         /// Creates a new instance of this DiskPartitionInfo-derived class and populates it with information from the operating system.
@@ -23,6 +24,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         /// <remarks></remarks>
         internal GptDiskPartitionInfo(Partitioning.PARTITION_INFORMATION_EX pe) : base(pe)
         {
+            partInfo = _partex.Gpt.PartitionCode;
         }
 
         /// <summary>
@@ -45,25 +47,11 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public Guid Id
+        Guid IGuid.Id
         {
             get
             {
                 return _partex.Gpt.PartitionId;
-            }
-        }
-
-        /// <summary>
-        /// Returns the PartitionType Guid.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public Guid PartitionType
-        {
-            get
-            {
-                return _partex.Gpt.PartitionType;
             }
         }
 
@@ -74,26 +62,6 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         /// <returns></returns>
         /// <remarks></remarks>
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public GptCodeInfo PartitionTypeInfo
-        {
-            get
-            {
-                return _partex.Gpt.PartitionCode;
-            }
-        }
-
-        /// <summary>
-        /// Returns the Guid of the Partition Type.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public override string TypeString
-        {
-            get
-            {
-                return PartitionType.ToString("B");
-            }
-        }
+        public override IPartitionType PartitionType => partInfo;
     }
 }

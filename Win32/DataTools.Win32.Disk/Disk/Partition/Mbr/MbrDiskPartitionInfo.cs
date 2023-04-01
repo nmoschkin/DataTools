@@ -15,6 +15,8 @@ namespace DataTools.Win32.Disk.Partition.Mbr
     public class MbrDiskPartitionInfo : DiskPartitionInfo
     {
 
+        private PartitionCodeInfo partInfo;
+
         /// <summary>
         /// Creates a new instance of this DiskPartitionInfo-derived class and populates it with information from the operating system.
         /// </summary>
@@ -22,6 +24,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
         /// <remarks></remarks>
         internal MbrDiskPartitionInfo(Partitioning.PARTITION_INFORMATION_EX pe) : base(pe)
         {
+            partInfo = PartitionCodeInfo.FindByCode(_partex.Mbr.PartitionType).FirstOrDefault();
         }
 
         /// <summary>
@@ -37,21 +40,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
             {
                 return _partex.Mbr.PartitionCode;
             }
-        }
-
-        /// <summary>
-        /// Return the MBR partition type byte code.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public byte PartitionType
-        {
-            get
-            {
-                return _partex.Mbr.PartitionType;
-            }
-        }
+        }        
 
         /// <summary>
         /// Indicates that the partition is bootable.
@@ -95,18 +84,8 @@ namespace DataTools.Win32.Disk.Partition.Mbr
             }
         }
 
-        /// <summary>
-        /// Represents a type identifier byte code.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public override string TypeString
-        {
-            get
-            {
-                return (string)((FriendlyPartitionId)_partex.Mbr.PartitionType);
-            }
-        }
+        /// <inheritdoc/>
+        public override IPartitionType PartitionType => partInfo;
+
     }
 }

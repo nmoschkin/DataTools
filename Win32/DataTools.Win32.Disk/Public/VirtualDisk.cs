@@ -14,7 +14,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-
+using DataTools.Shell.Native;
 using DataTools.Text;
 using DataTools.Win32;
 using DataTools.Win32.Memory;
@@ -62,7 +62,7 @@ namespace DataTools.Win32.Disk
     {
         internal DiskDeviceInfo _info;
         internal IntPtr _Handle = IntPtr.Zero;
-        private string _ImageFile;
+        private string imageFile;
 
         /// <summary>
         /// Indicates whether the virtual drive is attached.
@@ -99,9 +99,7 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public override string ToString()
         {
-            string ToStringRet = default;
-            ToStringRet = TextTools.PrintFriendlySize(Size) + " Virtual Drive [" + (Attached ? "Attached" : "Not Attached") + "]";
-            return ToStringRet;
+            return $"{TextTools.PrintFriendlySize(Size)} Virtual Drive [{(Attached ? "Attached" : "Not Attached")}]";
         }
 
         /// <summary>
@@ -114,19 +112,7 @@ namespace DataTools.Win32.Disk
         {
             get
             {
-                long PhysicalSizeRet = default;
-                var info = default(GET_VIRTUAL_DISK_INFO_SIZE);
-                uint iSize;
-                var sizeUSed = default(uint);
-                var mm = new MemPtr();
-                info.Version = GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_SIZE;
-                iSize = (uint)Marshal.SizeOf<GET_VIRTUAL_DISK_INFO_SIZE>();
-                mm.FromStruct(info);
-                uint r = VirtDisk.GetVirtualDiskInformation(_Handle, ref iSize, mm, ref sizeUSed);
-                info = mm.ToStruct<GET_VIRTUAL_DISK_INFO_SIZE>();
-                PhysicalSizeRet = (long)info.PhysicalSize;
-                mm.Free();
-                return PhysicalSizeRet;
+                return (long)GetSizeInfo().PhysicalSize;
             }
         }
 
@@ -140,19 +126,31 @@ namespace DataTools.Win32.Disk
         {
             get
             {
-                long SizeRet = default;
-                var info = default(GET_VIRTUAL_DISK_INFO_SIZE);
-                uint iSize;
-                var sizeUSed = default(uint);
-                var mm = new MemPtr();
+                return (long)GetSizeInfo().VirtualSize;
+            }
+        }
+
+        private GET_VIRTUAL_DISK_INFO_SIZE GetSizeInfo()
+        {
+            if (_Handle == IntPtr.Zero) return default;
+
+            GET_VIRTUAL_DISK_INFO_SIZE info;
+            uint iSize;
+            uint sizeUsed = 0;
+
+            using (var mm = new SafePtr())
+            {
+                info = new GET_VIRTUAL_DISK_INFO_SIZE();
                 info.Version = GET_VIRTUAL_DISK_INFO_VERSION.GET_VIRTUAL_DISK_INFO_SIZE;
-                iSize = (uint)Marshal.SizeOf(info);
+
+                iSize = (uint)Marshal.SizeOf<GET_VIRTUAL_DISK_INFO_SIZE>();
+
                 mm.FromStruct(info);
-                uint r = VirtDisk.GetVirtualDiskInformation(_Handle, ref iSize, mm, ref sizeUSed);
+
+                uint r = VirtDisk.GetVirtualDiskInformation(_Handle, ref iSize, mm, ref sizeUsed);
                 info = mm.ToStruct<GET_VIRTUAL_DISK_INFO_SIZE>();
-                SizeRet = (long)info.VirtualSize;
-                mm.Free();
-                return SizeRet;
+
+                return info;
             }
         }
 
@@ -166,14 +164,12 @@ namespace DataTools.Win32.Disk
         {
             get
             {
-                string PhysicalPathRet = default;
                 uint szpath = IO.MAX_PATH;
-                var mm = new MemPtr();
-                mm.Alloc(IO.MAX_PATH * 2);
-                uint r = VirtDisk.GetVirtualDiskPhysicalPath(_Handle, ref szpath, mm.Handle);
-                PhysicalPathRet = mm.ToString();
-                mm.Free();
-                return PhysicalPathRet;
+                using (var mm = new SafePtr(szpath * 2))
+                {
+                    var r = VirtDisk.GetVirtualDiskPhysicalPath(_Handle, ref szpath, mm);
+                    return mm.ToString();
+                }
             }
         }
 
@@ -225,14 +221,14 @@ namespace DataTools.Win32.Disk
         {
             get
             {
-                return _ImageFile;
+                return imageFile;
             }
 
             set
             {
                 if (Open())
                     Close();
-                _ImageFile = value;
+                imageFile = value;
             }
         }
 
@@ -322,9 +318,11 @@ namespace DataTools.Win32.Disk
             }
             else
             {
-                CreateRet = new VirtualDisk();
-                CreateRet._Handle = handleNew;
-                CreateRet._ImageFile = imageFile;
+                CreateRet = new VirtualDisk
+                {
+                    _Handle = handleNew,
+                    imageFile = imageFile
+                };
             }
 
             return CreateRet;
@@ -351,7 +349,7 @@ namespace DataTools.Win32.Disk
         public bool Open(bool openReadOnly)
         {
             bool OpenRet = default;
-            OpenRet = Open(_ImageFile, openReadOnly);
+            OpenRet = Open(imageFile, openReadOnly);
             return OpenRet;
         }
 
@@ -377,31 +375,34 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public bool Open(string imageFile, bool openReadOnly)
         {
-            bool OpenRet = default;
             string ext = Path.GetExtension(imageFile).ToLower();
             VIRTUAL_STORAGE_TYPE vst;
             if (_Handle != IntPtr.Zero)
                 Close();
 
-            var vdp1 = new OPEN_VIRTUAL_DISK_PARAMETERS_V1();
-            var vdp2 = new OPEN_VIRTUAL_DISK_PARAMETERS_V2();
 
-            uint r;
+            HResult r;
 
             var am = VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_GET_INFO | VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_DETACH;
 
             if (!openReadOnly)
             {
-                am = am | VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ATTACH_RW;
+                am |= VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ATTACH_RW;
             }
 
-            vdp2.Version = OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_2;
-            vdp2.ResiliencyGuid = Guid.NewGuid();
-            vdp2.ReadOnly = false;
-            vdp2.GetInfoOnly = false;
+            var vdp2 = new OPEN_VIRTUAL_DISK_PARAMETERS_V2
+            {
+                Version = OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_2,
+                ResiliencyGuid = Guid.NewGuid(),
+                ReadOnly = false,
+                GetInfoOnly = false
+            };
 
-            vdp1.RWDepth = 1U;
-            vdp1.Version = OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_1;
+            var vdp1 = new OPEN_VIRTUAL_DISK_PARAMETERS_V1
+            {
+                RWDepth = 1U,
+                Version = OPEN_VIRTUAL_DISK_VERSION.OPEN_VIRTUAL_DISK_VERSION_1
+            };
 
             vst.VendorId = VirtDisk.VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
 
@@ -409,25 +410,24 @@ namespace DataTools.Win32.Disk
             {
                 case ".vhd":
                     vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
-                    r = VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp1, ref _Handle);
+                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp1, ref _Handle);
                     break;
 
                 case ".vhdx":
                     vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
-                    r = VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp1, ref _Handle);
+                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp2, ref _Handle);
                     break;
 
                 default:
                     return false;
             }
 
-            if (r == 0L)
+            if (r == HResult.Ok)
             {
-                _ImageFile = imageFile;
+                this.imageFile = imageFile;
             }
 
-            OpenRet = r == 0L;
-            return OpenRet;
+            return r == 0L;
         }
 
         /// <summary>
@@ -522,7 +522,7 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public VirtualDisk(string imageFile, bool openDisk, bool openReadOnly)
         {
-            _ImageFile = imageFile;
+            this.imageFile = imageFile;
             if (openDisk) Open(openReadOnly);
         }
 

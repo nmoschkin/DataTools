@@ -6,6 +6,9 @@ using System.Runtime.InteropServices;
 
 namespace DataTools.Win32.Memory
 {
+    /// <summary>
+    /// SafePtr based on Win32
+    /// </summary>
     public class SafePtr : WinPtrBase, IHeapAssignable
     {
         /// <summary>
@@ -15,6 +18,9 @@ namespace DataTools.Win32.Memory
 
         private IntPtr currentHeap = ProcessHeap;
 
+        /// <summary>
+        /// Gets the <see cref="DataTools.Win32.Memory.HeapDestroyBehavior"/> for this instance.
+        /// </summary>
         public virtual HeapDestroyBehavior HeapDestroyBehavior { get; protected set; } = HeapDestroyBehavior.TransferOut;
 
         void IHeapAssignable.AssignHeap(Heap heap)
@@ -93,35 +99,64 @@ namespace DataTools.Win32.Memory
             }
         }
 
+        /// <summary>
+        /// Open access to the internal for the handle
+        /// </summary>
         protected internal new IntPtr handle
         {
             get => (IntPtr)base.handle;
             protected set => base.handle = value;
         }
 
+        /// <summary>
+        /// Create a new safe pointer from the specified pointer
+        /// </summary>
+        /// <param name="ptr">The pointer to access</param>
+        /// <param name="fOwn">True if this object owns this pointer</param>
+        /// <param name="gcpressure">True to inform garbage collection of allocations and releases</param>
         public SafePtr(IntPtr ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
         }
 
+        /// <summary>
+        /// Create a new, unallocated safe pointer 
+        /// </summary>
         public SafePtr() : this(IntPtr.Zero, true, true)
         {
         }
 
+        /// <summary>
+        /// Create a new safe pointer allocated on the process heap
+        /// </summary>
+        /// <param name="size">The amount of memory to allocate</param>
         public SafePtr(long size) : this(IntPtr.Zero, true, true)
         {
             Alloc(size);
         }
 
+        /// <summary>
+        /// Create a new safe pointer allocated on the process heap
+        /// </summary>
+        /// <param name="size">The amount of memory to allocate</param>
         public SafePtr(int size) : this(IntPtr.Zero, true, true)
         {
             Alloc(size);
         }
 
+        /// <summary>
+        /// Create a new safe pointer from byte data
+        /// </summary>
+        /// <param name="data">The data to initialize the buffer with</param>
         public SafePtr(byte[] data) : this(IntPtr.Zero, true, true)
         {
             FromByteArray(data);
         }
 
+        /// <summary>
+        /// Allocate or reallocate the buffer and zero out the memory after allocation
+        /// </summary>
+        /// <param name="size">The new size of the buffer</param>
+        /// <returns></returns>
         public bool AllocZero(long size)
         {
             var b = Alloc(size);
@@ -129,18 +164,22 @@ namespace DataTools.Win32.Memory
             return b;
         }
 
+        /// <inheritdoc/>
         public override MemoryType MemoryType { get; }
 
+        /// <inheritdoc/>
         protected override IntPtr Allocate(long size)
         {
             return Native.HeapAlloc(CurrentHeap, 8, (IntPtr)size);
         }
 
+        /// <inheritdoc/>
         protected override bool CanGetNativeSize()
         {
             return true;
         }
 
+        /// <inheritdoc/>
         protected override SafePtrBase Clone()
         {
             var b = new SafePtr();
@@ -149,17 +188,20 @@ namespace DataTools.Win32.Memory
             return b;
         }
 
+        /// <inheritdoc/>
         protected override void Deallocate(IntPtr ptr)
         {
             Native.HeapFree(CurrentHeap, 0, ptr);
         }
 
+        /// <inheritdoc/>
         protected override long GetNativeSize()
         {
             if ((long)handle == 0) return 0;
             return (long)Native.HeapSize(CurrentHeap, 0, handle);
         }
 
+        /// <inheritdoc/>
         protected override IntPtr Reallocate(IntPtr oldptr, long newsize)
         {
             return Native.HeapReAlloc(CurrentHeap, 0, handle, (IntPtr)newsize);

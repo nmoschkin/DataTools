@@ -404,14 +404,14 @@ namespace DataTools.Win32
 
             using (var inBuff = new SafePtr(inSize))
             {
-                using (var file = DiskHandle.OpenDisk(devicePath))
+                using (var disk = DiskHandle.OpenDisk(devicePath))
                 {
-                    b = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
+                    b = DeviceIoControl(disk, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
 
                     if (!b && User32.GetLastError() == ERROR_MORE_DATA)
                     {
                         inBuff.Length = inSize * inBuff.IntAt(0L);
-                        b = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
+                        b = DeviceIoControl(disk, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
                     }
 
                     if (!b)

@@ -100,7 +100,7 @@ namespace DataTools.Win32.Disk.Partition
 
             [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U2, SizeConst = 36)]
             private char[] _Name;
-
+            
             /// <summary>
             /// Returns the name of this partition.
             /// </summary>
@@ -132,11 +132,17 @@ namespace DataTools.Win32.Disk.Partition
             public override string ToString()
             {
                 if (!string.IsNullOrEmpty(Name))
+                {
                     return Name;
-                var c = PartitionCode;
-                if (c is object)
-                    return c.Name;
-                return null;
+                }
+                else if (PartitionCode != null)
+                {
+                    return PartitionCode.Name ?? PartitionCode.Guid.ToString("D");
+                }
+                else
+                {
+                    return base.ToString();
+                }
             }
         }
 
@@ -168,10 +174,12 @@ namespace DataTools.Win32.Disk.Partition
             {
                 get
                 {
-                    if (PartitionStyle == PartitionStyle.Gpt)
-                        return default;
-                    SafePtr mm = (SafePtr)_PartitionInfo;
-                    return mm.ToStruct<PARTITION_INFORMATION_MBR>();
+                    if (PartitionStyle == PartitionStyle.Gpt) return default;
+
+                    using (var mm = new SafePtr(_PartitionInfo))
+                    {
+                        return mm.ToStruct<PARTITION_INFORMATION_MBR>();
+                    }                    
                 }
             }
 
@@ -185,29 +193,29 @@ namespace DataTools.Win32.Disk.Partition
             {
                 get
                 {
-                    if (PartitionStyle == PartitionStyle.Mbr)
-                        return default;
-                    SafePtr mm = (SafePtr)_PartitionInfo;
-                    return mm.ToStruct<PARTITION_INFORMATION_GPT>();
+                    if (PartitionStyle == PartitionStyle.Mbr) return default;
+                    using (var mm = new SafePtr(_PartitionInfo))
+                    {
+                        return mm.ToStruct<PARTITION_INFORMATION_GPT>();
+                    }                        
                 }
             }
 
             public override string ToString()
             {
-                string ToStringRet = default;
-                if (StartingOffset == 0L && PartitionLength == 0L)
-                    return null;
-                string fs = TextTools.PrintFriendlySize(PartitionLength);
+                if (StartingOffset == 0L && PartitionLength == 0L) return "Empty or Invalid Structure";
+
+                var fs = TextTools.PrintFriendlySize(PartitionLength);
+
                 if (PartitionStyle == PartitionStyle.Mbr)
                 {
-                    ToStringRet = Mbr.ToString() + " [" + fs + "]";
+                    return $"{Mbr} [{fs}]";
                 }
                 else
                 {
-                    ToStringRet = Gpt.ToString() + " [" + fs + "]";
+                    return $"{Gpt} [{fs}]";
                 }
 
-                return ToStringRet;
             }
         }
 
@@ -251,8 +259,10 @@ namespace DataTools.Win32.Disk.Partition
             {
                 get
                 {
-                    SafePtr mm = (SafePtr)_LayoutInfo;
-                    return mm.ToStruct<DRIVE_LAYOUT_INFORMATION_MBR>();
+                    using (var mm = new SafePtr(_LayoutInfo))
+                    {
+                        return mm.ToStruct<DRIVE_LAYOUT_INFORMATION_MBR>();
+                    }
                 }
             }
 
@@ -260,8 +270,10 @@ namespace DataTools.Win32.Disk.Partition
             {
                 get
                 {
-                    SafePtr mm = (SafePtr)_LayoutInfo;
-                    return mm.ToStruct<DRIVE_LAYOUT_INFORMATION_GPT>();
+                    using (var mm = new SafePtr(_LayoutInfo))
+                    {
+                        return mm.ToStruct<DRIVE_LAYOUT_INFORMATION_GPT>();
+                    }
                 }
             }
         }

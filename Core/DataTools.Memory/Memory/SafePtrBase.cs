@@ -1027,7 +1027,7 @@ namespace DataTools.Memory
         public void SetUTF8StringIndirect(long index, string value, bool addNull = true)
         {
             unsafe
-            {
+            {                
                 EncodeUTF8Ptr((byte*)*(IntPtr*)((long)handle + index), value, addNull);
             }
         }

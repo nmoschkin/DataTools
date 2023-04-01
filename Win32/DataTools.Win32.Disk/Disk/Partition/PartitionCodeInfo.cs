@@ -10,10 +10,44 @@ namespace DataTools.Win32.Disk.Partition
 {
 
     /// <summary>
+    /// Represents a partition type with additional information about the partition type
+    /// </summary>
+    public interface IPartitionType
+    {
+        /// <summary>
+        /// The name of the partition type
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// A description of the paritition type
+        /// </summary>
+        string Description { get; }
+
+        /// <summary>
+        /// The partition code, as printed
+        /// </summary>
+        string PartitionCodeString { get; }
+
+    }
+
+    /// <summary>
+    /// Represents a partition type with additional information about the partition type
+    /// </summary>
+    /// <typeparam name="T">The type of object for the partition type code. Must be a structure or a number.</typeparam>
+    public interface IPartitionType<T> : IPartitionType where T: struct
+    {
+        /// <summary>
+        /// The partition code
+        /// </summary>
+        T PartitionCode { get; }
+    }
+
+    /// <summary>
     /// Contains the master list of all known partition types as PartitionCodeInfo objects.
     /// </summary>
     /// <remarks></remarks>
-    public sealed class PartitionCodeInfo
+    public sealed class PartitionCodeInfo : IPartitionType<byte>
     {
         private static readonly string[] allOSs;
         private static readonly List<PartitionCodeInfo> partCodes = new List<PartitionCodeInfo>();
@@ -214,6 +248,11 @@ namespace DataTools.Win32.Disk.Partition
             get => partitionId; 
             private set => partitionId = value;
         }
+
+        byte IPartitionType<byte>.PartitionCode => partitionId.Value;
+
+        string IPartitionType.PartitionCodeString => partitionId.ToString();
+
         /// <summary>
         /// Specifies the supported operating systems.
         /// </summary>
@@ -317,7 +356,7 @@ namespace DataTools.Win32.Disk.Partition
 
             var v = new List<string>
             {
-#region RAW DATA
+#region RAWDATA
                 "\"0x00\",\"MBR, EBR\",\"N/A\",\"No\",\"Free\",\"IBM\",\"All\",\"Empty partition entry\"",
                 "\"0x01\",\"MBR, EBR\",\"CHS, LBA\",\"x86, 68000, 8080/Z80\",\"Filesystem\",\"IBM\",\"DOS 2.0+\",\"FAT12 as primary partition in first physical 32 MB of disk or as logical drive anywhere on disk (else use 06h instead)\"",
                 "\"0x02\",\"MBR\",\"CHS\",\"\",\"\",\"Microsoft, SCO\",\"XENIX\",\"XENIX root\"",

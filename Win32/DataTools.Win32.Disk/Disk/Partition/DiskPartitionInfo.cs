@@ -59,7 +59,10 @@ namespace DataTools.Win32.Disk.Partition
             }
         }
 
-        public abstract string TypeString { get; }
+        /// <summary>
+        /// Get information about the partition type.
+        /// </summary>
+        public abstract IPartitionType PartitionType { get; }
 
         /// <summary>
         /// Returns the logical partition number of the partition on the disk.
@@ -90,27 +93,6 @@ namespace DataTools.Win32.Disk.Partition
         }
 
         /// <summary>
-        /// Returns the friendly type name of the partition type.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public string TypeName
-        {
-            get
-            {
-                if (_partex.PartitionStyle == PartitionStyle.Gpt)
-                {
-                    return _partex.Gpt.Name;
-                }
-                else
-                {
-                    return _partex.Mbr.PartitionCode.Name;
-                }
-            }
-        }
-
-        /// <summary>
         /// Returns the style of the partition (MBR or GPT).
         /// </summary>
         /// <value></value>
@@ -124,6 +106,7 @@ namespace DataTools.Win32.Disk.Partition
             }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return _partex.ToString();

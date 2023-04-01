@@ -16,13 +16,19 @@ namespace DataTools.Win32.Memory
         /// </summary>
         public static readonly Heap ProcessHeap = new Heap(Native.GetProcessHeap());
 
-        private readonly List<WeakReference<IHeapAssignable>> createdObjecs = new List<WeakReference<IHeapAssignable>>();
+        private readonly List<WeakReference<IHeapAssignable>> createdObjects = new List<WeakReference<IHeapAssignable>>();
 
         private IntPtr maxsize = IntPtr.Zero;
         private IntPtr currsize = IntPtr.Zero;
 
+        /// <summary>
+        /// Returns true if this object represents the main process heap
+        /// </summary>
         public bool IsProcessHeap => ProcessHeap.handle == handle;
 
+        /// <summary>
+        /// Returns the maximum allowable size of this heap
+        /// </summary>
         public long MaxSize
         {
             get
@@ -32,6 +38,9 @@ namespace DataTools.Win32.Memory
             }
         }
 
+        /// <summary>
+        /// Returns the current size of this heap
+        /// </summary>
         public long CurrentSize
         {
             get
@@ -41,6 +50,9 @@ namespace DataTools.Win32.Memory
             }
         }
 
+        /// <summary>
+        /// Returns the size of the part of the heap that is allocated to objects
+        /// </summary>
         public long UsedSpace
         {
             get
@@ -49,6 +61,9 @@ namespace DataTools.Win32.Memory
             }
         }
 
+        /// <summary>
+        /// Returns the size of the part of the heap that is empty
+        /// </summary>
         public long UnusedSpace
         {
             get
@@ -58,33 +73,60 @@ namespace DataTools.Win32.Memory
             }
         }
 
+        /// <summary>
+        /// Create a new heap from the specified heap pointer
+        /// </summary>
+        /// <param name="heapPtr">A pointer to a valid heap</param>
+        /// <param name="fOwn">True to own and dispose the heap on object destruction</param>
         public Heap(IntPtr heapPtr, bool fOwn) : base(IntPtr.Zero, fOwn)
         {
             handle = heapPtr;
             GetHeapSize();
         }
 
-        private Heap(IntPtr ptr) : base(IntPtr.Zero, false)
+        /// <summary>
+        /// Create a new heap from the specified heap pointer
+        /// </summary>
+        /// <param name="heapPtr">A pointer to a valid heap</param>
+        private Heap(IntPtr heapPtr) : base(IntPtr.Zero, false)
         {
-            handle = ptr;
+            handle = heapPtr;
             GetHeapSize();
         }
 
+        /// <summary>
+        /// Creates a new custom heap with the specified size
+        /// </summary>
+        /// <param name="size">The size of the heap to allocate</param>
         public Heap(long size) : base(IntPtr.Zero, true)
         {
             CreateHeap((IntPtr)size, (IntPtr)size);
         }
 
+        /// <summary>
+        /// Creates a new custom heap with the specified size
+        /// </summary>
+        /// <param name="size">The size of the heap to allocate</param>
         public Heap(int size) : base(IntPtr.Zero, true)
         {
             CreateHeap((IntPtr)size, (IntPtr)size);
         }
 
+        /// <summary>
+        /// Creates a new custom heap with the specified size and maximum size
+        /// </summary>
+        /// <param name="size">The size of the heap to allocate</param>
+        /// <param name="maxsize">The maximum size of the heap</param>
         public Heap(long size, long maxsize) : base(IntPtr.Zero, true)
         {
             CreateHeap((IntPtr)size, (IntPtr)maxsize);
         }
 
+        /// <summary>
+        /// Creates a new custom heap with the specified size and maximum size
+        /// </summary>
+        /// <param name="size">The size of the heap to allocate</param>
+        /// <param name="maxsize">The maximum size of the heap</param>
         public Heap(int size, int maxsize) : base(IntPtr.Zero, true)
         {
             CreateHeap((IntPtr)size, (IntPtr)maxsize);
@@ -188,7 +230,7 @@ namespace DataTools.Win32.Memory
         {
             var ptr = new T();
             ptr.AssignHeap(this);
-            createdObjecs.Add(new WeakReference<IHeapAssignable>(ptr));
+            createdObjects.Add(new WeakReference<IHeapAssignable>(ptr));
             return ptr;
         }
 
@@ -202,7 +244,7 @@ namespace DataTools.Win32.Memory
         {
             var ptr = new T();
             ptr.AssignHeap(this);
-            createdObjecs.Add(new WeakReference<IHeapAssignable>(ptr));
+            createdObjects.Add(new WeakReference<IHeapAssignable>(ptr));
 
             if (source != null && source.Length > 0)
             {
@@ -213,11 +255,13 @@ namespace DataTools.Win32.Memory
             return ptr;
         }
 
+        /// <inheritdoc/>
         public override bool IsInvalid => handle == IntPtr.Zero;
 
+        /// <inheritdoc/>
         protected override bool ReleaseHandle()
         {
-            foreach (var wr in createdObjecs)
+            foreach (var wr in createdObjects)
             {
                 if (wr.TryGetTarget(out var ptr))
                 {
@@ -228,6 +272,7 @@ namespace DataTools.Win32.Memory
             return DestroyHeap();
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             var b = 2 * IntPtr.Size;
