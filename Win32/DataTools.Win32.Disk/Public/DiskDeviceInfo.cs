@@ -3,51 +3,44 @@
 //
 // Module: DiskDeviceInfo derived class for disks and
 //         volumes.
-// 
+//
 // Copyright (C) 2011-2023 Nathaniel Moschkin
 // All Rights Reserved
 //
-// Licensed Under the Apache 2.0 License   
+// Licensed Under the Apache 2.0 License
 // *************************************************
 
-using System;
+using DataTools.Text;
+using DataTools.Win32.Disk.Partition;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using DataTools.Text;
-using static DataTools.Text.TextTools;
-using DataTools.Win32;
-using DataTools.Win32.Disk.Partition;
-using DataTools.Win32.Disk.Partition.Gpt;
 
 namespace DataTools.Win32.Disk
 {
-
-    
     /// <summary>
     /// An object that represents a disk or volume device on the system.
     /// </summary>
     /// <remarks></remarks>
     public class DiskDeviceInfo : DeviceInfo
     {
-        protected int _PhysicalDevice;
-        protected int _PartitionNumber;
-        protected StorageType _Type;
-        protected long _Size;
-        protected DeviceCapabilities _Capabilities;
-        protected string[] _BackingStore;
-        protected bool _IsVolume;
-        protected uint _SerialNumber;
-        protected string _FileSystem;
-        protected FileSystemFlags _VolumeFlags;
-        protected string _VolumeGuidPath;
-        protected string[] _VolumePaths;
-        protected DiskExtent[] _DiskExtents;
-        protected IDiskLayout _DiskLayout;
-        protected IDiskPartition _PartInfo;
-        protected int _SectorSize;
-        protected VirtualDisk _VirtualDrive;
-
-
+        private int phyiscalDevice;
+        private int partitionNumber;
+        private StorageType storageType;
+        private long size;
+        private DeviceCapabilities devCaps;
+        private string[] backingStore;
+        private bool isVolume;
+        private uint serialNumber;
+        private string fileSystem;
+        private FileSystemFlags volumeFlags;
+        private string volumeGuidPath;
+        private string[] volumePaths;
+        private DiskExtent[] diskExtents;
+        private IDiskLayout diskLayout;
+        private IDiskPartition partInfo;
+        private int sectorSize;
+        private VirtualDisk virtualDisk;
 
         /// <summary>
         /// Enumerate all local volumes (with or without mount points).
@@ -56,7 +49,7 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public static DiskDeviceInfo[] EnumVolumes()
         {
-            return DiskEnum._internalEnumDisks(DevProp.GUID_DEVINTERFACE_VOLUME);
+            return DiskEnum.InternalEnumDisks(DevProp.GUID_DEVINTERFACE_VOLUME);
         }
 
         /// <summary>
@@ -66,39 +59,21 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public static DiskDeviceInfo[] EnumDisks()
         {
-            var d = DiskEnum._internalEnumDisks();
-            var e = DiskEnum._internalEnumDisks(DevProp.GUID_DEVINTERFACE_CDROM);
-            int c = d.Count();
-            if (e is null || e.Count() == 0)
-                return d;
-            try
-            {
-                foreach (var x in e)
-                {
-                    try
-                    {
-                        Array.Resize(ref d, c + 1);
-                        d[c] = x;
-                        c += 1;
-                    }
-                    catch
-                    {
-                        e = null;
-                        return d;
-                    }
-                }
+            var ld = new List<DiskDeviceInfo>();
 
-                e = null;
-                return d;
-            }
-            catch
-            {
-            }
+            var hdds = DiskEnum.InternalEnumDisks();
+            var opticals = DiskEnum.InternalEnumDisks(DevProp.GUID_DEVINTERFACE_CDROM);
 
-            return new DiskDeviceInfo[0];
+            if (hdds != null && hdds.Length != 0) ld.AddRange(hdds);
+            if (opticals != null && opticals.Length != 0) ld.AddRange(opticals);
+
+            ld.Sort((a, b) =>
+            {
+                return string.Compare(a.DevicePath, b.DevicePath);
+            });
+
+            return ld.ToArray();
         }
-
-
 
         /// <summary>
         /// Access the virtual disk object (if any).
@@ -108,15 +83,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public VirtualDisk VirtualDisk
         {
-            get
-            {
-                return _VirtualDrive;
-            }
-
-            internal set
-            {
-                _VirtualDrive = value;
-            }
+            get => virtualDisk;
+            internal set => virtualDisk = value;
         }
 
         /// <summary>
@@ -127,15 +95,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public int SectorSize
         {
-            get
-            {
-                return _SectorSize;
-            }
-
-            internal set
-            {
-                _SectorSize = value;
-            }
+            get => sectorSize;
+            internal set => sectorSize = value;
         }
 
         /// <summary>
@@ -147,14 +108,8 @@ namespace DataTools.Win32.Disk
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public IDiskLayout DiskLayout
         {
-            get
-            {
-                return _DiskLayout;
-            }
-            internal set
-            {
-                _DiskLayout = value;
-            }
+            get => diskLayout;
+            set => diskLayout = value;
         }
 
         /// <summary>
@@ -168,46 +123,38 @@ namespace DataTools.Win32.Disk
             get
             {
                 Partitioning.PARTITION_INFORMATION_EX[] p;
+                if (Type != StorageType.Volume) return null;
 
-                if (Type != StorageType.Volume)
-                    return null;
-
-                if (_PartInfo == null)
+                if (partInfo == null)
                 {
                     try
                     {
-                        if (!IsVolumeMounted)
-                            return null;
-
-                        Partitioning.DRIVE_LAYOUT_INFORMATION_EX arglayInfo = new Partitioning.DRIVE_LAYOUT_INFORMATION_EX();
-
-                        p = Partitioning.GetPartitions(@"\\.\PhysicalDrive" + PhysicalDevice, IntPtr.Zero, layInfo: ref arglayInfo);
-                        
+                        if (!IsVolumeMounted) return null;
+                        p = Partitioning.GetPartitions(@"\\.\PhysicalDrive" + PhysicalDevice, null, out _);
                     }
                     catch
                     {
                         return null;
                     }
 
-                    if (p is object)
+                    if (p != null)
                     {
                         foreach (var x in p)
                         {
                             if (x.PartitionNumber == PartitionNumber)
                             {
-                                _PartInfo = DiskPartitionInfo.CreateInfo(x);
+                                partInfo = DiskPartitionInfo.CreateInfo(x);
                                 break;
                             }
                         }
                     }
                 }
 
-                return _PartInfo;
+                return partInfo;
             }
-
             internal set
             {
-                _PartInfo = value;
+                partInfo = value;
             }
         }
 
@@ -217,15 +164,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public int PhysicalDevice
         {
-            get
-            {
-                return _PhysicalDevice;
-            }
-
-            internal set
-            {
-                _PhysicalDevice = value;
-            }
+            get => phyiscalDevice;
+            internal set => phyiscalDevice = value;
         }
 
         /// <summary>
@@ -236,15 +176,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public int PartitionNumber
         {
-            get
-            {
-                return _PartitionNumber;
-            }
-
-            internal set
-            {
-                _PartitionNumber = value;
-            }
+            get => partitionNumber;
+            internal set => partitionNumber = value;
         }
 
         /// <summary>
@@ -256,46 +189,42 @@ namespace DataTools.Win32.Disk
             get
             {
                 if (Type != StorageType.Volume || string.IsNullOrEmpty(VolumeGuidPath))
-                {                    
-                    if (_Size == 0)
+                {
+                    if (size == 0)
                     {
-                        _DiskLayout = DiskLayoutInfo.CreateLayout(DevicePath);
-                        if (_DiskLayout != null)
+                        diskLayout = DiskLayoutInfo.CreateLayout(DevicePath);
+                        if (diskLayout != null)
                         {
                             long newsize = 0L;
-                            foreach (var disk in _DiskLayout)
+                            foreach (var disk in diskLayout)
                             {
                                 newsize += disk.Size;
                             }
 
-                            _Size = newsize;
+                            size = newsize;
                         }
                     }
 
-                    return _Size;
-                    
+                    return size;
                 }
-                var a = default(ulong);
-                var b = default(ulong);
-                var c = default(ulong);
+
                 try
                 {
                     if (!IsVolumeMounted)
                         return new FriendlySizeLong(0);
 
-                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, ref a, ref b, ref c);
+                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, out _, out ulong size, out _);
+                    return (FriendlySizeLong)(long)size;
                 }
                 catch
                 {
                     return new FriendlySizeLong(0);
                 }
-
-                return b;
             }
 
             internal set
             {
-                _Size = value;
+                size = value;
             }
         }
 
@@ -309,24 +238,18 @@ namespace DataTools.Win32.Disk
         {
             get
             {
-                if (Type != StorageType.Volume || string.IsNullOrEmpty(VolumeGuidPath))
-                    return _Size;
-                var a = default(ulong);
-                var b = default(ulong);
-                var c = default(ulong);
+                if (Type != StorageType.Volume || string.IsNullOrEmpty(VolumeGuidPath)) return size;
+
                 try
                 {
-                    if (!IsVolumeMounted)
-                        return new FriendlySizeLong(0);
-
-                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, ref a, ref b, ref c);
+                    if (!IsVolumeMounted) return 0;
+                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, out _, out _, out ulong sizeFree);
+                    return sizeFree;
                 }
                 catch
                 {
-                    return new FriendlySizeLong(0);
+                    return 0;
                 }
-
-                return c;
             }
         }
 
@@ -341,22 +264,17 @@ namespace DataTools.Win32.Disk
             get
             {
                 if (Type != StorageType.Volume || string.IsNullOrEmpty(VolumeGuidPath))
-                    return _Size;
-                var a = default(ulong);
-                var b = default(ulong);
-                var c = default(ulong);
+                    return size;
+
                 try
                 {
-                    if (!IsVolumeMounted)
-                        return new FriendlySizeLong(0);
-
-                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, ref a, ref b, ref c);
-
-                    return b - c;
+                    if (!IsVolumeMounted) return new FriendlySizeLong(0);
+                    IO.GetDiskFreeSpaceEx(VolumeGuidPath, out _, out ulong size, out ulong free);
+                    return size - free;
                 }
                 catch
                 {
-                    return new FriendlySizeLong(0);
+                    return 0;
                 }
             }
         }
@@ -367,15 +285,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public StorageType Type
         {
-            get
-            {
-                return _Type;
-            }
-
-            internal set
-            {
-                _Type = value;
-            }
+            get => storageType;
+            internal set => storageType = value;
         }
 
         /// <summary>
@@ -384,32 +295,20 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public DeviceCapabilities Capabilities
         {
-            get
-            {
-                return _Capabilities;
-            }
-
-            internal set
-            {
-                _Capabilities = value;
-            }
+            get => devCaps;
+            internal set => devCaps = value;
         }
+
         /// <summary>
         /// Contains a list of VHD/VHDX files that make up a virtual hard drive.
         /// </summary>
         /// <remarks></remarks>
         public string[] BackingStore
         {
-            get
-            {
-                return _BackingStore ?? new string[0];
-            }
-
-            internal set
-            {
-                _BackingStore = value;
-            }
+            get => backingStore ?? new string[0];
+            internal set => backingStore = value;
         }
+
         // Volume information
 
         /// <summary>
@@ -418,15 +317,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public bool IsVolume
         {
-            get
-            {
-                return _IsVolume;
-            }
-
-            internal set
-            {
-                _IsVolume = value;
-            }
+            get => isVolume;
+            internal set => isVolume = value;
         }
 
         /// <summary>
@@ -435,13 +327,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsVolumeMounted
-        {
-            get
-            {
-                return GetDriveFlag() != 0L & IO.GetLogicalDrives() != 0L;
-            }
-        }
+        public bool IsVolumeMounted => GetDriveFlag() != 0L & IO.GetLogicalDrives() != 0L;
 
         /// <summary>
         /// Returns the current logical drive flag.
@@ -450,13 +336,13 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         private uint GetDriveFlag()
         {
-            if (!IsVolume)
-                return 0U;
-            if (_VolumePaths is null || _VolumePaths.Length == 0)
-                return 0U;
+            if (!IsVolume) return 0U;
+            if (volumePaths is null || volumePaths.Length == 0) return 0U;
+
             char ch = '-';
             uint vl = 0U;
-            foreach (var vp in _VolumePaths)
+
+            foreach (var vp in volumePaths)
             {
                 if (vp.Length <= 3)
                 {
@@ -465,10 +351,10 @@ namespace DataTools.Win32.Disk
                 }
             }
 
-            if (ch == '-')
-                return 0U;
+            if (ch == '-') return 0U;
             ch = ch.ToString().ToUpper()[0];
             vl = (uint)(ch - 'A');
+
             return (uint)(1 << (int)vl);
         }
 
@@ -478,11 +364,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public uint SerialNumber
         {
-            get => _SerialNumber;
-            internal set
-            {
-                _SerialNumber = value;
-            }
+            get => serialNumber;
+            internal set => serialNumber = value;
         }
 
         /// <summary>
@@ -491,11 +374,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public string FileSystem
         {
-            get => _FileSystem;
-            internal set
-            {
-                _FileSystem = value;
-            }
+            get => fileSystem;
+            internal set => fileSystem = value;
         }
 
         /// <summary>
@@ -504,11 +384,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public FileSystemFlags VolumeFlags
         {
-            get => _VolumeFlags;
-            internal set
-            {
-                _VolumeFlags = value;
-            }
+            get => volumeFlags;
+            internal set => volumeFlags = value;
         }
 
         /// <summary>
@@ -517,23 +394,18 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public string VolumeGuidPath
         {
-            get => _VolumeGuidPath;
-            set
-            {
-                _VolumeGuidPath = value;
-            }
+            get => volumeGuidPath;
+            internal set => volumeGuidPath = value;
         }
+
         /// <summary>
         /// A list of all mount-points for the volume
         /// </summary>
         /// <remarks></remarks>
         public string[] VolumePaths
         {
-            get => _VolumePaths;
-            set
-            {
-                _VolumePaths = value;
-            }
+            get => volumePaths;
+            internal set => volumePaths = value;
         }
 
         /// <summary>
@@ -542,11 +414,8 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public DiskExtent[] DiskExtents
         {
-            get => _DiskExtents;
-            internal set
-            {
-                _DiskExtents = value;
-            }
+            get => diskExtents;
+            internal set => diskExtents = value;
         }
 
         /// <summary>
@@ -556,7 +425,7 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public override string ToString()
         {
-            string str = "";
+            string str;
 
             if (IsVolume)
             {
@@ -580,6 +449,4 @@ namespace DataTools.Win32.Disk
             return str;
         }
     }
-
-    
 }

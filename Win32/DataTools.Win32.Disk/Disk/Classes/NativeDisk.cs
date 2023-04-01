@@ -20,6 +20,7 @@ using DataTools.Win32.Disk.Partition;
 using DataTools.Win32.Disk.Partition.Mbr;
 using DataTools.Win32.Disk.Partition.Gpt;
 using DataTools.Win32.Memory;
+using DataTools.Win32.Disk;
 
 namespace DataTools.Win32
 {
@@ -295,10 +296,6 @@ namespace DataTools.Win32
         public readonly static CTL_CODE IOCTL_DISK_GET_MEDIA_TYPES = new CTL_CODE(IOCTL_DISK_BASE, 0x300U, METHOD_BUFFERED, FILE_ANY_ACCESS);
 
         //
-
-
-
-        
         /// <summary>
         /// Storage device number information.
         /// </summary>
@@ -313,10 +310,10 @@ namespace DataTools.Win32
 
         [DllImport("kernel32.dll")]
         public static extern bool DeviceIoControl(IntPtr hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, IntPtr lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, IntPtr lpOverlapped);
+
         [DllImport("kernel32.dll")]
         public static extern bool DeviceIoControl(IntPtr hDevice, uint dwIoControlCode, IntPtr lpInBuffer, uint nInBufferSize, ref STORAGE_DEVICE_NUMBER lpOutBuffer, uint nOutBufferSize, ref uint lpBytesReturned, IntPtr lpOverlapped);
-
-        
+      
         
         public const int ERROR_MORE_DATA = 234;
         public const int ERROR_INSUFFICIENT_BUFFER = 0x7A;
@@ -351,24 +348,28 @@ namespace DataTools.Win32
 
             public static VOLUME_DISK_EXTENTS FromPtr(IntPtr ptr)
             {
-                VOLUME_DISK_EXTENTS FromPtrRet = default;
-                var ve = new VOLUME_DISK_EXTENTS();
+                var extents = new VOLUME_DISK_EXTENTS();
                 int cb = Marshal.SizeOf<DISK_EXTENT>();
-                MemPtr m = ptr;
+
+                DataTools.Memory.MemPtr m = ptr;
+
                 int i;
-                ve.NumberOfExtents = m.IntAt(0L);
-                ve.Space = m.IntAt(1L);
-                ve.Extents = new DISK_EXTENT[ve.NumberOfExtents];
-                m = m + 8;
-                var c = ve.NumberOfExtents;
+                
+                extents.NumberOfExtents = m.IntAt(0L);
+                extents.Space = m.IntAt(1L);
+                extents.Extents = new DISK_EXTENT[extents.NumberOfExtents];
+
+                m += 8;
+
+                var c = extents.NumberOfExtents;
+
                 for (i = 0; i < c; i++)
                 {
-                    ve.Extents[i] = m.ToStruct<DISK_EXTENT>();
-                    m = m + cb;
+                    extents.Extents[i] = m.ToStruct<DISK_EXTENT>();
+                    m += cb;
                 }
 
-                FromPtrRet = ve;
-                return FromPtrRet;
+                return extents;
             }
         }
 
@@ -391,52 +392,49 @@ namespace DataTools.Win32
         /// <remarks></remarks>
         public static DiskExtent[] GetDiskExtentsFor(string devicePath)
         {
-            DiskExtent[] deOut = null;
-            MemPtr inBuff = new MemPtr();
+            DiskExtent[] deOut;
+
             int inSize;
-            IntPtr file;
-            int h = 0;
             var de = new DISK_EXTENT();
             var ve = new VOLUME_DISK_EXTENTS();
-            bool r;
-            file = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_ATTRIBUTE_NORMAL, IntPtr.Zero);
-            if (file == IO.INVALID_HANDLE_VALUE)
-            {
-                return null;
-            }
-
+            bool b;
             uint arb = 0;
 
             inSize = Marshal.SizeOf(de) + Marshal.SizeOf(ve);
-            inBuff.Length = inSize;
-            r = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
 
-            if (!r && User32.GetLastError() == ERROR_MORE_DATA)
+            using (var inBuff = new SafePtr(inSize))
             {
-                inBuff.Length = inSize * inBuff.IntAt(0L);
-                r = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
+                using (var file = DiskHandle.OpenDisk(devicePath))
+                {
+                    b = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
+
+                    if (!b && User32.GetLastError() == ERROR_MORE_DATA)
+                    {
+                        inBuff.Length = inSize * inBuff.IntAt(0L);
+                        b = DeviceIoControl(file, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, IntPtr.Zero, 0, inBuff, (uint)inSize, ref arb, IntPtr.Zero);
+                    }
+
+                    if (!b)
+                    {                        
+                        return null;
+                    }
+
+                    ve = VOLUME_DISK_EXTENTS.FromPtr(inBuff);
+                }
             }
 
-            if (!r)
-            {
-                inBuff.Free();
-                User32.CloseHandle(file);
-                return null;
-            }
-
-            User32.CloseHandle(file);
-            ve = VOLUME_DISK_EXTENTS.FromPtr(inBuff);
-            inBuff.Free();
-            h = 0;
+            var h = 0;
             deOut = new DiskExtent[ve.Extents.Length];
-            foreach (var currentDe in ve.Extents)
+
+            foreach (var currDe in ve.Extents)
             {
-                de = currentDe;
-                deOut[h].PhysicalDevice = de.DiskNumber;
-                deOut[h].Space = de.Space;
-                deOut[h].Size = de.ExtentLength;
-                deOut[h].Offset = de.StartingOffset;
-                h += 1;
+                deOut[h++] = new DiskExtent()
+                {
+                    PhysicalDevice = currDe.DiskNumber,
+                    Space = currDe.Space,
+                    Size = currDe.ExtentLength,
+                    Offset = currDe.StartingOffset
+                };
             }
 
             return deOut;
@@ -450,27 +448,30 @@ namespace DataTools.Win32
         /// <remarks></remarks>
         public static string[] GetVolumePaths(string path)
         {
-            string[] GetVolumePathsRet = default;
-            int cc = 1024;
-            int retc = 0;
-            var mm = new MemPtr();
-            bool r;
-            mm.Alloc(cc);
+            using (var mm = new SafePtr())
+            {         
+                int initSize = 1024;
+                int returnSize = 0;
 
-            r = NativeDisk.GetVolumePathNamesForVolumeName(path, mm.Handle, cc, ref retc);
-            if (!r)
-                return null;
-            if (retc > 1024)
-            {
-                mm.ReAlloc(retc);
-                r = NativeDisk.GetVolumePathNamesForVolumeName(path, mm, retc, ref retc);
+                bool b;
+
+                mm.Alloc(initSize);
+
+                b = GetVolumePathNamesForVolumeName(path, mm, initSize, ref returnSize);
+
+                if (!b) return null;
+
+                if (returnSize > initSize)
+                {
+                    mm.ReAlloc(returnSize);
+                    b = GetVolumePathNamesForVolumeName(path, mm, returnSize, ref returnSize);
+                }
+
+                if (!b) return null;
+                return mm.GetStringArray(0L);                                
             }
-
-            GetVolumePathsRet = mm.GetStringArray(0L);
-            mm.Free();
-            return GetVolumePathsRet;
+           
         }
-
         
     }
 }

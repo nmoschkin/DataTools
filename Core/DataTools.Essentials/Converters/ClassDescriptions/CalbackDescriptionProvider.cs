@@ -12,9 +12,21 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
     /// <typeparam name="T"></typeparam>
     public class CallbackDescriptionProvider<T> : PropertyDescriptionProviderBase<T>
     {
+        
+        /// <summary>
+        /// The callback method
+        /// </summary>
         protected Func<T, string, string> callback;
+
+        /// <summary>
+        /// The calback method name
+        /// </summary>
         protected string callbackMethodName;
-        protected MethodInfo mtd;
+
+        /// <summary>
+        /// The callback method reflection information
+        /// </summary>
+        protected MethodInfo method;
 
         /// <summary>
         /// Instantiate a new <see cref="CallbackDescriptionProvider{T}"/>
@@ -51,28 +63,30 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         public CallbackDescriptionProvider(string callbackMethodName, Type methodType) : base()
         {
             this.callbackMethodName = callbackMethodName;
-            mtd = (methodType ?? typeof(T)).GetMethod(callbackMethodName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+            method = (methodType ?? typeof(T)).GetMethod(callbackMethodName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
-            if (!ValidateMethod(mtd)) throw new ArgumentException("Method " + callbackMethodName + " not found or has an incorrect signature");
+            if (!ValidateMethod(method)) throw new ArgumentException("Method " + callbackMethodName + " not found or has an incorrect signature");
 
-            if (mtd.IsStatic)
+            if (method.IsStatic)
             {
                 callback = new Func<T, string, string>((value, propertyName) =>
                 {
-                    return (string)mtd.Invoke(null, new object[] { value, propertyName });
+                    return (string)method.Invoke(null, new object[] { value, propertyName });
                 });
             }
             else
             {
                 callback = new Func<T, string, string>((value, propertyName) =>
                 {
-                    return (string)mtd.Invoke(value, new object[] { value, propertyName });
+                    return (string)method.Invoke(value, new object[] { value, propertyName });
                 });
             }
         }
 
+        /// <inheritdoc/>
         public override TextLoadType LoadType { get; } = TextLoadType.Immediate;
 
+        /// <inheritdoc/>
         public override string ProvidePropertyDescription(T value, string propertyName)
         {
             return callback(value, propertyName);

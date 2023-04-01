@@ -163,10 +163,19 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
             _defaultProvider = EnumInfo.ResolveDefaultProvider<T>();
         }
 
+        /// <summary>
+        /// Create a new Described Enum instance
+        /// </summary>
+        /// <param name="value"></param>
         public DescribedEnum(T value) : this(value, DefaultProvider)
         {
         }
 
+        /// <summary>
+        /// Create a new Described Enum instance
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="description"></param>
         public DescribedEnum(T value, string description)
         {
             _value = value;
@@ -174,6 +183,11 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
             _descriptionProvider = null;
         }
 
+        /// <summary>
+        /// Create a new Described Enum instance
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="descriptionProvider"></param>
         public DescribedEnum(T value, IEnumDescriptionProvider<T> descriptionProvider)
         {
             _value = value;
@@ -359,11 +373,14 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
             return false;
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return (_value, _description, _descriptionProvider).GetHashCode();
         }
 
+
+        /// <inheritdoc/>
         public override string ToString()
         {
             return Description;

@@ -274,87 +274,109 @@ namespace DataTools.Win32.Disk.Partition
         /// <param name="layInfo">Optionally receives the layout information.</param>
         /// <returns>An array of PARTITION_INFORMATION_EX structures.</returns>
         /// <remarks></remarks>
-        public static PARTITION_INFORMATION_EX[] GetPartitions(string devicePath, IntPtr hfile, ref DRIVE_LAYOUT_INFORMATION_EX layInfo)
+        public static PARTITION_INFORMATION_EX[] GetPartitions(string devicePath, DiskHandle hfile, out DRIVE_LAYOUT_INFORMATION_EX layInfo)
         {
-            bool hf = false;
-            if (hfile != IntPtr.Zero)
+            bool alreadyOpen = false;
+
+            if (hfile != null)
             {
-                hf = true;
+                alreadyOpen = true;
             }
             else
             {
-                hfile = IO.CreateFile(devicePath, IO.GENERIC_READ, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, 0, IntPtr.Zero);
+                hfile = DiskHandle.OpenDisk(devicePath);
             }
 
-            var pex = new DataTools.Win32.Memory.MemPtr();
-            var pexBegin = new DataTools.Win32.Memory.MemPtr();
-            List<PARTITION_INFORMATION_EX> pOut = null;
-            DRIVE_LAYOUT_INFORMATION_EX lay;
-            int pexLen = Marshal.SizeOf<PARTITION_INFORMATION_EX>();
-            int i;
-            int c;
-            uint cb = 0U;
-            int sbs = 32768;
-            bool succeed = false;
-            if (hfile == IO.INVALID_HANDLE_VALUE)
-                return null;
-            do
+            if (hfile?.IsInvalid ?? true)
             {
-                pex.ReAlloc(sbs);
-                succeed = NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_LAYOUT_EX, IntPtr.Zero, 0U, pex.Handle, (uint)pex.Length, ref cb, IntPtr.Zero);
-                if (!succeed)
-                {
-                    int xErr = User32.GetLastError();
-                    if (xErr != NativeDisk.ERROR_MORE_DATA & xErr != NativeDisk.ERROR_INSUFFICIENT_BUFFER)
-                    {
-                        string s = NativeError.Message;
-                        sbs = -1;
-                        break;
-                    }
-                }
-
-                sbs *= 2;
-            }
-            while (!succeed);
-            if (sbs == -1)
-            {
-                pex.Free();
-                if (!hf)
-                    User32.CloseHandle(hfile);
+                layInfo = default;
                 return null;
             }
 
-            lay = pex.ToStruct<DRIVE_LAYOUT_INFORMATION_EX>();
-            pexBegin.Handle = pex.Handle + 48;
-            c = (int)lay.ParititionCount;
-            pOut = new List<PARTITION_INFORMATION_EX>();
-
-            for (i = 0; i < c; i++)
+            try
             {
-                var testPart = pexBegin.ToStruct<PARTITION_INFORMATION_EX>();
-
-                if (lay.PartitionStyle == PartitionStyle.Mbr)
+                using (var pex = new SafePtr())
                 {
-                    if (testPart.Mbr.PartitionType != 0 && testPart.Mbr.PartitionType != 0x5 && testPart.Mbr.PartitionType != 0x0f)
+                    DataTools.Memory.MemPtr pexBegin;
+
+                    List<PARTITION_INFORMATION_EX> pOut = null;
+                    DRIVE_LAYOUT_INFORMATION_EX lay;
+
+                    int pexLen = Marshal.SizeOf<PARTITION_INFORMATION_EX>();
+
+                    int i, c, sbs = 32768;
+                    uint cb = 0U;
+
+                    bool succeed = false;
+
+                    do
                     {
-                        pOut.Add(testPart);
+                        pex.ReAlloc(sbs);
+                        succeed = NativeDisk.DeviceIoControl(hfile, NativeDisk.IOCTL_DISK_GET_DRIVE_LAYOUT_EX, IntPtr.Zero, 0U, pex, (uint)pex.Length, ref cb, IntPtr.Zero);
+                        if (!succeed)
+                        {
+                            int xErr = User32.GetLastError();
+                    
+                            if (xErr != NativeDisk.ERROR_MORE_DATA & xErr != NativeDisk.ERROR_INSUFFICIENT_BUFFER)
+                            {
+                                string s = NativeError.Message;
+                                sbs = -1;
+                                break;
+                            }
+                        }
+
+                        sbs *= 2;
                     }
+                    while (!succeed);
+
+                    if (sbs == -1)
+                    {
+                        if (!alreadyOpen) hfile.Close();
+                        layInfo = default;
+                        return null;
+                    }
+
+                    lay = pex.ToStruct<DRIVE_LAYOUT_INFORMATION_EX>();
+                    pexBegin = (IntPtr)((long)(pex.DangerousGetHandle()) + 48);
+
+                    c = (int)lay.ParititionCount;
+                    pOut = new List<PARTITION_INFORMATION_EX>();
+
+                    for (i = 0; i < c; i++)
+                    {
+                        var testPart = pexBegin.ToStruct<PARTITION_INFORMATION_EX>();
+                        if (lay.PartitionStyle == PartitionStyle.Mbr)
+                        {
+                            if (testPart.Mbr.PartitionType != 0 && testPart.Mbr.PartitionType != 0x5 && testPart.Mbr.PartitionType != 0x0f)
+                            {
+                                pOut.Add(testPart);
+                            }
+                        }
+                        else
+                        {
+                            pOut.Add(testPart);
+                        }
+
+                        pexBegin += pexLen;
+                    }
+
+                    if (!alreadyOpen) hfile.Close();
+                    lay.ParititionCount = (uint)pOut.Count;
+
+                    layInfo = lay;
+                    return pOut.ToArray();
                 }
-                else
-                {
-                    pOut.Add(testPart);
-                }
-                pexBegin = pexBegin + pexLen;
+
             }
-
-            pex.Free();
-            if (!hf)
-                User32.CloseHandle(hfile);
-
-            lay.ParititionCount = (uint)pOut.Count;
-
-            layInfo = lay;
-            return pOut.ToArray();
+            catch
+            {
+                layInfo = default;
+                return null;
+            }
+            finally
+            {
+                if (!alreadyOpen) hfile.Close();
+            }
         }
     }
 }

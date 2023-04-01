@@ -523,8 +523,7 @@ namespace DataTools.Win32.Disk
         public VirtualDisk(string imageFile, bool openDisk, bool openReadOnly)
         {
             _ImageFile = imageFile;
-            if (openDisk)
-                Open(openReadOnly);
+            if (openDisk) Open(openReadOnly);
         }
 
         /// <summary>

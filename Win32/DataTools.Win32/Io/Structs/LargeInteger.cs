@@ -9,7 +9,7 @@ using System.Data.Common;
 namespace DataTools.Win32
 {
     [StructLayout(LayoutKind.Explicit)]
-    internal unsafe struct LARGE_INTEGER
+    internal unsafe struct LargeInteger
     {
         [FieldOffset(0)]
         internal int LowPart;
@@ -20,14 +20,14 @@ namespace DataTools.Win32
         [FieldOffset(0)]
         internal long QuadPart;
         
-        public static explicit operator long(LARGE_INTEGER val)
+        public static explicit operator long(LargeInteger val)
         {
             return val.QuadPart;
         }
 
-        public static explicit operator LARGE_INTEGER(long val)
+        public static explicit operator LargeInteger(long val)
         {
-            return new LARGE_INTEGER
+            return new LargeInteger
             {
                 QuadPart = val
             };

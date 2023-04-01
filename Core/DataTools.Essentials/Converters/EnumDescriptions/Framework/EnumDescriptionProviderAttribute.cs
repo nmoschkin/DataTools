@@ -11,6 +11,10 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
     public class EnumDescriptionProviderAttribute : Attribute
     {
         private readonly object[] parameters;
+
+        /// <summary>
+        /// Gets the provider type
+        /// </summary>
         public Type ProviderType { get; }
 
         /// <summary>

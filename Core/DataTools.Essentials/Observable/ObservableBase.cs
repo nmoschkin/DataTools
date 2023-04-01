@@ -31,10 +31,21 @@ namespace DataTools.Essentials.Observable
         }
     }
 
+    /// <summary>
+    /// Observable property changing event handler
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public delegate void ObservablePropertyChangingEventHandler(object sender, ObservablePropertyChangingEventArgs e);
 
+    /// <summary>
+    /// Implements an event handler of the delegate type <see cref="ObservablePropertyChangingEventHandler"/>
+    /// </summary>
     public interface IObservablePropertyChanging
     {
+        /// <summary>
+        /// Fired when a property is changing (cancelable)
+        /// </summary>
         event ObservablePropertyChangingEventHandler PropertyChanging;
     }
 
@@ -43,6 +54,7 @@ namespace DataTools.Essentials.Observable
     /// </summary>
     public abstract class ObservableBase : INotifyPropertyChanged, INotifyPropertyChanging, IObservablePropertyChanging
     {
+        /// <inheritdoc/>
         public event PropertyChangedEventHandler PropertyChanged;
 
         private List<ObservablePropertyChangingEventHandler> invokerList1 = new List<ObservablePropertyChangingEventHandler>();

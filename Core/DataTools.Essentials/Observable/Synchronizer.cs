@@ -24,6 +24,9 @@ namespace DataTools.Essentials.Observable
         /// </summary>
         public static bool CanInitialize => SynchronizationContext.Current != null;
 
+        /// <summary>
+        /// Gets the default synchronizer for the current application domain
+        /// </summary>
         public static Synchronizer Default { get; private set; }
 
         /// <summary>
@@ -86,7 +89,7 @@ namespace DataTools.Essentials.Observable
         /// </summary>
         /// <param name="sync">The synchronization context to test.</param>
         /// <returns>
-        /// <see cref="(bool, bool)"/> (nosend, nopost)
+        /// Bool tuple (nosend, nopost)
         /// </returns>
         protected static (bool, bool) TestSendPost(SynchronizationContext sync)
         {
@@ -259,6 +262,7 @@ namespace DataTools.Essentials.Observable
             return tsk.Task;
         }
 
+        /// <inheritdoc/>
         public void Invoke(Action action)
         {
             if (nosend)
@@ -271,6 +275,7 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <inheritdoc/>
         public T Invoke<T>(Func<T> action)
         {
             if (nosend)
@@ -285,8 +290,10 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <inheritdoc/>
         public virtual bool CanPost => !nopost;
 
+        /// <inheritdoc/>
         public virtual bool CanSend => !nosend;
     }
 }

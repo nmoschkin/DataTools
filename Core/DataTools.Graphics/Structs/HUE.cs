@@ -25,7 +25,10 @@ namespace DataTools.Graphics
     [StructLayout(LayoutKind.Sequential, Size = 8)]
     public struct Hue : IEquatable<Hue>, IComparable<Hue>
     {
-        public double value;
+        /// <summary>
+        /// The raw hue value number (0-360)
+        /// </summary>
+        private double value;
 
         /// <summary>A standard instance of hue set to the gray scale (not a hue) value.</summary>
         public static readonly Hue GrayScale = new Hue(true);
@@ -125,6 +128,12 @@ namespace DataTools.Graphics
             return t3 >= 0 ? t3 : -t3;
         }
 
+        /// <summary>
+        /// Add two hues (the result will always between 0-360)
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static Hue operator +(Hue lhs, Hue rhs)
         {
             if (lhs.IsGrayScale && rhs.IsGrayScale) return new Hue { value = double.NaN };
@@ -137,6 +146,12 @@ namespace DataTools.Graphics
             return new Hue() { value = v };
         }
 
+        /// <summary>
+        /// Subtract two hues (the result will always between 0-360)
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static Hue operator -(Hue lhs, Hue rhs)
         {
             if (lhs.IsGrayScale && rhs.IsGrayScale) return new Hue { value = double.NaN };
@@ -146,6 +161,12 @@ namespace DataTools.Graphics
             return new Hue() { value = lhs.GetDistance(rhs.value) };
         }
 
+        /// <summary>
+        /// Test if two hues are equal
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator ==(Hue lhs, Hue rhs)
         {
             if (lhs.IsGrayScale && rhs.IsGrayScale) return true;
@@ -153,6 +174,12 @@ namespace DataTools.Graphics
             return lhs.value == rhs.value;
         }
 
+        /// <summary>
+        /// Test if two hues are not equal
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator !=(Hue lhs, Hue rhs)
         {
             if (lhs.IsGrayScale && rhs.IsGrayScale) return false;
@@ -160,36 +187,69 @@ namespace DataTools.Graphics
             return lhs.value != rhs.value;
         }
 
+        /// <summary>
+        /// Test if lhs is greater than rhs
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator >(Hue lhs, Hue rhs)
         {
             return lhs.value > rhs.value;
         }
 
+        /// <summary>
+        /// Test if lhs is less than rhs
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator <(Hue lhs, Hue rhs)
         {
             return lhs.value < rhs.value;
         }
 
+        /// <summary>
+        /// Test if lhs is greater than or equal to rhs
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator >=(Hue lhs, Hue rhs)
         {
             return lhs.value >= rhs.value;
         }
 
+        /// <summary>
+        /// Test if lhs is less than or equal to rhs
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public static bool operator <=(Hue lhs, Hue rhs)
         {
             return lhs.value <= rhs.value;
         }
 
+        /// <summary>
+        /// Cast a double value directly to a hue
+        /// </summary>
+        /// <param name="value"></param>
         public static implicit operator Hue(double value)
         {
             return new Hue(value);
         }
 
+        /// <summary>
+        /// Cast a hue directly to a double value
+        /// </summary>
+        /// <param name="value"></param>
         public static implicit operator double(Hue value)
         {
             return value.value;
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             if (obj is Hue rhs)
@@ -201,16 +261,19 @@ namespace DataTools.Graphics
             else return false;
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return value.GetHashCode();
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return value.ToString();
         }
 
+        /// <inheritdoc/>
         public bool Equals(Hue other)
         {
             if (IsGrayScale && other.IsGrayScale) return true;
@@ -218,6 +281,7 @@ namespace DataTools.Graphics
             return value == other.value;
         }
 
+        /// <inheritdoc/>
         public int CompareTo(Hue other)
         {
             if (other.IsGrayScale && IsGrayScale) return 0;

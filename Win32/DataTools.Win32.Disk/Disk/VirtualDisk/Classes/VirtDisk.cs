@@ -92,7 +92,7 @@ namespace DataTools.Win32.Disk
         public static extern uint GetAllAttachedVirtualDiskPhysicalPaths(ref uint PathsBufferSizeInBytes, [MarshalAs(UnmanagedType.LPWStr)] string PathsBuffer);
 
         [DllImport("VirtDisk.dll")]
-        public static extern uint GetStorageDependencyInformation(IntPtr Handle, GET_STORAGE_DEPENDENCY_FLAG Flags, uint StorageDependencyInfoSize, IntPtr StorageDependencyInfo, ref uint SizeUsed);
+        public static extern uint GetStorageDependencyInformation(IntPtr Handle, GET_STORAGE_DEPENDENCY_FLAG Flags, uint StorageDependencyInfoSize, IntPtr StorageDependencyInfo, out uint SizeUsed);
 
         [DllImport("VirtDisk.dll")]
         public static extern uint GetVirtualDiskInformation(IntPtr Handle, ref uint VirtualDiskInfoSize, GET_VIRTUAL_DISK_INFO_SIZE VirtualDiskInfo, ref uint SizeUsed);

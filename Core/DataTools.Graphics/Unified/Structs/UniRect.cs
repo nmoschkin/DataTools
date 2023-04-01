@@ -101,9 +101,9 @@ namespace DataTools.Graphics
         /// Create a new rectangle with the specified geometry
         /// </summary>
         /// <param name="x">The top-left X coordinate in pixels reckoned from zero</param>
-        /// <param name="x">The top-left Y coordinate in pixels reckoned from zero</param>
+        /// <param name="y">The top-left Y coordinate in pixels reckoned from zero</param>
         /// <param name="width">The width in pixels</param>
-        /// <param name="width">The height in pixels</param>
+        /// <param name="height">The height in pixels</param>
         public UniRect(double x, double y, double width, double height)
         {
             left = x;
@@ -174,22 +174,42 @@ namespace DataTools.Graphics
             height = rc.Height;
         }
 
+        /// <summary>
+        /// Check if the rectangle contains the given point
+        /// </summary>
+        /// <param name="pt"></param>
+        /// <returns></returns>
         public bool Contains(UniPoint pt)
         {
             return pt.X >= Left && pt.X <= Right && pt.Y >= Top && pt.Y <= Bottom;
         }
 
+        /// <summary>
+        /// Create a rectangle from an integer quad of left,top,width,height
+        /// </summary>
+        /// <param name="ints"></param>
+        /// <returns></returns>
         public static UniRect FromInts(int[] ints)
         {
             return new UniRect(ints[0], ints[1], ints[2], ints[3]);
         }
 
+        /// <summary>
+        /// Create a rectangle from a pointer of an integer quad of left,top,width,height
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
         public static unsafe UniRect FromIntsPointer(void* ptr)
         {
             int* ints = (int*)ptr;
             return new UniRect(ints[0], ints[1], ints[2], ints[3]);
         }
 
+        /// <summary>
+        /// Create a rectangle from a pointer of an integer quad of left,top,width,height
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
         public static UniRect FromIntsPointer(IntPtr ptr)
         {
             unsafe
@@ -199,11 +219,21 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// Create a rectangle from a double quad of left,top,width,height
+        /// </summary>
+        /// <param name="doubles"></param>
+        /// <returns></returns>
         public static UniRect FromDoubles(double[] doubles)
         {
             return new UniRect(doubles[0], doubles[1], doubles[2], doubles[3]);
         }
 
+        /// <summary>
+        /// Create a rectangle from a pointer of a double quad of left,top,width,height
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
         public static UniRect FromDoublesPointer(IntPtr ptr)
         {
             unsafe
@@ -213,17 +243,32 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// Create a rectangle from a pointer of a double quad of left,top,width,height
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
         public static unsafe UniRect FromDoublesPointer(void* ptr)
         {
             double* doubles = (double*)ptr;
             return new UniRect(doubles[0], doubles[1], doubles[2], doubles[3]);
         }
 
+        /// <summary>
+        /// Create a rectangle from a float quad of left,top,width,height
+        /// </summary>
+        /// <param name="floats"></param>
+        /// <returns></returns>
         public static UniRect FromFloats(float[] floats)
         {
             return new UniRect(floats[0], floats[1], floats[2], floats[3]);
         }
 
+        /// <summary>
+        /// Create a rectangle from a pointer of a float quad of left,top,width,height
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
         public static UniRect FromFloatsPointer(IntPtr ptr)
         {
             unsafe
@@ -233,6 +278,11 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// Create a rectangle from a pointer of a float quad of left,top,width,height
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <returns></returns>
         public static unsafe UniRect FromFloatsPointer(void* ptr)
         {
             float* floats = (float*)ptr;
@@ -248,36 +298,43 @@ namespace DataTools.Graphics
             return string.Format("{0}, {1}; {2}x{3}", left, top, width, height);
         }
 
+        /// <inheritdoc/>
         public static explicit operator RectangleF(UniRect operand)
         {
             return new RectangleF((float)operand.left, (float)operand.top, (float)operand.width, (float)operand.height);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniRect(RectangleF operand)
         {
             return new UniRect(operand);
         }
 
+        /// <inheritdoc/>
         public static explicit operator Rectangle(UniRect operand)
         {
             return new Rectangle((int)operand.left, (int)operand.top, (int)operand.width, (int)operand.height);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniRect(Rectangle operand)
         {
             return new UniRect(operand);
         }
 
+        /// <inheritdoc/>
         public static implicit operator double[](UniRect operand)
         {
             return new[] { operand.Left, operand.Top, operand.Right, operand.Bottom };
         }
 
+        /// <inheritdoc/>
         public static implicit operator LinearRect(UniRect operand)
         {
             return new LinearRect(operand.Left, operand.Top, operand.Width, operand.Height);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniRect(LinearRect operand)
         {
             return new UniRect(operand);

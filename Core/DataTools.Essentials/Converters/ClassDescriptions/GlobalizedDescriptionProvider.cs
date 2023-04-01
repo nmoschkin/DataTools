@@ -19,6 +19,10 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         private ResourceManager resmgr;
         private string contextName;
         private string resourceKey;
+
+        /// <summary>
+        /// Cross-reference of class properties
+        /// </summary>
         protected static readonly Dictionary<string, (PropertyInfo, TranslationKeyAttribute)> classProperties;
 
         static GlobalizedDescriptionProvider()
@@ -42,6 +46,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// </summary>
         public string ResourceKey => resourceKey;
 
+        /// <inheritdoc/>
         public override TextLoadType LoadType { get; }
 
         /// <summary>
@@ -95,6 +100,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// </summary>
         public virtual string Suffix { get; protected set; }
 
+        /// <inheritdoc/>
         public override string ProvidePropertyDescription(T obj, string propertyName)
         {
             return ProvideDescription(obj, propertyName);
@@ -138,6 +144,7 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
             return translation;
         }
 
+        /// <inheritdoc/>
         public string ProvideDescription(T value)
         {
             return ProvideDescription(value, null);
@@ -151,7 +158,8 @@ namespace DataTools.Essentials.Converters.ClassDescriptions
         /// <summary>
         /// Compute the resource key name for the given value based on the current options.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="altProp">Alternate property name</param>
+        /// <param name="value">Value</param>
         /// <returns></returns>
         protected virtual string ComputeKeyName(string altProp = null, T value = default)
         {

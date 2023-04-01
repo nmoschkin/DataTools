@@ -473,7 +473,7 @@ namespace DataTools.Win32
             CALLBACK_STREAM_SWITCH = 1U
         }
 
-        public delegate uint CopyProgressRoutine(LARGE_INTEGER TotalFileSize, LARGE_INTEGER TotalBytesTrasnferred, LARGE_INTEGER StreamSize, LARGE_INTEGER StreambytesTransferred, uint dwStreamNumber, CALLBACK_REASON dwCallbackReason, IntPtr hSourceFile, IntPtr hDestinationFile, IntPtr lpData);
+        public delegate uint CopyProgressRoutine(LargeInteger TotalFileSize, LargeInteger TotalBytesTrasnferred, LargeInteger StreamSize, LargeInteger StreambytesTransferred, uint dwStreamNumber, CALLBACK_REASON dwCallbackReason, IntPtr hSourceFile, IntPtr hDestinationFile, IntPtr lpData);
 
 
 

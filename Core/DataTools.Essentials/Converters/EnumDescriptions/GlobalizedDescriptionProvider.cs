@@ -19,6 +19,9 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         private ResourceManager resmgr;
         private Dictionary<T, string> resourceKeys = null;
 
+        /// <summary>
+        /// Gets the dictionary of resource keys
+        /// </summary>
         public IReadOnlyDictionary<T, string> ResourceKeys => resourceKeys;
 
         /// <summary>
@@ -30,9 +33,6 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// <param name="customPrefix">The custom prefix to specify for the resource name values.</param>
         /// <param name="customSuffix">The custom suffix to specify for the resource name values.</param>
         /// <param name="customSeparator">The string that will separate parts of the computed resource key name.</param>
-        /// <remarks>
-        /// If <paramref name="assembly"/> is null, the assembly is taken from <typeparamref name="T"/>.
-        /// </remarks>
         public GlobalizedDescriptionProvider(KeyNameOptions nameOptions, Type resourceType, CultureInfo cultureInfo = null, string customPrefix = null, string customSuffix = null, string customSeparator = "_") : base()
         {
             loadType = TextLoadType.Lazy;
@@ -179,13 +179,9 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// <summary>
         /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}" />
         /// </summary>
-        /// <param name="resourceTypeName">The fully qualified type name of the resource class.</param>
-        /// <param name="assembly">The assembly that contains the resource class.</param>
         /// <param name="cultureInfo">CultureInfo to reference when rendering a string.</param>
+        /// <param name="resourceType">The resource type.</param>
         /// <param name="customPrefix">The custom prefix to specify for the resource name values.</param>
-        /// <remarks>
-        /// If <paramref name="assembly"/> is null, the assembly is taken from <typeparamref name="T"/>.
-        /// </remarks>
         public GlobalizedDescriptionProvider(string customPrefix, Type resourceType, CultureInfo cultureInfo = null) : this(KeyNameOptions.CustomPrefix, resourceType, customPrefix: customPrefix, cultureInfo: cultureInfo)
         {
         }
@@ -193,7 +189,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// <summary>
         /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}" />
         /// </summary>
-        /// <param name="resourceTypeName">The fully qualified type name of the resource class.</param>
+        /// <param name="resourceType">The resource type.</param>
         /// <param name="cultureInfo">CultureInfo to reference when rendering a string.</param>
         /// <remarks>
         /// In this usage, the assembly is taken from <typeparamref name="T"/>.
@@ -205,7 +201,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// <summary>
         /// Create a new instance of <see cref="GlobalizedDescriptionProvider{T}" />
         /// </summary>
-        /// <param name="resourceTypeName">The fully qualified type name of the resource class.</param>
+        /// <param name="resourceType">The resource type.</param>
         /// <remarks>
         /// In this usage, the assembly is taken from <typeparamref name="T"/>.
         /// </remarks>
@@ -222,6 +218,9 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
             set => ci = value;
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="TextLoadType"/> for the current attribute description provider.
+        /// </summary>
         public virtual TextLoadType LoadType => loadType;
 
         /// <summary>
@@ -249,6 +248,7 @@ namespace DataTools.Essentials.Converters.EnumDescriptions
         /// </summary>
         public virtual string Suffix { get; protected set; }
 
+        /// <inheritdoc/>
         public override string ProvideDescription(T value)
         {
             var resourceKey = ComputeKeyName(value);

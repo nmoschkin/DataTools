@@ -34,7 +34,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         {
             get
             {
-                return _Layout.Gpt.DiskId;
+                return layout.Gpt.DiskId;
             }
         }
 
@@ -48,7 +48,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         {
             get
             {
-                return _Layout.Gpt.StartingUsableOffset;
+                return layout.Gpt.StartingUsableOffset;
             }
         }
 
@@ -62,7 +62,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         {
             get
             {
-                return _Layout.Gpt.UsableLength;
+                return layout.Gpt.UsableLength;
             }
         }
 
@@ -76,7 +76,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         {
             get
             {
-                return _Layout.Gpt.MaxPartitionCount;
+                return layout.Gpt.MaxPartitionCount;
             }
         }
     }

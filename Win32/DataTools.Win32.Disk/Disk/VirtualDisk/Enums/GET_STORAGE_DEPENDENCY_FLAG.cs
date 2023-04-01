@@ -17,18 +17,27 @@ using System.Runtime.InteropServices;
 
 namespace DataTools.Win32.Disk
 {
-    // Flags for GetStorageDependencyInformation
+    /// <summary>
+    /// Flags for GetStorageDependencyInformation
+    /// </summary>
     [Flags()]
-    public enum GET_STORAGE_DEPENDENCY_FLAG
+    internal enum GET_STORAGE_DEPENDENCY_FLAG
     {
+        /// <summary>
+        /// None
+        /// </summary>
         GET_STORAGE_DEPENDENCY_FLAG_NONE = 0,
 
-        // Return information for volumes or disks hosting the volume specified
-        // If not set, returns info about volumes or disks being hosted by
-        // the volume or disk specified
+        /// <summary>
+        /// Return information for volumes or disks hosting the volume specified 
+        /// If not set, returns info about volumes or disks being hosted by
+        /// the volume or disk specified 
+        /// </summary>
         GET_STORAGE_DEPENDENCY_FLAG_HOST_VOLUMES = 1,
 
-        //  The handle provided is to a disk, not volume or file
+        /// <summary>
+        /// The handle provided is to a disk, not volume or file
+        /// </summary>
         GET_STORAGE_DEPENDENCY_FLAG_DISK_HANDLE = 2
     }
 }

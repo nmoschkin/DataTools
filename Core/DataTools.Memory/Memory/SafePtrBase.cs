@@ -19,7 +19,6 @@ namespace DataTools.Memory
         /// Instantiate and set up a new memory buffer object.
         /// </summary>
         /// <param name="ptr">The initial pointer.</param>
-        /// <param name="t">The type of memory being allocated.</param>
         /// <param name="fOwn">Whether we will own the memory pointer specified by <paramref name="ptr"/>.</param>
         /// <param name="gcpressure">True to make the garbage collector aware of memory allocations made by this object.</param>
         protected SafePtrBase(IntPtr ptr, bool fOwn, bool gcpressure) : base(IntPtr.Zero, fOwn)
@@ -33,8 +32,6 @@ namespace DataTools.Memory
         /// Instantiate and set up a new memory buffer object.
         /// </summary>
         /// <param name="ptr">The initial pointer.</param>
-        /// <param name="size">The size of the buffer.</param>
-        /// <param name="t">The type of memory being allocated.</param>
         /// <param name="fOwn">Whether we will own the memory pointer specified by <paramref name="ptr"/>.</param>
         /// <param name="gcpressure">True to make the garbage collector aware of memory allocations made by this object.</param>
         protected unsafe SafePtrBase(void* ptr, bool fOwn, bool gcpressure) : base(IntPtr.Zero, fOwn)
@@ -48,6 +45,7 @@ namespace DataTools.Memory
 
         #region Public Properties
 
+        /// <inheritdoc/>
         public override bool IsInvalid => handle == (IntPtr)0;
 
         /// <summary>
@@ -934,9 +932,9 @@ namespace DataTools.Memory
         }
 
         /// <summary>
-        /// Gets a string encoded as UTF-8 from the specified byte index in the memory buffer.
+        /// Gets a null-terminated string encoded as UTF-8 from the specified byte index in the memory buffer.
         /// </summary>
-        /// <param name="index">The index in the memory buffer that contains the UTF-8-encoded string.</param>
+        /// <param name="index">The index in the memory buffer that contains the UTF-8 string.</param>
         /// <returns>A <see cref="string"/> that has been decoded from UTF-8.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetUTF8String(long index)
@@ -944,6 +942,21 @@ namespace DataTools.Memory
             unsafe
             {
                 return DecodeUTF8Ptr((byte*)((long)handle + index));
+            }
+        }
+
+        /// <summary>
+        /// Gets a string encoded as UTF-8 from the specified byte index in the memory buffer.
+        /// </summary>
+        /// <param name="index">The index in the memory buffer that contains the UTF-8-encoded string.</param>
+        /// <param name="length">The length, in bytes, of the string to retrieve.</param>
+        /// <returns>A <see cref="string"/> that has been decoded from UTF-8.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetUTF8String(long index, int length)
+        {
+            unsafe
+            {
+                return DecodeUTF8Ptr((byte*)((long)handle + index), length);
             }
         }
 
@@ -975,6 +988,18 @@ namespace DataTools.Memory
             if (ptr == b2) return "";
 
             return Encoding.UTF8.GetString(ptr, (int)(b2 - ptr));
+        }
+
+        /// <summary>
+        /// Decode a null-terminated UTF-8 byte array into a string.
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected unsafe string DecodeUTF8Ptr(byte* ptr, int length)
+        {
+            return Encoding.UTF8.GetString(ptr, length);
         }
 
         /// <summary>
@@ -1284,6 +1309,7 @@ namespace DataTools.Memory
         /// </summary>
         /// <param name="index">The index where expansion begins. The expansion starts at this position.</param>
         /// <param name="amount">Number of bytes to push out.</param>
+        /// <param name="bytes">Optional bytes to insert</param>
         /// <param name="addPressure">Specify whether to notify the garbage collector.</param>
         /// <remarks></remarks>
         public virtual long PushOut(long index, long amount, byte[] bytes = null, bool addPressure = false)
@@ -1348,6 +1374,7 @@ namespace DataTools.Memory
         /// </summary>
         /// <param name="index">The index where expansion begins. The expansion starts at this position.</param>
         /// <param name="amount">Number of characters to push out.</param>
+        /// <param name="chars">Optional characters to insert</param>
         /// <param name="addPressure">Specify whether to notify the garbage collector.</param>
         /// <remarks></remarks>
         public virtual long PushOutChar(long index, long amount, char[] chars = null, bool addPressure = false)
@@ -1563,7 +1590,8 @@ namespace DataTools.Memory
         /// <summary>
         /// Provide the low-level ability to re-allocate an existing memory block to change its size.
         /// </summary>
-        /// <param name="size"></param>
+        /// <param name="oldptr">The old pointer</param>
+        /// <param name="newsize">The new size</param>
         /// <returns></returns>
         /// <remarks>
         /// Overrides of this method should provide only the functionality necessary<br />
@@ -1744,6 +1772,7 @@ namespace DataTools.Memory
             return true;
         }
 
+        /// <inheritdoc/>
         protected override bool ReleaseHandle()
         {
             return Free();
@@ -1813,6 +1842,7 @@ namespace DataTools.Memory
             }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             if (handle == (IntPtr)0) return "";
@@ -1892,82 +1922,101 @@ namespace DataTools.Memory
             return Clone();
         }
 
+        /// <summary>
+        /// Make a copy of this memory object
+        /// </summary>
+        /// <returns></returns>
         protected abstract SafePtrBase Clone();
 
         #endregion ICloneable
 
         #region Explicit Cast Operators
 
+        /// <inheritdoc/>
         public static explicit operator byte[](SafePtrBase val)
         {
             return val.ToByteArray();
         }
 
+        /// <inheritdoc/>
         public static explicit operator char[](SafePtrBase val)
         {
             return val.ToCharArray();
         }
 
+        /// <inheritdoc/>
         public static explicit operator sbyte[](SafePtrBase val)
         {
             return val.ToArray<sbyte>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator short[](SafePtrBase val)
         {
             return val.ToArray<short>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator ushort[](SafePtrBase val)
         {
             return val.ToArray<ushort>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator int[](SafePtrBase val)
         {
             return val.ToArray<int>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator uint[](SafePtrBase val)
         {
             return val.ToArray<uint>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator long[](SafePtrBase val)
         {
             return val.ToArray<long>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator ulong[](SafePtrBase val)
         {
             return val.ToArray<ulong>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator float[](SafePtrBase val)
         {
             return val.ToArray<float>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator double[](SafePtrBase val)
         {
             return val.ToArray<double>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator decimal[](SafePtrBase val)
         {
             return val.ToArray<decimal>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator DateTime[](SafePtrBase val)
         {
             return val.ToArray<DateTime>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator Guid[](SafePtrBase val)
         {
             return val.ToArray<Guid>();
         }
 
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator string(SafePtrBase val)
         {
@@ -1979,16 +2028,20 @@ namespace DataTools.Memory
 
         #region Implicit Cast Operators
 
+        /// <inheritdoc/>
         public static implicit operator IntPtr(SafePtrBase val) => val.handle;
 
+        /// <inheritdoc/>
         public static unsafe implicit operator void*(SafePtrBase val) => (void*)val.handle;
 
+        /// <inheritdoc/>
         public static implicit operator UIntPtr(SafePtrBase val) => (UIntPtr)(long)val.handle;
 
         #endregion Implicit Cast Operators
 
         #region Concatenating Operators
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, byte[] val2)
         {
             var c = val1.Length;
@@ -1999,6 +2052,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, char[] val2)
         {
             var c = val1.Length;
@@ -2009,6 +2063,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, string val2)
         {
             var c = val1.Length;
@@ -2019,6 +2074,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, sbyte[] val2)
         {
             var c = val1.Length;
@@ -2029,6 +2085,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, short[] val2)
         {
             var c = val1.Length;
@@ -2039,6 +2096,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, ushort[] val2)
         {
             var c = val1.Length;
@@ -2049,6 +2107,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, int[] val2)
         {
             var c = val1.Length;
@@ -2059,6 +2118,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, uint[] val2)
         {
             var c = val1.Length;
@@ -2069,6 +2129,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, long[] val2)
         {
             var c = val1.Length;
@@ -2079,6 +2140,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, ulong[] val2)
         {
             var c = val1.Length;
@@ -2089,6 +2151,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, float[] val2)
         {
             var c = val1.Length;
@@ -2099,6 +2162,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, double[] val2)
         {
             var c = val1.Length;
@@ -2109,6 +2173,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, decimal[] val2)
         {
             var c = val1.Length;
@@ -2119,6 +2184,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, DateTime[] val2)
         {
             var c = val1.Length;
@@ -2129,6 +2195,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, Guid[] val2)
         {
             var c = val1.Length;
@@ -2143,84 +2210,98 @@ namespace DataTools.Memory
 
         #region Pointer Arithmatic Operators
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, short val2)
         {
             val1.handle += val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator -(SafePtrBase val1, short val2)
         {
             val1.handle -= val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, ushort val2)
         {
             val1.handle += val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator -(SafePtrBase val1, ushort val2)
         {
             val1.handle -= val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, int val2)
         {
             val1.handle += val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator -(SafePtrBase val1, int val2)
         {
             val1.handle -= val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, long val2)
         {
             val1.handle = (IntPtr)((long)val1.handle + val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator -(SafePtrBase val1, long val2)
         {
             val1.handle = (IntPtr)((long)val1.handle - val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, uint val2)
         {
             val1.handle = (IntPtr)((uint)val1.handle + val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator -(SafePtrBase val1, uint val2)
         {
             val1.handle = (IntPtr)((uint)val1.handle - val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, ulong val2)
         {
             val1.handle = (IntPtr)((ulong)val1.handle + val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator -(SafePtrBase val1, ulong val2)
         {
             val1.handle = (IntPtr)((ulong)val1.handle - val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator +(SafePtrBase val1, IntPtr val2)
         {
             val1.handle = (IntPtr)((long)val1.handle + (long)val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtrBase operator -(SafePtrBase val1, IntPtr val2)
         {
             val1.handle = (IntPtr)((long)val1.handle - (long)val2);
@@ -2231,21 +2312,25 @@ namespace DataTools.Memory
 
         #region Equality Operators
 
+        /// <inheritdoc/>
         public static bool operator ==(IntPtr val1, SafePtrBase val2)
         {
             return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
+        /// <inheritdoc/>
         public static bool operator !=(IntPtr val1, SafePtrBase val2)
         {
             return val1 != (val2?.handle ?? IntPtr.Zero);
         }
 
+        /// <inheritdoc/>
         public static bool operator ==(SafePtrBase val2, IntPtr val1)
         {
             return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
+        /// <inheritdoc/>
         public static bool operator !=(SafePtrBase val2, IntPtr val1)
         {
             return val1 != (val2?.handle ?? IntPtr.Zero);

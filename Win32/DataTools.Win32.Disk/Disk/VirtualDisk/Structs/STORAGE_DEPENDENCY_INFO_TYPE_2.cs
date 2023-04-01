@@ -14,12 +14,12 @@
 using System;
 using System.Runtime.InteropServices;
 
-using DataTools.Win32.Memory;
+using DataTools.Memory;
 
 namespace DataTools.Win32.Disk
 {
     // Parameter structure for GetStorageDependencyInformation
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct STORAGE_DEPENDENCY_INFO_TYPE_2
     {
         public DEPENDENT_DISK_FLAG DependencyTypeFlags;

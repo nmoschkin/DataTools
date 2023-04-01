@@ -133,7 +133,7 @@ namespace DataTools.Essentials.SortedLists
             Sort(ref values, comparison, lo, hi);
         }
 
-        public static void Sort<T>(ref T[] values, Func<T, T, int> comparison, int lo, int hi)
+        private static void Sort<T>(ref T[] values, Func<T, T, int> comparison, int lo, int hi)
         {
             if (lo < hi)
             {
@@ -179,7 +179,7 @@ namespace DataTools.Essentials.SortedLists
         /// <typeparam name="T">The type of object to sort.</typeparam>
         /// <param name="values">The array of values to sort.</param>
         /// <param name="comparison">The comparison function to use.</param>
-        /// <param name="didChange">True if the collection did change.</param>
+        /// <param name="sortOrder">Specify the sort order.</param>
         public static void Sort<T>(IList<T> values, Func<T, T, int> comparison, SortOrder sortOrder = SortOrder.Ascending)
         {
             Sort(values, comparison, sortOrder, out _);
@@ -191,6 +191,7 @@ namespace DataTools.Essentials.SortedLists
         /// <typeparam name="T">The type of object to sort.</typeparam>
         /// <param name="values">The array of values to sort.</param>
         /// <param name="comparison">The comparison function to use.</param>
+        /// <param name="sortOrder">Specify the sort order.</param>
         /// <param name="didChange">True if the collection did change.</param>
         public static void Sort<T>(IList<T> values, Func<T, T, int> comparison, SortOrder sortOrder, out bool didChange)
         {
@@ -206,7 +207,7 @@ namespace DataTools.Essentials.SortedLists
             Sort(values, comparison, sortOrder, lo, hi, out didChange);
         }
 
-        public static void Sort<T>(IList<T> values, Func<T, T, int> comparison, SortOrder sortOrder, int lo, int hi, out bool didChange)
+        private static void Sort<T>(IList<T> values, Func<T, T, int> comparison, SortOrder sortOrder, int lo, int hi, out bool didChange)
         {
             bool dcf = false;
             bool dc = false;

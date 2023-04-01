@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace DataTools.Memory
 {
+    /// <summary>
+    /// Safe general use heap memory handler
+    /// </summary>
     public class SafePtr : SafePtrBase
     {
+        /// <inheritdoc/>
         public override bool IsInvalid => handle == IntPtr.Zero;
+
         private long size = 0;
 
         internal virtual new IntPtr handle
@@ -20,59 +24,73 @@ namespace DataTools.Memory
             }
         }
 
+        /// <inheritdoc/>
         public override MemoryType MemoryType => MemoryType.HGlobal;
 
+        /// <inheritdoc/>
         public SafePtr(IntPtr ptr, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
         }
 
+        /// <inheritdoc/>
         public SafePtr(byte[] data) : this(IntPtr.Zero, true, true)
         {
             FromByteArray(data);
         }
 
+        /// <inheritdoc/>
         public SafePtr(long size) : this(IntPtr.Zero, true, true)
         {
             Alloc(size);
         }
 
+        /// <inheritdoc/>
         public SafePtr(int size) : this((long)size)
         {
         }
 
+        /// <inheritdoc/>
         public SafePtr() : this(IntPtr.Zero, true, true)
         {
         }
 
+        /// <inheritdoc/>
         public SafePtr(IntPtr ptr, long size, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
             this.size = size;
         }
 
+        /// <inheritdoc/>
         public SafePtr(IntPtr ptr, long size) : this(ptr, size, true, true)
         {
         }
 
+        /// <inheritdoc/>
         public SafePtr(IntPtr ptr, int size) : this(ptr, (long)size, true, true)
         {
         }
 
+        /// <inheritdoc/>
         public SafePtr(IntPtr ptr) : this(ptr, false, false)
         {
         }
 
+        /// <inheritdoc/>
         public SafePtr(IntPtr ptr, bool fOwn) : this(ptr, fOwn, fOwn)
         {
         }
 
+        /// <inheritdoc/>
         public unsafe SafePtr(void* ptr, long size) : this((IntPtr)ptr, size, true, true)
         {
         }
 
+        /// <inheritdoc/>
         public unsafe SafePtr(void* ptr) : this((IntPtr)ptr, 0L, true, true)
         {
         }
 
+        /// <inheritdoc/>
         protected override void InternalDoZeroMem(IntPtr startptr, long length)
         {
             unsafe
@@ -81,32 +99,38 @@ namespace DataTools.Memory
             }
         }
 
+        /// <inheritdoc/>
         protected override IntPtr Allocate(long size)
         {
             return Marshal.AllocHGlobal((int)size);
         }
 
+        /// <inheritdoc/>
         protected override void Deallocate(IntPtr ptr)
         {
             Marshal.FreeHGlobal(ptr);
             this.size = 0;
         }
 
+        /// <inheritdoc/>
         protected override IntPtr Reallocate(IntPtr oldptr, long newsize)
         {
             return Marshal.ReAllocHGlobal(oldptr, (IntPtr)newsize);
         }
 
+        /// <inheritdoc/>
         protected override long GetNativeSize()
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         protected override bool CanGetNativeSize()
         {
             return false;
         }
 
+        /// <inheritdoc/>
         protected override SafePtrBase Clone()
         {
             unsafe
@@ -120,27 +144,34 @@ namespace DataTools.Memory
             }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             if (handle == IntPtr.Zero) return "";
             return GetString(0);
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             return base.Equals(obj);
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
 
+        /// <inheritdoc/>
+        /// <inheritdoc/>
         public static explicit operator byte[](SafePtr val)
         {
             return val.ToByteArray();
         }
 
+        /// <inheritdoc/>
+        /// <inheritdoc/>
         public static explicit operator SafePtr(byte[] val)
         {
             var n = new SafePtr();
@@ -148,11 +179,15 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
+        /// <inheritdoc/>
         public static explicit operator char[](SafePtr val)
         {
             return val.ToCharArray();
         }
 
+        /// <inheritdoc/>
+        /// <inheritdoc/>
         public static explicit operator SafePtr(char[] val)
         {
             var n = new SafePtr();
@@ -160,11 +195,14 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
+        /// <inheritdoc/>
         public static explicit operator sbyte[](SafePtr val)
         {
             return val.ToArray<sbyte>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(sbyte[] val)
         {
             var n = new SafePtr();
@@ -172,11 +210,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator short[](SafePtr val)
         {
             return val.ToArray<short>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(short[] val)
         {
             var n = new SafePtr();
@@ -184,11 +224,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator ushort[](SafePtr val)
         {
             return val.ToArray<ushort>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(ushort[] val)
         {
             var n = new SafePtr();
@@ -196,11 +238,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator int[](SafePtr val)
         {
             return val.ToArray<int>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(int[] val)
         {
             var n = new SafePtr();
@@ -208,11 +252,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator uint[](SafePtr val)
         {
             return val.ToArray<uint>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(uint[] val)
         {
             var n = new SafePtr();
@@ -220,11 +266,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator long[](SafePtr val)
         {
             return val.ToArray<long>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(long[] val)
         {
             var n = new SafePtr();
@@ -232,11 +280,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator ulong[](SafePtr val)
         {
             return val.ToArray<ulong>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(ulong[] val)
         {
             var n = new SafePtr();
@@ -244,11 +294,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator float[](SafePtr val)
         {
             return val.ToArray<float>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(float[] val)
         {
             var n = new SafePtr();
@@ -256,11 +308,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator double[](SafePtr val)
         {
             return val.ToArray<double>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(double[] val)
         {
             var n = new SafePtr();
@@ -268,11 +322,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator decimal[](SafePtr val)
         {
             return val.ToArray<decimal>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(decimal[] val)
         {
             var n = new SafePtr();
@@ -280,11 +336,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator DateTime[](SafePtr val)
         {
             return val.ToArray<DateTime>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(DateTime[] val)
         {
             var n = new SafePtr();
@@ -292,11 +350,13 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         public static explicit operator Guid[](SafePtr val)
         {
             return val.ToArray<Guid>();
         }
 
+        /// <inheritdoc/>
         public static explicit operator SafePtr(Guid[] val)
         {
             var n = new SafePtr();
@@ -304,6 +364,7 @@ namespace DataTools.Memory
             return n;
         }
 
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator string(SafePtr val)
         {
@@ -311,6 +372,7 @@ namespace DataTools.Memory
             return val.GetString(0);
         }
 
+        /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator SafePtr(string val)
         {
@@ -319,6 +381,7 @@ namespace DataTools.Memory
             return op;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, byte[] val2)
         {
             var c = val1.size;
@@ -329,6 +392,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, char[] val2)
         {
             var c = val1.size;
@@ -339,6 +403,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, string val2)
         {
             var c = val1.size;
@@ -356,6 +421,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, sbyte[] val2)
         {
             var c = val1.size;
@@ -366,6 +432,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, short[] val2)
         {
             var c = val1.size;
@@ -376,6 +443,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, ushort[] val2)
         {
             var c = val1.size;
@@ -386,6 +454,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, int[] val2)
         {
             var c = val1.size;
@@ -396,6 +465,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, uint[] val2)
         {
             var c = val1.size;
@@ -406,6 +476,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, long[] val2)
         {
             var c = val1.size;
@@ -416,6 +487,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, ulong[] val2)
         {
             var c = val1.size;
@@ -426,6 +498,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, float[] val2)
         {
             var c = val1.size;
@@ -436,6 +509,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, double[] val2)
         {
             var c = val1.size;
@@ -446,6 +520,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, decimal[] val2)
         {
             var c = val1.size;
@@ -456,6 +531,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, DateTime[] val2)
         {
             var c = val1.size;
@@ -466,6 +542,7 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, Guid[] val2)
         {
             var c = val1.size;
@@ -476,115 +553,135 @@ namespace DataTools.Memory
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, short val2)
         {
             val1.handle += val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator -(SafePtr val1, short val2)
         {
             val1.handle -= val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, ushort val2)
         {
             val1.handle += val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator -(SafePtr val1, ushort val2)
         {
             val1.handle -= val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, int val2)
         {
             val1.handle += val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator -(SafePtr val1, int val2)
         {
             val1.handle -= val2;
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, long val2)
         {
             val1.handle = (IntPtr)((long)val1.handle + val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator -(SafePtr val1, long val2)
         {
             val1.handle = (IntPtr)((long)val1.handle - val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, uint val2)
         {
             val1.handle = (IntPtr)((uint)val1.handle + val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator -(SafePtr val1, uint val2)
         {
             val1.handle = (IntPtr)((uint)val1.handle - val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, ulong val2)
         {
             val1.handle = (IntPtr)((ulong)val1.handle + val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator -(SafePtr val1, ulong val2)
         {
             val1.handle = (IntPtr)((ulong)val1.handle - val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, IntPtr val2)
         {
             val1.handle = (IntPtr)((long)val1.handle + (long)val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static SafePtr operator -(SafePtr val1, IntPtr val2)
         {
             val1.handle = (IntPtr)((long)val1.handle - (long)val2);
             return val1;
         }
 
+        /// <inheritdoc/>
         public static bool operator ==(IntPtr val1, SafePtr val2)
         {
             return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
+        /// <inheritdoc/>
         public static bool operator !=(IntPtr val1, SafePtr val2)
         {
             return val1 != (val2?.handle ?? IntPtr.Zero);
         }
 
+        /// <inheritdoc/>
         public static bool operator ==(SafePtr val2, IntPtr val1)
         {
             return val1 == (val2?.handle ?? IntPtr.Zero);
         }
 
+        /// <inheritdoc/>
         public static bool operator !=(SafePtr val2, IntPtr val1)
         {
             return val1 != (val2?.handle ?? IntPtr.Zero);
         }
 
+        /// <inheritdoc/>
         public static implicit operator IntPtr(SafePtr val)
         {
             return val?.handle ?? IntPtr.Zero;
         }
 
+        /// <inheritdoc/>
         public static implicit operator SafePtr(IntPtr val)
         {
             unsafe
@@ -596,6 +693,7 @@ namespace DataTools.Memory
             }
         }
 
+        /// <inheritdoc/>
         public static implicit operator UIntPtr(SafePtr val)
         {
             unsafe
@@ -604,6 +702,7 @@ namespace DataTools.Memory
             }
         }
 
+        /// <inheritdoc/>
         public static implicit operator SafePtr(UIntPtr val)
         {
             unsafe

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -16,10 +17,11 @@ using DataTools.Essentials.Converters.ClassDescriptions;
 using DataTools.Essentials.Converters.ClassDescriptions.Framework;
 using DataTools.Essentials.Converters.EnumDescriptions.Framework;
 using DataTools.Essentials.Observable;
+using DataTools.Essentials.Settings;
 using DataTools.Graphics;
 using DataTools.Streams;
 using DataTools.Win32.Memory;
-
+using DataTools.Windows.Essentials.Settings;
 using Newtonsoft.Json;
 
 using SkiaSharp;
@@ -232,8 +234,12 @@ namespace CoreTestOne
     }
 
     [Globalized(typeof(SampleBaseClass), typeof(AppResources))]
-    public class SampleBaseClass : IEquatable<SampleBaseClass>
+    public class SampleBaseClass : RegistrySerializable, IEquatable<SampleBaseClass>
     {
+        public SampleBaseClass() : base("Nathaniel Moschkin", typeof(SampleBaseClass).Assembly)
+        {
+        }
+
         public string ValueA
         {
             get; set;
@@ -244,7 +250,7 @@ namespace CoreTestOne
             get; set;
         }
 
-        public SampleBaseClass(string valueA, int valueI)
+        public SampleBaseClass(string valueA, int valueI) : this()
         {
             ValueA = valueA;
             ValueI = valueI;
@@ -383,6 +389,8 @@ namespace CoreTestOne
         {
             get; set;
         }
+
+        public DescendantA1 MaybeSkippers { get; set; } = new DescendantA1("Hoyaman", "Singing Loopily", 11);
     }
 
     public class DescendantB : SampleBaseClass
@@ -432,6 +440,8 @@ namespace CoreTestOne
         {
             return string.Join(", ", pappy);
         }
+
+        public DescendantA2 Ables { get; set; } = new DescendantA2(4, "nininin", 995);
 
         public DescendantB1A(decimal valueDe, string valueA, int valueI, IEnumerable<string> preNoodles = null, Guid? hippieCode = null) : base(valueDe, valueA, valueI, hippieCode)
         {
@@ -608,7 +618,7 @@ namespace CoreTestOne
 
             //var b2a = new DescendantB2A(69M, "Becknus", 5);
 
-            //var b1a = new DescendantB1A(45.5912933M, "Glissful Blissoms", 55, new List<string> { "Glances", "Common Noodles", "Weeds" });
+            var b1a = new DescendantB1A(45.5912933M, "Glissful Blissoms", 55, new List<string> { "Glances", "Common Noodles", "Weeds" });
 
             //var allprovs = ClassInfo.GetDescriptions(b1a);
 
@@ -639,6 +649,21 @@ namespace CoreTestOne
             //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2a, b1);
 
             //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(a, a1);
+
+            var smo = new SettingsMapOptions();
+            var bllb = new DescendantB1A(30.00M, "Hiiyp", 934);
+            bllb.Load();
+
+            var rmo = SettingsMapOptions.MapSettings(typeof(DescendantB1A), smo);
+            bllb.Ables.ValueA = "Bjorn";
+            var tbool = SettingsMapOptions.LookupProperty(bllb, "Ables\\MaybeSkippers\\SkipNeeds", out var found, out var fprop);
+
+            if (tbool)
+            {
+                var springTest = (string)fprop.GetValue(found);
+            }
+
+            bllb.Save();
 
             var frm = new frmExterns();
             System.Windows.Forms.Application.Run(frm);

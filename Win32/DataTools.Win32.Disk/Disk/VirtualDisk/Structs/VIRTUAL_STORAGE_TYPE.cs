@@ -17,14 +17,10 @@ using System.Runtime.InteropServices;
 
 namespace DataTools.Win32.Disk
 {
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct VIRTUAL_STORAGE_TYPE
     {
         public uint DeviceId;
-
-        // <MarshalAs(UnmanagedType.ByValArray, ArraySubType:=UnmanagedType.U1, SizeConst:=16)> _
-
-        [MarshalAs(UnmanagedType.Struct)]
         public Guid VendorId;
     }
 }

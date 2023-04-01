@@ -9,6 +9,9 @@ using DataTools.Text;
 
 namespace DataTools.Graphics
 {
+    /// <summary>
+    /// <see cref="UniColor"/> formatting static utility class
+    /// </summary>
     public static class UniColorFormatter
     {
         static Dictionary<char, int> FmtRef = new Dictionary<char, int>();
@@ -32,6 +35,12 @@ namespace DataTools.Graphics
             FmtRef.Add('M', 0x10000);
         }
 
+        /// <summary>
+        /// Translate the format string into <see cref="UniColorFormatOptions"/>
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
         public static UniColorFormatOptions ProvideFormatOptions(string format)
         {
             if (string.IsNullOrEmpty(format)) return UniColorFormatOptions.Default;

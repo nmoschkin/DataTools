@@ -5,10 +5,10 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1067</AssemblyVersion>
-    <FileVersion>8.0.0.1067</FileVersion>
+    <AssemblyVersion>8.0.0.1077</AssemblyVersion>
+    <FileVersion>8.0.0.1077</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1067</Version>
+    <Version>8.0.0.1077</Version>
     <Product>DataTools Core 8 Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -17,7 +17,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1066</PreviousVersion>
+    <PreviousVersion>8.0.0.1076</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -30,6 +30,7 @@
     <ProjectReference Include="..\..\Win32\DataTools.Win32.FileSystem\DataTools.Win32.FileSystem.csproj" />
     <ProjectReference Include="..\..\Win32\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
     <ProjectReference Include="..\..\Win32\DataTools.Win32\DataTools.Win32.csproj" />
+    <ProjectReference Include="..\..\Windows\DataTools.Windows.Essentials\DataTools.Windows.Essentials.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Resources\AppResources.Designer.cs">

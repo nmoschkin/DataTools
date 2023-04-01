@@ -42,23 +42,20 @@ namespace DataTools.Win32.Disk.Partition
         /// <remarks></remarks>
         public int Compare(PartitionCodeInfo x, PartitionCodeInfo y)
         {
-            los1.Clear();
-            los2.Clear();
-            if (x.SupporedOSes is object)
-                los1.AddRange(x.SupporedOSes);
-            if (y.SupporedOSes is object)
-                los2.AddRange(y.SupporedOSes);
+            var los1 = x.SupporedOSes;
+            var los2 = y.SupporedOSes;
+
             if (x.PartitionID.Value == y.PartitionID.Value)
             {
-                if (los1.Count == 1 && los1[0] == "Windows NT" && los2.Count == 1 && los2[0] == "Windows NT")
+                if (los1.Length == 1 && los1[0] == "Windows NT" && los2.Length == 1 && los2[0] == "Windows NT")
                 {
                     return string.Compare(x.Description, y.Description);
                 }
-                else if (los1.Count == 1 && los1[0] == "Windows NT")
+                else if (los1.Length == 1 && los1[0] == "Windows NT")
                 {
                     return -1;
                 }
-                else if (los2.Count == 1 && los2[0] == "Windows NT")
+                else if (los2.Length == 1 && los2[0] == "Windows NT")
                 {
                     return 1;
                 }

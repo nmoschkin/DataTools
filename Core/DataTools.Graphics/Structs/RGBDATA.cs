@@ -10,16 +10,38 @@ namespace DataTools.Graphics
     /// </summary>
     public struct RGBDATA : IParseableColorData<RGBDATA>
     {
+        /// <summary>
+        /// Blue Channel
+        /// </summary>
         public byte Blue;
+
+        /// <summary>
+        /// Green Channel
+        /// </summary>
         public byte Green;
+
+        /// <summary>
+        /// Red Channel
+        /// </summary>
         public byte Red;
 
+        /// <summary>
+        /// Get RGB data from a color
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static RGBDATA FromColor(UniColor value)
         {
             ColorMath.ColorToRGB(value, out var d);
             return d;
         }
 
+        /// <summary>
+        /// Parse a string into RGB data
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <exception cref="FormatException"></exception>
         public static RGBDATA Parse(string value)
         {
             value = value.ToUpper().Trim();
@@ -55,26 +77,34 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// Create a color from RGB data
+        /// </summary>
+        /// <returns></returns>
         public UniColor CreateColor()
         {
             return new UniColor()
             {
                 R = Red,
                 G = Green,
-                B = Blue
+                B = Blue,
+                A = 255
             };
         }
 
+        /// <inheritdoc/>
         public bool Equals(RGBDATA other)
         {
             return Red == other.Red && Green == other.Green && Blue == other.Blue;
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return $"RGB({Red}, {Green}, {Blue})";
         }
 
+        /// <inheritdoc/>
         public string ToString(string format, IFormatProvider formatProvider)
         {
             if (format == "x")

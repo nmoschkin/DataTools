@@ -8,8 +8,12 @@ using Newtonsoft.Json;
 namespace DataTools.Graphics
 {
 
+    /// <summary>
+    /// Support <see cref="UniColor"/> in JSON data
+    /// </summary>
     public class UniColorConverter : JsonConverter<UniColor>
     {
+        /// <inheritdoc/>
         public override UniColor ReadJson(JsonReader reader, Type objectType, UniColor existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             if (reader.Value is string s)
@@ -20,6 +24,7 @@ namespace DataTools.Graphics
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         public override void WriteJson(JsonWriter writer, UniColor value, JsonSerializer serializer)
         {
             writer.WriteValue(value.ToString());

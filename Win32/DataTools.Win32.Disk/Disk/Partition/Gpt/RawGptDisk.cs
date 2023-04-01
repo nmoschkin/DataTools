@@ -12,9 +12,11 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Principal;
+using System.Text;
 using DataTools.Text;
 using DataTools.Win32.Disk.Partition;
 using DataTools.Win32.Memory;
@@ -47,126 +49,143 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             // principalPerm.Demand()
 
 
-            var hfile = IO.CreateFile(devicePath, IO.GENERIC_READ | IO.GENERIC_WRITE, IO.FILE_SHARE_READ | IO.FILE_SHARE_WRITE, IntPtr.Zero, IO.OPEN_EXISTING, IO.FILE_FLAG_NO_BUFFERING | IO.FILE_FLAG_RANDOM_ACCESS, IntPtr.Zero);
-
-            if (hfile == IO.INVALID_HANDLE_VALUE)
-                return false;
-
-            DISK_GEOMETRY_EX? outGeo = default;
-
-            // get the disk geometry to retrieve the sector (LBA) size.
-            if (!DiskGeometry.GetDiskGeometry(null, hfile, out outGeo))
+            using (var hfile = DiskHandle.OpenDisk(devicePath))
             {
-                User32.CloseHandle(hfile);
-                return false;
-            }
 
-            if (outGeo == null)
-            {
-                User32.CloseHandle(hfile);
-                return false;
-            }
+                DISK_GEOMETRY_EX? outGeo = default;
 
-            var geo = (DISK_GEOMETRY_EX)outGeo;
-
-            // sector size (usually 512 bytes)
-            uint bps = geo.Geometry.BytesPerSector;
-            uint br = 0U;
-            long lp = 0L;
-            long lp2 = 0L;
-            var mm = new MemPtr(bps * 2L);
-            IO.SetFilePointerEx(hfile, 0L, ref lp, IO.FilePointerMoveMethod.Begin);
-            IO.ReadFile(hfile, mm.Handle, bps * 2, ref br, IntPtr.Zero);
-            var mbr = new RAW_MBR();
-            var gpt = new RAW_GPT_HEADER();
-            RAW_GPT_PARTITION[] gpp = null;
-
-            // read the master boot record.
-            mbr = mm.ToStructAt<RAW_MBR>(446L);
-
-            // read the GPT structure header.
-            gpt = mm.ToStructAt<RAW_GPT_HEADER>(bps);
-
-            // check the partition header CRC.
-            if (gpt.IsValid)
-            {
-                long lr = br;
-
-                // seek to the LBA of the partition information.
-                IO.SetFilePointerEx(hfile, (uint)(bps * gpt.PartitionEntryLBA), ref lr, IO.FilePointerMoveMethod.Begin);
-                br = (uint)lr;
-
-                // calculate the size of the partition table buffer.
-                lp = gpt.NumberOfPartitions * gpt.PartitionEntryLength;
-
-                // byte align to the sector size.
-                if (lp % bps != 0L)
+                // get the disk geometry to retrieve the sector (LBA) size.
+                if (!DiskGeometry.GetDiskGeometry(null, hfile, out outGeo))
                 {
-                    lp += bps - lp % bps;
+                    return false;
                 }
 
-                // bump up the memory pointer.
-                mm.ReAlloc(lp);
-                mm.ZeroMemory();
-
-                // read the partition information into the pointer.
-                IO.ReadFile(hfile, mm.Handle, (uint)lp, ref br, IntPtr.Zero);
-
-                // check the partition table CRC.
-                if (mm.CalculateCrc32() == gpt.PartitionArrayCRC32)
+                if (outGeo == null)
                 {
-                    // disk is valid.
+                    return false;
+                }
 
-                    lp = (uint)Marshal.SizeOf<RAW_GPT_PARTITION>();
-                    br = 0U;
-                    int i;
-                    int c = (int)gpt.NumberOfPartitions;
+                var geo = (DISK_GEOMETRY_EX)outGeo;
 
-                    gpp = new RAW_GPT_PARTITION[c + 1];
+                // sector size (usually 512 bytes)
+                long bps = geo.Geometry.BytesPerSector;
+                uint br = 0U;
+                long lp = 0L;
+                long lp2 = 0L;
+                var ptypes = new List<string>();
 
-                    // populate the drive information.
-                    for (i = 0; i < c; i++)
+                var ntfs = BitConverter.ToUInt64(System.Text.Encoding.UTF8.GetBytes("NTFS    "), 0);
+
+                using (var mm = new SafePtr(bps * 2L))
+                {
+                    IO.SetFilePointerEx(hfile, 0L, ref lp, IO.FilePointerMoveMethod.Begin);
+                    IO.ReadFile(hfile, mm, (uint)(bps * 2L), ref br, IntPtr.Zero);
+                    var mbr = new RAW_MBR();
+                    var gpt = new RAW_GPT_HEADER();
+                    RAW_GPT_PARTITION[] gpp = null;
+
+                    // read the master boot record.
+                    mbr = mm.ToStructAt<RAW_MBR>(446L);
+
+                    // read the GPT structure header.
+                    gpt = mm.ToStructAt<RAW_GPT_HEADER>(bps);
+
+                    // check the partition header CRC.
+                    if (gpt.IsValid)
                     {
-                        gpp[i] = mm.ToStructAt<RAW_GPT_PARTITION>(lp2);
+                        long lr = br;
 
-                        // break on empty GUID, we are past the last partition.
-                        if (gpp[i].PartitionTypeGuid == Guid.Empty)
-                            break;
-                        lp2 += lp;
+                        // seek to the LBA of the partition information.
+                        IO.SetFilePointerEx(hfile, (long)((ulong)bps * gpt.PartitionEntryLBA), ref lr, IO.FilePointerMoveMethod.Begin);
+                        br = (uint)lr;
+
+                        // calculate the size of the partition table buffer.
+                        lp = gpt.NumberOfPartitions * gpt.PartitionEntryLength;
+
+                        // byte align to the sector size.
+                        if (lp % bps != 0L)
+                        {
+                            lp += bps - lp % bps;
+                        }
+
+                        // bump up the memory pointer.
+                        mm.AllocZero(lp);                        
+
+                        // read the partition information into the pointer.
+                        IO.ReadFile(hfile, mm, (uint)lp, ref br, IntPtr.Zero);
+
+                        // check the partition table CRC.
+                        if (mm.CalculateCrc32() == gpt.PartitionArrayCRC32)
+                        {
+                            // disk is valid.
+
+                            lp = (uint)Marshal.SizeOf<RAW_GPT_PARTITION>();
+                            br = 0U;
+
+                            int i;
+                            int c = (int)gpt.NumberOfPartitions;
+
+                            gpp = new RAW_GPT_PARTITION[c + 1];
+
+                            // populate the drive information.
+                            for (i = 0; i < c; i++)
+                            {
+                                gpp[i] = mm.ToStructAt<RAW_GPT_PARTITION>(lp2);
+
+                                // break on empty GUID, we are past the last partition.
+                                if (gpp[i].PartitionTypeGuid == Guid.Empty) break;
+
+                                IO.SetFilePointerEx(hfile, (long)((ulong)bps * gpp[i].StartingLBA), ref lr, IO.FilePointerMoveMethod.Begin);
+                                br = (uint)lr;
+
+                                using (var expt = new SafePtr(bps))
+                                {                                    
+                                    IO.ReadFile(hfile, expt, (uint)bps, ref br, IntPtr.Zero);
+                                    var xf = expt.GetUTF8String(3).Trim();
+                                    if (!string.IsNullOrEmpty(xf))
+                                    {
+                                        ptypes.Add(xf);
+                                    }
+                                    else
+                                    {
+                                        ptypes.Add("Unknown");
+                                    }
+                                }
+
+                                lp2 += lp;
+                            }
+
+                            // trim off excess records from the array.
+                            if (i < c)
+                            {
+                                if (i == 0)
+                                {
+                                    gpp = Array.Empty<RAW_GPT_PARTITION>();
+                                }
+                                else
+                                {
+                                    Array.Resize(ref gpp, i);
+                                }
+                            }
+                        }
                     }
 
-                    // trim off excess records from the array.
-                    if (i < c)
+                    // if gpp is nothing then some error occurred somewhere and we did not succeed.
+                    if (gpp is null)
+                        return false;
+
+                    // create a new RAW_GPT_DISK structure.
+                    gptInfo = new RAW_GPT_DISK()
                     {
-                        if (i == 0)
-                        {
-                            gpp = Array.Empty<RAW_GPT_PARTITION>();
-                        }
-                        else
-                        {
-                            Array.Resize(ref gpp, i);
-                        }
-                    }
+                        Header = gpt,
+                        Partitions = gpp,
+                        PartitionTypes = ptypes.ToArray()
+                    };
+
+                    // we have succeeded.
+                    return true;
                 }
             }
-
-            // free the resources.
-            mm.Free();
-            User32.CloseHandle(hfile);
-
-            // if gpp is nothing then some error occurred somewhere and we did not succeed.
-            if (gpp is null)
-                return false;
-
-            // create a new RAW_GPT_DISK structure.
-            gptInfo = new RAW_GPT_DISK()
-            {
-                Header = gpt,
-                Partitions = gpp
-            };
-            
-            // we have succeeded.
-            return true;
         }
 
         /// <summary>
@@ -189,12 +208,11 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             {
                 get
                 {
-                    int StartingCHSRet = default;
-                    var mm = new MemPtr(4L);
-                    Marshal.Copy(_startingChs, 0, mm.Handle, 3);
-                    StartingCHSRet = mm.IntAt(0L);
-                    mm.Free();
-                    return StartingCHSRet;
+                    using (var mm = new SafePtr(4L))
+                    {
+                        Marshal.Copy(_startingChs, 0, mm, 3);
+                        return mm.IntAt(0L);
+                    }
                 }
             }
 
@@ -202,12 +220,11 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             {
                 get
                 {
-                    int EndingCHSRet = default;
-                    var mm = new MemPtr(4L);
-                    Marshal.Copy(_endingChs, 0, mm.Handle, 3);
-                    EndingCHSRet = mm.IntAt(0L);
-                    mm.Free();
-                    return EndingCHSRet;
+                    using (var mm = new SafePtr(4L))
+                    {
+                        Marshal.Copy(_endingChs, 0, mm, 3);
+                        return mm.IntAt(0L);
+                    }
                 }
             }
         }
@@ -240,15 +257,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             /// <value></value>
             /// <returns></returns>
             /// <remarks></remarks>
-            public bool IsValid
-            {
-                get
-                {
-                    bool IsValidRet = default;
-                    IsValidRet = Validate();
-                    return IsValidRet;
-                }
-            }
+            public bool IsValid => Validate();            
 
             /// <summary>
             /// Validate the header and CRC-32 of this structure.
@@ -257,15 +266,14 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             /// <remarks></remarks>
             public bool Validate()
             {
-                bool ValidateRet = default;
-                var mm = new MemPtr();
-                mm.FromStruct(this);
-                mm.UIntAt(4L) = 0U;
+                using (var mm = new SafePtr())
+                {
+                    mm.FromStruct(this);
+                    mm.UIntAt(4L) = 0U;
 
-                // validate the crc and the signature moniker 
-                ValidateRet = HeaderCRC32 == mm.CalculateCrc32() && Signature == 0x5452415020494645;
-                mm.Free();
-                return ValidateRet;
+                    // validate the crc and the signature moniker 
+                    return HeaderCRC32 == mm.CalculateCrc32() && Signature == 0x5452415020494645;
+                }
             }
         }
 
@@ -283,6 +291,19 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             public GptPartitionAttributes Attributes;
             [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U2, SizeConst = 36)]
             private char[] _Name;
+
+            public ulong GetByteOffset(ulong sectorSize = 512)
+            {
+                return StartingLBA * sectorSize;
+            }
+
+            public ulong Size
+            {
+                get
+                {
+                    return (EndingLBA - StartingLBA) * 512;
+                }
+            }
 
             /// <summary>
             /// Returns the name of this partition (if any).
@@ -345,6 +366,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         {
             public RAW_GPT_HEADER Header;
             public RAW_GPT_PARTITION[] Partitions;
+            public string[] PartitionTypes;
         }
     }
 }
