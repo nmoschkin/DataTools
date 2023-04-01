@@ -932,9 +932,9 @@ namespace DataTools.Memory
         }
 
         /// <summary>
-        /// Gets a string encoded as UTF-8 from the specified byte index in the memory buffer.
+        /// Gets a null-terminated string encoded as UTF-8 from the specified byte index in the memory buffer.
         /// </summary>
-        /// <param name="index">The index in the memory buffer that contains the UTF-8-encoded string.</param>
+        /// <param name="index">The index in the memory buffer that contains the UTF-8 string.</param>
         /// <returns>A <see cref="string"/> that has been decoded from UTF-8.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string GetUTF8String(long index)
@@ -942,6 +942,21 @@ namespace DataTools.Memory
             unsafe
             {
                 return DecodeUTF8Ptr((byte*)((long)handle + index));
+            }
+        }
+
+        /// <summary>
+        /// Gets a string encoded as UTF-8 from the specified byte index in the memory buffer.
+        /// </summary>
+        /// <param name="index">The index in the memory buffer that contains the UTF-8-encoded string.</param>
+        /// <param name="length">The length, in bytes, of the string to retrieve.</param>
+        /// <returns>A <see cref="string"/> that has been decoded from UTF-8.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetUTF8String(long index, int length)
+        {
+            unsafe
+            {
+                return DecodeUTF8Ptr((byte*)((long)handle + index), length);
             }
         }
 
@@ -973,6 +988,18 @@ namespace DataTools.Memory
             if (ptr == b2) return "";
 
             return Encoding.UTF8.GetString(ptr, (int)(b2 - ptr));
+        }
+
+        /// <summary>
+        /// Decode a null-terminated UTF-8 byte array into a string.
+        /// </summary>
+        /// <param name="ptr"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected unsafe string DecodeUTF8Ptr(byte* ptr, int length)
+        {
+            return Encoding.UTF8.GetString(ptr, length);
         }
 
         /// <summary>
