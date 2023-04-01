@@ -352,6 +352,26 @@ namespace DataTools.Text
             _Value = v;
         }
 
+        public static implicit operator FriendlySizeLong(int operand)
+        {
+            return new FriendlySizeLong(operand);
+        }
+
+        public static implicit operator int(FriendlySizeLong operand)
+        {
+            return (int)(operand.Value);
+        }
+
+        public static implicit operator FriendlySizeLong(uint operand)
+        {
+            return new FriendlySizeLong(operand);
+        }
+
+        public static implicit operator uint(FriendlySizeLong operand)
+        {
+            return (uint)operand.Value;
+        }
+
         public static implicit operator FriendlySizeLong(long operand)
         {
             return new FriendlySizeLong(operand);

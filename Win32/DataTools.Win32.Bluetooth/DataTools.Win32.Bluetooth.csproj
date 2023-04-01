@@ -4,10 +4,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1075</AssemblyVersion>
-    <FileVersion>8.0.0.1075</FileVersion>
+    <AssemblyVersion>8.0.0.1076</AssemblyVersion>
+    <FileVersion>8.0.0.1076</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1075</Version>
+    <Version>8.0.0.1076</Version>
     <Product>DataTools Win32 Bluetooth Library</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -16,7 +16,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64</Platforms>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1074</PreviousVersion>
+    <PreviousVersion>8.0.0.1075</PreviousVersion>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />

@@ -4,10 +4,10 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <nullable>disable</nullable>
-    <AssemblyVersion>8.0.0.1075</AssemblyVersion>
-    <FileVersion>8.0.0.1075</FileVersion>
+    <AssemblyVersion>8.0.0.1076</AssemblyVersion>
+    <FileVersion>8.0.0.1076</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1075</Version>
+    <Version>8.0.0.1076</Version>
     <Product>DataTools Disk Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -17,7 +17,7 @@
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1074</PreviousVersion>
+    <PreviousVersion>8.0.0.1075</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
