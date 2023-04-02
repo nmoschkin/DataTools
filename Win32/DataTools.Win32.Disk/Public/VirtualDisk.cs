@@ -111,32 +111,12 @@ namespace DataTools.Win32.Disk
         }
 
         /// <summary>
-        /// Indicates whether the virtual drive is mounted.
-        /// </summary>
-        /// <value></value>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool Mounted
-        {
-            get
-            {
-                return !string.IsNullOrEmpty(DevicePath);
-            }
-        }
-
-        /// <summary>
         /// Returns the backing store paths.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string[] BackingStore
-        {
-            get
-            {
-                return diskInfo.BackingStore;
-            }
-        }
+        public string[] BackingStore => diskInfo?.BackingStore;
 
         /// <summary>
         /// Returns the DeviceCapabilities enumeration.
@@ -144,13 +124,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public DeviceCapabilities Capabilities
-        {
-            get
-            {
-                return diskInfo.Capabilities;
-            }
-        }
+        public DeviceCapabilities Capabilities => diskInfo?.Capabilities ?? DeviceCapabilities.None;
 
         /// <summary>
         /// Returns the device path.
@@ -158,13 +132,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string DevicePath
-        {
-            get
-            {
-                return diskInfo.DevicePath;
-            }
-        }
+        public string DevicePath => diskInfo?.DevicePath;
 
         /// <summary>
         /// Returns the device type.
@@ -172,13 +140,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public DeviceType DeviceType
-        {
-            get
-            {
-                return DeviceType.Disk;
-            }
-        }
+        public DeviceType DeviceType => DeviceType.Disk;
 
         /// <summary>
         /// Returns the device friendly name.
@@ -186,13 +148,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string FriendlyName
-        {
-            get
-            {
-                return diskInfo.FriendlyName;
-            }
-        }
+        public string FriendlyName => diskInfo?.FriendlyName;
 
         /// <summary>
         /// Returns the unique Guid identifier of the virtual drive.
@@ -241,10 +197,9 @@ namespace DataTools.Win32.Disk
             {
                 return imageFile;
             }
-
             set
             {
-                if (IsOpen) Close();
+                if (IsOpen) ReleaseHandle();
                 imageFile = value;
             }
         }
@@ -255,13 +210,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public string InstanceId
-        {
-            get
-            {
-                return diskInfo.InstanceId;
-            }
-        }
+        public string InstanceId => diskInfo?.InstanceId;
 
         /// <inheritdoc/>
         public override bool IsInvalid => handle == IntPtr.Zero;
@@ -272,13 +221,15 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public bool IsOpen
-        {
-            get
-            {
-                return handle != IntPtr.Zero;
-            }
-        }
+        public bool IsOpen => handle != IntPtr.Zero;
+
+        /// <summary>
+        /// Indicates whether the virtual drive is mounted.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public bool Mounted => !string.IsNullOrEmpty(DevicePath);
 
         /// <summary>
         /// Returns the PhysicalDriveX number.
@@ -286,13 +237,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public int PhysicalDevice
-        {
-            get
-            {
-                return diskInfo.PhysicalDevice;
-            }
-        }
+        public int PhysicalDevice => diskInfo.PhysicalDevice;
 
         /// <summary>
         /// Returns the physical hardware path of the device.
@@ -319,13 +264,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public long PhysicalSize
-        {
-            get
-            {
-                return (long)GetSizeInfo().PhysicalSize;
-            }
-        }
+        public long PhysicalSize => (long)GetSizeInfo().PhysicalSize;
 
         /// <summary>
         /// Returns the virtual size of the drive.
@@ -333,13 +272,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public long Size
-        {
-            get
-            {
-                return (long)GetSizeInfo().VirtualSize;
-            }
-        }
+        public long Size => (long)GetSizeInfo().VirtualSize;
 
         /// <summary>
         /// Miscellaneous data
@@ -352,13 +285,7 @@ namespace DataTools.Win32.Disk
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public StorageType Type
-        {
-            get
-            {
-                return StorageType.Virtual;
-            }
-        }
+        public StorageType Type => StorageType.Virtual;
 
         /// <summary>
         /// Creates a new virtual disk device file.
@@ -454,21 +381,25 @@ namespace DataTools.Win32.Disk
         }
 
         /// <summary>
-        /// Mount the virtual drive.
+        /// Mount the virtual drive, permanently.
         /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
+        /// <returns>True if successful.</returns>
+        /// <remarks>
+        /// The virtual drive will stay mounted beyond the lifetime of this instance.
+        /// </remarks>
         public bool Mount()
         {
             return Mount(true);
         }
 
         /// <summary>
-        /// Mount the virtual drive, permanently.  The virtual drive will stay mounted beyond the lifetime of this instance.
+        /// Mount the virtual drive.
         /// </summary>
-        /// <param name="makePermanent"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
+        /// <param name="makePermanent">True to make the mount permanent.</param>
+        /// <returns>True if successful.</returns>
+        /// <remarks>
+        /// If <paramref name="makePermanent"/> is set to true, then the virtual drive will stay mounted beyond the lifetime of this instance.
+        /// </remarks>
         public bool Mount(bool makePermanent)
         {
             if (handle == IntPtr.Zero || Mounted) return false;
@@ -480,19 +411,6 @@ namespace DataTools.Win32.Disk
 
                 return r == 0L;
             }
-        }
-
-        /// <summary>
-        /// Dismount the drive.
-        /// </summary>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public bool Unmount()
-        {
-            if (!Mounted) return false;
-
-            uint r = VirtDisk.DetachVirtualDisk(handle, DETACH_VIRTUAL_DISK_FLAG.DETACH_VIRTUAL_DISK_FLAG_NONE, 0U);
-            return r == 0L;
         }
 
         /// <summary>
@@ -527,18 +445,22 @@ namespace DataTools.Win32.Disk
         /// <remarks></remarks>
         public bool Open(string imageFile, bool openReadOnly)
         {
-            if (handle != IntPtr.Zero) Close();
+            if (handle != IntPtr.Zero) ReleaseHandle();
 
             string ext = Path.GetExtension(imageFile).ToLower();
             VIRTUAL_STORAGE_TYPE vst;
 
             HResult r;
 
-            var am = VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_GET_INFO | VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_DETACH;
+            var accessMode = VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_GET_INFO | VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_DETACH;
 
             if (!openReadOnly)
             {
-                am |= VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ATTACH_RW;
+                accessMode |= VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ATTACH_RW;
+            }
+            else
+            {
+                accessMode |= VIRTUAL_DISK_ACCESS_MASK.VIRTUAL_DISK_ACCESS_ATTACH_RO;
             }
 
             var vdp2 = new OPEN_VIRTUAL_DISK_PARAMETERS_V2
@@ -561,12 +483,12 @@ namespace DataTools.Win32.Disk
             {
                 case ".vhd":
                     vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
-                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp1, out handle);
+                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, accessMode, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp1, out handle);
                     break;
 
                 case ".vhdx":
                     vst.DeviceId = VirtDisk.VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
-                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, am, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp2, out handle);
+                    r = (HResult)VirtDisk.OpenVirtualDisk(vst, imageFile, accessMode, OPEN_VIRTUAL_DISK_FLAG.OPEN_VIRTUAL_DISK_FLAG_NONE, vdp2, out handle);
                     break;
 
                 default:
@@ -589,6 +511,19 @@ namespace DataTools.Win32.Disk
         public override string ToString()
         {
             return $"{TextTools.PrintFriendlySize(Size)} Virtual Drive [{(Mounted ? "Attached" : "Not Attached")}]";
+        }
+
+        /// <summary>
+        /// Dismount the drive.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public bool Unmount()
+        {
+            if (!Mounted) return false;
+
+            uint r = VirtDisk.DetachVirtualDisk(handle, DETACH_VIRTUAL_DISK_FLAG.DETACH_VIRTUAL_DISK_FLAG_NONE, 0U);
+            return r == 0L;
         }
         /// <inheritdoc/>
         protected override bool ReleaseHandle()
