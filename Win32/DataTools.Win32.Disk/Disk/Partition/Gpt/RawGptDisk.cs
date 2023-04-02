@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Principal;
 using System.Text;
+using DataTools.Disk.Partition.Structs;
 using DataTools.Text;
 using DataTools.Win32.Disk.Partition;
 using DataTools.Win32.Memory;
@@ -141,6 +142,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                                 using (var expt = new SafePtr(bps))
                                 {                                    
                                     IO.ReadFile(hfile, expt, (uint)bps, ref br, IntPtr.Zero);
+
                                     var xf = expt.GetUTF8String(3).Trim();
                                     if (!string.IsNullOrEmpty(xf))
                                     {
@@ -148,7 +150,23 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                                     }
                                     else
                                     {
-                                        ptypes.Add("Unknown");
+                                        IO.SetFilePointerEx(hfile, (long)((ulong)bps * gpp[i].StartingLBA) + 1024, ref lr, IO.FilePointerMoveMethod.Begin);
+                                        
+                                        expt.Free();
+                                        expt.AllocZero(1024);
+                                        
+                                        IO.ReadFile(hfile, expt, 1024, ref br, IntPtr.Zero);
+
+                                        var sb = expt.ToStruct<SuperBlock>();
+
+                                        if (sb.s_magic == SuperBlock.MagicSignature)
+                                        {
+                                            ptypes.Add("ext4");
+                                        }
+                                        else
+                                        {
+                                            ptypes.Add("Unknown");
+                                        }
                                     }
                                 }
 
