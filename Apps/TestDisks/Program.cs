@@ -47,7 +47,7 @@ namespace TestNetwork
                             foreach (var pt in gptInfo?.Partitions)
                             {
                                 var pc = pt.PartitionCode;
-                                var pn = gptInfo.Value.PartitionTypes[c - 1];
+                                var pn = gptInfo.Value.PartitionFileSystems[c - 1];
                                 if (pc != null)
                                 {
                                     Console.Write($"Partition {c++}: {new FriendlySizeLong(pt.Size)} {pc.Name}");
