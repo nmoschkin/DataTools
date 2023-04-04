@@ -132,6 +132,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                 new GptCodeInfo("Apple Label", "4C616265-6C00-11AA-AA11-00306543ECAC"),
                 new GptCodeInfo("Apple TV Recovery partition", "5265636F-7665-11AA-AA11-00306543ECAC"),
                 new GptCodeInfo("Apple Core Storage (i.e. Lion FileVault) partition", "53746F72-6167-11AA-AA11-00306543ECAC"),
+                new GptCodeInfo("Apple File System (APFS)", "7C3457EF-0000-11AA-AA11-00306543ECAC"),
                 new GptCodeInfo("Boot partition", "6A82CB45-1DD2-11B2-99A6-080020736631"),
                 new GptCodeInfo("Root partition", "6A85CF4D-1DD2-11B2-99A6-080020736631"),
                 new GptCodeInfo("Swap partition", "6A87C46F-1DD2-11B2-99A6-080020736631"),
