@@ -142,9 +142,13 @@ namespace DataTools.Win32.Disk.Partition.Mbr
         /// Must be Administrator.
         /// </summary>
         /// <param name="devicePath">Device Path of Disk Device.</param>
+        /// <param name="sectorSize">The known sector size of the RAW MBR disk</param>
         /// <param name="rawMbrInfo">Receives the drive layout information.</param>
         /// <returns>True if successful.</returns>
-        /// <remarks></remarks>
+        /// <remarks>
+        /// Sector size must be correctly specified, even if it is 512 (and especially if it is not.)<br/>
+        /// See <see cref="DiskGeometry.GetDiskGeometry(string, DiskHandle, out DISK_GEOMETRY_EX?)"/>.
+        /// </remarks>
         public static bool ReadRawMbrDisk(string devicePath, int sectorSize, out RAW_MBR_INFO? rawMbrInfo)
         {
             MBR mbrInfo;
@@ -188,6 +192,8 @@ namespace DataTools.Win32.Disk.Partition.Mbr
 
                         if (part.PartType == 0x05 || part.PartType == 0x0f)
                         {
+                            // Ah, ye olde extended partition
+
                             long ebrStart = part.StartLBA * sectorSize;
                             long newFace = 0;
                             IO.SetFilePointerEx(hfile, ebrStart, ref newFace, IO.FilePointerMoveMethod.Begin);
@@ -216,9 +222,6 @@ namespace DataTools.Win32.Disk.Partition.Mbr
                                     res = IO.ReadFile(hfile, mm, bps, ref br, IntPtr.Zero);
                                 }
                             } while (ebrInfo.PartTable[1].StartLBA != 0);
-
-                            // Extended partition
-                            // Let's read this info, too.
                         }
                     }
                 }
