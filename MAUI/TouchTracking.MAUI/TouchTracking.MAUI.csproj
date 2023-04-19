@@ -13,17 +13,17 @@
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
     <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
-    <AssemblyVersion>8.0.0.1078</AssemblyVersion>
-    <FileVersion>8.0.0.1078</FileVersion>
+    <AssemblyVersion>8.0.0.1079</AssemblyVersion>
+    <FileVersion>8.0.0.1079</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1078</Version>
+    <Version>8.0.0.1079</Version>
     <Product>DataTools Network Adapters Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PreviousVersion>8.0.0.1077</PreviousVersion>
+    <PreviousVersion>8.0.0.1078</PreviousVersion>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Platforms\Android\" />
