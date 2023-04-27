@@ -17,7 +17,7 @@ namespace TestNetwork
             var bd = Guid.Parse("EBD0A0A2-B9E5-4433-87C0-68B6B72699C7");
 
             foreach (var disk in disks)
-            {
+            {                
                 Console.WriteLine();
                 Console.WriteLine("Disk: " + disk.ToString());
                 Console.WriteLine("Is Virtual: " + (disk.VirtualDisk != null).ToString());
@@ -30,10 +30,10 @@ namespace TestNetwork
                     Console.WriteLine("------------------");
                 }
                 Console.WriteLine("Physical Disk: " + disk.BusReportedDeviceDesc);
-                Console.WriteLine("Partition Style: " + disk.DiskLayout?.ToString() ?? "None");
 
-                if (disk.DiskLayout != null)
+                if (disk.DiskLayout != null && disk.DiskLayout.Count > 0)
                 {
+                    Console.WriteLine("Partition Style: " + disk.DiskLayout?.ToString() ?? "None");
                     if (disk.DiskLayout.PartitionStyle == PartitionStyle.Gpt)
                     {
                         RawGptDisk.RAW_GPT_DISK? gptInfo = default;
@@ -104,6 +104,10 @@ namespace TestNetwork
                         }
 
                     }
+                }
+                else
+                {
+                    Console.WriteLine("No disk in drive, skipping...");
                 }
             }
         }
