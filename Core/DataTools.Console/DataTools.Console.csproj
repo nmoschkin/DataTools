@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net7.0;net472;net48;net481</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1079</AssemblyVersion>
-    <FileVersion>8.0.0.1079</FileVersion>
+    <AssemblyVersion>8.0.0.1080</AssemblyVersion>
+    <FileVersion>8.0.0.1080</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1079</Version>
+    <Version>8.0.0.1080</Version>
     <Product>DataTools Color Console</Product>
     <Description>DataTools Color Console</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -19,7 +19,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1078</PreviousVersion>
+    <PreviousVersion>8.0.0.1079</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>

@@ -85,14 +85,14 @@ namespace TestNetwork
                                 {
                                     var pc = pt.PartType;
                                     if (pc == 0) continue;
-                                    Console.WriteLine($"Partition {c++}: {new FriendlySizeLong(pt.Size)} {PartitionCodeInfo.FindByCode(pt.PartType).First().Name}");
+                                    Console.WriteLine($"Partition {c++}: {new FriendlySizeLong(pt.Size)} {MbrCodeInfo.FindByCode(pt.PartType).First().Name}");
                                 }
 
                                 foreach (var pt in mbrInfo?.Extended)
                                 {
                                     var pc = pt.PartType;
                                     if (pc == 0) continue;
-                                    Console.WriteLine($"Partition {c++}: {PartitionCodeInfo.FindByCode(pt.PartType).First().Name}");
+                                    Console.WriteLine($"Partition {c++}: {MbrCodeInfo.FindByCode(pt.PartType).First().Name}");
                                 }
 
                             }
