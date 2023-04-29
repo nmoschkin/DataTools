@@ -84,7 +84,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                     IO.ReadFile(hfile, mm, (uint)(bps * 2L), ref br, IntPtr.Zero);
                     var mbr = new RAW_MBR();
                     var gpt = new RAW_GPT_HEADER();
-                    RAW_GPT_PARTITION[] gpp = null;
+                    RawGptPartitionStruct[] gpp = null;
 
                     // read the master boot record.
                     mbr = mm.ToStructAt<RAW_MBR>(446L);
@@ -121,18 +121,18 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                         {
                             // disk is valid.
 
-                            lp = (uint)Marshal.SizeOf<RAW_GPT_PARTITION>();
+                            lp = (uint)Marshal.SizeOf<RawGptPartitionStruct>();
                             br = 0U;
 
                             int i;
                             int c = (int)gpt.NumberOfPartitions;
 
-                            gpp = new RAW_GPT_PARTITION[c + 1];
+                            gpp = new RawGptPartitionStruct[c + 1];
 
                             // populate the drive information.
                             for (i = 0; i < c; i++)
                             {
-                                gpp[i] = mm.ToStructAt<RAW_GPT_PARTITION>(lp2);
+                                gpp[i] = mm.ToStructAt<RawGptPartitionStruct>(lp2);
 
                                 // break on empty GUID, we are past the last partition.
                                 if (gpp[i].PartitionTypeGuid == Guid.Empty) break;
@@ -190,7 +190,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
                             {
                                 if (i == 0)
                                 {
-                                    gpp = Array.Empty<RAW_GPT_PARTITION>();
+                                    gpp = Array.Empty<RawGptPartitionStruct>();
                                 }
                                 else
                                 {
@@ -386,114 +386,6 @@ namespace DataTools.Win32.Disk.Partition.Gpt
         }
 
         /// <summary>
-        /// Raw GPT partition information.
-        /// </summary>
-        /// <remarks></remarks>
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct RAW_GPT_PARTITION
-        {
-            /// <summary>
-            /// Partition Type Guid
-            /// </summary>
-            public Guid PartitionTypeGuid;
-
-            /// <summary>
-            /// Unique Partition Guid
-            /// </summary>
-            public Guid UniquePartitionGuid;
-
-            /// <summary>
-            /// Starting LBA
-            /// </summary>
-            public ulong StartingLBA;
-
-            /// <summary>
-            /// Ending LBA
-            /// </summary>
-            public ulong EndingLBA;
-
-            /// <summary>
-            /// Partition Attributes
-            /// </summary>
-            public GptPartitionAttributes Attributes;
-            [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U2, SizeConst = 36)]
-            private char[] _Name;
-
-            /// <summary>
-            /// Get the starting byte offset on disk of this partition
-            /// </summary>
-            /// <param name="sectorSize"></param>
-            /// <returns></returns>
-            public ulong GetByteOffset(ulong sectorSize = 512)
-            {
-                return StartingLBA * sectorSize;
-            }
-
-            /// <summary>
-            /// Returns the size of the partition in bytes
-            /// </summary>
-            public ulong Size
-            {
-                get
-                {
-                    return (EndingLBA - StartingLBA) * 512;
-                }
-            }
-
-            /// <summary>
-            /// Returns the name of this partition (if any).
-            /// </summary>
-            /// <value></value>
-            /// <returns></returns>
-            /// <remarks></remarks>
-            public string Name
-            {
-                get
-                {
-                    return new string(_Name).Trim('\0');
-                }
-            }
-
-            /// <summary>
-            /// Retrieve the partition code information for this partition type (if any).
-            /// </summary>
-            /// <value></value>
-            /// <returns></returns>
-            /// <remarks></remarks>
-            public GptCodeInfo PartitionCode
-            {
-                get
-                {
-                    return GptCodeInfo.FindByCode(PartitionTypeGuid);
-                }
-            }
-
-            /// <summary>
-            /// Converts this object into its string representation.
-            /// </summary>
-            /// <returns></returns>
-            /// <remarks></remarks>
-            public override string ToString()
-            {
-                string ToStringRet = default;
-                if (!string.IsNullOrEmpty(Name))
-                {
-                    ToStringRet = Name;
-                }
-                else if (PartitionCode is object)
-                {
-                    ToStringRet = PartitionCode.ToString();
-                }
-                else
-                {
-                    ToStringRet = UniquePartitionGuid.ToString("B");
-                }
-
-                return ToStringRet;
-            }
-        }
-
-        /// <summary>
         /// Contains an entire raw GPT disk layout.
         /// </summary>
         /// <remarks></remarks>
@@ -507,7 +399,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             /// <summary>
             /// Partitions
             /// </summary>
-            public RAW_GPT_PARTITION[] Partitions;
+            public RawGptPartitionStruct[] Partitions;
 
             /// <summary>
             /// Partition File Systems
@@ -515,4 +407,114 @@ namespace DataTools.Win32.Disk.Partition.Gpt
             public string[] PartitionFileSystems;
         }
     }
+
+    /// <summary>
+    /// Raw GPT partition information.
+    /// </summary>
+    /// <remarks></remarks>
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct RawGptPartitionStruct
+    {
+        /// <summary>
+        /// Partition Type Guid
+        /// </summary>
+        public Guid PartitionTypeGuid;
+
+        /// <summary>
+        /// Unique Partition Guid
+        /// </summary>
+        public Guid UniquePartitionGuid;
+
+        /// <summary>
+        /// Starting LBA
+        /// </summary>
+        public ulong StartingLBA;
+
+        /// <summary>
+        /// Ending LBA
+        /// </summary>
+        public ulong EndingLBA;
+
+        /// <summary>
+        /// Partition Attributes
+        /// </summary>
+        public GptPartitionAttributes Attributes;
+        [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U2, SizeConst = 36)]
+        private char[] _Name;
+
+        /// <summary>
+        /// Get the starting byte offset on disk of this partition
+        /// </summary>
+        /// <param name="sectorSize"></param>
+        /// <returns></returns>
+        public ulong GetByteOffset(ulong sectorSize = 512)
+        {
+            return StartingLBA * sectorSize;
+        }
+
+        /// <summary>
+        /// Returns the size of the partition in bytes
+        /// </summary>
+        public ulong Size
+        {
+            get
+            {
+                return (EndingLBA - StartingLBA) * 512;
+            }
+        }
+
+        /// <summary>
+        /// Returns the name of this partition (if any).
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public string Name
+        {
+            get
+            {
+                return new string(_Name).Trim('\0');
+            }
+        }
+
+        /// <summary>
+        /// Retrieve the partition code information for this partition type (if any).
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public GptCodeInfo PartitionCode
+        {
+            get
+            {
+                return GptCodeInfo.FindByCode(PartitionTypeGuid);
+            }
+        }
+
+        /// <summary>
+        /// Converts this object into its string representation.
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public override string ToString()
+        {
+            string ToStringRet = default;
+            if (!string.IsNullOrEmpty(Name))
+            {
+                ToStringRet = Name;
+            }
+            else if (PartitionCode is object)
+            {
+                ToStringRet = PartitionCode.ToString();
+            }
+            else
+            {
+                ToStringRet = UniquePartitionGuid.ToString("B");
+            }
+
+            return ToStringRet;
+        }
+    }
+
+
 }

@@ -135,7 +135,7 @@ namespace DataTools.Win32.Disk.Partition
         /// <summary>
         /// The raw MBR partition structure source
         /// </summary>
-        protected readonly RawMbrDisk.Partition source;
+        protected readonly RawMbrPartitionStruct source;
 
         private MbrCodeInfo cInfo;
         private int partNo;
@@ -180,7 +180,7 @@ namespace DataTools.Win32.Disk.Partition
             return ldisks;
         }
 
-        internal RawMbrPartition(int partNo, RawMbrDisk.Partition partition, int sectorSize = 512, MbrPartitionKind partitionKind = MbrPartitionKind.Primary) : base(sectorSize)
+        internal RawMbrPartition(int partNo, RawMbrPartitionStruct partition, int sectorSize = 512, MbrPartitionKind partitionKind = MbrPartitionKind.Primary) : base(sectorSize)
         {
             this.source = partition;
             this.partNo = partNo;
@@ -233,7 +233,7 @@ namespace DataTools.Win32.Disk.Partition
         /// <summary>
         /// The raw GPT partition structure source
         /// </summary>
-        protected readonly RawGptDisk.RAW_GPT_PARTITION source;
+        protected readonly RawGptPartitionStruct source;
 
         private int partNo;
         private long offset;
@@ -268,7 +268,7 @@ namespace DataTools.Win32.Disk.Partition
             return ldisks;
         }
 
-        internal RawGptPartition(int partNo, RawGptDisk.RAW_GPT_PARTITION partition, int sectorSize = 512, string fileSystem = "Unknown") : base(sectorSize)
+        internal RawGptPartition(int partNo, RawGptPartitionStruct partition, int sectorSize = 512, string fileSystem = "Unknown") : base(sectorSize)
         {
             this.source = partition;
             this.partNo = partNo;

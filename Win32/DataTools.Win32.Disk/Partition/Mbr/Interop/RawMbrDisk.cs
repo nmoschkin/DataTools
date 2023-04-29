@@ -16,57 +16,6 @@ namespace DataTools.Win32.Disk.Partition.Mbr
     /// </summary>
     internal static class RawMbrDisk
     {
-        /// <summary>
-        /// MBR Disk Partition
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct Partition
-        {
-            /// <summary>
-            /// 0x80 for bootable, 0x00 for not bootable, anything else for invalid
-            /// </summary>
-            public byte Status;
-
-            /// <summary>
-            /// Head address of start of partition
-            /// </summary>
-            public byte StartAddrHead;
-            
-            /// <summary>
-            /// (AddrCylSec &amp; 0x3F) for sector,  (AddrCylSec &amp; 0x3FF) for cylinder
-            /// </summary>
-            public ushort StartAddrCylSec;
-
-            /// <summary>
-            /// Partition type code (see <see cref="MbrCodeInfo"/>)
-            /// </summary>
-            public byte PartType;
-            
-            /// <summary>
-            /// Head address of start of partition
-            /// </summary>
-            public byte EndAddrHead;
-            
-            /// <summary>
-            /// (AddrCylSec &amp; 0x3F) for sector,  (AddrCylSec &amp; 0x3FF) for cylinder
-            /// </summary>
-            public ushort EndAddrCylSec;
-            
-            /// <summary>
-            /// Linear address of first sector in partition. Multiply by sector size (usually 512) for real offset
-            /// </summary>
-            public uint StartLBA;
-            
-            /// <summary>
-            /// Linear address of last sector in partition. Multiply by sector size (usually 512) for real offset
-            /// </summary>
-            public uint EndLBA;
-
-            /// <summary>
-            /// Gets the size based on 512 sector size
-            /// </summary>
-            public long Size => (EndLBA * 512L);
-        }
 
         /// <summary>
         /// Master Boot Record structure
@@ -94,7 +43,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
             /// Partition Table
             /// </summary>
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-            public Partition[] PartTable;
+            public RawMbrPartitionStruct[] PartTable;
 
             /// <summary>
             /// 0x55 0xAA for bootable
@@ -121,7 +70,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
             /// <summary>
             /// Extended Partitions
             /// </summary>
-            public Partition[] Extended;
+            public RawMbrPartitionStruct[] Extended;
 
             /// <summary>
             /// Primary Partition Count
@@ -159,7 +108,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
             rawMbrInfo = null;
             int pc = 0;
 
-            List<Partition> exParts = new List<Partition>();
+            List<RawMbrPartitionStruct> exParts = new List<RawMbrPartitionStruct>();
 
             // Demand Administrator for accessing a raw disk.
             AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
