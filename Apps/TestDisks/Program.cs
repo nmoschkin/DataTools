@@ -27,6 +27,7 @@ namespace TestNetwork
 
                     try
                     {
+                        //var testdetect = RawDiskPartition.DetectPartitionStyle(disk);
                         rawParts = RawDiskPartition.ReadPartitions(disk);
                     }
                     catch (Exception ex) 

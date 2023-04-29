@@ -14,7 +14,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
     /// <summary>
     /// Raw MBR-format disk reading tools
     /// </summary>
-    public static class RawMbrDisk
+    internal static class RawMbrDisk
     {
         /// <summary>
         /// MBR Disk Partition

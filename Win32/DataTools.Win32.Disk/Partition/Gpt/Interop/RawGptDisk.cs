@@ -30,7 +30,7 @@ namespace DataTools.Win32.Disk.Partition.Gpt
     /// </summary>
     /// <remarks></remarks>
     [SecurityCritical()]
-    public static class RawGptDisk
+    internal static class RawGptDisk
     {
 
         /// <summary>
