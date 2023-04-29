@@ -92,7 +92,7 @@ namespace TestNetwork
                                 {
                                     var pc = pt.PartType;
                                     if (pc == 0) continue;
-                                    Console.WriteLine($"Partition {c++}: {MbrCodeInfo.FindByCode(pt.PartType).First().Name}");
+                                    Console.WriteLine($"Partition {c++}: {new FriendlySizeLong(pt.Size)} {MbrCodeInfo.FindByCode(pt.PartType).First().Name}");
                                 }
 
                             }
