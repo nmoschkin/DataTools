@@ -855,47 +855,56 @@ namespace DataTools.Win32.Usb
             protected internal set => usageCollections = value;
         }
 
-        protected override void ParseHw()
+
+        /// <summary>
+        /// Parses the <see cref="DeviceInfo.HardwareIds"/> into <see cref="DeviceInfo.VendorId"/>, <see cref="DeviceInfo.ProductId"/> and <see cref="HidUsagePage"/>, if possible.
+        /// </summary>
+        /// <remarks></remarks>
+        /// <returns>True if the value was successfully parsed into intelligible <see cref="DeviceInfo.VendorId"/>, <see cref="DeviceInfo.ProductId"/> and <see cref="HidUsagePage"/> values.</returns>
+        protected override bool ParseHardwareIdToProductIds()
         {
-            base.ParseHw();
+            var ret = base.ParseHardwareIdToProductIds();
+            if (!ret) return false;
+
             string[] v;
 
             // this is how we determine the HID class of the device. I've found this to be a very reliable method.
             foreach (string hw in _HardwareIds)
             {
                 int i = hw.IndexOf("HID_DEVICE_UP:");
+
                 if (i >= 0)
                 {
                     v = TextTools.Split(hw.Substring(i), ":");
+
                     if (v.Length > 1)
                     {
-                        ushort hp;
-                        if (ushort.TryParse(v[1].Replace("_U", ""), System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture.NumberFormat, out hp))
+                        if (ushort.TryParse(v[1].Replace("_U", ""), System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture.NumberFormat, out var hp))
                         {
                             hidPage = (HidUsagePage)(hp);
+
                             if ((int)hidPage > 0xFF)
                             {
                                 hidPage = HidUsagePage.Reserved;
+
                                 if (v.Length > 2)
                                 {
                                     if (ushort.TryParse(v[1].Replace("_U", ""), System.Globalization.NumberStyles.AllowHexSpecifier, System.Globalization.CultureInfo.CurrentCulture.NumberFormat, out hp))
                                     {
                                         hidPage = (HidUsagePage)(hp);
-                                        if ((int)hidPage > 0xFF)
-                                            hidPage = HidUsagePage.Reserved;
+                                        if ((int)hidPage > 0xFF) hidPage = HidUsagePage.Reserved;
                                     }
                                 }
 
-                                return;
                             }
-                            else
-                            {
-                                return;
-                            }
+
+                            return true;
                         }
                     }
                 }
             }
+
+            return false;
         }
 
         /// <summary>
