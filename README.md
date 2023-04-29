@@ -7,7 +7,7 @@ __Note__: Active development is occurring in the __dev-8.0__ branch. It is merge
 
 **April 29, 2023**
 
-Finally the heavy refactoring is starting to pay off. There is a new series of utilities in _DataTools.Win32.Disk_ that will read raw partition structure from the disk without having to hit the Operating System. This is part of the first of a series of native interop libraries I plan to attempt to port to *NIX/iOS systems.
+Finally the heavy refactoring is starting to pay off. There is a new series of utilities in __DataTools.Win32.Disk__ that will read raw partition structure from the disk without having to hit the Operating System. This is part of the first of a series of native interop libraries I plan to attempt to port to *NIX/iOS systems.
 
 I have been going through and trying to write detailed documentation for all public types and members. Now that the disk library refactoring is done (that was a true mess), the remaining refactors for the Win32 subsystem should be complete and I will be ready to publish 8.0.
 
