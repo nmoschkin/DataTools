@@ -11,6 +11,7 @@
 
 using DataTools.Text;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -22,7 +23,7 @@ namespace DataTools.Win32
     /// </summary>
     /// <remarks></remarks>
     [TypeConverter(typeof(ExpandableObjectConverter))]
-    public class DeviceInfo
+    public class DeviceInfo : ICloneable
     {
         internal SP_DEVINFO_DATA _devInfo;
 
@@ -424,7 +425,7 @@ namespace DataTools.Win32
             internal set
             {
                 _HardwareIds = value;
-                ParseHardwareIdToProductIds();
+                ParseHardwareIds();
             }
         }
 
@@ -610,11 +611,11 @@ namespace DataTools.Win32
         {
             get
             {
-                if (string.IsNullOrEmpty(Description) == false)
+                if (!string.IsNullOrEmpty(Description))
                 {
                     return Description;
                 }
-                else if (string.IsNullOrEmpty(FriendlyName) == false)
+                else if (!string.IsNullOrEmpty(FriendlyName))
                 {
                     return FriendlyName;
                 }
@@ -668,32 +669,29 @@ namespace DataTools.Win32
                 dprep.LinkedChildren = null;
             }
 
+            var lchild = new List<DeviceInfo>();
+
             foreach (var de in devInfo)
             {
+                lchild.Clear();
+
                 foreach (var fe in devInfo)
                 {
                     if ((de.InstanceId.ToUpper().Trim() ?? "") == (fe.Parent.ToUpper().Trim() ?? ""))
                     {
                         fe.LinkedParent = de;
-                        if (de._LinkedChildren is null)
-                        {
-                            de._LinkedChildren = new DeviceInfo[1];
-                        }
-                        else
-                        {
-                            Array.Resize(ref de._LinkedChildren, de._LinkedChildren.Count() + 1);
-                        }
-
-                        de._LinkedChildren[de._LinkedChildren.Count() - 1] = fe;
+                        lchild.Add(fe);
                     }
                 }
+
+                de._LinkedChildren = lchild.ToArray();
             }
         }
 
         /// <summary>
-        /// Copy this Device Info class into another device info derived class.
+        /// Copy the data of this object into the specified <see cref="DeviceInfo"/>-derived object instance.
         /// </summary>
-        /// <typeparam name="T">The <see cref="DeviceInfo"/> derived destination type.</typeparam>
+        /// <typeparam name="T">The <see cref="DeviceInfo"/>-derived destination type.</typeparam>
         /// <param name="obj">The object to copy into.</param>
         public virtual void CopyTo<T>(T obj) where T : DeviceInfo
         {
@@ -709,13 +707,30 @@ namespace DataTools.Win32
             }
         }
 
+        object ICloneable.Clone()
+        {
+            return Clone<DeviceInfo>();
+        }
+
         /// <summary>
-        /// Create a new <see cref="DeviceInfo"/> derived class from the data in this object.
+        /// Clone the data of this object into a new <see cref="DeviceInfo"/> object instance.
         /// </summary>
+        /// <returns>
+        /// A new <see cref="DeviceInfo"/> object.
+        /// </returns>
+        public virtual DeviceInfo Clone()
+        {
+            return Clone<DeviceInfo>();
+        }
+
+        /// <summary>
+        /// Clone the data of this object into a new <see cref="DeviceInfo"/>-derived object instance.
+        /// </summary>
+        /// <typeparam name="T">The <see cref="DeviceInfo"/>-derived object type to create.</typeparam>
         /// <returns>
         /// A new <typeparamref name="T"/> object.
         /// </returns>
-        public virtual T CopyTo<T>() where T : DeviceInfo, new()
+        public virtual T Clone<T>() where T : DeviceInfo, new()
         {
             var result = new T();
             CopyTo(result);
@@ -726,9 +741,9 @@ namespace DataTools.Win32
         /// Display the system device properties dialog page for this device.
         /// </summary>
         /// <remarks></remarks>
-        public void ShowDevicePropertiesDialog(IntPtr hwnd = default)
+        public virtual void ShowDevicePropertiesDialog(IntPtr? hwnd = null)
         {
-            DevPropDialog.OpenDeviceProperties(InstanceId, hwnd);
+            DevPropDialog.OpenDeviceProperties(InstanceId, hwnd ?? IntPtr.Zero);
         }
 
         /// <summary>
@@ -753,37 +768,13 @@ namespace DataTools.Win32
                 return d;
             }
         }
-
-        /// <summary>
-        /// Create a DeviceInfo-based class based upon the given class, populating common members.
-        /// </summary>
-        /// <typeparam name="T">A DeviceInfo-derived class.</typeparam>
-        /// <param name="inf">The object to duplicate.</param>
-        /// <returns>A new instance of T.</returns>
-        /// <remarks></remarks>
-        internal static T Duplicate<T>(DeviceInfo inf) where T : DeviceInfo, new()
-        {
-            var flds = inf.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-
-            FieldInfo cfinfo;
-
-            var objT = new T();
-
-            foreach (var fld in flds)
-            {
-                cfinfo = typeof(T).GetField(fld.Name, BindingFlags.NonPublic | BindingFlags.Instance);
-                if (cfinfo != null) cfinfo.SetValue(objT, fld.GetValue(inf));
-            }
-
-            return objT;
-        }
-
+                
         /// <summary>
         /// Parses the <see cref="HardwareIds"/> into <see cref="VendorId"/> and <see cref="ProductId"/>, if possible.
         /// </summary>
         /// <remarks></remarks>
         /// <returns>True if the value was successfully parsed into intelligible <see cref="VendorId"/> and <see cref="ProductId"/> values.</returns>
-        protected virtual bool ParseHardwareIdToProductIds()
+        protected virtual bool ParseHardwareIds()
         {
             var s = TextTools.Split(_HardwareIds[0], @"\");
             if (s is null || s.Length < 2) return false;

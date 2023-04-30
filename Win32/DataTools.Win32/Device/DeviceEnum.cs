@@ -30,7 +30,6 @@ namespace DataTools.Win32
     /// Internal device enumeration functions module.
     /// </summary>
     /// <remarks></remarks>
-    [SecurityCritical]
     internal static class DeviceEnum
     {
         public const int DICLASSPROP_INTERFACE = 2;
@@ -54,11 +53,12 @@ namespace DataTools.Win32
         public static DeviceInfo[] InternalGetComputer(bool noLink = false, Guid classOnly = default)
         {
             DeviceInfo[] devOut = null;
+     
             int c = 0;
             var devInfo = default(SP_DEVINFO_DATA);
             var devInterface = default(SP_DEVICE_INTERFACE_DATA);
             var lIcon = new Dictionary<Guid, System.Drawing.Icon>();
-            var mm = new SafePtr();
+            
             var hicon = IntPtr.Zero;
             int picon = 0;
 
@@ -1003,142 +1003,89 @@ namespace DataTools.Win32
         /// <remarks></remarks>
         public static object DevPropToObject(DevPropTypes type, IntPtr data, int length = 0)
         {
-            MemPtr mm = data;
+            DataTools.Memory.MemPtr mm = data;
+            
             switch (type)
             {
                 case DevPropTypes.Binary:
-                    {
-                        return mm.ToByteArray(0L, length);
-                    }
+                    return mm.ToByteArray(0L, length);
 
                 case DevPropTypes.Boolean:
-                    {
-                        return mm.ByteAt(0L) == 0 ? false : true;
-                    }
+                    return mm.ByteAt(0L) != 0;
 
                 case DevPropTypes.Byte:
-                    {
-                        return mm.ByteAt(0L);
-                    }
+                    return mm.ByteAt(0L);
 
                 case DevPropTypes.SByte:
-                    {
-                        return mm.SByteAt(0L);
-                    }
+                    return mm.SByteAt(0L);
 
                 case DevPropTypes.Int16:
-                    {
-                        return mm.ShortAt(0L);
-                    }
+                    return mm.ShortAt(0L);
 
                 case DevPropTypes.UInt16:
-                    {
-                        return mm.UShortAt(0L);
-                    }
+                    return mm.UShortAt(0L);
 
                 case DevPropTypes.Int32:
-                    {
-                        return mm.IntAt(0L);
-                    }
+                    return mm.IntAt(0L);
 
                 case DevPropTypes.UInt32:
-                    {
-                        return mm.UIntAt(0L);
-                    }
+                    return mm.UIntAt(0L);
 
                 case DevPropTypes.Int64:
-                    {
-                        return mm.LongAt(0L);
-                    }
+                    return mm.LongAt(0L);
 
                 case DevPropTypes.UInt64:
-                    {
-                        return mm.ULongAt(0L);
-                    }
+                    return mm.ULongAt(0L);
 
                 case DevPropTypes.Currency:
-                    {
-                        // I had to read the documentation on MSDN very carefully to understand why this needs to be.
-                        return mm.DoubleAt(0L) * 10000.0d;
-                    }
+                    return mm.DecimalAt(0L);
 
                 case DevPropTypes.Float:
-                    {
-                        return mm.SingleAt(0L);
-                    }
+                    return mm.SingleAt(0L);
 
                 case DevPropTypes.Date:
-                    {
-                        // based on what the MSDN describes of this property format, this is what
-                        // I believe needs to be done to make the value into an acceptable CLR DateTime object.
-                        double d = mm.DoubleAt(0L);
+                    // based on what the MSDN describes of this property format, this is what
+                    // I believe needs to be done to make the value into an acceptable CLR DateTime object.
+                    double d = mm.DoubleAt(0L);
 
-                        var t = new TimeSpan((int)(d * 24d), 0, 0);
-                        var dt = DateTime.Parse("1899-12-31");
+                    var t = new TimeSpan(0, 0, (int)(d * 24d * 60d * 60d));
+                    var dt = new DateTime(1899, 12, 31, 0, 0, 0);
 
-                        dt.Add(t);
-                        return dt;
-                    }
+                    return dt + t;
 
                 case DevPropTypes.Decimal:
-                    {
-                        return mm.DecimalAt(0L);
-                    }
+                    return mm.DecimalAt(0L);
 
                 case DevPropTypes.FileTime:
-                    {
-                        var ft = mm.ToStruct<FILETIME>();
-                        return ft.ToDateTime();
-                    }
+                    return mm.ToStruct<FILETIME>().ToDateTime();
 
                 case DevPropTypes.DevPropKey:
-                    {
-                        DEVPROPKEY dk;
-                        dk = mm.ToStruct<DEVPROPKEY>();
-                        return dk;
-                    }
+                    return mm.ToStruct<DEVPROPKEY>();
 
                 case DevPropTypes.Guid:
-                    {
-                        return mm.GuidAt(0L);
-                    }
+                    return mm.GuidAt(0L);
 
                 case DevPropTypes.SecurityDescriptor:
-                    {
-                        var sd = mm.ToStruct<SecurityDescriptor.SECURITY_DESCRIPTOR>();
-                        return sd;
-                    }
+                    return mm.ToStruct<SecurityDescriptor.SECURITY_DESCRIPTOR>();
 
                 case DevPropTypes.String:
-                    {
-                        return mm.ToString();
-                    }
+                    return mm.ToString();
 
                 case DevPropTypes.StringList:
-                    {
-                        return mm.GetStringArray(0L);
-                    }
+                    return mm.GetStringArray(0L);
 
                 case DevPropTypes.DevPropType:
-                    {
-                        return mm.IntAt(0L);
-                    }
+                    return mm.IntAt(0L);
 
                 case DevPropTypes.SecurityDescriptorString:
-                    {
-                        return mm.ToString();
-                    }
+                    return mm.ToString();
 
                 case DevPropTypes.StringIndirect:
-                    {
-                        // load the string resource, itself, from the file.
-                        return Resources.LoadStringResource(mm.ToString());
-                    }
+                    // load the string resource, itself, from the file.
+                    return Resources.LoadStringResource(mm.ToString());
 
                 case DevPropTypes.NTStatus:
-                    {
-                        return mm.IntAt(0L);
-                    }
+                    return mm.IntAt(0L);
             }
 
             return null;

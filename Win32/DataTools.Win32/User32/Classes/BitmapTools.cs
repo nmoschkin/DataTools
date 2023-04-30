@@ -2,21 +2,54 @@
 
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
 namespace DataTools.Win32
 {
+    /// <summary>
+    /// Various bitmap tools and constants
+    /// </summary>
     public static class BitmapTools
     {
+        /// <summary>
+        /// No compression (Bitmap/RGB values)
+        /// </summary>
         public const long BI_RGB = 0L;
+
+        /// <summary>
+        /// RLE-8 encoding
+        /// </summary>
         public const long BI_RLE8 = 1L;
+
+        /// <summary>
+        /// RLE-4 encoding
+        /// </summary>
         public const long BI_RLE4 = 2L;
+
+        /// <summary>
+        /// Bit fields
+        /// </summary>
         public const long BI_BITFIELDS = 3L;
+
+        /// <summary>
+        /// JPEG encoding
+        /// </summary>
         public const long BI_JPEG = 4L;
+
+        /// <summary>
+        /// PNG encoding
+        /// </summary>
         public const long BI_PNG = 5L;
 
         [DllImport("gdi32", CharSet = CharSet.Unicode)]
-        internal static extern IntPtr CreateDIBSection(IntPtr hdc, IntPtr pbmi, uint usage, ref IntPtr ppvBits, IntPtr hSection, int offset);
+        internal static extern IntPtr CreateDIBSection(
+            IntPtr hdc, 
+            IntPtr pbmi, 
+            uint usage, 
+            out IntPtr ppvBits, 
+            IntPtr hSection, 
+            int offset);
 
         /// <summary>
         /// Gray out an icon.
@@ -26,43 +59,51 @@ namespace DataTools.Win32
         /// <remarks></remarks>
         public static Image GrayIcon(Icon icn)
         {
-            var n = new Bitmap(icn.Width, icn.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var n = new Bitmap(
+                icn.Width, 
+                icn.Height, 
+                PixelFormat.Format32bppArgb
+                );
+
             var g = System.Drawing.Graphics.FromImage(n);
+
             g.FillRectangle(Brushes.Transparent, new Rectangle(0, 0, n.Width, n.Height));
             g.DrawIcon(icn, 0, 0);
             g.Dispose();
-            var bm = new System.Drawing.Imaging.BitmapData();
-            var mm = new MemPtr((long)n.Width * n.Height * 4);
-            bm.Stride = n.Width * 4;
-            bm.Scan0 = mm;
-            bm.PixelFormat = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
-            bm.Width = n.Width;
-            bm.Height = n.Height;
-            bm = n.LockBits(new Rectangle(0, 0, n.Width, n.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite | System.Drawing.Imaging.ImageLockMode.UserInputBuffer, System.Drawing.Imaging.PixelFormat.Format32bppArgb, bm);
-            int i;
-            int c;
-
-            // Dim b() As Byte
-
-            // ReDim b((bm.Stride * bm.Height) - 1)
-            // MemCpy(b, bm.Scan0, bm.Stride * bm.Height)
-            c = bm.Stride * bm.Height - 1;
-            int stp = (int)(bm.Stride / (double)bm.Width);
-
-            // For i = 3 To c Step stp
-            // If b(i) > &H7F Then b(i) = &H7F
-            // Next
-
-            for (i = 3; stp >= 0 ? i <= c : i >= c; i += stp)
+            
+            using (var mm = new SafePtr((long)n.Width * n.Height * 4)) 
             {
-                if (mm.ByteAt(i) > 0x7F)
-                    mm.ByteAt(i) = 0x7F;
+                var bm = new BitmapData
+                {
+                    Stride = n.Width * 4,
+                    Scan0 = mm,
+                    PixelFormat = PixelFormat.Format32bppArgb,
+                    Width = n.Width,
+                    Height = n.Height
+                };
+
+                bm = n.LockBits(
+                    new Rectangle(0, 0, n.Width, n.Height), 
+                    ImageLockMode.ReadWrite | ImageLockMode.UserInputBuffer, 
+                    PixelFormat.Format32bppArgb, 
+                    bm
+                    );
+
+                var c = bm.Stride * bm.Height - 1;
+                int stp = (int)(bm.Stride / (double)bm.Width);
+
+                for (var i = 3; stp >= 0 ? i <= c : i >= c; i += stp)
+                {
+                    if (mm.ByteAt(i) > 0x7F)
+                    {
+                        mm.ByteAt(i) = 0x7F;
+                    }
+                }
+
+                n.UnlockBits(bm);
+                return n;
             }
 
-            // MemCpy(bm.Scan0, b, bm.Stride * bm.Height)
-            n.UnlockBits(bm);
-            mm.Free();
-            return n;
         }
 
         /// <summary>
@@ -92,48 +133,74 @@ namespace DataTools.Win32
             // adapted from C++ code examples.
 
             short wBitsPerPixel = 32;
+            
             int BytesPerRow = (int)((double)(img.Width * wBitsPerPixel + 31 & ~31L) / 8d);
+            
             int size = img.Height * BytesPerRow;
-            var bmpInfo = default(BITMAPINFO);
-            var mm = new MemPtr();
-            int bmpSizeOf = Marshal.SizeOf(bmpInfo);
-            mm.ReAlloc(bmpSizeOf + size);
-            var pbmih = default(BITMAPINFOHEADER);
-            pbmih.biSize = Marshal.SizeOf(pbmih);
-            pbmih.biWidth = img.Width;
-            pbmih.biHeight = img.Height; // positive indicates bottom-up DIB
-            pbmih.biPlanes = 1;
-            pbmih.biBitCount = wBitsPerPixel;
-            pbmih.biCompression = (int)BI_RGB;
-            pbmih.biSizeImage = size;
-            pbmih.biXPelsPerMeter = (int)(24.5d * 1000d); // pixels per meter! And these values MUST be correct if you want to pass a DIB to a native menu.
-            pbmih.biYPelsPerMeter = (int)(24.5d * 1000d); // pixels per meter!
-            pbmih.biClrUsed = 0;
-            pbmih.biClrImportant = 0;
-            var pPixels = IntPtr.Zero;
-            int DIB_RGB_COLORS = 0;
-            Marshal.StructureToPtr(pbmih, mm.Handle, false);
-            var hPreviewBitmap = BitmapTools.CreateDIBSection(IntPtr.Zero, mm.Handle, (uint)DIB_RGB_COLORS, ref pPixels, IntPtr.Zero, 0);
-            bitPtr = pPixels;
-            var bm = new System.Drawing.Imaging.BitmapData();
-            bm = img.LockBits(new Rectangle(0, 0, img.Width, img.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppPArgb, bm);
-            var pCurrSource = bm.Scan0;
-
-            // Our DIBsection is bottom-up...start at the bottom row...
-            var pCurrDest = pPixels + (img.Width - 1) * BytesPerRow;
-            // ... and work our way up
-            int DestinationStride = -BytesPerRow;
-
-            for (int curY = 0, ih = img.Height - 1; curY <= ih; curY++)
+                        
+            using (var mm = new SafePtr())
             {
-                Native.MemCpy(pCurrSource, pCurrDest, BytesPerRow);
-                pCurrSource = pCurrSource + bm.Stride;
-                pCurrDest = pCurrDest + DestinationStride;
-            }
+                int bmpSizeOf = Marshal.SizeOf<BITMAPINFO>();
 
-            // Free up locked buffer.
-            img.UnlockBits(bm);
-            return hPreviewBitmap;
+                var pbmih = new BITMAPINFOHEADER()
+                {
+                    biSize = Marshal.SizeOf<BITMAPINFOHEADER>(),
+                    biWidth = img.Width,
+                    biHeight = img.Height, // positive indicates bottom-up DIB
+                    biPlanes = 1,
+                    biBitCount = wBitsPerPixel,
+                    biCompression = (int)BI_RGB,
+                    biSizeImage = size,
+                    biXPelsPerMeter = (int)(24.5d * 1000d), // pixels per meter! And these values MUST be correct if you want to pass a DIB to a native menu.
+                    biYPelsPerMeter = (int)(24.5d * 1000d), // pixels per meter!
+                    biClrUsed = 0,
+                    biClrImportant = 0
+                };
+
+                var pPixels = IntPtr.Zero;
+                int DIB_RGB_COLORS = 0;
+                
+                mm.FromStruct(pbmih);
+
+                var hPreviewBitmap = CreateDIBSection(
+                    IntPtr.Zero, 
+                    mm, 
+                    (uint)DIB_RGB_COLORS, 
+                    out pPixels, 
+                    IntPtr.Zero, 
+                    0);
+                
+                bitPtr = pPixels;
+               
+                var bm = new BitmapData();
+
+                bm = img.LockBits(
+                    new Rectangle(0, 0, img.Width, img.Height), 
+                    ImageLockMode.ReadWrite, 
+                    PixelFormat.Format32bppPArgb, 
+                    bm);
+
+                var pCurrSource = bm.Scan0;
+
+                // Our DIBsection is bottom-up...start at the bottom row...
+                var pCurrDest = pPixels + (img.Width - 1) * BytesPerRow;
+                // ... and work our way up
+                int DestinationStride = -BytesPerRow;
+
+                unsafe
+                {
+                    for (int curY = 0, ih = img.Height - 1; curY <= ih; curY++)
+                    {
+                        Buffer.MemoryCopy((void*)pCurrSource, (void*)pCurrDest, BytesPerRow, BytesPerRow);
+                        pCurrSource = pCurrSource + bm.Stride;
+                        pCurrDest = pCurrDest + DestinationStride;
+                    }
+                }
+
+                // Free up locked buffer.
+                img.UnlockBits(bm);
+                return hPreviewBitmap;
+            }
         }
 
         /// <summary>
@@ -144,15 +211,23 @@ namespace DataTools.Win32
         /// <remarks></remarks>
         public static Bitmap IconToTransparentBitmap(Icon icn)
         {
-            if (icn is null)
-                return null;
-            var n = new Bitmap(icn.Width, icn.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            if (icn == null) return null;
+
+            var n = new Bitmap(
+                icn.Width, 
+                icn.Height, 
+                PixelFormat.Format32bppArgb);
+
             var g = System.Drawing.Graphics.FromImage(n);
+            
             g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+            
             g.Clear(Color.Transparent);
+            
             g.DrawIcon(icn, 0, 0);
             g.Dispose();
+
             return n;
         }
     }
