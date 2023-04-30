@@ -861,9 +861,9 @@ namespace DataTools.Win32.Usb
         /// </summary>
         /// <remarks></remarks>
         /// <returns>True if the value was successfully parsed into intelligible <see cref="DeviceInfo.VendorId"/>, <see cref="DeviceInfo.ProductId"/> and <see cref="HidUsagePage"/> values.</returns>
-        protected override bool ParseHardwareIdToProductIds()
+        protected override bool ParseHardwareIds()
         {
-            var ret = base.ParseHardwareIdToProductIds();
+            var ret = base.ParseHardwareIds();
             if (!ret) return false;
 
             string[] v;

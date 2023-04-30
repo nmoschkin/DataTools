@@ -22,8 +22,7 @@ using System.Runtime.InteropServices;
 using System.Security;
 
 namespace DataTools.Win32.Disk.Partition.Internals
-{
-    [SecurityCritical()]
+{    
     internal static class Partitioning
     {
         /// <summary>
