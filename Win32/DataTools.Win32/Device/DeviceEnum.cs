@@ -432,7 +432,7 @@ namespace DataTools.Win32
         /// <param name="mm">An open memory object.</param>
         /// <returns>A new instance of T.</returns>
         /// <remarks></remarks>
-        public static T PopulateDeviceInfo<T>(IntPtr hDev, Guid ClassId, SP_DEVINFO_DATA devInfo, SP_DEVICE_INTERFACE_DATA devInterface) where T : DeviceInfo, new()
+        public unsafe static T PopulateDeviceInfo<T>(IntPtr hDev, Guid ClassId, SP_DEVINFO_DATA devInfo, SP_DEVICE_INTERFACE_DATA devInterface) where T : DeviceInfo, new()
         {
             var devOut = new T();
             uint cbSize;

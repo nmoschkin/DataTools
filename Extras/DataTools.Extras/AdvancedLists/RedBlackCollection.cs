@@ -681,7 +681,6 @@ namespace DataTools.Extras.AdvancedLists
         /// <summary>
         /// Attempt to Rebalance The Tree
         /// </summary>
-        /// <param name="threshold">The ratio of the tree size over the logical count at which a rebalance should be performed. Default is 1.2 : 1</param>
         /// <returns>A <see cref="RebalanceResult"/> of <see cref="RebalanceResult.NotPerformed"/>, <see cref="RebalanceResult.Unchanged"/>, or <see cref="RebalanceResult.Changed"/>.</returns>
         public RebalanceResult TryRebalance()
         {

@@ -17,10 +17,16 @@ using System.IO;
 namespace DataTools.Win32
 {
     /// <summary>
-    /// Public utility methods
+    /// Public FileSystem Utility Methods
     /// </summary>
     public static class FileTools
     {
+        /// <summary>
+        /// Move a file from one location to another
+        /// </summary>
+        /// <param name="oldPath"></param>
+        /// <param name="newPath"></param>
+        /// <returns></returns>
         public static bool MoveFile(string oldPath, string newPath)
         {
             return IO.MoveFile(oldPath, newPath) == 0 ? false : true;
@@ -31,7 +37,7 @@ namespace DataTools.Win32
         /// </summary>
         /// <param name="directory"></param>
         /// <remarks></remarks>
-        public static bool DeleteWithExtremePrejudice(string directory, bool preserveRoot = true)
+        public static bool DeleteWithExtremePrejudice(string directory)
         {
             var sh = new SHFILEOPSTRUCT();
             directory = Path.GetFullPath(directory);
@@ -41,6 +47,7 @@ namespace DataTools.Win32
 
             sh.wFunc = User32.FO_DELETE;
             sh.fFlags = User32.FOF_SILENT | User32.FOF_NOCONFIRMATION | User32.FOF_NOERRORUI | User32.FOF_NOCONFIRMMKDIR;
+        
             return User32.SHFileOperation(sh) == 0;
         }
 
