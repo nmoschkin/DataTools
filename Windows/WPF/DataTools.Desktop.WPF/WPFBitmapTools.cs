@@ -10,11 +10,12 @@ using System.Linq;
 using System.Text;
 using System.Windows.Media.Imaging;
 
-using static DataTools.Win32.BitmapTools;
+using static DataTools.Desktop.BitmapTools;
 
 namespace DataTools.Desktop
 {
-    public class BitmapTools
+    public static class WPFBitmapTools
+
     {
         private static Dictionary<IntPtr, BitmapSource> cachedImages = new Dictionary<IntPtr, BitmapSource>();
 

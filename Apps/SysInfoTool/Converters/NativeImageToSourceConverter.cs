@@ -22,7 +22,7 @@ namespace SysInfoTool.Converters
                     return src;
                 }
 
-                src = BitmapTools.MakeWPFImage(bitmap);
+                src = WPFBitmapTools.MakeWPFImage(bitmap);
                 sessionCache.Add(bitmap.GetHbitmap(), src);
                 return src;
             }
@@ -33,7 +33,7 @@ namespace SysInfoTool.Converters
                     return src;
                 }
 
-                src = BitmapTools.MakeWPFImage(icon);
+                src = WPFBitmapTools.MakeWPFImage(icon);
                 sessionCache.Add(icon.Handle, src);
                 return src;
             }
