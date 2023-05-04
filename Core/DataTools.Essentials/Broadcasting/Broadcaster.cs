@@ -1,24 +1,36 @@
 ﻿using DataTools.Essentials.Observable;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
+using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataTools.Essentials.Broadcasting
 {
-
     /// <summary>
-    /// Base class for broadcasters
+    /// Base class for broadcasters with weakly-referenced subscribers
     /// </summary>
     public abstract class Broadcaster<T> : ObservableBase, IBroadcaster<T>
     {
-        private object lockObj = new object();
-        private bool disposedValue;
-        private readonly List<ISubscription<T>> subscriptions = new List<ISubscription<T>>();
+        /// <summary>
+        /// Lock Object
+        /// </summary>
+        protected readonly object lockObj = new object();
+
+        /// <summary>
+        /// Maximum number of tasks to run in parallel
+        /// </summary>
+        protected readonly int maxTasks;
+
+        /// <summary>
+        /// Disposed Value
+        /// </summary>
+        protected bool disposedValue;
+
+        /// <summary>
+        /// The inner subscription list
+        /// </summary>
+        protected readonly List<ISubscription<T>> subscriptions = new List<ISubscription<T>>();
 
         /// <summary>
         /// Gets or sets the name of the broadcaster
@@ -26,14 +38,39 @@ namespace DataTools.Essentials.Broadcasting
         public virtual string Name { get; set; }
 
         /// <inheritdoc/>
-        public virtual ChannelToken ChannelToken { get; protected set; } = ChannelToken.CreateToken();
+        public virtual ChannelToken ChannelToken { get; protected set; }
+
+        /// <summary>
+        /// The invocation method that this broadcaster uses to broadcast data
+        /// </summary>
+        public InvocationType InvocationType { get; }
+
+        /// <summary>
+        /// The parallel options 
+        /// </summary>
+        protected readonly ParallelOptions parallelOptions;
 
         /// <summary>
         /// Create a new broadcaster
         /// </summary>
-        public Broadcaster()
+        /// <param name="invocationType">The invocation method to use when broadcasting data</param>
+        /// <param name="channelToken">The channel token to identify the new broadcaster</param>
+        /// <param name="name">The name of the channel</param>
+        /// <param name="maxParallelTasks">Maximum number of parallel tasks to perform at once</param>
+        protected Broadcaster(InvocationType invocationType, ChannelToken channelToken, string name, int maxParallelTasks = -1)
         {
             Synchronizer.Initialize();
+
+            InvocationType = invocationType;
+            ChannelToken = channelToken;
+            Name = name;
+
+            maxTasks = maxParallelTasks <= 0 ? Environment.ProcessorCount : maxParallelTasks;
+
+            parallelOptions = new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = maxTasks
+            };
         }
 
         /// <summary>
@@ -71,6 +108,7 @@ namespace DataTools.Essentials.Broadcasting
             {
                 if (returnExisting)
                 {
+                    CleanupSubscriptions();
                     foreach (var item in subscriptions)
                     {
                         if (item.TryGetSubscriber(out var subtest) && subtest == subscriber)
@@ -87,15 +125,51 @@ namespace DataTools.Essentials.Broadcasting
             }
         }
 
-        internal void SubDetach(object sender, EventArgs e)
+        /// <summary>
+        /// Detach the subscription from this service, ending the relationship
+        /// </summary>
+        /// <param name="sub"></param>
+        /// <returns></returns>
+        internal bool SubDetach(ISubscription<T> sub)
         {
-            if (sender is Subscription<T> sub)
+            lock (lockObj)
             {
-                lock(lockObj)
+                return CleanupSubscriptions(sub);
+            }
+        }
+
+        /// <summary>
+        /// Cleanup subscriptions, remove any that fail a call to <see cref="ISubscription.Validate"/>
+        /// </summary>
+        public bool CleanupSubscriptions() => CleanupSubscriptions(null);
+        
+        /// <summary>
+        /// Cleanup subscriptions, remove any that fail a call to <see cref="ISubscription.Validate"/><br/>
+        /// Additionally, if <paramref name="removeItem"/> is not null, remove that item.
+        /// </summary>
+        /// <param name="removeItem">Item to remove</param>
+        /// <returns>True if items were removed</returns>
+        protected virtual bool CleanupSubscriptions(ISubscription<T> removeItem)
+        {
+            var res = false;
+
+            lock (lockObj)
+            {
+                var c = subscriptions.Count;
+
+                for (int i = c - 1; i >= 0; i--)
                 {
-                    subscriptions.Remove(sub);
+                    var sub = subscriptions[i];
+
+                    if ((sub == removeItem) || !sub.Validate())
+                    {
+                        if (!res) res = true;
+                        subscriptions.Remove(sub);
+                    }
                 }
             }
+
+            return res;
         }
 
         /// <summary>
@@ -111,27 +185,49 @@ namespace DataTools.Essentials.Broadcasting
         }
 
         /// <summary>
-        /// Transmit the data
+        /// Transmit new data
+        /// </summary>
+        /// <param name="data"></param>
+        protected void TransmitData(T data)
+        {
+            TransmitData(data, InvocationType);
+        }
+
+        /// <summary>
+        /// Transmit new data
         /// </summary>
         /// <param name="data">The data to transmit</param>
         /// <param name="invocationType">The invocation type</param>
-        protected void TransmitData(T data, InvocationType invocationType = InvocationType.Synchronous)
+        protected void TransmitData(T data, InvocationType invocationType)
         {
-            lock (lockObj)
+            if (invocationType == InvocationType.Parallel)
             {
-
-                if (invocationType == InvocationType.Parallel)
+                try
                 {
-                    Parallel.ForEach(subscriptions, (sub) =>
+                    Parallel.ForEach(subscriptions, parallelOptions, (sub) =>
                     {
-                        if (sub.TryGetSubscriber(out var subscriber))
+                        try
                         {
-                            var sbb = CreateSideBandData(data, sub, invocationType);
-                            subscriber.ReceiveData(data, sbb);
+                            if (sub.TryGetSubscriber(out var subscriber))
+                            {
+                                var sbb = CreateSideBandData(data, sub, invocationType);
+                                subscriber.ReceiveData(data, sbb);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex);
                         }
                     });
                 }
-                else
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+            }
+            else
+            {
+                try
                 {
                     foreach (var sub in subscriptions)
                     {
@@ -142,23 +238,51 @@ namespace DataTools.Essentials.Broadcasting
                             switch (invocationType)
                             {
                                 case InvocationType.Synchronous:
-                                    subscriber.ReceiveData(data, sbb);
+                                    try
+                                    {
+                                        subscriber.ReceiveData(data, sbb);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Debug.WriteLine(ex);
+                                    }
+
                                     break;
 
                                 case InvocationType.Async:
-                                    _ = Task.Run(() => subscriber.ReceiveData(data, sbb));
+                                    _ = Task.Run(() =>
+                                    {
+                                        try
+                                        {
+                                            subscriber.ReceiveData(data, sbb);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Debug.WriteLine(ex);
+                                        }
+                                    });
                                     break;
 
                                 case InvocationType.Dispatcher:
                                     Synchronizer.Default.BeginInvoke(() =>
                                     {
-                                        subscriber.ReceiveData(data, sbb);
+                                        try
+                                        {
+                                            subscriber.ReceiveData(data, sbb);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Debug.WriteLine(ex);
+                                        }
                                     });
                                     break;
                             }
-
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
                 }
             }
         }
@@ -170,7 +294,7 @@ namespace DataTools.Essentials.Broadcasting
             {
                 if (disposing)
                 {
-                    subscriptions.Clear();                   
+                    subscriptions.Clear();
                 }
 
                 disposedValue = true;

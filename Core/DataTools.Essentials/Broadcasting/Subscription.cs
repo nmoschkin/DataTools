@@ -91,7 +91,7 @@ namespace DataTools.Essentials.Broadcasting
                 {
                     if (broadcaster.TryGetTarget(out var ib) && ib is Broadcaster<T> b)
                     {
-                        b.SubDetach(this, EventArgs.Empty);
+                        b.SubDetach(this);
                     }
 
                     Task.Run(() => Detach?.Invoke(this, EventArgs.Empty));
