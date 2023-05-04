@@ -11,7 +11,15 @@ namespace DataTools.Essentials.Broadcasting
     [StructLayout(LayoutKind.Explicit, Size = 16)]
     public struct ChannelToken : IEquatable<ChannelToken>
     {
-        private static readonly Guid runtimeSeed = Guid.NewGuid();
+        /// <summary>
+        /// Gets or sets the MD5 seed to use when generating tokens
+        /// </summary>
+        public static Guid RuntimeSeed { get; set; } = Guid.NewGuid();
+
+        /// <summary>
+        /// Return an empty channel token
+        /// </summary>
+        public static readonly ChannelToken Empty = CreateToken("");
 
         [FieldOffset(0)]
         private Guid guid;
@@ -23,10 +31,16 @@ namespace DataTools.Essentials.Broadcasting
         /// <returns></returns>
         public static ChannelToken CreateToken(string stringValue)
         {
-            HMACMD5 hMACMD5 = new HMACMD5(runtimeSeed.ToByteArray());
+            if (string.IsNullOrEmpty(stringValue))
+            {
+                return new ChannelToken { guid = Guid.Empty };
+            }
+
+            var md5 = new HMACMD5(RuntimeSeed.ToByteArray());
             var ct = new ChannelToken();
 
-            ct.guid = new Guid(hMACMD5.ComputeHash(Encoding.UTF8.GetBytes(stringValue)));
+            ct.guid = new Guid(md5.ComputeHash(Encoding.UTF8.GetBytes(stringValue)));
+
             return ct;
         }
 
