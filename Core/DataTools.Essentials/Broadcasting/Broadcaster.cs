@@ -12,6 +12,10 @@ namespace DataTools.Essentials.Broadcasting
     /// </summary>
     public abstract class Broadcaster<T> : ObservableBase, IBroadcaster<T>
     {
+        private string name;
+        private ChannelToken token;
+        private object tag;
+
         /// <summary>
         /// Lock Object
         /// </summary>
@@ -35,10 +39,36 @@ namespace DataTools.Essentials.Broadcasting
         /// <summary>
         /// Gets or sets the name of the broadcaster
         /// </summary>
-        public virtual string Name { get; set; }
+        public virtual string Name
+        {
+            get => name;
+            set
+            {
+                SetProperty(ref name, value);
+            }
+        }
 
         /// <inheritdoc/>
-        public virtual ChannelToken ChannelToken { get; protected set; }
+        public virtual ChannelToken ChannelToken
+        {
+            get => token;
+            protected set
+            {
+                SetProperty(ref token, value);
+            }
+        }
+
+        /// <summary>
+        /// Miscellaneous data to associate with this broadcaster
+        /// </summary>
+        public object Tag
+        {
+            get => tag;
+            set
+            {
+                SetProperty(ref tag, value);
+            }
+        }
 
         /// <summary>
         /// The invocation method that this broadcaster uses to broadcast data
