@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using CoreTestOne.Resources;
 
 using DataTools.Desktop;
+using DataTools.Essentials.Broadcasting;
 using DataTools.Essentials.Converters.ClassDescriptions;
 using DataTools.Essentials.Converters.ClassDescriptions.Framework;
 using DataTools.Essentials.Converters.EnumDescriptions.Framework;
@@ -611,6 +612,20 @@ namespace CoreTestOne
         public static void Main(string[] args)
         {
             AllocConsole();
+
+            var tok = ChannelToken.CreateToken("This is my channel on ice");
+
+            var strtok = tok.ToString();
+
+            var tok2 = ChannelToken.CreateToken("This is my channel on ice");
+            var tok3 = ChannelToken.CreateToken("This is my channel on ice part 4");
+
+            var atok = tok == tok2;
+            var btok = tok == tok3;
+
+
+            var strtok2 = "";
+
 
             //var b1 = new DescendantB1(5.4949944444M, "Volleyball", 10, Guid.NewGuid());
 
