@@ -48,12 +48,22 @@ namespace DataTools.Essentials.Broadcasting
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets the channel token
+        /// </summary>
+        /// <remarks>
+        /// Setting this property to <see cref="ChannelToken.Empty"/> will have the effect of generating a new random token.
+        /// </remarks>
         public virtual ChannelToken ChannelToken
         {
             get => token;
             protected set
             {
+                if (value == ChannelToken.Empty)
+                {
+                    value = ChannelToken.CreateToken();
+                }
+
                 SetProperty(ref token, value);
             }
         }
@@ -85,7 +95,7 @@ namespace DataTools.Essentials.Broadcasting
         /// </summary>
         /// <param name="invocationType">The invocation method to use when broadcasting data</param>
         /// <param name="channelToken">The channel token to identify the new broadcaster</param>
-        /// <param name="name">The name of the channel</param>
+        /// <param name="name">The name of the channel (can be null)</param>
         /// <param name="maxParallelTasks">Maximum number of parallel tasks to perform at once</param>
         protected Broadcaster(InvocationType invocationType, ChannelToken channelToken, string name, int maxParallelTasks = -1)
         {
@@ -279,7 +289,7 @@ namespace DataTools.Essentials.Broadcasting
 
                                     break;
 
-                                case InvocationType.Async:
+                                case InvocationType.NoWait:
                                     _ = Task.Run(() =>
                                     {
                                         try

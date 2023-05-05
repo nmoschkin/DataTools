@@ -18,7 +18,7 @@
         /// <summary>
         /// Invoke data transmission asynchronously
         /// </summary>
-        Async,
+        NoWait,
 
         /// <summary>
         /// Invoke data transmission on the dispatcher or main thread
