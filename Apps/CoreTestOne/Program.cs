@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 using CoreTestOne.Resources;
@@ -21,6 +22,7 @@ using DataTools.Essentials.Observable;
 using DataTools.Essentials.Settings;
 using DataTools.Graphics;
 using DataTools.Streams;
+using DataTools.Text;
 using DataTools.Win32.Memory;
 using DataTools.Windows.Essentials.Settings;
 using Newtonsoft.Json;
@@ -603,31 +605,34 @@ namespace CoreTestOne
         }
     }
 
-    public class BCast : Broadcaster<string>
+    public class BCast : Broadcaster<byte[]>
     {
         public BCast(InvocationType invocationType = InvocationType.Synchronous) : base(invocationType, ChannelToken.CreateToken("My Dispatch"), "My Dispatch")
         {
         }
 
-        public void PostString(string text)
+        public void PostBytes(byte[] data, params ChannelToken[] channels)
         {
-            TransmitData(text);
+            TransmitData(data, InvocationType, channels);
         }
 
     }
 
-    public class Listener : ISubscriber<string>
+    public class Listener : ISubscriber<byte[]>
     {
+        private byte[] buffer = new byte[65536];
+
         public string ReceiveString { get; set; } = "Broadcast Received: {0}";
-        
-        public void ReceiveData(string value, ISideBandData sideBandData)
+        public long Counter { get; set; } = 0;
+        public void ReceiveData(byte[] value, ISideBandData sideBandData)
         {
-            Console.WriteLine(string.Format(ReceiveString, value));
+            Counter += value.Length;
+            Array.Copy(value, buffer, 65536);
         }
         
         void ISubscriber.ReceiveData(object value, ISideBandData sideBandData)
         {
-            ReceiveData((string)value, sideBandData);
+            ReceiveData((byte[])value, sideBandData);
         }
     }
 
@@ -642,9 +647,10 @@ namespace CoreTestOne
         {
             AllocConsole();
 
-            var bc = new BCast(InvocationType.Dispatcher);
+            var bc = new BCast(InvocationType.Synchronous);
 
             var ls = new Listener();
+            var ls3 = new Listener();
             var ls2 = new Listener()
             {
                 ReceiveString = "Other Listener {0}"
@@ -652,16 +658,92 @@ namespace CoreTestOne
 
             var sub = bc.Subscribe(ls);
             var sub2 = bc.Subscribe(ls2);
+            var sub3 = bc.Subscribe(ls3);
 
-            _ = Task.Run(() =>
+            DateTime n = DateTime.Now;
+
+            var bre = true;
+            long ssz = 0;
+
+            Console.WriteLine("Initiating...");
+            Console.WriteLine("");
+            var forseed = (int)DateTime.Now.Ticks & 0x7fffffff;
+
+            var th = new Thread(async () =>
             {
-                for (var i = 0; i < 100; i++)
+                var i = 0;
+                var rnd = new Random(forseed);
+
+                var bsize = 65536;// rnd.Next(4 * 1024 * 1024, 8 * 1024 * 1024);
+                var buff = new byte[bsize];
+
+                while (bre)
                 {
-                    bc.PostString($"Test Iteration {i}");
+                    var nn = DateTime.Now;
+                    var tf = nn - n;
+
+                    if (tf.Seconds >= 1)
+                    {
+                        forseed ^= i;
+                        rnd = new Random(forseed);
+
+                        var bps = ls.Counter; // / ls.Counter;
+                        var bps2 = ls2.Counter; // / ls2.Counter;
+                        var bps3 = ls3.Counter; // / ls2.Counter;
+
+                        n = nn;
+                        ls.Counter = ls2.Counter = ls3.Counter = 0;
+                        ssz = 0;
+
+                        Console.Write($"Object 1: {new FriendlySpeedLong(bps)}, Object 2: {new FriendlySpeedLong(bps2)}, Object 3: {new FriendlySpeedLong(bps3)}                                   \r");
+                        i++;
+                    }
+
+                    _ = Task.Run(() =>
+                    {
+                        var by1 = (byte)rnd.Next(0, 255);
+                        var by2 = (byte)rnd.Next(0, 255);
+
+                        for (var j = 0; j < bsize; j++)
+                        {
+                            by1 ^= by2;
+                            buff[j] = by1;
+                            by2 ^= (byte)(by1 ^ by2 << 1);
+                        }
+
+                        ssz += bsize;
+                        bc.PostBytes(buff);
+                    });
+                    
+                    for (var n = 0; n < 128; n++)
+                    {
+                        Thread.Sleep(new TimeSpan(0, 0, 0, 0, 0, 500));
+                    }
                 }
+
+                Console.WriteLine("");
+                Console.WriteLine("Terminated");
             });
-            
-            Console.ReadKey();
+
+            th.Priority = ThreadPriority.AboveNormal;
+            th.IsBackground = false;
+            th.Start();
+
+            while(true)
+            {
+                if (Console.KeyAvailable)
+                {
+                    break;
+                }
+
+                Thread.Sleep(0);
+            }
+
+            bre = false;
+            Environment.Exit(0);
+
+
+
 
             //var b1 = new DescendantB1(5.4949944444M, "Volleyball", 10, Guid.NewGuid());
 
