@@ -369,7 +369,7 @@ namespace DataTools.Essentials.Broadcasting
                                 }
                             }
 
-                            if (i == l) return;
+                            if (i == l) continue;
                         }
 
                         if (sub.TryGetSubscriber(out var subscriber))

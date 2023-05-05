@@ -622,11 +622,17 @@ namespace CoreTestOne
     {
         private byte[] buffer = new byte[65536];
 
+        public long Packets { get; set; } = 0;
         public string ReceiveString { get; set; } = "Broadcast Received: {0}";
         public long Counter { get; set; } = 0;
+        public long LongCounter { get; set; } = 0;
+
         public void ReceiveData(byte[] value, ISideBandData sideBandData)
         {
             Counter += value.Length;
+            Packets++;
+            LongCounter++;
+
             Array.Copy(value, buffer, 65536);
         }
         
@@ -649,6 +655,10 @@ namespace CoreTestOne
 
             var bc = new BCast(InvocationType.Synchronous);
 
+            var tok1 = ChannelToken.CreateToken("Boogie1");
+            var tok2 = ChannelToken.CreateToken("Boogie2");
+            var tok3 = ChannelToken.CreateToken("Boogie3");
+
             var ls = new Listener();
             var ls3 = new Listener();
             var ls2 = new Listener()
@@ -656,20 +666,24 @@ namespace CoreTestOne
                 ReceiveString = "Other Listener {0}"
             };
 
-            var sub = bc.Subscribe(ls);
-            var sub2 = bc.Subscribe(ls2);
-            var sub3 = bc.Subscribe(ls3);
+            var sub = bc.Subscribe(ls, tok1);
+            var sub2 = bc.Subscribe(ls2, tok2);
+            var sub3 = bc.Subscribe(ls3, tok3);
 
             DateTime n = DateTime.Now;
 
             var bre = true;
             long ssz = 0;
+            
+            int plep;
 
             Console.WriteLine("Initiating...");
             Console.WriteLine("");
             var forseed = (int)DateTime.Now.Ticks & 0x7fffffff;
 
-            var th = new Thread(async () =>
+            var orig = Console.GetCursorPosition().Top;
+
+            var th = new Thread(() =>
             {
                 var i = 0;
                 var rnd = new Random(forseed);
@@ -682,22 +696,40 @@ namespace CoreTestOne
                     var nn = DateTime.Now;
                     var tf = nn - n;
 
+                    plep = rnd.Next(1, 10);
+
                     if (tf.Seconds >= 1)
                     {
                         forseed ^= i;
                         rnd = new Random(forseed);
 
-                        var bps = ls.Counter; // / ls.Counter;
+                        var bps1 = ls.Counter; // / ls.Counter;
                         var bps2 = ls2.Counter; // / ls2.Counter;
                         var bps3 = ls3.Counter; // / ls2.Counter;
 
+                        var pk1 = ls.Packets;
+                        var pk2 = ls2.Packets;
+                        var pk3 = ls3.Packets;
+
+                        var l1 = ls.LongCounter;
+                        var l2 = ls2.LongCounter;
+                        var l3 = ls3.LongCounter;
+
+
                         n = nn;
                         ls.Counter = ls2.Counter = ls3.Counter = 0;
+                        ls.Packets = ls2.Packets = ls3.Packets = 0;
+
                         ssz = 0;
 
-                        Console.Write($"Object 1: {new FriendlySpeedLong(bps)}, Object 2: {new FriendlySpeedLong(bps2)}, Object 3: {new FriendlySpeedLong(bps3)}                                   \r");
-                        i++;
+                        Console.SetCursorPosition(0, orig);
+
+                        Console.WriteLine($"Object 1: {new FriendlySpeedLong(bps1),-9} ({pk1,-7:#,##0} Pkts/s) ({l1,-11:#,##0} Packets Total)        ");
+                        Console.WriteLine($"Object 2: {new FriendlySpeedLong(bps2),-9} ({pk2,-7:#,##0} Pkts/s) ({l2,-11:#,##0} Packets Total)        ");
+                        Console.WriteLine($"Object 3: {new FriendlySpeedLong(bps3),-9} ({pk3,-7:#,##0} Pkts/s) ({l3,-11:#,##0} Packets Total)        ");
                     }
+
+                    i++;
 
                     _ = Task.Run(() =>
                     {
@@ -712,7 +744,36 @@ namespace CoreTestOne
                         }
 
                         ssz += bsize;
-                        bc.PostBytes(buff);
+
+                        if ((plep & 8) != 0)
+                        {
+                            if (plep == 8)
+                            {
+                                bc.PostBytes(buff, tok1);
+                            }
+                            else 
+                            {
+                                bc.PostBytes(buff, tok2, tok3);
+                            }
+                        }
+                        else
+                        {
+                            if ((plep & 1) != 0)
+                            {
+                                bc.PostBytes(buff, tok1);
+                            }
+
+                            if ((plep & 2) != 0)
+                            {
+                                bc.PostBytes(buff, tok2);
+                            }
+
+                            if ((plep & 4) != 0)
+                            {
+                                bc.PostBytes(buff, tok3);
+                            } 
+                        }
+
                     });
                     
                     for (var n = 0; n < 128; n++)
