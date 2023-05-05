@@ -19,6 +19,22 @@ namespace DataTools.Essentials.Observable
 
         private SynchronizationContext sync;
 
+        private class FallbackContext : SynchronizationContext
+        {
+            public override void Post(SendOrPostCallback d, object state)
+            {
+                _ = Task.Run(() =>
+                {                    
+                    d(state);
+                });
+            }
+
+            public override void Send(SendOrPostCallback d, object state)
+            {
+                d(state);
+            }
+        }
+
         /// <summary>
         /// Returns true if we can obtain a synchronization context automatically from the current point in the program.
         /// </summary>
@@ -36,7 +52,7 @@ namespace DataTools.Essentials.Observable
         /// <returns></returns>
         public static bool Initialize(SynchronizationContext initSync = null)
         {
-            var odefsync = initSync ?? SynchronizationContext.Current;
+            var odefsync = initSync ?? SynchronizationContext.Current ?? new FallbackContext();
             if (odefsync == null) return false;
 
             (var dnosend, var dnopost) = TestSendPost(odefsync);
