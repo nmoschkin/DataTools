@@ -105,7 +105,7 @@ namespace DataTools.Essentials.Broadcasting
         /// <inheritdoc/>
         public int CompareTo(ChannelToken other)
         {
-            return Compare(this, other);
+            return InnerCompare(this, other);
         }
 
         /// <inheritdoc/>
@@ -144,7 +144,7 @@ namespace DataTools.Essentials.Broadcasting
         /// <returns></returns>
         public static bool operator >(ChannelToken a, ChannelToken b)
         {
-            return Compare(a, b) > 0;
+            return InnerCompare(a, b) > 0;
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace DataTools.Essentials.Broadcasting
         /// <returns></returns>
         public static bool operator >=(ChannelToken a, ChannelToken b)
         {
-            return Compare(a, b) >= 0;
+            return InnerCompare(a, b) >= 0;
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace DataTools.Essentials.Broadcasting
         /// <returns></returns>
         public static bool operator <(ChannelToken a, ChannelToken b)
         {
-            return Compare(a, b) < 0;
+            return InnerCompare(a, b) < 0;
         }
 
         /// <summary>
@@ -177,10 +177,16 @@ namespace DataTools.Essentials.Broadcasting
         /// <returns></returns>
         public static bool operator <=(ChannelToken a, ChannelToken b)
         {
-            return Compare(a, b) <= 0;
+            return InnerCompare(a, b) <= 0;
         }
 
-        private static int Compare(ChannelToken a, ChannelToken b)
+        /// <summary>
+        /// Compare two tokens and return their relationship as an integer
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        private static int InnerCompare(ChannelToken a, ChannelToken b)
         {
             unsafe
             {
@@ -189,13 +195,12 @@ namespace DataTools.Essentials.Broadcasting
 
                 for (byte i = 0; i < 16; i++)
                 {
-                    if (*aptr > *bptr) return 1;
-                    else if (*aptr < *bptr) return -1;
+                    if (*aptr < *bptr) return -1;
+                    else if (*aptr > *bptr) return 1;
 
                     aptr++;
                     bptr++;
                 }
-
             }
 
             return 0;
