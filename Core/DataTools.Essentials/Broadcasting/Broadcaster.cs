@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +28,7 @@ namespace DataTools.Essentials.Broadcasting
     /// <summary>
     /// Base class for broadcasters with weakly-referenced subscribers
     /// </summary>
-    public abstract class Broadcaster<T> : ObservableBase, IBroadcaster<T>
+    public abstract class Broadcaster<T> : ObservableBase, IChannelBroadcaster<T>
     {
         private string name;
         private ChannelToken token;
@@ -152,6 +153,20 @@ namespace DataTools.Essentials.Broadcasting
             return Subscribe(subscriber, false);
         }
 
+        /// <summary>
+        /// Create a new subscription for the specified subscriber
+        /// </summary>
+        /// <param name="subscriber">The subscriber</param>
+        /// <param name="channelToken">Explicit channel token to use (instead of a randomly generated one)</param>
+        /// <returns>A new subscription</returns>
+        /// <remarks>
+        /// This method will always create a new subscription, even if the specified subscriber has a previous subscription.
+        /// </remarks>
+        public ISubscription<T> Subscribe(ISubscriber<T> subscriber, ChannelToken channelToken)
+        {
+            return Subscribe(subscriber, false, channelToken);
+        }
+
         ISubscription IBroadcaster.Subscribe(ISubscriber subscriber)
         {
             if (subscriber is ISubscriber<T> valid)
@@ -162,13 +177,25 @@ namespace DataTools.Essentials.Broadcasting
             throw new NotSupportedException();
         }
 
+        ISubscription IChannelBroadcaster.Subscribe(ISubscriber subscriber, ChannelToken channelToken)
+        {
+            if (subscriber is ISubscriber<T> valid)
+            {
+                return Subscribe(valid, channelToken);
+            }
+
+            throw new NotSupportedException();
+        }
+
+
         /// <summary>
         /// Create a new subscription for the specified subscriber
         /// </summary>
         /// <param name="subscriber">The subscriber</param>
         /// <param name="returnExisting">True to return any existing subscription for the specified subscriber instead of creating a new one</param>
+        /// <param name="channelToken">Optional explicit channel token to use (instead of a randomly generated one)</param>
         /// <returns>A new subscription</returns>
-        public ISubscription<T> Subscribe(ISubscriber<T> subscriber, bool returnExisting)
+        public ISubscription<T> Subscribe(ISubscriber<T> subscriber, bool returnExisting, ChannelToken? channelToken = null)
         {
             lock (lockObj)
             {
@@ -181,15 +208,30 @@ namespace DataTools.Essentials.Broadcasting
                         {
                             return item;
                         }
+                        else if (channelToken is ChannelToken ct && ct == item.ChannelToken)
+                        {
+                            return item;
+                        }
                     }
                 }
 
-                var sub = new Subscription<T>(subscriber, this);
+
+                ISubscription<T> sub; 
+                
+                if (channelToken is ChannelToken cta)
+                {
+                    sub = new Subscription<T>(cta, subscriber, this);
+                }
+                else
+                {
+                    sub = new Subscription<T>(subscriber, this);
+                }
 
                 subscriptions.Add(sub);
                 return sub;
             }
         }
+
 
         /// <summary>
         /// Detach the subscription from this service, ending the relationship
@@ -264,8 +306,12 @@ namespace DataTools.Essentials.Broadcasting
         /// </summary>
         /// <param name="data">The data to transmit</param>
         /// <param name="invocationType">The invocation type</param>
-        protected void TransmitData(T data, InvocationType invocationType)
+        /// <param name="channels">Explicit channels to broadcast to</param>
+        protected void TransmitData(T data, InvocationType invocationType, params ChannelToken[] channels)
         {
+            bool dochannels = (channels != null && channels.Length > 0);
+            var l = dochannels ? channels.Length : 0;
+
             if (invocationType == InvocationType.Parallel)
             {
                 try
@@ -274,6 +320,20 @@ namespace DataTools.Essentials.Broadcasting
                     {
                         try
                         {
+                            if (dochannels)
+                            {
+                                int i;
+                                for (i = 0; i < l; i++)
+                                {
+                                    if (channels[i] == sub.ChannelToken)
+                                    {
+                                        break;
+                                    }
+                                }
+                             
+                                if (i == l) return;
+                            }
+
                             if (sub.TryGetSubscriber(out var subscriber))
                             {
                                 var sbb = CreateSideBandData(data, sub, invocationType);
@@ -297,6 +357,21 @@ namespace DataTools.Essentials.Broadcasting
                 {
                     foreach (var sub in subscriptions)
                     {
+
+                        if (dochannels)
+                        {
+                            int i;
+                            for (i = 0; i < l; i++)
+                            {
+                                if (channels[i] == sub.ChannelToken)
+                                {
+                                    break;
+                                }
+                            }
+
+                            if (i == l) return;
+                        }
+
                         if (sub.TryGetSubscriber(out var subscriber))
                         {
                             var sbb = CreateSideBandData(data, sub, invocationType);
@@ -393,5 +468,6 @@ namespace DataTools.Essentials.Broadcasting
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+
     }
 }

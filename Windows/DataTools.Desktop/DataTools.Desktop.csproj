@@ -4,10 +4,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1087</AssemblyVersion>
-    <FileVersion>8.0.0.1087</FileVersion>
+    <AssemblyVersion>8.0.0.1088</AssemblyVersion>
+    <FileVersion>8.0.0.1088</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1087</Version>
+    <Version>8.0.0.1088</Version>
     <Product>DataTools Desktop Base Library</Product>
     <Description>DataTools Desktop Base Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -23,7 +23,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1086</PreviousVersion>
+    <PreviousVersion>8.0.0.1087</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
