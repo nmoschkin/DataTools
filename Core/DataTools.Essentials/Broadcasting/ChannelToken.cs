@@ -190,10 +190,10 @@ namespace DataTools.Essentials.Broadcasting
         {
             unsafe
             {
-                byte* aptr = (byte*)&a;
-                byte* bptr = (byte*)&b;
+                long* aptr = (long*)&a;
+                long* bptr = (long*)&b;
 
-                for (byte i = 0; i < 16; i++)
+                for (byte i = 0; i < 2; i++)
                 {
                     if (*aptr < *bptr) return -1;
                     else if (*aptr > *bptr) return 1;
