@@ -603,6 +603,35 @@ namespace CoreTestOne
         }
     }
 
+    public class BCast : Broadcaster<string>
+    {
+        public BCast(InvocationType invocationType = InvocationType.Synchronous) : base(invocationType, ChannelToken.CreateToken("My Dispatch"), "My Dispatch")
+        {
+        }
+
+        public void PostString(string text)
+        {
+            TransmitData(text);
+        }
+
+    }
+
+    public class Listener : ISubscriber<string>
+    {
+        public string ReceiveString { get; set; } = "Broadcast Received: {0}";
+        
+        public void ReceiveData(string value, ISideBandData sideBandData)
+        {
+            Console.WriteLine(string.Format(ReceiveString, value));
+        }
+        
+        void ISubscriber.ReceiveData(object value, ISideBandData sideBandData)
+        {
+            ReceiveData((string)value, sideBandData);
+        }
+    }
+
+
     public static class Program
     {
         [DllImport("kernel32.dll")]
@@ -613,19 +642,26 @@ namespace CoreTestOne
         {
             AllocConsole();
 
-            var tok = ChannelToken.CreateToken("This is my channel on ice");
+            var bc = new BCast(InvocationType.Dispatcher);
 
-            var strtok = tok.ToString();
+            var ls = new Listener();
+            var ls2 = new Listener()
+            {
+                ReceiveString = "Other Listener {0}"
+            };
 
-            var tok2 = ChannelToken.CreateToken("This is my channel on ice");
-            var tok3 = ChannelToken.CreateToken("This is my channel on ice part 4");
+            var sub = bc.Subscribe(ls);
+            var sub2 = bc.Subscribe(ls2);
 
-            var atok = tok == tok2;
-            var btok = tok == tok3;
-
-
-            var strtok2 = "";
-
+            _ = Task.Run(() =>
+            {
+                for (var i = 0; i < 100; i++)
+                {
+                    bc.PostString($"Test Iteration {i}");
+                }
+            });
+            
+            Console.ReadKey();
 
             //var b1 = new DescendantB1(5.4949944444M, "Volleyball", 10, Guid.NewGuid());
 
