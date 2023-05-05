@@ -7,6 +7,23 @@ using System.Threading.Tasks;
 
 namespace DataTools.Essentials.Broadcasting
 {
+
+    /// <summary>
+    /// Options for the Dispatch broadcasting mode
+    /// </summary>
+    public enum BroadcastDispatchType
+    {
+        /// <summary>
+        /// The broadcast is performed on the main thread, and the process waits for the broadcast method to finish before returning
+        /// </summary>
+        Send,
+
+        /// <summary>
+        /// The broadcast is performed on the main thread, and the process returns immediately without waiting for the broadcast method to finish
+        /// </summary>
+        Post
+    }
+
     /// <summary>
     /// Base class for broadcasters with weakly-referenced subscribers
     /// </summary>
@@ -85,6 +102,12 @@ namespace DataTools.Essentials.Broadcasting
         /// </summary>
         public InvocationType InvocationType { get; }
 
+
+        /// <summary>
+        /// Dispatch broadcasting mode
+        /// </summary>
+        public BroadcastDispatchType DispatchType { get; }
+
         /// <summary>
         /// The parallel options 
         /// </summary>
@@ -97,12 +120,15 @@ namespace DataTools.Essentials.Broadcasting
         /// <param name="channelToken">The channel token to identify the new broadcaster</param>
         /// <param name="name">The name of the channel (can be null)</param>
         /// <param name="maxParallelTasks">Maximum number of parallel tasks to perform at once</param>
-        protected Broadcaster(InvocationType invocationType, ChannelToken channelToken, string name, int maxParallelTasks = -1)
+        /// <param name="dispatchType">Dispatcher broadcasting mode (only applies if the invocation type is set to Dispatcher)</param>
+        protected Broadcaster(InvocationType invocationType, ChannelToken channelToken, string name, int maxParallelTasks = -1, BroadcastDispatchType dispatchType = BroadcastDispatchType.Send)
         {
             Synchronizer.Initialize();
 
             InvocationType = invocationType;
             ChannelToken = channelToken;
+            DispatchType = dispatchType;
+
             Name = name;
 
             maxTasks = maxParallelTasks <= 0 ? Environment.ProcessorCount : maxParallelTasks;
@@ -304,17 +330,36 @@ namespace DataTools.Essentials.Broadcasting
                                     break;
 
                                 case InvocationType.Dispatcher:
-                                    Synchronizer.Default.BeginInvoke(() =>
+
+                                    if (DispatchType == BroadcastDispatchType.Post)
                                     {
-                                        try
+                                        Synchronizer.Default.BeginInvoke(() =>
                                         {
-                                            subscriber.ReceiveData(data, sbb);
-                                        }
-                                        catch (Exception ex)
+                                            try
+                                            {
+                                                subscriber.ReceiveData(data, sbb);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Debug.WriteLine(ex);
+                                            }
+                                        });
+                                    }
+                                    else
+                                    {
+                                        Synchronizer.Default.Invoke(() =>
                                         {
-                                            Debug.WriteLine(ex);
-                                        }
-                                    });
+                                            try
+                                            {
+                                                subscriber.ReceiveData(data, sbb);
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                Debug.WriteLine(ex);
+                                            }
+                                        });
+                                    }
+
                                     break;
                             }
                         }
