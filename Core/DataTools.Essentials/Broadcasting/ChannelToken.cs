@@ -9,7 +9,7 @@ namespace DataTools.Essentials.Broadcasting
     /// Represents a channel token
     /// </summary>
     [StructLayout(LayoutKind.Explicit, Size = 16)]
-    public struct ChannelToken : IEquatable<ChannelToken>
+    public struct ChannelToken : IEquatable<ChannelToken>, IComparable<ChannelToken>
     {
         /// <summary>
         /// Gets or sets the MD5 seed to use when generating tokens
@@ -103,6 +103,12 @@ namespace DataTools.Essentials.Broadcasting
         }
 
         /// <inheritdoc/>
+        public int CompareTo(ChannelToken other)
+        {
+            return Compare(this, other);
+        }
+
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return guid.GetHashCode();
@@ -130,6 +136,69 @@ namespace DataTools.Essentials.Broadcasting
             return !a.Equals(b);
         }
 
+        /// <summary>
+        /// Test if a greater than b
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator >(ChannelToken a, ChannelToken b)
+        {
+            return Compare(a, b) > 0;
+        }
 
+        /// <summary>
+        /// Test if a greater than or equal to b
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator >=(ChannelToken a, ChannelToken b)
+        {
+            return Compare(a, b) >= 0;
+        }
+
+        /// <summary>
+        /// Test if a less than b
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator <(ChannelToken a, ChannelToken b)
+        {
+            return Compare(a, b) < 0;
+        }
+
+        /// <summary>
+        /// Test if a less than or equal to b
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator <=(ChannelToken a, ChannelToken b)
+        {
+            return Compare(a, b) <= 0;
+        }
+
+        private static int Compare(ChannelToken a, ChannelToken b)
+        {
+            unsafe
+            {
+                byte* aptr = (byte*)&a;
+                byte* bptr = (byte*)&b;
+
+                for (byte i = 0; i < 16; i++)
+                {
+                    if (*aptr > *bptr) return 1;
+                    else if (*aptr < *bptr) return -1;
+
+                    aptr++;
+                    bptr++;
+                }
+
+            }
+
+            return 0;
+        }
     }
 }
