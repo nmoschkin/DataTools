@@ -659,6 +659,47 @@ namespace CoreTestOne
             var tok2 = ChannelToken.CreateToken("Boogie2");
             var tok3 = ChannelToken.CreateToken("Boogie3");
 
+            var tok4 = tok1 ^ tok3;
+            var tok5 = tok4 ^ tok3;
+
+            var tok8 = ~tok4 ^ tok1;
+
+            var t8c = tok8.GetHashCode();
+
+            var lb = tok5 == tok1;
+
+            var th1 = tok1.GetHashCode();
+            var th5 = tok5.GetHashCode();
+
+            var lb2 = th1 == th5;
+
+            var btest1 = new byte[16];
+
+            btest1[0] = 5;
+            btest1[1] = 5;
+            btest1[2] = 0xa;
+            btest1[7] = 0xc;
+            btest1[13] = 71;
+            btest1[14] = 15;
+            btest1[15] = 55;
+
+            var tok6 = new ChannelToken(btest1);
+
+            Console.WriteLine($"{tok6}");
+
+            btest1[0] = 7;
+            btest1[1] = 9;
+            btest1[2] = 0xd;
+            btest1[7] = 0xf;
+            btest1[13] = 23;
+            btest1[14] = 137;
+            btest1[15] = 45;
+
+            var tok7 = new ChannelToken(btest1);
+
+
+            var tv = tok6.CompareTo(tok7);
+
             var ls = new Listener();
             var ls3 = new Listener();
             var ls2 = new Listener()
@@ -683,7 +724,7 @@ namespace CoreTestOne
 
             var orig = Console.GetCursorPosition().Top;
 
-            var th = new Thread(() =>
+            var th = new Thread(async () =>
             {
                 var i = 0;
                 var rnd = new Random(forseed);
@@ -776,10 +817,13 @@ namespace CoreTestOne
 
                     });
                     
-                    for (var n = 0; n < 128; n++)
+                    await Task.Run(() =>
                     {
-                        Thread.Sleep(new TimeSpan(0, 0, 0, 0, 0, 500));
-                    }
+                        for (var n = 0; n < 64; n++)
+                        {
+                            Thread.Sleep(new TimeSpan(0, 0, 0, 0, 0, 500));
+                        }
+                    });
                 }
 
                 Console.WriteLine("");

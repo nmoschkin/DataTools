@@ -1,16 +1,24 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace DataTools.Essentials.Broadcasting
 {
+
     /// <summary>
     /// Represents a channel token
     /// </summary>
-    [StructLayout(LayoutKind.Explicit, Size = 16)]
+    [StructLayout(LayoutKind.Explicit, Size = 16, Pack = 1)]
     public struct ChannelToken : IEquatable<ChannelToken>, IComparable<ChannelToken>
     {
+        [FieldOffset(0)]
+        private ulong _l;
+
+        [FieldOffset(8)]
+        private ulong _h;
+
         /// <summary>
         /// Gets or sets the MD5 seed to use when generating tokens
         /// </summary>
@@ -21,9 +29,6 @@ namespace DataTools.Essentials.Broadcasting
         /// </summary>
         public static readonly ChannelToken Empty = CreateToken("");
 
-        [FieldOffset(0)]
-        private Guid guid;
-
         /// <summary>
         /// Create a channel token from the specified string
         /// </summary>
@@ -33,15 +38,15 @@ namespace DataTools.Essentials.Broadcasting
         {
             if (string.IsNullOrEmpty(stringValue))
             {
-                return new ChannelToken { guid = Guid.Empty };
+                return new ChannelToken();
             }
 
             var md5 = new HMACMD5(RuntimeSeed.ToByteArray());
-            var ct = new ChannelToken();
 
-            ct.guid = new Guid(md5.ComputeHash(Encoding.UTF8.GetBytes(stringValue)));
-
-            return ct;
+            unsafe
+            {
+                return new ChannelToken(md5.ComputeHash(Encoding.UTF8.GetBytes(stringValue)));                
+            }
         }
 
         /// <summary>
@@ -54,32 +59,70 @@ namespace DataTools.Essentials.Broadcasting
         }
 
         /// <summary>
+        /// Create a new channel token from the specified bytes
+        /// </summary>
+        /// <param name="bytes"></param>
+        public ChannelToken(byte[] bytes)
+        {
+            unsafe
+            {
+                fixed (void *bs = bytes)
+                {
+                    fixed (ChannelToken *ts = &this)
+                    {
+                        *ts = *(ChannelToken*)bs;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the bytes of the structure
         /// </summary>
         /// <returns></returns>
-        public byte[] GetBytes()
+        public byte[] ToByteArray()
         {
-            return guid.ToByteArray();
+            unsafe
+            {
+                var bytes = new byte[16];
+
+                fixed (void* bs = bytes)
+                {
+                    fixed (ChannelToken* ts = &this)
+                    {
+                        *(ChannelToken*)bs = *ts;
+                    }
+                }
+
+                return bytes;
+            }
         }
 
         /// <summary>
         /// Convert the token to a <see cref="Guid"/> structure
         /// </summary>
         /// <returns></returns>
-        public Guid ToGuid() => guid;
+        public Guid ToGuid() => new Guid(ToByteArray());
 
         /// <inheritdoc/>
         public override string ToString()
         {
             var sb = new StringBuilder();
-            var bytes = GetBytes();
-            int i = 0;
 
-            foreach (var b in bytes)
+            unsafe
             {
-                if (i > 0) sb.Append(" ");
-                sb.Append($"{b:X2}");
-                i++;
+                fixed (void* bs = &this)
+                {
+                    short* bptr = (short*)bs;
+
+                    for (var i = 0; i < 8; i++)
+                    {
+                        if (i > 0) sb.Append(':');
+                        sb.Append($"{*bptr:X4}");
+                        bptr++;
+
+                    }
+                }
             }
 
             return sb.ToString();
@@ -99,7 +142,7 @@ namespace DataTools.Essentials.Broadcasting
         /// <inheritdoc/>
         public bool Equals(ChannelToken other)
         {
-            return guid.Equals(other.guid);
+            return this == other;
         }
 
         /// <inheritdoc/>
@@ -111,7 +154,25 @@ namespace DataTools.Essentials.Broadcasting
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            return guid.GetHashCode();
+            unsafe
+            {
+                int hc = -1;
+
+                fixed (void* bs = &this)
+                {
+                    int* bptr = (int*)bs;
+
+                    hc ^= *bptr++;
+                    hc <<= 3;
+                    hc ^= *bptr++ >> 3;
+                    hc <<= 3;
+                    hc ^= *bptr++ >> 3;
+                    hc <<= 3;
+                    hc ^= *bptr++ >> 3;
+
+                    return hc;
+                }
+            }
         }
 
         /// <summary>
@@ -122,7 +183,13 @@ namespace DataTools.Essentials.Broadcasting
         /// <returns></returns>
         public static bool operator ==(ChannelToken a, ChannelToken b)
         {
-            return a.Equals(b);
+            unsafe
+            {
+                ulong* aptr = (ulong*)&a;
+                ulong* bptr = (ulong*)&b;
+
+                return (*aptr ^ *bptr) == 0 && (*(aptr + 1) ^ *(bptr + 1)) == 0;
+            }
         }
 
         /// <summary>
@@ -133,7 +200,13 @@ namespace DataTools.Essentials.Broadcasting
         /// <returns></returns>
         public static bool operator !=(ChannelToken a, ChannelToken b)
         {
-            return !a.Equals(b);
+            unsafe
+            {
+                ulong* aptr = (ulong*)&a;
+                ulong* bptr = (ulong*)&b;
+
+                return (*aptr ^ *bptr) != 0 || (*(aptr + 1) ^ *(bptr + 1)) != 0;
+            }
         }
 
         /// <summary>
@@ -181,7 +254,86 @@ namespace DataTools.Essentials.Broadcasting
         }
 
         /// <summary>
-        /// Compare two tokens and return their relationship as an integer
+        /// Bitwise OR
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static ChannelToken operator |(ChannelToken a, ChannelToken b)
+        {
+            unsafe
+            {
+                ulong* aptr = (ulong*)&a;
+                ulong* bptr = (ulong*)&b;
+
+                *aptr |= *bptr;
+                *(aptr + 1) |= *(bptr + 1);
+
+                return a;
+            }
+        }
+
+        /// <summary>
+        /// Bitwise AND
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static ChannelToken operator &(ChannelToken a, ChannelToken b)
+        {
+            unsafe
+            {
+                ulong* aptr = (ulong*)&a;
+                ulong* bptr = (ulong*)&b;
+
+                *aptr &= *bptr;
+                *(aptr + 1) &= *(bptr + 1);
+
+                return a;
+            }
+        }
+
+        /// <summary>
+        /// Bitwise XOR
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static ChannelToken operator ^(ChannelToken a, ChannelToken b)
+        {
+            unsafe
+            {
+                ulong* aptr = (ulong*)&a;
+                ulong* bptr = (ulong*)&b;
+
+                *aptr ^= *bptr;
+                *(aptr + 1) ^= *(bptr + 1);
+
+                return a;
+            }
+        }
+
+
+        /// <summary>
+        /// Bitwise NOT
+        /// </summary>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static ChannelToken operator ~(ChannelToken val) 
+        {
+            unsafe
+            {
+                ulong* aptr = (ulong*)&val;
+
+                *aptr ^= 0xffffffffffffffff;
+                *(aptr + 1) ^= 0xffffffffffffffff;
+
+                return val;
+            }
+        }
+       
+        /// <summary>
+        /// Compare two tokens and return their relationship as a sorting integer (-1,0,1)
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
@@ -190,17 +342,32 @@ namespace DataTools.Essentials.Broadcasting
         {
             unsafe
             {
-                long* aptr = (long*)&a;
-                long* bptr = (long*)&b;
+                ushort* aptr = (ushort*)&a;
+                ushort* bptr = (ushort*)&b;
 
-                for (byte i = 0; i < 2; i++)
-                {
-                    if (*aptr < *bptr) return -1;
-                    else if (*aptr > *bptr) return 1;
+                if (*aptr < *bptr) return -1;
+                else if (*aptr++ > *bptr++) return 1;
 
-                    aptr++;
-                    bptr++;
-                }
+                if (*aptr < *bptr) return -1;
+                else if (*aptr++ > *bptr++) return 1;
+
+                if (*aptr < *bptr) return -1;
+                else if (*aptr++ > *bptr++) return 1;
+
+                if (*aptr < *bptr) return -1;
+                else if (*aptr++ > *bptr++) return 1;
+
+                if (*aptr < *bptr) return -1;
+                else if (*aptr++ > *bptr++) return 1;
+
+                if (*aptr < *bptr) return -1;
+                else if (*aptr++ > *bptr++) return 1;
+
+                if (*aptr < *bptr) return -1;
+                else if (*aptr++ > *bptr++) return 1;
+
+                if (*aptr < *bptr) return -1;
+                else if (*aptr++ > *bptr++) return 1;
             }
 
             return 0;
