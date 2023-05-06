@@ -12,8 +12,6 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public override bool IsInvalid => handle == IntPtr.Zero;
 
-        private long size = 0;
-
         internal virtual new IntPtr handle
         {
             get => base.handle;
@@ -34,18 +32,18 @@ namespace DataTools.Memory
 
         /// <inheritdoc/>
         public SafePtr(byte[] data) : this(IntPtr.Zero, true, true)
-        {
+        {            
             FromByteArray(data);
         }
 
         /// <inheritdoc/>
-        public SafePtr(long size) : this(IntPtr.Zero, true, true)
+        public SafePtr(long Length) : this(IntPtr.Zero, true, true)
         {
-            Alloc(size);
+            Alloc(Length);
         }
 
         /// <inheritdoc/>
-        public SafePtr(int size) : this((long)size)
+        public SafePtr(int Length) : this((long)Length)
         {
         }
 
@@ -55,18 +53,18 @@ namespace DataTools.Memory
         }
 
         /// <inheritdoc/>
-        public SafePtr(IntPtr ptr, long size, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
+        public SafePtr(IntPtr ptr, long Length, bool fOwn, bool gcpressure) : base(ptr, fOwn, gcpressure)
         {
-            this.size = size;
+            this.Length = Length;
         }
 
         /// <inheritdoc/>
-        public SafePtr(IntPtr ptr, long size) : this(ptr, size, true, true)
+        public SafePtr(IntPtr ptr, long Length) : this(ptr, Length, true, true)
         {
         }
 
         /// <inheritdoc/>
-        public SafePtr(IntPtr ptr, int size) : this(ptr, (long)size, true, true)
+        public SafePtr(IntPtr ptr, int Length) : this(ptr, (long)Length, true, true)
         {
         }
 
@@ -81,7 +79,7 @@ namespace DataTools.Memory
         }
 
         /// <inheritdoc/>
-        public unsafe SafePtr(void* ptr, long size) : this((IntPtr)ptr, size, true, true)
+        public unsafe SafePtr(void* ptr, long Length) : this((IntPtr)ptr, Length, true, true)
         {
         }
 
@@ -100,16 +98,16 @@ namespace DataTools.Memory
         }
 
         /// <inheritdoc/>
-        protected override IntPtr Allocate(long size)
+        protected override IntPtr Allocate(long Length)
         {
-            return Marshal.AllocHGlobal((int)size);
+            return Marshal.AllocHGlobal((int)Length);
         }
 
         /// <inheritdoc/>
         protected override void Deallocate(IntPtr ptr)
         {
             Marshal.FreeHGlobal(ptr);
-            this.size = 0;
+            this.Length = 0;
         }
 
         /// <inheritdoc/>
@@ -384,9 +382,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, byte[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length);
+            val1.Alloc(val1.Length + val2.Length);
             val1.FromByteArray(val2, c);
 
             return val1;
@@ -395,9 +393,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, char[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(char));
+            val1.Alloc(val1.Length + val2.Length * sizeof(char));
             val1.FromCharArray(val2, c);
 
             return val1;
@@ -406,7 +404,7 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, string val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
             val1.Length += (val2.Length * 2);
 
             if (val1.CharAtAbsolute(c - sizeof(char)) == 0)
@@ -424,9 +422,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, sbyte[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length);
+            val1.Alloc(val1.Length + val2.Length);
             val1.FromArray(val2, c);
 
             return val1;
@@ -435,9 +433,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, short[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(short));
+            val1.Alloc(val1.Length + val2.Length * sizeof(short));
             val1.FromArray(val2, c);
 
             return val1;
@@ -446,9 +444,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, ushort[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(ushort));
+            val1.Alloc(val1.Length + val2.Length * sizeof(ushort));
             val1.FromArray(val2, c);
 
             return val1;
@@ -457,9 +455,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, int[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(int));
+            val1.Alloc(val1.Length + val2.Length * sizeof(int));
             val1.FromArray(val2, c);
 
             return val1;
@@ -468,9 +466,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, uint[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(uint));
+            val1.Alloc(val1.Length + val2.Length * sizeof(uint));
             val1.FromArray(val2, c);
 
             return val1;
@@ -479,9 +477,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, long[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(long));
+            val1.Alloc(val1.Length + val2.Length * sizeof(long));
             val1.FromArray(val2, c);
 
             return val1;
@@ -490,9 +488,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, ulong[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(ulong));
+            val1.Alloc(val1.Length + val2.Length * sizeof(ulong));
             val1.FromArray(val2, c);
 
             return val1;
@@ -501,9 +499,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, float[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(float));
+            val1.Alloc(val1.Length + val2.Length * sizeof(float));
             val1.FromArray(val2, c);
 
             return val1;
@@ -512,9 +510,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, double[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(double));
+            val1.Alloc(val1.Length + val2.Length * sizeof(double));
             val1.FromArray(val2, c);
 
             return val1;
@@ -523,9 +521,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, decimal[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * sizeof(decimal));
+            val1.Alloc(val1.Length + val2.Length * sizeof(decimal));
             val1.FromArray(val2, c);
 
             return val1;
@@ -534,9 +532,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, DateTime[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * Marshal.SizeOf<DateTime>());
+            val1.Alloc(val1.Length + val2.Length * Marshal.SizeOf<DateTime>());
             val1.FromArray(val2, c);
 
             return val1;
@@ -545,9 +543,9 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         public static SafePtr operator +(SafePtr val1, Guid[] val2)
         {
-            var c = val1.size;
+            var c = val1.Length;
 
-            val1.Alloc(val1.size + val2.Length * Marshal.SizeOf<Guid>());
+            val1.Alloc(val1.Length + val2.Length * Marshal.SizeOf<Guid>());
             val1.FromArray(val2, c);
 
             return val1;

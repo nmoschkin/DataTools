@@ -18,41 +18,6 @@ namespace DataTools.Win32.Disk.Partition.Mbr
     {
 
         /// <summary>
-        /// Master Boot Record structure
-        /// </summary>
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public struct MBR
-        {
-            /// <summary>
-            /// Byte Code
-            /// </summary>
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 440)]
-            public byte[] Code;
-
-            /// <summary>
-            /// Optional
-            /// </summary>
-            public uint DiskSig; //This is optional
-            
-            /// <summary>
-            /// Reserved
-            /// </summary>
-            public ushort Reserved; //Usually 0x0000
-
-            /// <summary>
-            /// Partition Table
-            /// </summary>
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-            public RawMbrPartitionStruct[] PartTable;
-
-            /// <summary>
-            /// 0x55 0xAA for bootable
-            /// </summary>
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-            public byte[] BootSignature; //0x55 0xAA for bootable
-        }
-
-        /// <summary>
         /// Entire MBR Disk Structure
         /// </summary>
         public struct RAW_MBR_INFO
@@ -60,7 +25,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
             /// <summary>
             /// The Master Boot Record
             /// </summary>
-            public MBR Mbr;
+            public MasterBootRecord Mbr;
 
             /// <summary>
             /// Sector size
@@ -102,7 +67,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
         /// </remarks>
         public static bool ReadRawMbrDisk(string devicePath, int sectorSize, out RAW_MBR_INFO? rawMbrInfo)
         {
-            MBR mbrInfo;
+            MasterBootRecord mbrInfo;
             RAW_MBR_INFO rawInfo = default;
 
             rawMbrInfo = null;
@@ -117,7 +82,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
 
             using (var hfile = DiskHandle.OpenDisk(devicePath))
             {
-                uint bps = (uint)Marshal.SizeOf<MBR>();
+                uint bps = (uint)sectorSize;
                 uint br = 0;
 
                 using (var mm = new SafePtr(bps))
@@ -131,7 +96,7 @@ namespace DataTools.Win32.Disk.Partition.Mbr
                         throw new NativeException();
                     }
 
-                    mbrInfo = mm.ToStruct<MBR>();
+                    mbrInfo = mm.ToStruct<MasterBootRecord>();
 
                     rawInfo.Mbr = mbrInfo;
                     rawInfo.SectorSize = (uint)sectorSize;
@@ -157,11 +122,11 @@ namespace DataTools.Win32.Disk.Partition.Mbr
                                 throw new NativeException();
                             }
 
-                            MBR ebrInfo = default;
+                            MasterBootRecord ebrInfo = default;
 
                             do
                             {
-                                ebrInfo = mm.ToStruct<MBR>();
+                                ebrInfo = mm.ToStruct<MasterBootRecord>();
                                 exParts.Add(ebrInfo.PartTable[0]);
 
                                 if (ebrInfo.PartTable[1].StartLBA != 0)
@@ -192,4 +157,6 @@ namespace DataTools.Win32.Disk.Partition.Mbr
 
         }
     }
+
+
 }

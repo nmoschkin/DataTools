@@ -44,13 +44,13 @@ namespace DataTools.Win32.Disk.Partition.Mbr
         public uint StartLBA;
             
         /// <summary>
-        /// Linear address of last sector in partition. Multiply by sector size (usually 512) for real offset
+        /// Total LBAs in the partitition (partition size / sector size)
         /// </summary>
-        public uint EndLBA;
+        public uint TotalLBAs;
 
         /// <summary>
         /// Gets the size based on 512 sector size
         /// </summary>
-        public long Size => (EndLBA * 512L);
+        public long Size => (TotalLBAs * 512L);
     }
 }

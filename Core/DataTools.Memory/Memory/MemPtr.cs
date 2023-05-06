@@ -32,6 +32,15 @@ namespace DataTools.Memory
             }
         }
 
+        /// <summary>
+        /// Gets or sets the pointer
+        /// </summary>
+        public unsafe void* Pointer
+        {
+            get => (void*)handle;
+            set => handle = (IntPtr)value;
+        }
+
         public MemPtr(long size = 1024)
         {
             if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
@@ -1141,42 +1150,37 @@ namespace DataTools.Memory
             return val1.handle != val2.handle;
         }
 
+        public static unsafe implicit operator void*(MemPtr val)
+        {
+            return (void*)val.handle;
+        }
+
+        public static unsafe implicit operator MemPtr(void* val)
+        {
+            return new MemPtr(val);
+        }
+
         public static implicit operator IntPtr(MemPtr val)
         {
-            unsafe
-            {
-                return val.handle;
-            }
+            return val.handle;
         }
 
         public static implicit operator MemPtr(IntPtr val)
         {
-            unsafe
+            return new MemPtr
             {
-                return new MemPtr
-                {
-                    handle = (IntPtr)(void*)val
-                };
-            }
+                handle = val
+            };
         }
 
         public static implicit operator UIntPtr(MemPtr val)
         {
-            unsafe
-            {
-                return (UIntPtr)(void*)val.handle;
-            }
+            return (UIntPtr)(ulong)(long)val.handle;
         }
 
         public static implicit operator MemPtr(UIntPtr val)
         {
-            unsafe
-            {
-                return new MemPtr
-                {
-                    handle = (IntPtr)(void*)val
-                };
-            }
+            return new MemPtr((IntPtr)(long)(ulong)val);
         }
     }
 }

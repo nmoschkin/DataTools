@@ -36,7 +36,7 @@ namespace DataTools.Desktop.Network
             {
                 base.DeviceIcon = value;
                 if (value != null)
-                    DeviceImage = DataTools.Desktop.BitmapTools.MakeWPFImage(value);
+                    DeviceImage = WPFBitmapTools.MakeWPFImage(value);
                 else
                     DeviceImage = null;
             }

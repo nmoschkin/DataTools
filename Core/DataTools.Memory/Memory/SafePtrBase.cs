@@ -1842,6 +1842,12 @@ namespace DataTools.Memory
             }
         }
 
+        /// <summary>
+        /// Return the value of the <see cref="SafeHandle.handle"/> field as a pointer.
+        /// </summary>
+        /// <returns></returns>
+        public unsafe void* DangerousGetPointer() => (void*)DangerousGetHandle();
+
         /// <inheritdoc/>
         public override string ToString()
         {

@@ -122,27 +122,35 @@ namespace DataTools.Win32.Memory
         }
 
         /// <summary>
-        /// Read a structure of type T from a stream
+        /// Read a structure of type <typeparamref name="T"/> from a <see cref="Stream"/>
         /// </summary>
+        /// <typeparam name="T">Structure to read</typeparam>
         /// <param name="stream"><see cref="Stream"/> object</param>
-        /// <param name="struct">The output struct of type T</param>
+        /// <param name="result">The output structure of type <typeparamref name="T"/></param>
         /// <returns>True if successful</returns>
-        public static bool ReadStruct<T>(Stream stream, ref T @struct) where T : struct
+        public static bool ReadStruct<T>(Stream stream, out T result) where T : struct
         {
             try
             {
                 int a = Marshal.SizeOf<T>();
-                byte[] b;
-                b = new byte[a];
+
+                byte[] b = new byte[a];                
                 stream.Read(b, 0, a);
-                var gch = GCHandle.Alloc(b, GCHandleType.Pinned);
-                MemPtr mm = gch.AddrOfPinnedObject();
-                @struct = mm.ToStruct<T>();
-                gch.Free();
-                return true;
+                
+                unsafe
+                {
+                    fixed (byte* ptr = b)
+                    {
+                        var mm = new DataTools.Memory.MemPtr(ptr);
+                        result = mm.ToStruct<T>();
+
+                        return true;
+                    }
+                }
             }
             catch
             {
+                result = default;
                 return false;
             }
         }

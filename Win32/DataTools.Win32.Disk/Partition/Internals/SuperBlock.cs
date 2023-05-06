@@ -129,138 +129,169 @@ namespace DataTools.Win32.Disk.Partition.Internals
     [StructLayout(LayoutKind.Sequential)]
     public struct SuperBlock
     {
+        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         /// <summary>
         /// The File System Magic Signature
         /// </summary>
-        public const ushort MagicSignature = 0xEF53;
+        public const ushort MagicSignatureConstant = 0xEF53;
 
         /// <summary>
         /// Total inode count.
         /// </summary>
-        public uint s_inodes_count;
+        public uint INodesCount;
 
         /// <summary>
         /// Total block count.
         /// </summary>
-        public uint s_blocks_count_lo;
+        public uint TotalBlockCount;
 
         /// <summary>
         /// This number of blocks can only be allocated by the super-user.
         /// </summary>
-        public uint s_r_blocks_count_lo;
+        public uint SuperUserReservedBlockCount;
 
         /// <summary>
         /// Free block count.
         /// </summary>
-        public uint s_free_blocks_count_lo;
+        public uint FreeBlockCount;
 
         /// <summary>
         /// Free inode count.
         /// </summary>
-        public uint s_free_inodes_count;
+        public uint FreeINodesCount;
 
         /// <summary>
         /// First data block. This must be at least 1 for 1k-block filesystems and is typically 0 for all other block sizes.
         /// </summary>
-        public uint s_first_data_block;
+        public uint FirstDataBlock;
 
         /// <summary>
         /// Block size is 2 ^ (10 + s_log_block_size).
         /// </summary>
-        public uint s_log_block_size;
+        public uint LogBlockSize;
+
+        /// <summary>
+        /// Block Size
+        /// </summary>
+        public uint BlockSize => (uint)Math.Pow(2, LogBlockSize + 10);
 
         /// <summary>
         /// Cluster size is (2 ^ s_log_cluster_size) blocks if bigalloc is enabled. Otherwise s_log_cluster_size must equal s_log_block_size.
         /// </summary>
-        public uint s_log_cluster_size;
+        public uint LogClusterSize;
+
+        ///// <summary>
+        ///// Cluster Size
+        ///// </summary>
+        //public uint ClusterSize => (uint)Math.Pow(2, ClusterSize);
 
         /// <summary>
         /// Blocks per group.
         /// </summary>
-        public uint s_blocks_per_group;
+        public uint BlocksPerGroup;
 
         /// <summary>
         /// Clusters per group, if bigalloc is enabled. Otherwise s_clusters_per_group must equal s_blocks_per_group.
         /// </summary>
-        public uint s_clusters_per_group;
+        public uint ClustersPerGroup;
 
         /// <summary>
         /// Inodes per group.
         /// </summary>
-        public uint s_inodes_per_group;
+        public uint INodesPerGroup;
 
         /// <summary>
         /// Mount time, in seconds since the epoch.
         /// </summary>
-        public uint s_mtime;
+        private uint _MountTime;
+
+        /// <summary>
+        /// Mount time.
+        /// </summary>
+        public DateTime MountTime => Epoch.AddSeconds(_MountTime).ToLocalTime();
 
         /// <summary>
         /// Write time, in seconds since the epoch.
         /// </summary>
-        public uint s_wtime;
+        private uint _WriteTime;
+
+        /// <summary>
+        /// Write time.
+        /// </summary>
+        public DateTime WriteTime => Epoch.AddSeconds(_WriteTime).ToLocalTime();
 
         /// <summary>
         /// Number of mounts since the last fsck.
         /// </summary>
-        public ushort s_mnt_count;
+        public ushort MountsSinceFsck;
 
         /// <summary>
         /// Number of mounts beyond which a fsck is needed.
         /// </summary>
-        public ushort s_max_mnt_count;
+        public ushort MaxMountsBeforeFsck;
 
         /// <summary>
         /// Magic signature, 0xEF53
         /// </summary>
-        public ushort s_magic;
+        public ushort MagicSignature;
+
+        /// <summary>
+        /// True if the structure has the magic signature
+        /// </summary>
+        public bool IsValid => MagicSignature == MagicSignatureConstant;
 
         /// <summary>
         /// File system state. Valid values are:
         /// </summary>
-        public DriveState s_state;
+        public DriveState State;
 
         /// <summary>
         /// Behaviour when detecting errors. One of:
         /// </summary>
-        public DriveErrors s_errors;
+        public DriveErrors Errors;
 
         /// <summary>
         /// Minor revision level.
         /// </summary>
-        public ushort s_minor_rev_level;
+        public ushort MinorRevisionLevel;
 
         /// <summary>
         /// Time of last check, in seconds since the epoch.
         /// </summary>
-        public uint s_lastcheck;
+        private uint _LastCheck;
+
+        /// <summary>
+        /// Time of last check.
+        /// </summary>
+        public DateTime LastCheck => Epoch.AddSeconds(_LastCheck).ToLocalTime();
 
         /// <summary>
         /// Maximum time between checks, in seconds.
         /// </summary>
-        public uint s_checkinterval;
+        public uint MaxCheckInterval;
 
         /// <summary>
         /// Creator OS
         /// </summary>
-        public CreatorOS s_creator_os;
+        public CreatorOS CreatorOS;
 
         /// <summary>
         /// Revision level. One of:
         /// </summary>
-        public uint s_rev_level;
+        public uint RevisionLevel;
 
         // 0 	Original format
         // 1 	v2 format w/ dynamic inode sizes
         /// <summary>
         /// Default uid for reserved blocks.
         /// </summary>
-        public ushort s_def_resuid;
+        public ushort DefaultReservedUid;
 
         /// <summary>
         /// Default gid for reserved blocks. 
         /// </summary>
-        public ushort s_def_resgid;
+        public ushort DefaultReservedGid;
 
     }
 }

@@ -101,13 +101,30 @@ namespace DataTools.Win32.Disk.Partition
 
         /// <inheritdoc/>
         public abstract IPartitionType PartitionType { get; }
+
         /// <inheritdoc/>
         public abstract PartitionStyle PartitionStyle { get; }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return $"{(FriendlySizeLong)Size} {PartitionStyle} [{PartitionType}]";
         }
+    }
+
+    /// <inheritdoc/>
+    public abstract class RawDiskPartition<T> : RawDiskPartition where T: struct
+    {
+        internal RawDiskPartition(int sectorSize) : base(sectorSize)
+        {
+        }
+
+        /// <summary>
+        /// Gets the native source structure for this instance
+        /// </summary>
+        /// <returns></returns>
+        public abstract T GetNativeObject();
+
     }
 
     /// <summary>
@@ -130,7 +147,7 @@ namespace DataTools.Win32.Disk.Partition
     /// <summary>
     /// Raw MBR Partition Information
     /// </summary>
-    public class RawMbrPartition : RawDiskPartition
+    public class RawMbrPartition : RawDiskPartition<RawMbrPartitionStruct>
     {
         /// <summary>
         /// The raw MBR partition structure source
@@ -188,10 +205,10 @@ namespace DataTools.Win32.Disk.Partition
             this.offset = (long)source.StartLBA * sectorSize;
             this.size = source.Size;
             this.slba = (long)source.StartLBA;
-            this.elba = (long)source.EndLBA;
+            this.elba = (long)source.TotalLBAs;
             this.cInfo = MbrCodeInfo.FindByCode(source.PartType)?.FirstOrDefault();
         }
-
+        
         /// <summary>
         /// True if this partition is an MBR extended partition entry
         /// </summary>
@@ -219,6 +236,12 @@ namespace DataTools.Win32.Disk.Partition
         public override PartitionStyle PartitionStyle => PartitionStyle.Mbr;
 
         /// <inheritdoc/>
+        public override RawMbrPartitionStruct GetNativeObject()
+        {
+            return source;
+        }
+
+        /// <inheritdoc/>
         public override string ToString()
         {
             return base.ToString() + " [" + PartitionKind.ToString() + "]";
@@ -228,7 +251,7 @@ namespace DataTools.Win32.Disk.Partition
     /// <summary>
     /// Raw GPT Partition Information
     /// </summary>
-    public class RawGptPartition : RawDiskPartition
+    public class RawGptPartition : RawDiskPartition<RawGptPartitionStruct>
     {
         /// <summary>
         /// The raw GPT partition structure source
@@ -306,6 +329,12 @@ namespace DataTools.Win32.Disk.Partition
 
         /// <inheritdoc/>
         public override PartitionStyle PartitionStyle => PartitionStyle.Gpt;
+
+        /// <inheritdoc/>
+        public override RawGptPartitionStruct GetNativeObject()
+        {
+            return source;
+        }
 
         /// <inheritdoc/>
         public override string ToString()

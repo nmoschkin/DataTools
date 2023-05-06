@@ -50,26 +50,28 @@ namespace DataTools.Win32
 
         public static IntPtr DoRegisterDeviceClassNotification(IntPtr hWnd, Guid devclass) 
         {
-            var mm = new MemPtr();
+            using (var mm = new SafePtr())
+            {
+                var bh = new DEV_BROADCAST_HDR
+                {
+                    dbch_size = Marshal.SizeOf<DEV_BROADCAST_HDR>(),
+                    dbch_devicetype = DBT_DEVTYP_DEVICEINTERFACE
+                };
 
-            var bh = new DEV_BROADCAST_HDR();
-            var di = new DEV_BROADCAST_DEVICEINTERFACE();
+                var di = new DEV_BROADCAST_DEVICEINTERFACE
+                {
+                    dbcc_size = Marshal.SizeOf<DEV_BROADCAST_DEVICEINTERFACE>(),
+                    dbcc_classguid = devclass
+                };
 
-            bh.dbch_size = Marshal.SizeOf<DEV_BROADCAST_HDR>();
-            di.dbcc_size = Marshal.SizeOf<DEV_BROADCAST_DEVICEINTERFACE>();
+                mm.Alloc(bh.dbch_size + di.dbcc_size);
 
-            bh.dbch_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
-            di.dbcc_classguid = devclass;
+                mm.FromStruct(bh);
+                mm.FromStructAt(bh.dbch_size, di);
 
-            mm.Alloc(bh.dbch_size + di.dbcc_size);
+                return RegisterDeviceNotification(hWnd, mm, DEVICE_NOTIFY_WINDOW_HANDLE);
+            }
 
-            mm.FromStruct(bh);
-            mm.FromStructAt(bh.dbch_size, di);
-
-            var ret = RegisterDeviceNotification(hWnd, mm, DEVICE_NOTIFY_WINDOW_HANDLE);
-            mm.Free();
-
-            return ret;
         }
 
 
