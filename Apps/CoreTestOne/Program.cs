@@ -702,6 +702,7 @@ namespace CoreTestOne
             sf += btest2;
 
             var btest3 = sf.ToByteArray();
+            sf.Free();
 
             var tok7 = new ChannelToken(btest1);
 
