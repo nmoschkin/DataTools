@@ -106,8 +106,7 @@ namespace DataTools.Memory
         /// <inheritdoc/>
         protected override void Deallocate(IntPtr ptr)
         {
-            Marshal.FreeHGlobal(ptr);
-            this.Length = 0;
+            Marshal.FreeHGlobal(ptr);            
         }
 
         /// <inheritdoc/>
