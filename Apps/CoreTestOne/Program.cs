@@ -687,13 +687,21 @@ namespace CoreTestOne
 
             Console.WriteLine($"{tok6}");
 
-            btest1[0] = 7;
-            btest1[1] = 9;
-            btest1[2] = 0xd;
-            btest1[7] = 0xf;
-            btest1[13] = 23;
-            btest1[14] = 137;
-            btest1[15] = 45;
+            var btest2 = new byte[16];
+            
+            btest2[0] = 7;
+            btest2[1] = 9;
+            btest2[2] = 0xd;
+            btest2[7] = 0xf;
+            btest2[13] = 23;
+            btest2[14] = 137;
+            btest2[15] = 45;
+
+            var sf = new DataTools.Memory.SafePtr();
+            sf.FromByteArray(btest1);
+            sf += btest2;
+
+            var btest3 = sf.ToByteArray();
 
             var tok7 = new ChannelToken(btest1);
 
