@@ -20,10 +20,10 @@ namespace DataTools.Text
         private const int BASE64PAD = 61;
         private const int BASE64PADRETURN = 254;
         
-        private static byte[] OutputTable = new byte[64];
-        private static byte[] InputTable = new byte[256];
-        
-        internal static bool B64TableCreated { get; private set; }
+        private static readonly byte[] OutputTable = new byte[64];
+        private static readonly byte[] InputTable = new byte[256];
+
+        internal static readonly bool B64TableCreated;
                 
         static Base64()
         {
