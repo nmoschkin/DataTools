@@ -1,4 +1,6 @@
-﻿namespace DataTools.Essentials.Broadcasting
+﻿using DataTools.Essentials.Observable;
+
+namespace DataTools.Essentials.Broadcasting
 {
     /// <summary>
     /// Implements methods that allow a subscriber to receive data
@@ -26,4 +28,7 @@
         /// <param name="sideBandData">Sideband data</param>
         void ReceiveData(T value, ISideBandData sideBandData);
     }
+
+
+
 }
