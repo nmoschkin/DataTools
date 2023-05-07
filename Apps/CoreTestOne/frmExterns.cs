@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -7,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using DataTools.Essentials.Observable;
+using DataTools.Text;
 
 namespace CoreTestOne
 {
@@ -256,6 +259,63 @@ namespace CoreTestOne
         private async void button2_Click(object sender, EventArgs e)
         {
             var str = await vm.GetButtonText();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog()
+            {
+                Filter = "All Files|*.*",
+                Title = "Encode To Base64"
+            };
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+
+                var ldd = File.ReadAllBytes(dlg.FileName);
+
+                var txt = Base64.ToBase64String(ldd);
+
+                File.WriteAllText(dlg.FileName + ".base64.txt", txt);
+                Process.Start(Environment.ExpandEnvironmentVariables("%WINDIR%\\explorer.exe"), Path.GetDirectoryName(dlg.FileName));
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog()
+            {
+                Filter = "All Files|*.*"
+            };
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+
+                var fn = Path.GetFileName(dlg.FileName);
+                var dir = Path.GetDirectoryName(dlg.FileName);
+
+                if (fn.EndsWith(".txt")) fn = fn.Substring(0, fn.Length - 4);
+
+                var txt = File.ReadAllText(dlg.FileName);
+
+                var ldd = Base64.FromBase64String(txt);
+
+                var dlg2 = new SaveFileDialog()
+                {
+                    Filter = "All Files|*.*"
+                };
+
+                dlg2.InitialDirectory = dir;
+                dlg2.FileName = fn;
+                dlg2.Title = "Save Decoded File";
+
+                if (dlg2.ShowDialog() == DialogResult.OK)
+                {
+                    fn = dlg2.FileName;
+                    File.WriteAllBytes(fn, ldd);
+                    Process.Start(Environment.ExpandEnvironmentVariables("%WINDIR%\\explorer.exe"), Path.GetDirectoryName(dlg.FileName));
+                }
+            }
         }
     }
 }

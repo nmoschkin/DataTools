@@ -1,5 +1,6 @@
 ﻿using System;
-
+using System.Linq;
+using System.Text;
 
 namespace DataTools.Text
 {
@@ -9,14 +10,19 @@ namespace DataTools.Text
         public byte[] Data;
     }
 
-    public class Base64
+    
+    /// <summary>
+    /// Base 64 Tools
+    /// </summary>
+    public static class Base64
     {
-        const string BASE64TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        const int BASE64PAD = 61;
-        const int BASE64PADRETURN = 254;
+        private const string BASE64TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        private const int BASE64PAD = 61;
+        private const int BASE64PADRETURN = 254;
         
-        private static byte[] B64CodeOut = new byte[64];
-        private static byte[] B64CodeReturn = new byte[256];
+        private static byte[] OutputTable = new byte[64];
+        private static byte[] InputTable = new byte[256];
+        
         internal static bool B64TableCreated { get; private set; }
                 
         static Base64()
@@ -24,171 +30,206 @@ namespace DataTools.Text
             int i;
             int d;
 
-            for (i = 0; i <= 255; i++)
-                B64CodeReturn[i] = 0x7F;
-
-            for (i = 0; i <= 63; i++)
+            for (i = 0; i < 256; i++)
             {
-                d = BASE64TABLE.Substring(i, 1)[0];
-                B64CodeOut[i] = (byte)(d & 255);
-                B64CodeReturn[d] = (byte)(i & 0x3F);
+                InputTable[i] = 0x7F;
             }
 
-            B64CodeReturn[BASE64PAD] = BASE64PADRETURN;
+            for (i = 0; i < 64; i++)
+            {
+                d = BASE64TABLE[i];
+
+                OutputTable[i] = (byte)(d & 255);
+                InputTable[d] = (byte)(i & 0x3F);
+            }
+
+            InputTable[BASE64PAD] = BASE64PADRETURN;
             B64TableCreated = true;
         }
 
-        internal Base64()
-        {
-
-        }
-
+        /// <summary>
+        /// Convert from base 64 UTF-8 text data to binary data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static byte[] FromBase64(byte[] data)
         {
-            byte[] bOut;
-
-            Decode64(data, data.Length, out bOut);
+            Decode64(data, data.Length, out var bOut);
             return bOut;
         }
 
+        /// <summary>
+        /// Convert to base 64 UTF-8 text data from binary data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static byte[] ToBase64(byte[] data)
         {
-            BASE64STRUCT bOut;
-
-            Encode64(data, data.Length, out bOut);
+            Encode64(data, data.Length, out var bOut);
             return bOut.Data;
         }
 
-        internal static int Decode64(byte[] DataIn, int Length, out byte[] DataOut)
+        /// <summary>
+        /// Convert to a base 64 text string from binary data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string ToBase64String(byte[] data)
         {
-            int Decode64Ret = default;
+            return Encoding.UTF8.GetString(ToBase64(data));
+        }
 
-            int l;
-            int j;
-            int v;
+        /// <summary>
+        /// Convert from a base 64 text string to binary data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static byte[] FromBase64String(string data)
+        {
+            return FromBase64(Encoding.UTF8.GetBytes(data));
+        }
 
-            var Quartet = new byte[4];
+        internal static int Decode64(byte[] dataIn, int length, out byte[] dataOut)
+        {
+            int triplen, j, v;
 
-            l = (int)(Length / 4d * 3d);
-            
-            DataOut = new byte[l + 1];
+            var quartet = new byte[4];
+
+            triplen = length / 4 * 3;            
+            dataOut = new byte[triplen + 1];
             
             v = 0;
             
-            for (l = 0; l < Length; l += 0)
+            for (triplen = 0; triplen < length; )
             {
                 j = 0;
                 while (j < 4)
                 {
-                    if (B64CodeReturn[DataIn[l]] != 0x7F)
+                    if (InputTable[dataIn[triplen]] != 0x7F)
                     {
-                        Quartet[j] = B64CodeReturn[DataIn[l]];
-                        j = j + 1;
+                        quartet[j] = InputTable[dataIn[triplen]];
+                        j++;
                     }
 
-                    l = l + 1;
-                    if (l >= Length)
+                    triplen++;
+                    if (triplen >= length)
                     {
                         while (j < 4)
                         {
-                            Quartet[j] = BASE64PADRETURN;
-                            j = j + 1;
+                            quartet[j] = BASE64PADRETURN;
+                            j++;
                         }
 
                         break;
                     }
                 }
 
-                if (Quartet[0] == BASE64PADRETURN | Quartet[1] == BASE64PADRETURN)
+                if (quartet[0] == BASE64PADRETURN || quartet[1] == BASE64PADRETURN)
                 {
-                    l = (int)-1L;
                     break;
                 }
 
-                DataOut[v] = (byte)((Quartet[0] << 2) | (Quartet[1] >> 4));
-                v = v + 1;
-                if (Quartet[2] == BASE64PADRETURN)
+                dataOut[v] = (byte)((quartet[0] << 2) | (quartet[1] >> 4));
+                v++;
+
+                if (quartet[2] == BASE64PADRETURN)
                 {
-                    l = (int)-1L;
                     break;
                 }
 
-                DataOut[v] = (byte)((Quartet[1] << 4) | (Quartet[2] >> 2));
-                v = v + 1;
-                if (Quartet[3] == BASE64PADRETURN)
+                dataOut[v] = (byte)((quartet[1] << 4) | (quartet[2] >> 2));
+                v++;
+
+                if (quartet[3] == BASE64PADRETURN)
                 {
-                    l = (int)-1L;
+                    //l = (int)-1L;
                     break;
                 }
 
-                DataOut[v] = (byte)((Quartet[2] << 6) | Quartet[3]);
-                v = v + 1;
+                dataOut[v] = (byte)((quartet[2] << 6) | quartet[3]);
+                v++;
             }
 
-            Array.Resize(ref DataOut, v - 1 + 1);
-
-            Decode64Ret = v;
-            return Decode64Ret;
+            Array.Resize(ref dataOut, v);
+            return v;
         }
 
-        internal static bool Encode64(byte[] DataIn, int Length, out BASE64STRUCT b64Out)
+        internal static bool Encode64(byte[] dataIn, int length, out BASE64STRUCT b64Out, int maxColumns = 76)
         {
+            double dln = (double)maxColumns;
+            if (dln <= 0) dln = 0;
+
             int l;
             int x;
-            int v;
-            var lC = default(int);
+            int outPos;
+            var column = 0;
             int lProcess;
             int lReturn;
             int lActual;
 
-            lActual = Length;
-            lProcess = Length;
+            if (length > dataIn.Length)
+            {
+                length = dataIn.Length;
+            }
 
+            lProcess = lActual = length;
             b64Out = new BASE64STRUCT();
+
+            var triplets = dataIn.ToArray();
 
             if (0 != (lProcess % 3))
             {
-                lProcess = lProcess + (3 - lProcess % 3);
+                lProcess += (3 - lProcess % 3);
             }
 
-            lReturn = (int)(lProcess / 3d * 4d);
+            lReturn = lProcess / 3 * 4;
 
-            Array.Resize(ref DataIn, lProcess - 1 + 1);
+            Array.Resize(ref triplets, lProcess);
 
-            if (Math.Round(lReturn / 76d) != lReturn / 76d)
+            if (dln != 0)
             {
-                v = (int)(Math.Round(lReturn / 76d) + 1d);
+                if (Math.Floor(lReturn / dln) != lReturn / dln)
+                {
+                    x = (int)(Math.Round(lReturn / dln) + 1);
+                }
+                else
+                {
+                    x = (int)(lReturn / dln);
+                }
             }
             else
             {
-                v = (int)(lReturn / 76d);
+                x = 0;
             }
 
-            v = v * 2;
-            l = lReturn - 1 + v;
+            // carriage return and line feed
+            x *= 2;
+            l = lReturn + x;
 
-            b64Out.Data = new byte[l + 1];
-            b64Out.Length = l + 1;
+            b64Out.Data = new byte[l];
+            b64Out.Length = l;
 
-            l = lProcess;
-            v = 0;
+            outPos = 0;
 
-            for (x = 0; x < l; x += 3)
+            for (x = 0; x < lProcess; x += 3)
             {
-                b64Out.Data[v] = B64CodeOut[(DataIn[x] >> 2)];
-                b64Out.Data[v + 1] = B64CodeOut[(DataIn[x] << 4) & 0x30 | (DataIn[x + 1] >> 4)];
-                b64Out.Data[v + 2] = B64CodeOut[(DataIn[x + 1] << 2) & 0x3C | (DataIn[x + 2] >> 6)];
-                b64Out.Data[v + 3] = B64CodeOut[DataIn[x + 2] & 0x3F];
-                v = v + 4;
-                lC = lC + 4;
-                if (lC >= 76)
+                b64Out.Data[outPos] = OutputTable[(triplets[x] >> 2)];
+                b64Out.Data[outPos + 1] = OutputTable[(triplets[x] << 4) & 0x30 | (triplets[x + 1] >> 4)];
+                b64Out.Data[outPos + 2] = OutputTable[(triplets[x + 1] << 2) & 0x3C | (triplets[x + 2] >> 6)];
+                b64Out.Data[outPos + 3] = OutputTable[triplets[x + 2] & 0x3F];
+
+                outPos += 4;
+                column += 4;
+
+                if (dln != 0 && column >= dln)
                 {
-                    lC = 0;
+                    column = 0;
                     if (l - x > 3)
                     {
-                        b64Out.Data[v] = 13;
-                        b64Out.Data[v + 1] = 10;
-                        v = v + 2;
+                        b64Out.Data[outPos] = 13;
+                        b64Out.Data[outPos + 1] = 10;
+
+                        outPos += 2;
                     }
                 }
 
@@ -197,28 +238,25 @@ namespace DataTools.Text
             switch (lProcess - lActual)
             {
                 case 1:
-                    {
-                        b64Out.Data[v - 1] = BASE64PAD;
-                        break;
-                    }
+                    b64Out.Data[outPos - 1] = BASE64PAD;
+                    break;
 
                 case 2:
-                    {
-                        b64Out.Data[v - 1] = BASE64PAD;
-                        b64Out.Data[v - 2] = BASE64PAD;
-                        break;
-                    }
+                    b64Out.Data[outPos - 1] = BASE64PAD;
+                    b64Out.Data[outPos - 2] = BASE64PAD;
+                    break;
             }
 
-            if (lC != 0)
+            if (dln != 0 && column != 0)
             {
-                b64Out.Data[v] = 13;
-                b64Out.Data[v + 1] = 10;
-                Array.Resize(ref b64Out.Data, v + 1 + 1);
+                b64Out.Data[outPos] = 13;
+                b64Out.Data[outPos + 1] = 10;
+
+                Array.Resize(ref b64Out.Data, outPos + 2);
             }
             else
             {
-                Array.Resize(ref b64Out.Data, v);
+                Array.Resize(ref b64Out.Data, outPos);
             }
 
             return 0 != (b64Out.Length);
