@@ -6,25 +6,21 @@ namespace DataTools.Text
 {
     internal struct BASE64STRUCT
     {
-        public int Length;
         public byte[] Data;
+        public int Length;
     }
 
-    
     /// <summary>
     /// Base 64 Tools
     /// </summary>
     public static class Base64
     {
-        private const string BASE64TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        internal static readonly bool B64TableCreated;
         private const int BASE64PAD = 61;
         private const int BASE64PADRETURN = 254;
-        
-        private static readonly byte[] OutputTable = new byte[64];
+        private const string BASE64TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         private static readonly byte[] InputTable = new byte[256];
-
-        internal static readonly bool B64TableCreated;
-                
+        private static readonly byte[] OutputTable = new byte[64];
         static Base64()
         {
             int i;
@@ -59,6 +55,16 @@ namespace DataTools.Text
         }
 
         /// <summary>
+        /// Convert from a base 64 text string to binary data
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static byte[] FromBase64String(string data)
+        {
+            return FromBase64(Encoding.UTF8.GetBytes(data));
+        }
+
+        /// <summary>
         /// Convert to base 64 UTF-8 text data from binary data
         /// </summary>
         /// <param name="data"></param>
@@ -78,29 +84,18 @@ namespace DataTools.Text
         {
             return Encoding.UTF8.GetString(ToBase64(data));
         }
-
-        /// <summary>
-        /// Convert from a base 64 text string to binary data
-        /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
-        public static byte[] FromBase64String(string data)
-        {
-            return FromBase64(Encoding.UTF8.GetBytes(data));
-        }
-
         internal static int Decode64(byte[] dataIn, int length, out byte[] dataOut)
         {
             int triplen, j, v;
 
             var quartet = new byte[4];
 
-            triplen = length / 4 * 3;            
+            triplen = length / 4 * 3;
             dataOut = new byte[triplen + 1];
-            
+
             v = 0;
-            
-            for (triplen = 0; triplen < length; )
+
+            for (triplen = 0; triplen < length;)
             {
                 j = 0;
                 while (j < 4)
@@ -232,7 +227,6 @@ namespace DataTools.Text
                         outPos += 2;
                     }
                 }
-
             }
 
             switch (lProcess - lActual)
