@@ -3,10 +3,10 @@
     <TargetFrameworks>net6.0-windows;net7.0-windows;net472;net48;net481</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
-    <AssemblyVersion>8.0.0.1092</AssemblyVersion>
-    <FileVersion>8.0.0.1092</FileVersion>
+    <AssemblyVersion>8.0.0.1093</AssemblyVersion>
+    <FileVersion>8.0.0.1093</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1092</Version>
+    <Version>8.0.0.1093</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - USB and USB HID Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -23,7 +23,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1091</PreviousVersion>
+    <PreviousVersion>8.0.0.1092</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
