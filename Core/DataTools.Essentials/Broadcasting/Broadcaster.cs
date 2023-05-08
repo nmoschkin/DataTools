@@ -103,6 +103,9 @@ namespace DataTools.Essentials.Broadcasting
         /// </summary>
         public InvocationType InvocationType { get; }
 
+        /// <inheritdoc/>
+        public Type BroadcastObjectType => typeof(T);
+
 
         /// <summary>
         /// Dispatch broadcasting mode
@@ -166,27 +169,6 @@ namespace DataTools.Essentials.Broadcasting
         {
             return Subscribe(subscriber, false, channelToken);
         }
-
-        ISubscription IBroadcaster.Subscribe(ISubscriber subscriber)
-        {
-            if (subscriber is ISubscriber<T> valid)
-            {
-                return Subscribe(valid);
-            }
-
-            throw new NotSupportedException();
-        }
-
-        ISubscription IChannelBroadcaster.Subscribe(ISubscriber subscriber, ChannelToken channelToken)
-        {
-            if (subscriber is ISubscriber<T> valid)
-            {
-                return Subscribe(valid, channelToken);
-            }
-
-            throw new NotSupportedException();
-        }
-
 
         /// <summary>
         /// Create a new subscription for the specified subscriber

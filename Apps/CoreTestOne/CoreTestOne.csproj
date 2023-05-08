@@ -5,10 +5,10 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.0.1095</AssemblyVersion>
-    <FileVersion>8.0.0.1095</FileVersion>
+    <AssemblyVersion>8.0.0.1098</AssemblyVersion>
+    <FileVersion>8.0.0.1098</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1095</Version>
+    <Version>8.0.0.1098</Version>
     <Product>DataTools Core 8 Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -16,8 +16,8 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64</Platforms>
-    <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1094</PreviousVersion>
+    <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
+    <PreviousVersion>8.0.0.1097</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>

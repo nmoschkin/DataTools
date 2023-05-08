@@ -636,12 +636,14 @@ namespace CoreTestOne
             Array.Copy(value, buffer, 65536);
         }
         
-        void ISubscriber.ReceiveData(object value, ISideBandData sideBandData)
-        {
-            ReceiveData((byte[])value, sideBandData);
-        }
     }
 
+    public enum SomeEnum
+    {
+        Vabula,
+        Imbula,
+        Terba
+    }
 
     public static class Program
     {
@@ -651,6 +653,14 @@ namespace CoreTestOne
         [STAThread]
         public static void Main(string[] args)
         {
+
+
+            var clins = (System.Enum)SomeEnum.Vabula;
+
+
+            var den = new DescribedEnum(clins);
+
+
             //AllocConsole();
 
             //var bc = new BCast(InvocationType.Synchronous);

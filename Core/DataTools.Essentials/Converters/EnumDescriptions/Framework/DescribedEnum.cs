@@ -47,23 +47,11 @@ namespace DataTools.Essentials.Converters.EnumDescriptions.Framework
         /// </remarks>
         public DescribedEnum(Enum value, IEnumDescriptionProvider descriptionProvider = null)
         {
+            this.enumType = value.GetType();
             _descriptionProvider = descriptionProvider ?? EnumInfo.ResolveDefaultProvider(enumType);
             Value = value;
         }
-
-        /// <summary>
-        /// Create a new mutable, observable <see cref="Enum"/> described enum.
-        /// </summary>
-        /// <param name="descriptionProvider">The optional description provider.</param>
-        /// <remarks>
-        /// If <paramref name="descriptionProvider"/> is null, the default <see cref="IEnumDescriptionProvider"/> for the enum is retrieved.
-        /// </remarks>
-        public DescribedEnum(IEnumDescriptionProvider descriptionProvider = null)
-        {
-            this.enumType = value.GetType();
-            _descriptionProvider = descriptionProvider ?? EnumInfo.ResolveDefaultProvider(enumType);
-        }
-
+  
         /// <summary>
         /// Gets the enum type for this instance. This is automatically detected.
         /// </summary>

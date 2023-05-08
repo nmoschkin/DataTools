@@ -11,10 +11,6 @@ namespace DataTools.Essentials.Broadcasting
         /// <inheritdoc/>
         public abstract void ReceiveData(T value, ISideBandData sideBandData);
 
-        void ISubscriber.ReceiveData(object value, ISideBandData sideBandData)
-        {
-            ReceiveData((T)value, sideBandData);
-        }
     }
 
 

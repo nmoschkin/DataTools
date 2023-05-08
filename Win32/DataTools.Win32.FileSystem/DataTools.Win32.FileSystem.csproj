@@ -4,10 +4,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1095</AssemblyVersion>
-    <FileVersion>8.0.0.1095</FileVersion>
+    <AssemblyVersion>8.0.0.1098</AssemblyVersion>
+    <FileVersion>8.0.0.1098</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1095</Version>
+    <Version>8.0.0.1098</Version>
     <Product>DataTools Win32 File System and Shell Library</Product>
     <Description>DataTools Win32 File System and Shell Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -21,8 +21,8 @@
     <Title>DataTools.Win32.FileSystem</Title>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1094</PreviousVersion>
+    <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
+    <PreviousVersion>8.0.0.1097</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -46,6 +46,11 @@
     <Optimize>True</Optimize>
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
+    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <!-- <Exec Command="post-build-tool /d ." /> -->
+  </Target>
+  <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'Debug NuGet'">
     <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
     <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
     <!-- <Exec Command="post-build-tool /d ." /> -->

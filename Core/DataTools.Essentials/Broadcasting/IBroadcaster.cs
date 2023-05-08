@@ -16,7 +16,7 @@ namespace DataTools.Essentials.Broadcasting
     }
 
     /// <summary>
-    /// An object that is identified by a <see cref="ChannelToken"/> structure.
+    /// An object that is identified by a <see cref="DataTools.Essentials.Broadcasting.ChannelToken"/> structure.
     /// </summary>
     public interface IChannelIdentifiable : IIdentifiable
     {
@@ -32,25 +32,10 @@ namespace DataTools.Essentials.Broadcasting
     public interface IBroadcaster : IChannelIdentifiable, IDisposable
     {
         /// <summary>
-        /// Subscribe to this broadcasting service
+        /// Gets the expected type for this object
         /// </summary>
-        /// <param name="subscriber">The subscriber</param>
         /// <returns>A new subscription which contains a channel token.</returns>
-        ISubscription Subscribe(ISubscriber subscriber);
-    }
-
-    /// <summary>
-    /// Implements methods that allow a broadcaster to handle subscribers on different channels
-    /// </summary>
-    public interface IChannelBroadcaster : IBroadcaster
-    {
-        /// <summary>
-        /// Subscribe to this broadcasting service on the specified channel
-        /// </summary>
-        /// <param name="subscriber"></param>
-        /// <param name="channelToken"></param>
-        /// <returns></returns>
-        ISubscription Subscribe(ISubscriber subscriber, ChannelToken channelToken);
+        Type BroadcastObjectType { get; }
     }
 
     /// <summary>
@@ -71,7 +56,7 @@ namespace DataTools.Essentials.Broadcasting
     /// Implements methods that allow a broadcaster to handle subscribers on different channels
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IChannelBroadcaster<T> : IBroadcaster<T>, IChannelBroadcaster
+    public interface IChannelBroadcaster<T> : IBroadcaster<T>
     {
         /// <summary>
         /// Subscribe to this broadcasting service on the specified channel

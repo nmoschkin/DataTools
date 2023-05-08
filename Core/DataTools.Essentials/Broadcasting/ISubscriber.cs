@@ -1,4 +1,5 @@
 ﻿using DataTools.Essentials.Observable;
+using System;
 
 namespace DataTools.Essentials.Broadcasting
 {
@@ -7,14 +8,8 @@ namespace DataTools.Essentials.Broadcasting
     /// </summary>
     public interface ISubscriber
     {
-        /// <summary>
-        /// Receive new data
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="sideBandData"></param>
-        void ReceiveData(object value, ISideBandData sideBandData);
-
     }
+
     /// <summary>
     /// Implements methods that allow a subscriber to receive data
     /// </summary>
@@ -28,7 +23,5 @@ namespace DataTools.Essentials.Broadcasting
         /// <param name="sideBandData">Sideband data</param>
         void ReceiveData(T value, ISideBandData sideBandData);
     }
-
-
 
 }

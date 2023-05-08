@@ -5,10 +5,10 @@
     <RootNamespace>DataTools.WinUI.ColorControls</RootNamespace>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
     <UseWinUI>true</UseWinUI>
-    <AssemblyVersion>8.0.0.1095</AssemblyVersion>
-    <FileVersion>8.0.0.1095</FileVersion>
+    <AssemblyVersion>8.0.0.1098</AssemblyVersion>
+    <FileVersion>8.0.0.1098</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1095</Version>
+    <Version>8.0.0.1098</Version>
     <Product>DataTools WinUI Color Controls Library</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2022 Nathaniel Moschkin</Copyright>
@@ -16,7 +16,7 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64</Platforms>
-    <PreviousVersion>8.0.0.1094</PreviousVersion>
+    <PreviousVersion>8.0.0.1097</PreviousVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
