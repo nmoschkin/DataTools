@@ -9,7 +9,7 @@ using System.Text;
 namespace DataTools.Memory
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct MemPtr
+    public struct MemPtr : IDisposable
     {
         internal IntPtr handle;
         public static readonly MemPtr Empty = new MemPtr(IntPtr.Zero);
@@ -66,6 +66,23 @@ namespace DataTools.Memory
             unsafe
             {
                 return Crc32.Hash((byte*)handle, c);
+            }
+        }
+
+        /// <summary>
+        /// Gets a reference to the native int (IntPtr) value at the specified size-relative index in the memory block.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// In 64-bit environments, this value is 8 bytes long, and in 32-bit environments, it is 4 bytes long.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref IntPtr NIntAt(long index)
+        {
+            unsafe
+            {
+                return ref *(IntPtr*)((long)handle + index * IntPtr.Size);
             }
         }
 
@@ -1181,6 +1198,11 @@ namespace DataTools.Memory
         public static implicit operator MemPtr(UIntPtr val)
         {
             return new MemPtr((IntPtr)(long)(ulong)val);
+        }
+
+        public void Dispose()
+        {
+            Free();
         }
     }
 }

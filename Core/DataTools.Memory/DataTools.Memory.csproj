@@ -3,10 +3,10 @@
     <TargetFrameworks>netstandard2.0;net6.0;net7.0;net472;net48;net481</TargetFrameworks>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyVersion>8.0.0.1099</AssemblyVersion>
-    <FileVersion>8.0.0.1099</FileVersion>
+    <AssemblyVersion>8.0.0.1101</AssemblyVersion>
+    <FileVersion>8.0.0.1101</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1099</Version>
+    <Version>8.0.0.1101</Version>
     <Product>DataTools Memory Objects</Product>
     <Description>DataTools Memory Objects</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -21,7 +21,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
-    <PreviousVersion>8.0.0.1098</PreviousVersion>
+    <PreviousVersion>8.0.0.1100</PreviousVersion>
     <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -33,11 +33,6 @@
     <Optimize>True</Optimize>
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
-    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
-    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
-    <!-- <Exec Command="post-build-tool /d ." /> -->
-  </Target>
-  <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'Debug NuGet'">
     <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
     <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
     <!-- <Exec Command="post-build-tool /d ." /> -->

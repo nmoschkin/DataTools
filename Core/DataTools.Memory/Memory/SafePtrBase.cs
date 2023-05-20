@@ -96,6 +96,22 @@ namespace DataTools.Memory
         #region xxxxAt Methods
 
         /// <summary>
+        /// Gets a reference to the native int (IntPtr) value at the specified size-relative index in the memory block.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// In 64-bit environments, this value is 8 bytes long, and in 32-bit environments, it is 4 bytes long.
+        /// </remarks>
+        public ref IntPtr NIntAt(long index)
+        {
+            unsafe
+            {
+                return ref *(IntPtr*)((long)handle + index * IntPtr.Size);
+            }
+        }
+
+        /// <summary>
         /// Gets a reference to the value at the specified byte-sized index in the memory block.
         /// </summary>
         /// <param name="index"></param>
