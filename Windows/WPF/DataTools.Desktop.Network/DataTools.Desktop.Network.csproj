@@ -20,7 +20,7 @@
     <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
     <Nullable>disable</Nullable>
     <PreviousVersion>8.0.0.1100</PreviousVersion>
-    <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>C:\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>

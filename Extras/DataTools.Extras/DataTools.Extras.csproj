@@ -19,7 +19,7 @@
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
     <PreviousVersion>8.0.0.1100</PreviousVersion>
-    <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>C:\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>

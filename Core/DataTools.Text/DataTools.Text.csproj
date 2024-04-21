@@ -6,7 +6,7 @@
     <FileVersion>8.0.0.1101</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
     <PreviousVersion>8.0.0.1100</PreviousVersion>
-    <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>C:\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Version>8.0.0.1101</Version>
@@ -24,7 +24,9 @@
     <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Csv\" />
+    <Compile Remove="Csv\**" />
+    <EmbeddedResource Remove="Csv\**" />
+    <None Remove="Csv\**" />
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='NuGet|AnyCPU'">
     <Optimize>True</Optimize>
