@@ -157,7 +157,7 @@ namespace DataTools.Computer
                     }
                     else
                     {
-                        if (comp[i].InstanceId.Substring(0, 8) == @"BTHENUM\")
+                        if (comp[i].InstanceId?.Substring(0, 8) == @"BTHENUM\")
                         {
                             comp[i].DeviceClass = DeviceClassEnum.Bluetooth;
                         }

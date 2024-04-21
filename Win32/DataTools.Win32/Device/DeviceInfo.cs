@@ -677,7 +677,7 @@ namespace DataTools.Win32
 
                 foreach (var fe in devInfo)
                 {
-                    if ((de.InstanceId.ToUpper().Trim() ?? "") == (fe.Parent.ToUpper().Trim() ?? ""))
+                    if ((de.InstanceId?.ToUpper().Trim() ?? "") == (fe?.Parent?.ToUpper().Trim() ?? ""))
                     {
                         fe.LinkedParent = de;
                         lchild.Add(fe);
