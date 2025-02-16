@@ -16,7 +16,7 @@ namespace TestHid
         {
             DeviceInfo[] hids = HidDeviceInfo.EnumerateHidDevices();
             DeviceInfo[] batts = DeviceEnum.EnumerateDevices<DeviceInfo>(DevProp.GUID_DEVICE_BATTERY);
-
+            var test = HidFeatures.HidDevicesByUsage(HidUsagePage.PowerDevice1);
             var battery = hids.Where((e) => e.DeviceClass == DeviceClassEnum.Battery).ToList().FirstOrDefault();
 
             if (battery == null)

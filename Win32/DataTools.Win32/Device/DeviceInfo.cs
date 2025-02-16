@@ -839,7 +839,7 @@ namespace DataTools.Win32
                 }
             }
 
-            return _VenderId != null && _ProductId != null;
+            return (_VenderId != null && _ProductId != null) || (_Vid != 0 && _Pid != 0);
 
         }
     }

@@ -3,10 +3,10 @@
     <TargetFrameworks>netstandard2.0;net8.0;net7.0;net472;net48;net481</TargetFrameworks>
     <Nullable>disable</Nullable>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyVersion>8.0.0.1102</AssemblyVersion>
-    <FileVersion>8.0.0.1102</FileVersion>
+    <AssemblyVersion>8.0.0.1103</AssemblyVersion>
+    <FileVersion>8.0.0.1103</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1102</Version>
+    <Version>8.0.0.1103</Version>
     <Product>DataTools Memory Objects</Product>
     <Description>DataTools Memory Objects</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>

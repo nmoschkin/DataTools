@@ -4,10 +4,10 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <nullable>disable</nullable>
-    <AssemblyVersion>8.0.0.1102</AssemblyVersion>
-    <FileVersion>8.0.0.1102</FileVersion>
+    <AssemblyVersion>8.0.0.1103</AssemblyVersion>
+    <FileVersion>8.0.0.1103</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1102</Version>
+    <Version>8.0.0.1103</Version>
     <Product>DataTools Disk Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
