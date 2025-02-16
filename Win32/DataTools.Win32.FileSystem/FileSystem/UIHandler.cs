@@ -948,7 +948,7 @@ namespace DataTools.Desktop
 
             foreach (var sn in sn2)
             {
-                if ((sn != null)) continue;
+                if ((sn == null)) continue;
 
                 sf = SystemFileType.FromExtension(sn, this);
 

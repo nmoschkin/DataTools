@@ -4,10 +4,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.0.1103</AssemblyVersion>
-    <FileVersion>8.0.0.1103</FileVersion>
+    <AssemblyVersion>8.0.0.1104</AssemblyVersion>
+    <FileVersion>8.0.0.1104</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1103</Version>
+    <Version>8.0.0.1104</Version>
     <Product>DataTools Win32 TrueType Font Reader Library</Product>
     <Description>DataTools Win32 TrueType Font Reader Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
