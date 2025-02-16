@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <nullable>disable</nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1101</AssemblyVersion>
-    <FileVersion>8.0.0.1101</FileVersion>
+    <AssemblyVersion>8.0.0.1102</AssemblyVersion>
+    <FileVersion>8.0.0.1102</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1101</Version>
+    <Version>8.0.0.1102</Version>
     <Product>DataTools Network Adapters Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>

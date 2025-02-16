@@ -14,9 +14,21 @@ namespace TestHid
         [STAThread]
         public static void Main(string[] args)
         {
-            var hids = HidDeviceInfo.EnumerateHidDevices();
+            DeviceInfo[] hids = HidDeviceInfo.EnumerateHidDevices();
+            DeviceInfo[] batts = DeviceEnum.EnumerateDevices<DeviceInfo>(DevProp.GUID_DEVICE_BATTERY);
 
             var battery = hids.Where((e) => e.DeviceClass == DeviceClassEnum.Battery).ToList().FirstOrDefault();
+
+            if (battery == null)
+            {
+                battery = batts.FirstOrDefault();
+            }
+
+            if (battery == null)
+            {
+                Environment.Exit(0);
+                return;
+            }
 
             var batt2 = HidPowerDeviceInfo.CreateFromHidDevice(battery);
             batt2.OpenHid();

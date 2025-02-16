@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0-windows;net7.0-windows;net472;net48;net481</TargetFrameworks>
+    <TargetFrameworks>net8.0-windows;net7.0-windows;net472;net48;net481</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
-    <AssemblyVersion>8.0.0.1101</AssemblyVersion>
-    <FileVersion>8.0.0.1101</FileVersion>
+    <AssemblyVersion>8.0.0.1102</AssemblyVersion>
+    <FileVersion>8.0.0.1102</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1101</Version>
+    <Version>8.0.0.1102</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - USB and USB HID Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -100,8 +100,8 @@
     <Optimize>True</Optimize>
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
-    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source E:\Projects\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
-    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source E:\Projects\LocalNuggets" />
+    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source C:\Users\theim\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source C:\Users\theim\LocalNuggets" />
     <!-- <Exec Command="post-build-tool /d ." /> -->
   </Target>
 </Project>

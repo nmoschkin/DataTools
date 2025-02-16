@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net6.0-windows;net7.0-windows;net472;net48;net481</TargetFrameworks>
+    <TargetFrameworks>net8.0-windows;net7.0-windows;net472;net48;net481</TargetFrameworks>
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1101</AssemblyVersion>
-    <FileVersion>8.0.0.1101</FileVersion>
+    <AssemblyVersion>8.0.0.1102</AssemblyVersion>
+    <FileVersion>8.0.0.1102</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1101</Version>
+    <Version>8.0.0.1102</Version>
     <Product>DataTools Desktop Network Library</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
