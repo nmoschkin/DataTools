@@ -1,0 +1,9127 @@
+[
+  {
+    "usageId": 0,
+    "usageName": "Undefined",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1,
+    "usageName": "Sensor [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2,
+        15
+      ]
+    ]
+  },
+  {
+    "usageId": 16,
+    "usageName": "Biometric [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 17,
+    "usageName": "Biometric: Human Presence [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 18,
+    "usageName": "Biometric: Human Proximity [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 19,
+    "usageName": "Biometric: Human Touch [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 20,
+    "usageName": "Biometric: Blood Pressure [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 21,
+    "usageName": "Biometric: Body Temperature [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 22,
+    "usageName": "Biometric: Heart Rate [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 23,
+    "usageName": "Biometric: Heart Rate Variability [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 24,
+    "usageName": "Biometric: Peripheral Oxygen Saturation [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 25,
+    "usageName": "Biometric: Respiratory Rate [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        26,
+        31
+      ]
+    ]
+  },
+  {
+    "usageId": 32,
+    "usageName": "Electrical [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 33,
+    "usageName": "Electrical: Capacitance [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 34,
+    "usageName": "Electrical: Current [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 35,
+    "usageName": "Electrical: Power [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 36,
+    "usageName": "Electrical: Inductance [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 37,
+    "usageName": "Electrical: Resistance [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 38,
+    "usageName": "Electrical: Voltage [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 39,
+    "usageName": "Electrical: Potentiometer [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 40,
+    "usageName": "Electrical: Frequency [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 41,
+    "usageName": "Electrical: Period [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        42,
+        47
+      ]
+    ]
+  },
+  {
+    "usageId": 48,
+    "usageName": "Environmental [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 49,
+    "usageName": "Environmental: Atmospheric Pressure [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 50,
+    "usageName": "Environmental: Humidity [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 51,
+    "usageName": "Environmental: Temperature [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 52,
+    "usageName": "Environmental: Wind Direction [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 53,
+    "usageName": "Environmental: Wind Speed [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 54,
+    "usageName": "Environmental: Air Quality [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 55,
+    "usageName": "Environmental: Heat Index [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 56,
+    "usageName": "Environmental: Surface Temperature [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 57,
+    "usageName": "Environmental: Volatile Organic Compounds [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 58,
+    "usageName": "Environmental: Object Presence [50]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 59,
+    "usageName": "Environmental: Object Proximity [50]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        60,
+        63
+      ]
+    ]
+  },
+  {
+    "usageId": 64,
+    "usageName": "Light [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 65,
+    "usageName": "Light: Ambient Light [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 66,
+    "usageName": "Light: Consumer Infrared [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 67,
+    "usageName": "Light: Infrared Light [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 68,
+    "usageName": "Light: Visible Light [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 69,
+    "usageName": "Light: Ultraviolet Light [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        70,
+        79
+      ]
+    ]
+  },
+  {
+    "usageId": 80,
+    "usageName": "Location [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 81,
+    "usageName": "Location: Broadcast [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 82,
+    "usageName": "Location: Dead Reckoning [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 83,
+    "usageName": "Location: GPS (Global Positioning System) [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 84,
+    "usageName": "Location: Lookup [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 85,
+    "usageName": "Location: Other [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 86,
+    "usageName": "Location: Static [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 87,
+    "usageName": "Location: Triangulation [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        88,
+        95
+      ]
+    ]
+  },
+  {
+    "usageId": 96,
+    "usageName": "Mechanical [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 97,
+    "usageName": "Mechanical: Boolean Switch [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 98,
+    "usageName": "Mechanical: Boolean Switch Array [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 99,
+    "usageName": "Mechanical: Multivalue Switch [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 100,
+    "usageName": "Mechanical: Force [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 101,
+    "usageName": "Mechanical: Pressure [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 102,
+    "usageName": "Mechanical: Strain [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 103,
+    "usageName": "Mechanical: Weight [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 104,
+    "usageName": "Mechanical: Haptic Vibrator [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 105,
+    "usageName": "Mechanical: Hall Effect Switch [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        106,
+        111
+      ]
+    ]
+  },
+  {
+    "usageId": 112,
+    "usageName": "Motion [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 113,
+    "usageName": "Motion: Accelerometer 1D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 114,
+    "usageName": "Motion: Accelerometer 2D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 115,
+    "usageName": "Motion: Accelerometer 3D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 116,
+    "usageName": "Motion: Gyrometer 1D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 117,
+    "usageName": "Motion: Gyrometer 2D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 118,
+    "usageName": "Motion: Gyrometer 3D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 119,
+    "usageName": "Motion: Motion Detector [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 120,
+    "usageName": "Motion: Speedometer [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 121,
+    "usageName": "Motion: Accelerometer [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 122,
+    "usageName": "Motion: Gyrometer [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 123,
+    "usageName": "Motion: Gravity Vector [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 124,
+    "usageName": "Motion: Linear Accelerometer [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        125,
+        127
+      ]
+    ]
+  },
+  {
+    "usageId": 128,
+    "usageName": "Orientation [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 129,
+    "usageName": "Orientation: Compass 1D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 130,
+    "usageName": "Orientation: Compass 2D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 131,
+    "usageName": "Orientation: Compass 3D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 132,
+    "usageName": "Orientation: Inclinometer 1D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 133,
+    "usageName": "Orientation: Inclinometer 2D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 134,
+    "usageName": "Orientation: Inclinometer 3D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 135,
+    "usageName": "Orientation: Distance 1D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 136,
+    "usageName": "Orientation: Distance 2D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 137,
+    "usageName": "Orientation: Distance 3D [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 138,
+    "usageName": "Orientation: Device Orientation [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 139,
+    "usageName": "Orientation: Compass [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 140,
+    "usageName": "Orientation: Inclinometer [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 141,
+    "usageName": "Orientation: Distance [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 142,
+    "usageName": "Orientation: Relative Orientation [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 143,
+    "usageName": "Orientation: Simple Orientation [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 144,
+    "usageName": "Scanner [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 145,
+    "usageName": "Scanner: Barcode [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 146,
+    "usageName": "Scanner: RFID [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 147,
+    "usageName": "Scanner: NFC [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        148,
+        159
+      ]
+    ]
+  },
+  {
+    "usageId": 160,
+    "usageName": "Time [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 161,
+    "usageName": "Time: Alarm Timer [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 162,
+    "usageName": "Time: Real Time Clock [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        163,
+        175
+      ]
+    ]
+  },
+  {
+    "usageId": 176,
+    "usageName": "Personal Activity [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 177,
+    "usageName": "Personal Activity: Activity Detection [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 178,
+    "usageName": "Personal Activity: Device Position [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 179,
+    "usageName": "Personal Activity: Pedometer [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 180,
+    "usageName": "Personal Activity: Step Detection [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        181,
+        191
+      ]
+    ]
+  },
+  {
+    "usageId": 192,
+    "usageName": "Orientation Extended [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 193,
+    "usageName": "Orientation Extended: Geomagnetic Orientation [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 194,
+    "usageName": "Orientation Extended: Magnetometer [30]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        195,
+        207
+      ]
+    ]
+  },
+  {
+    "usageId": 208,
+    "usageName": "Gesture [60]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 209,
+    "usageName": "Gesture: Chassis Flip Gesture [60]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 210,
+    "usageName": "Gesture: Hinge Fold Gesture [60]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        211,
+        223
+      ]
+    ]
+  },
+  {
+    "usageId": 224,
+    "usageName": "Other [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 225,
+    "usageName": "Other: Custom [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 226,
+    "usageName": "Other: Generic [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 227,
+    "usageName": "Other: Generic Enumerator [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 228,
+    "usageName": "Other: Hinge Angle [59]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        229,
+        239
+      ]
+    ]
+  },
+  {
+    "usageId": 240,
+    "usageName": "Vendor Reserved 1 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 241,
+    "usageName": "Vendor Reserved 2 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 242,
+    "usageName": "Vendor Reserved 3 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 243,
+    "usageName": "Vendor Reserved 4 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 244,
+    "usageName": "Vendor Reserved 5 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 245,
+    "usageName": "Vendor Reserved 6 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 246,
+    "usageName": "Vendor Reserved 7 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 247,
+    "usageName": "Vendor Reserved 8 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 248,
+    "usageName": "Vendor Reserved 9 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 249,
+    "usageName": "Vendor Reserved 10 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 250,
+    "usageName": "Vendor Reserved 11 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 251,
+    "usageName": "Vendor Reserved 12 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 252,
+    "usageName": "Vendor Reserved 13 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 253,
+    "usageName": "Vendor Reserved 14 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 254,
+    "usageName": "Vendor Reserved 15 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 255,
+    "usageName": "Vendor Reserved 16 [12]",
+    "usageType": null,
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        256,
+        511
+      ]
+    ]
+  },
+  {
+    "usageId": 512,
+    "usageName": "Event [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 513,
+    "usageName": "Event: Sensor State [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 514,
+    "usageName": "Event: Sensor Event [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        515,
+        767
+      ]
+    ]
+  },
+  {
+    "usageId": 768,
+    "usageName": "Property [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 769,
+    "usageName": "Property: Friendly Name [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 770,
+    "usageName": "Property: Persistent Unique ID [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 771,
+    "usageName": "Property: Sensor Status [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 772,
+    "usageName": "Property: Minimum Report Interval [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 773,
+    "usageName": "Property: Sensor Manufacturer [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 774,
+    "usageName": "Property: Sensor Model [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 775,
+    "usageName": "Property: Sensor Serial Number [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 776,
+    "usageName": "Property: Sensor Description [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 777,
+    "usageName": "Property: Sensor Connection Type [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 778,
+    "usageName": "Property: Sensor Device Path [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 779,
+    "usageName": "Property: Hardware Revision [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 780,
+    "usageName": "Property: Firmware Version [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 781,
+    "usageName": "Property: Release Date [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 782,
+    "usageName": "Property: Report Interval [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 783,
+    "usageName": "Property: Change Sensitivity Absolute [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 784,
+    "usageName": "Property: Change Sensitivity Percent of Range [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 785,
+    "usageName": "Property: Change Sensitivity Percent Relative [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 786,
+    "usageName": "Property: Accuracy [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 787,
+    "usageName": "Property: Resolution [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 788,
+    "usageName": "Property: Maximum [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 789,
+    "usageName": "Property: Minimum [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 790,
+    "usageName": "Property: Reporting State [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 791,
+    "usageName": "Property: Sampling Rate [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 792,
+    "usageName": "Property: Response Curve [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 793,
+    "usageName": "Property: Power State [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 794,
+    "usageName": "Property: Maximum FIFO Events [27]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 795,
+    "usageName": "Property: Report Latency [27]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 796,
+    "usageName": "Property: Flush FIFO Events [30]",
+    "usageType": "DF",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 797,
+    "usageName": "Property: Maximum Power Consumption [30]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 798,
+    "usageName": "Property: Is Primary [50]",
+    "usageType": "DF",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 799,
+    "usageName": "Property: Human Presence Detection Type [69]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        800,
+        1023
+      ]
+    ]
+  },
+  {
+    "usageId": 1024,
+    "usageName": "Data Field: Location [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1025,
+        1025
+      ]
+    ]
+  },
+  {
+    "usageId": 1026,
+    "usageName": "Data Field: Altitude Antenna Sea Level [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1027,
+    "usageName": "Data Field: Differential Reference Station ID [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1028,
+    "usageName": "Data Field: Altitude Ellipsoid Error [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1029,
+    "usageName": "Data Field: Altitude Ellipsoid [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1030,
+    "usageName": "Data Field: Altitude Sea Level Error [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1031,
+    "usageName": "Data Field: Altitude Sea Level [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1032,
+    "usageName": "Data Field: Differential GPS Data Age [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1033,
+    "usageName": "Data Field: Error Radius [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1034,
+    "usageName": "Data Field: Fix Quality [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1035,
+    "usageName": "Data Field: Fix Type [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1036,
+    "usageName": "Data Field: Geoidal Separation [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1037,
+    "usageName": "Data Field: GPS Operation Mode [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1038,
+    "usageName": "Data Field: GPS Selection Mode [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1039,
+    "usageName": "Data Field: GPS Status [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1040,
+    "usageName": "Data Field: Position Dilution of Precision [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1041,
+    "usageName": "Data Field: Horizontal Dilution of Precision [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1042,
+    "usageName": "Data Field: Vertical Dilution of Precision [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1043,
+    "usageName": "Data Field: Latitude [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1044,
+    "usageName": "Data Field: Longitude [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1045,
+    "usageName": "Data Field: True Heading [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1046,
+    "usageName": "Data Field: Magnetic Heading [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1047,
+    "usageName": "Data Field: Magnetic Variation [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1048,
+    "usageName": "Data Field: Speed [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1049,
+    "usageName": "Data Field: Satellites in View [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1050,
+    "usageName": "Data Field: Satellites in View Azimuth [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1051,
+    "usageName": "Data Field: Satellites in View Elevation [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1052,
+    "usageName": "Data Field: Satellites in View IDs [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1053,
+    "usageName": "Data Field: Satellites in View PRNs [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1054,
+    "usageName": "Data Field: Satellites in View S/N Ratios [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1055,
+    "usageName": "Data Field: Satellites Used Count [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1056,
+    "usageName": "Data Field: Satellites Used PRNs [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1057,
+    "usageName": "Data Field: NMEA Sentence [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1058,
+    "usageName": "Data Field: Address Line 1 [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1059,
+    "usageName": "Data Field: Address Line 2 [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1060,
+    "usageName": "Data Field: City [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1061,
+    "usageName": "Data Field: State or Province [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1062,
+    "usageName": "Data Field: Country or Region [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1063,
+    "usageName": "Data Field: Postal Code [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1064,
+        1065
+      ]
+    ]
+  },
+  {
+    "usageId": 1066,
+    "usageName": "Property: Location [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1067,
+    "usageName": "Property: Location Desired Accuracy [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1068,
+        1071
+      ]
+    ]
+  },
+  {
+    "usageId": 1072,
+    "usageName": "Data Field: Environmental [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1073,
+    "usageName": "Data Field: Atmospheric Pressure [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1074,
+        1074
+      ]
+    ]
+  },
+  {
+    "usageId": 1075,
+    "usageName": "Data Field: Relative Humidity [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1076,
+    "usageName": "Data Field: Temperature [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1077,
+    "usageName": "Data Field: Wind Direction [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1078,
+    "usageName": "Data Field: Wind Speed [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1079,
+    "usageName": "Data Field: Air Quality Index [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1080,
+    "usageName": "Data Field: Equivalent CO2 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1081,
+    "usageName": "Data Field: Volatile Organic Compound Concentration [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1082,
+    "usageName": "Data Field: Object Presence [50]",
+    "usageType": "SF",
+    "input": false,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1083,
+    "usageName": "Data Field: Object Proximity Range [50]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1084,
+    "usageName": "Data Field: Object Proximity Out of Range [50]",
+    "usageType": "SF",
+    "input": false,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1085,
+        1087
+      ]
+    ]
+  },
+  {
+    "usageId": 1088,
+    "usageName": "Property: Environmental [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1089,
+    "usageName": "Property: Reference Pressure [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1090,
+        1103
+      ]
+    ]
+  },
+  {
+    "usageId": 1104,
+    "usageName": "Data Field: Motion [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1105,
+    "usageName": "Data Field: Motion State [12]",
+    "usageType": "SF",
+    "input": false,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1106,
+    "usageName": "Data Field: Acceleration [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1107,
+    "usageName": "Data Field: Acceleration Axis X [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1108,
+    "usageName": "Data Field: Acceleration Axis Y [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1109,
+    "usageName": "Data Field: Acceleration Axis Z [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1110,
+    "usageName": "Data Field: Angular Velocity [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1111,
+    "usageName": "Data Field: Angular Velocity about X Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1112,
+    "usageName": "Data Field: Angular Velocity about Y Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1113,
+    "usageName": "Data Field: Angular Velocity about Z Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1114,
+    "usageName": "Data Field: Angular Position [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1115,
+    "usageName": "Data Field: Angular Position about X Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1116,
+    "usageName": "Data Field: Angular Position about Y Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1117,
+    "usageName": "Data Field: Angular Position about Z Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1118,
+    "usageName": "Data Field: Motion Speed [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1119,
+    "usageName": "Data Field: Motion Intensity [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1120,
+        1135
+      ]
+    ]
+  },
+  {
+    "usageId": 1136,
+    "usageName": "Data Field: Orientation [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1137,
+    "usageName": "Data Field: Heading [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1138,
+    "usageName": "Data Field: Heading X Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1139,
+    "usageName": "Data Field: Heading Y Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1140,
+    "usageName": "Data Field: Heading Z Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1141,
+    "usageName": "Data Field: Heading Compensated Magnetic North [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1142,
+    "usageName": "Data Field: Heading Compensated True North [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1143,
+    "usageName": "Data Field: Heading Magnetic North [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1144,
+    "usageName": "Data Field: Heading True North [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1145,
+    "usageName": "Data Field: Distance [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1146,
+    "usageName": "Data Field: Distance X Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1147,
+    "usageName": "Data Field: Distance Y Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1148,
+    "usageName": "Data Field: Distance Z Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1149,
+    "usageName": "Data Field: Distance Out-of-Range [12]",
+    "usageType": "SF",
+    "input": false,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1150,
+    "usageName": "Data Field: Tilt [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1151,
+    "usageName": "Data Field: Tilt X Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1152,
+    "usageName": "Data Field: Tilt Y Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1153,
+    "usageName": "Data Field: Tilt Z Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1154,
+    "usageName": "Data Field: Rotation Matrix [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1155,
+    "usageName": "Data Field: Quaternion [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1156,
+    "usageName": "Data Field: Magnetic Flux [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1157,
+    "usageName": "Data Field: Magnetic Flux X Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1158,
+    "usageName": "Data Field: Magnetic Flux Y Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1159,
+    "usageName": "Data Field: Magnetic Flux Z Axis [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1160,
+    "usageName": "Data Field: Magnetometer Accuracy [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1161,
+    "usageName": "Data Field: Simple Orientation Direction [30]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1162,
+        1167
+      ]
+    ]
+  },
+  {
+    "usageId": 1168,
+    "usageName": "Data Field: Mechanical [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1169,
+    "usageName": "Data Field: Boolean Switch State [12]",
+    "usageType": "SF",
+    "input": false,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1170,
+    "usageName": "Data Field: Boolean Switch Array States [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1171,
+    "usageName": "Data Field: Multivalue Switch Value [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1172,
+    "usageName": "Data Field: Force [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1173,
+    "usageName": "Data Field: Absolute Pressure [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1174,
+    "usageName": "Data Field: Gauge Pressure [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1175,
+    "usageName": "Data Field: Strain [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1176,
+    "usageName": "Data Field: Weight [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1177,
+        1183
+      ]
+    ]
+  },
+  {
+    "usageId": 1184,
+    "usageName": "Property: Mechanical [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1185,
+    "usageName": "Property: Vibration State [12]",
+    "usageType": "DF",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1186,
+    "usageName": "Property: Forward Vibration Speed [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1187,
+    "usageName": "Property: Backward Vibration Speed [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1188,
+        1199
+      ]
+    ]
+  },
+  {
+    "usageId": 1200,
+    "usageName": "Data Field: Biometric [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1201,
+    "usageName": "Data Field: Human Presence [12]",
+    "usageType": "SF",
+    "input": false,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1202,
+    "usageName": "Data Field: Human Proximity Range [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1203,
+    "usageName": "Data Field: Human Proximity Out of Range [12]",
+    "usageType": "SF",
+    "input": false,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1204,
+    "usageName": "Data Field: Human Touch State [12]",
+    "usageType": "SF",
+    "input": false,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1205,
+    "usageName": "Data Field: Blood Pressure [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1206,
+    "usageName": "Data Field: Blood Pressure Diastolic [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1207,
+    "usageName": "Data Field: Blood Pressure Systolic [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1208,
+    "usageName": "Data Field: Heart Rate [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1209,
+    "usageName": "Data Field: Resting Heart Rate [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1210,
+    "usageName": "Data Field: Heartbeat Interval [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1211,
+    "usageName": "Data Field: Respiratory Rate [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1212,
+    "usageName": "Data Field: SpO2 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1213,
+    "usageName": "Data Field: Human Attention Detected [74]",
+    "usageType": "MC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1214,
+        1231
+      ]
+    ]
+  },
+  {
+    "usageId": 1232,
+    "usageName": "Data Field: Light [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1233,
+    "usageName": "Data Field: Illuminance [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1234,
+    "usageName": "Data Field: Color Temperature [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1235,
+    "usageName": "Data Field: Chromaticity [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1236,
+    "usageName": "Data Field: Chromaticity X [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1237,
+    "usageName": "Data Field: Chromaticity Y [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1238,
+    "usageName": "Data Field: Consumer IR Sentence Receive [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1239,
+    "usageName": "Data Field: Infrared Light [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1240,
+    "usageName": "Data Field: Red Light [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1241,
+    "usageName": "Data Field: Green Light [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1242,
+    "usageName": "Data Field: Blue Light [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1243,
+    "usageName": "Data Field: Ultraviolet A Light [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1244,
+    "usageName": "Data Field: Ultraviolet B Light [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1245,
+    "usageName": "Data Field: Ultraviolet Index [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1246,
+    "usageName": "Data Field: Near Infrared Light [50]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1247,
+    "usageName": "Property: Light [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1249,
+        1249
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1252,
+        1263
+      ]
+    ]
+  },
+  {
+    "usageId": 1264,
+    "usageName": "Data Field: Scanner [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1265,
+    "usageName": "Data Field: RFID Tag 40 Bit [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1266,
+    "usageName": "Data Field: NFC Sentence Receive [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1267,
+        1271
+      ]
+    ]
+  },
+  {
+    "usageId": 1272,
+    "usageName": "Property: Scanner [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1273,
+    "usageName": "Property: NFC Sentence Send [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1274,
+        1279
+      ]
+    ]
+  },
+  {
+    "usageId": 1280,
+    "usageName": "Data Field: Electrical [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1281,
+    "usageName": "Data Field: Capacitance [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1282,
+    "usageName": "Data Field: Current [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1283,
+    "usageName": "Data Field: Electrical Power [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1284,
+    "usageName": "Data Field: Inductance [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1285,
+    "usageName": "Data Field: Resistance [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1286,
+    "usageName": "Data Field: Voltage [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1287,
+    "usageName": "Data Field: Frequency [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1288,
+    "usageName": "Data Field: Period [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1289,
+    "usageName": "Data Field: Percent of Range [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1290,
+        1311
+      ]
+    ]
+  },
+  {
+    "usageId": 1312,
+    "usageName": "Data Field: Time [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1313,
+    "usageName": "Data Field: Year [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1314,
+    "usageName": "Data Field: Month [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1315,
+    "usageName": "Data Field: Day [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1316,
+    "usageName": "Data Field: Day of Week [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1317,
+    "usageName": "Data Field: Hour [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1318,
+    "usageName": "Data Field: Minute [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1319,
+    "usageName": "Data Field: Second [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1320,
+    "usageName": "Data Field: Millisecond [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1321,
+    "usageName": "Data Field: Timestamp [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1322,
+    "usageName": "Data Field: Julian Day of Year [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1323,
+    "usageName": "Data Field: Time Since System Boot [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1324,
+        1327
+      ]
+    ]
+  },
+  {
+    "usageId": 1328,
+    "usageName": "Property: Time [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1329,
+    "usageName": "Property: Time Zone Offset from UTC [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1330,
+    "usageName": "Property: Time Zone Name [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1331,
+    "usageName": "Property: Daylight Savings Time Observed [12]",
+    "usageType": "DF",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1332,
+    "usageName": "Property: Time Trim Adjustment [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1333,
+    "usageName": "Property: Arm Alarm [12]",
+    "usageType": "DF",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1334,
+        1343
+      ]
+    ]
+  },
+  {
+    "usageId": 1344,
+    "usageName": "Data Field: Custom [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1345,
+    "usageName": "Data Field: Custom Usage [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1346,
+    "usageName": "Data Field: Custom Boolean Array [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1347,
+    "usageName": "Data Field: Custom Value [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1348,
+    "usageName": "Data Field: Custom Value 1 [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1349,
+    "usageName": "Data Field: Custom Value 2 [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1350,
+    "usageName": "Data Field: Custom Value 3 [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1351,
+    "usageName": "Data Field: Custom Value 4 [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1352,
+    "usageName": "Data Field: Custom Value 5 [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1353,
+    "usageName": "Data Field: Custom Value 6 [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1354,
+    "usageName": "Data Field: Custom Value 7 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1355,
+    "usageName": "Data Field: Custom Value 8 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1356,
+    "usageName": "Data Field: Custom Value 9 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1357,
+    "usageName": "Data Field: Custom Value 10 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1358,
+    "usageName": "Data Field: Custom Value 11 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1359,
+    "usageName": "Data Field: Custom Value 12 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1360,
+    "usageName": "Data Field: Custom Value 13 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1361,
+    "usageName": "Data Field: Custom Value 14 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1362,
+    "usageName": "Data Field: Custom Value 15 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1363,
+    "usageName": "Data Field: Custom Value 16 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1364,
+    "usageName": "Data Field: Custom Value 17 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1365,
+    "usageName": "Data Field: Custom Value 18 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1366,
+    "usageName": "Data Field: Custom Value 19 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1367,
+    "usageName": "Data Field: Custom Value 20 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1368,
+    "usageName": "Data Field: Custom Value 21 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1369,
+    "usageName": "Data Field: Custom Value 22 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1370,
+    "usageName": "Data Field: Custom Value 23 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1371,
+    "usageName": "Data Field: Custom Value 24 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1372,
+    "usageName": "Data Field: Custom Value 25 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1373,
+    "usageName": "Data Field: Custom Value 26 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1374,
+    "usageName": "Data Field: Custom Value 27 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1375,
+    "usageName": "Data Field: Custom Value 28 [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1376,
+    "usageName": "Data Field: Generic [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1377,
+    "usageName": "Data Field: Generic GUID or PROPERTYKEY [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1378,
+    "usageName": "Data Field: Generic Category GUID [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1379,
+    "usageName": "Data Field: Generic Type GUID [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1380,
+    "usageName": "Data Field: Generic Event PROPERTYKEY [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1381,
+    "usageName": "Data Field: Generic Property PROPERTYKEY [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1382,
+    "usageName": "Data Field: Generic Data Field PROPERTYKEY [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1383,
+    "usageName": "Data Field: Generic Event [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1384,
+    "usageName": "Data Field: Generic Property [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1385,
+    "usageName": "Data Field: Generic Data Field [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1386,
+    "usageName": "Data Field: Enumerator Table Row Index [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1387,
+    "usageName": "Data Field: Enumerator Table Row Count [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1388,
+    "usageName": "Data Field: Generic GUID or PROPERTYKEY kind [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1389,
+    "usageName": "Data Field: Generic GUID [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1390,
+    "usageName": "Data Field: Generic PROPERTYKEY [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1391,
+    "usageName": "Data Field: Generic Top Level Collection ID [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1392,
+    "usageName": "Data Field: Generic Report ID [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1393,
+    "usageName": "Data Field: Generic Report Item Position Index [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1394,
+    "usageName": "Data Field: Generic Firmware VARTYPE [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1395,
+    "usageName": "Data Field: Generic Unit of Measure [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1396,
+    "usageName": "Data Field: Generic Unit Exponent [12]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1397,
+    "usageName": "Data Field: Generic Report Size [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1398,
+    "usageName": "Data Field: Generic Report Count [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1399,
+        1407
+      ]
+    ]
+  },
+  {
+    "usageId": 1408,
+    "usageName": "Property: Generic [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1409,
+    "usageName": "Property: Enumerator Table Row Index [12]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1410,
+    "usageName": "Property: Enumerator Table Row Count [12]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1411,
+        1423
+      ]
+    ]
+  },
+  {
+    "usageId": 1424,
+    "usageName": "Data Field: Personal Activity [30]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1425,
+    "usageName": "Data Field: Activity Type [30]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1426,
+    "usageName": "Data Field: Activity State [30]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1427,
+    "usageName": "Data Field: Device Position [30]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1428,
+    "usageName": "Data Field: Step Count [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1429,
+    "usageName": "Data Field: Step Count Reset [30]",
+    "usageType": "DF",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1430,
+    "usageName": "Data Field: Step Duration [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1431,
+    "usageName": "Data Field: Step Type [30]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1432,
+        1439
+      ]
+    ]
+  },
+  {
+    "usageId": 1440,
+    "usageName": "Property: Minimum Activity Detection Interval [30]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1441,
+    "usageName": "Property: Supported Activity Types [30]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1442,
+    "usageName": "Property: Subscribed Activity Types [30]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1443,
+    "usageName": "Property: Supported Step Types [30]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1444,
+    "usageName": "Property: Subscribed Step Types [30]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1445,
+    "usageName": "Property: Floor Height [30]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1446,
+        1455
+      ]
+    ]
+  },
+  {
+    "usageId": 1456,
+    "usageName": "Data Field: Custom Type ID [30]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1457,
+        1471
+      ]
+    ]
+  },
+  {
+    "usageId": 1472,
+    "usageName": "Property: Custom [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1473,
+    "usageName": "Property: Custom Value 1 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1474,
+    "usageName": "Property: Custom Value 2 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1475,
+    "usageName": "Property: Custom Value 3 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1476,
+    "usageName": "Property: Custom Value 4 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1477,
+    "usageName": "Property: Custom Value 5 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1478,
+    "usageName": "Property: Custom Value 6 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1479,
+    "usageName": "Property: Custom Value 7 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1480,
+    "usageName": "Property: Custom Value 8 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1481,
+    "usageName": "Property: Custom Value 9 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1482,
+    "usageName": "Property: Custom Value 10 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1483,
+    "usageName": "Property: Custom Value 11 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1484,
+    "usageName": "Property: Custom Value 12 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1485,
+    "usageName": "Property: Custom Value 13 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1486,
+    "usageName": "Property: Custom Value 14 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1487,
+    "usageName": "Property: Custom Value 15 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1488,
+    "usageName": "Property: Custom Value 16 [50]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1489,
+        1503
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1506,
+        1519
+      ]
+    ]
+  },
+  {
+    "usageId": 1520,
+    "usageName": "Data Field: Gesture Sensor [60]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 1521,
+    "usageName": "Data Field: Gesture State [60]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1522,
+    "usageName": "Data Field: Hinge Fold Initial Angle [60]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1523,
+    "usageName": "Data Field: Hinge Fold Final Angle [60]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1524,
+    "usageName": "Data Field: Hinge Fold Contributing Panel [60]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1525,
+    "usageName": "Data Field: Hinge Fold Type [60]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        1526,
+        2047
+      ]
+    ]
+  },
+  {
+    "usageId": 2048,
+    "usageName": "Sensor State: Undefined [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2049,
+    "usageName": "Sensor State: Ready [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2050,
+    "usageName": "Sensor State: Not Available [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2051,
+    "usageName": "Sensor State: No Data [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2052,
+    "usageName": "Sensor State: Initializing [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2053,
+    "usageName": "Sensor State: Access Denied [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2054,
+    "usageName": "Sensor State: Error [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2055,
+        2063
+      ]
+    ]
+  },
+  {
+    "usageId": 2064,
+    "usageName": "Sensor Event: Unknown [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2065,
+    "usageName": "Sensor Event: State Changed [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2066,
+    "usageName": "Sensor Event: Property Changed [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2067,
+    "usageName": "Sensor Event: Data Updated [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2068,
+    "usageName": "Sensor Event: Poll Response [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2069,
+    "usageName": "Sensor Event: Change Sensitivity [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2070,
+    "usageName": "Sensor Event: Range Maximum Reached [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2071,
+    "usageName": "Sensor Event: Range Minimum Reached [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2072,
+    "usageName": "Sensor Event: High Threshold Cross Upward [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2073,
+    "usageName": "Sensor Event: High Threshold Cross Downward [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2074,
+    "usageName": "Sensor Event: Low Threshold Cross Upward [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2075,
+    "usageName": "Sensor Event: Low Threshold Cross Downward [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2076,
+    "usageName": "Sensor Event: Zero Threshold Cross Upward [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2077,
+    "usageName": "Sensor Event: Zero Threshold Cross Downward [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2078,
+    "usageName": "Sensor Event: Period Exceeded [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2079,
+    "usageName": "Sensor Event: Frequency Exceeded [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2080,
+    "usageName": "Sensor Event: Complex Trigger [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2081,
+        2095
+      ]
+    ]
+  },
+  {
+    "usageId": 2096,
+    "usageName": "Connection Type: PC Integrated [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2097,
+    "usageName": "Connection Type: PC Attached [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2098,
+    "usageName": "Connection Type: PC External [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2099,
+        2111
+      ]
+    ]
+  },
+  {
+    "usageId": 2112,
+    "usageName": "Reporting State: Report No Events [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2113,
+    "usageName": "Reporting State: Report All Events [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2114,
+    "usageName": "Reporting State: Report Threshold Events [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2115,
+    "usageName": "Reporting State: Wake On No Events [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2116,
+    "usageName": "Reporting State: Wake On All Events [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2117,
+    "usageName": "Reporting State: Wake On Threshold Events [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2118,
+        2127
+      ]
+    ]
+  },
+  {
+    "usageId": 2128,
+    "usageName": "Power State: Undefined [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2129,
+    "usageName": "Power State: D0 Full Power [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2130,
+    "usageName": "Power State: D1 Low Power [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2131,
+    "usageName": "Power State: D2 Standby Power with Wakeup [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2132,
+    "usageName": "Power State: D3 Sleep with Wakeup [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2133,
+    "usageName": "Power State: D4 Power Off [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2134,
+        2143
+      ]
+    ]
+  },
+  {
+    "usageId": 2144,
+    "usageName": "Accuracy: Default [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2145,
+    "usageName": "Accuracy: High [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2146,
+    "usageName": "Accuracy: Medium [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2147,
+    "usageName": "Accuracy: Low [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2148,
+        2159
+      ]
+    ]
+  },
+  {
+    "usageId": 2160,
+    "usageName": "Fix Quality: No Fix [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2161,
+    "usageName": "Fix Quality: GPS [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2162,
+    "usageName": "Fix Quality: DGPS [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2163,
+        2175
+      ]
+    ]
+  },
+  {
+    "usageId": 2176,
+    "usageName": "Fix Type: No Fix [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2177,
+    "usageName": "Fix Type: GPS SPS Mode, Fix Valid [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2178,
+    "usageName": "Fix Type: DGPS SPS Mode, Fix Valid [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2179,
+    "usageName": "Fix Type: GPS PPS Mode, Fix Valid [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2180,
+    "usageName": "Fix Type: Real Time Kinematic [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2181,
+    "usageName": "Fix Type: Float RTK [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2182,
+    "usageName": "Fix Type: Estimated (dead reckoned) [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2183,
+    "usageName": "Fix Type: Manual Input Mode [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2184,
+    "usageName": "Fix Type: Simulator Mode [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2185,
+        2191
+      ]
+    ]
+  },
+  {
+    "usageId": 2192,
+    "usageName": "GPS Operation Mode: Manual [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2193,
+    "usageName": "GPS Operation Mode: Automatic [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2194,
+        2207
+      ]
+    ]
+  },
+  {
+    "usageId": 2208,
+    "usageName": "GPS Selection Mode: Autonomous [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2209,
+    "usageName": "GPS Selection Mode: DGPS [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2210,
+    "usageName": "GPS Selection Mode: Estimated (dead reckoned) [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2211,
+    "usageName": "GPS Selection Mode: Manual Input [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2212,
+    "usageName": "GPS Selection Mode: Simulator [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2213,
+    "usageName": "GPS Selection Mode: Data Not Valid [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2214,
+        2223
+      ]
+    ]
+  },
+  {
+    "usageId": 2224,
+    "usageName": "GPS Status Data: Valid [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2225,
+    "usageName": "GPS Status Data: Not Valid [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2226,
+        2239
+      ]
+    ]
+  },
+  {
+    "usageId": 2240,
+    "usageName": "Day of Week: Sunday [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2241,
+    "usageName": "Day of Week: Monday [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2242,
+    "usageName": "Day of Week: Tuesday [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2243,
+    "usageName": "Day of Week: Wednesday [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2244,
+    "usageName": "Day of Week: Thursday [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2245,
+    "usageName": "Day of Week: Friday [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2246,
+    "usageName": "Day of Week: Saturday [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2247,
+        2255
+      ]
+    ]
+  },
+  {
+    "usageId": 2256,
+    "usageName": "Kind: Category [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2257,
+    "usageName": "Kind: Type [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2258,
+    "usageName": "Kind: Event [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2259,
+    "usageName": "Kind: Property [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2260,
+    "usageName": "Kind: Data Field [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2261,
+        2271
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2275,
+        2287
+      ]
+    ]
+  },
+  {
+    "usageId": 2288,
+    "usageName": "Simple Orientation Direction: Not Rotated [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2289,
+    "usageName": "Simple Orientation Direction: Rotated 90 Degrees CCW [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2290,
+    "usageName": "Simple Orientation Direction: Rotated 180 Degrees CCW [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2291,
+    "usageName": "Simple Orientation Direction: Rotated 270 Degrees CCW [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2292,
+    "usageName": "Simple Orientation Direction: Face Up [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2293,
+    "usageName": "Simple Orientation Direction: Face Down [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2294,
+        2303
+      ]
+    ]
+  },
+  {
+    "usageId": 2304,
+    "usageName": "VT_NULL [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2305,
+    "usageName": "VT_BOOL [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2306,
+    "usageName": "VT_UI1 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2307,
+    "usageName": "VT_I1 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2308,
+    "usageName": "VT_UI2 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2309,
+    "usageName": "VT_I2 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2310,
+    "usageName": "VT_UI4 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2311,
+    "usageName": "VT_I4 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2312,
+    "usageName": "VT_UI8 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2313,
+    "usageName": "VT_I8 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2314,
+    "usageName": "VT_R4 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2315,
+    "usageName": "VT_R8 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2316,
+    "usageName": "VT_WSTR [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2317,
+    "usageName": "VT_STR [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2318,
+    "usageName": "VT_CLSID [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2319,
+    "usageName": "VT_VECTOR VT_UI1 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2320,
+    "usageName": "VT_F16E0 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2321,
+    "usageName": "VT_F16E1 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2322,
+    "usageName": "VT_F16E2 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2323,
+    "usageName": "VT_F16E3 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2324,
+    "usageName": "VT_F16E4 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2325,
+    "usageName": "VT_F16E5 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2326,
+    "usageName": "VT_F16E6 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2327,
+    "usageName": "VT_F16E7 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2328,
+    "usageName": "VT_F16E8 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2329,
+    "usageName": "VT_F16E9 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2330,
+    "usageName": "VT_F16EA [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2331,
+    "usageName": "VT_F16EB [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2332,
+    "usageName": "VT_F16EC [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2333,
+    "usageName": "VT_F16ED [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2334,
+    "usageName": "VT_F16EE [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2335,
+    "usageName": "VT_F16EF [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2336,
+    "usageName": "VT_F32E0 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2337,
+    "usageName": "VT_F32E1 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2338,
+    "usageName": "VT_F32E2 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2339,
+    "usageName": "VT_F32E3 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2340,
+    "usageName": "VT_F32E4 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2341,
+    "usageName": "VT_F32E5 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2342,
+    "usageName": "VT_F32E6 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2343,
+    "usageName": "VT_F32E7 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2344,
+    "usageName": "VT_F32E8 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2345,
+    "usageName": "VT_F32E9 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2346,
+    "usageName": "VT_F32EA [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2347,
+    "usageName": "VT_F32EB [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2348,
+    "usageName": "VT_F32EC [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2349,
+    "usageName": "VT_F32ED [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2350,
+    "usageName": "VT_F32EE [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2351,
+    "usageName": "VT_F32EF [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2352,
+    "usageName": "Activity Type: Unknown [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2353,
+    "usageName": "Activity Type: Stationary [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2354,
+    "usageName": "Activity Type: Fidgeting [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2355,
+    "usageName": "Activity Type: Walking [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2356,
+    "usageName": "Activity Type: Running [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2357,
+    "usageName": "Activity Type: In Vehicle [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2358,
+    "usageName": "Activity Type: Biking [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2359,
+    "usageName": "Activity Type: Idle [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2360,
+        2367
+      ]
+    ]
+  },
+  {
+    "usageId": 2368,
+    "usageName": "Unit: Not Specified [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2369,
+    "usageName": "Unit: Lux [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2370,
+    "usageName": "Unit: Degrees Kelvin [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2371,
+    "usageName": "Unit: Degrees Celsius [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2372,
+    "usageName": "Unit: Pascal [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2373,
+    "usageName": "Unit: Newton [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2374,
+    "usageName": "Unit: Meters/Second [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2375,
+    "usageName": "Unit: Kilogram [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2376,
+    "usageName": "Unit: Meter [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2377,
+    "usageName": "Unit: Meters/Second/Second [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2378,
+    "usageName": "Unit: Farad [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2379,
+    "usageName": "Unit: Ampere [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2380,
+    "usageName": "Unit: Watt [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2381,
+    "usageName": "Unit: Henry [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2382,
+    "usageName": "Unit: Ohm [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2383,
+    "usageName": "Unit: Volt [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2384,
+    "usageName": "Unit: Hertz [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2385,
+    "usageName": "Unit: Bar [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2386,
+    "usageName": "Unit: Degrees Anti-clockwise [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2387,
+    "usageName": "Unit: Degrees Clockwise [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2388,
+    "usageName": "Unit: Degrees [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2389,
+    "usageName": "Unit: Degrees/Second [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2390,
+    "usageName": "Unit: Degrees/Second/Second [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2391,
+    "usageName": "Unit: Knot [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2392,
+    "usageName": "Unit: Percent [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2393,
+    "usageName": "Unit: Second [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2394,
+    "usageName": "Unit: Millisecond [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2395,
+    "usageName": "Unit: G [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2396,
+    "usageName": "Unit: Bytes [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2397,
+    "usageName": "Unit: Milligauss [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2398,
+    "usageName": "Unit: Bits [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2399,
+        2399
+      ]
+    ]
+  },
+  {
+    "usageId": 2400,
+    "usageName": "Activity State: No State Change [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2401,
+    "usageName": "Activity State: Start Activity [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2402,
+    "usageName": "Activity State: End Activity [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2403,
+        2415
+      ]
+    ]
+  },
+  {
+    "usageId": 2416,
+    "usageName": "Exponent 0 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2417,
+    "usageName": "Exponent 1 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2418,
+    "usageName": "Exponent 2 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2419,
+    "usageName": "Exponent 3 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2420,
+    "usageName": "Exponent 4 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2421,
+    "usageName": "Exponent 5 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2422,
+    "usageName": "Exponent 6 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2423,
+    "usageName": "Exponent 7 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2424,
+    "usageName": "Exponent 8 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2425,
+    "usageName": "Exponent 9 [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2426,
+    "usageName": "Exponent A [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2427,
+    "usageName": "Exponent B [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2428,
+    "usageName": "Exponent C [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2429,
+    "usageName": "Exponent D [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2430,
+    "usageName": "Exponent E [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2431,
+    "usageName": "Exponent F [12]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2432,
+    "usageName": "Device Position: Unknown [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2433,
+    "usageName": "Device Position: Unchanged [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2434,
+    "usageName": "Device Position: On Desk [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2435,
+    "usageName": "Device Position: In Hand [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2436,
+    "usageName": "Device Position: Moving in Bag [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2437,
+    "usageName": "Device Position: Stationary in Bag [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2438,
+        2447
+      ]
+    ]
+  },
+  {
+    "usageId": 2448,
+    "usageName": "Step Type: Unknown [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2449,
+    "usageName": "Step Type: Running [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2450,
+    "usageName": "Step Type: Walking [30]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2451,
+        2463
+      ]
+    ]
+  },
+  {
+    "usageId": 2464,
+    "usageName": "Gesture State: Unknown [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2465,
+    "usageName": "Gesture State: Started [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2466,
+    "usageName": "Gesture State: Completed [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2467,
+    "usageName": "Gesture State: Cancelled [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2468,
+        2479
+      ]
+    ]
+  },
+  {
+    "usageId": 2480,
+    "usageName": "Hinge Fold Contributing Panel: Unknown [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2481,
+    "usageName": "Hinge Fold Contributing Panel: Panel 1 [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2482,
+    "usageName": "Hinge Fold Contributing Panel: Panel 2 [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2483,
+    "usageName": "Hinge Fold Contributing Panel: Both [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2484,
+    "usageName": "Hinge Fold Type: Unknown [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2485,
+    "usageName": "Hinge Fold Type: Increasing [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2486,
+    "usageName": "Hinge Fold Type: Decreasing [60]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2487,
+        2495
+      ]
+    ]
+  },
+  {
+    "usageId": 2496,
+    "usageName": "Human Presence Detection Type: Vendor-Defined Non-Biometric [69]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2497,
+    "usageName": "Human Presence Detection Type: Vendor-Defined Biometric [69]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2498,
+    "usageName": "Human Presence Detection Type: Facial Biometric [69]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2499,
+    "usageName": "Human Presence Detection Type: Audio Biometric [69]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2500,
+        4095
+      ]
+    ]
+  },
+  {
+    "usageId": 4096,
+    "usageName": "Modifier: Change Sensitivity Absolute [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        4097,
+        4351
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Change Sensitivity Absolute modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        4352,
+        6143
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        6144,
+        8191
+      ]
+    ]
+  },
+  {
+    "usageId": 8192,
+    "usageName": "Modifier: Maximum [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        8193,
+        8447
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Maximum modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        8448,
+        10239
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        10240,
+        12287
+      ]
+    ]
+  },
+  {
+    "usageId": 12288,
+    "usageName": "Modifier: Minimum [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        12289,
+        12543
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Minimum modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        12544,
+        14335
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        14336,
+        16383
+      ]
+    ]
+  },
+  {
+    "usageId": 16384,
+    "usageName": "Modifier: Accuracy [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        16385,
+        16639
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Accuracy modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        16640,
+        18431
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        18432,
+        20479
+      ]
+    ]
+  },
+  {
+    "usageId": 20480,
+    "usageName": "Modifier: Resolution [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        20481,
+        20735
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Resolution modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        20736,
+        22527
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        22528,
+        24575
+      ]
+    ]
+  },
+  {
+    "usageId": 24576,
+    "usageName": "Modifier: Threshold High [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        24577,
+        24831
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Threshold High modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        24832,
+        26623
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        26624,
+        28671
+      ]
+    ]
+  },
+  {
+    "usageId": 28672,
+    "usageName": "Modifier: Threshold Low [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        28673,
+        28927
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Threshold Low modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        28928,
+        30719
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        30720,
+        32767
+      ]
+    ]
+  },
+  {
+    "usageId": 32768,
+    "usageName": "Modifier: Calibration Offset [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        32769,
+        33023
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Calibration Offset modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        33024,
+        34815
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        34816,
+        36863
+      ]
+    ]
+  },
+  {
+    "usageId": 36864,
+    "usageName": "Modifier: Calibration Multiplier [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        36865,
+        37119
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Calibration Multiplier modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        37120,
+        38911
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        38912,
+        40959
+      ]
+    ]
+  },
+  {
+    "usageId": 40960,
+    "usageName": "Modifier: Report Interval [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        40961,
+        41215
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Report Interval modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        41216,
+        43007
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        43008,
+        45055
+      ]
+    ]
+  },
+  {
+    "usageId": 45056,
+    "usageName": "Modifier: Frequency Max [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        45057,
+        45311
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Frequency Max modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        45312,
+        47103
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        47104,
+        49151
+      ]
+    ]
+  },
+  {
+    "usageId": 49152,
+    "usageName": "Modifier: Period Max [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        49153,
+        49407
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Period Max modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        49408,
+        51199
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        51200,
+        53247
+      ]
+    ]
+  },
+  {
+    "usageId": 53248,
+    "usageName": "Modifier: Change Sensitivity Percent of Range [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        53249,
+        53503
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Change Sensitivity Percent modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        53504,
+        55295
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        55296,
+        57343
+      ]
+    ]
+  },
+  {
+    "usageId": 57344,
+    "usageName": "Modifier: Change Sensitivity Percent Relative [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        57345,
+        57599
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Change Sensitivity Percent modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        57600,
+        59391
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        59392,
+        61439
+      ]
+    ]
+  },
+  {
+    "usageId": 61440,
+    "usageName": "Modifier: Vendor Reserved [12]",
+    "usageType": "US",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        61441,
+        61695
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved for use as Vendor Reserved modifier range",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        61696,
+        63487
+      ]
+    ]
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        63488,
+        65535
+      ]
+    ]
+  }
+]

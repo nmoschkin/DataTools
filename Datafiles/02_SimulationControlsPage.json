@@ -1,0 +1,625 @@
+[
+  {
+    "usageId": 0,
+    "usageName": "Undefined",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1,
+    "usageName": "Flight Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 2,
+    "usageName": "Automobile Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 3,
+    "usageName": "Tank Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 4,
+    "usageName": "Spaceship Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 5,
+    "usageName": "Submarine Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 6,
+    "usageName": "Sailing Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 7,
+    "usageName": "Motorcycle Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 8,
+    "usageName": "Sports Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 9,
+    "usageName": "Airplane Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 10,
+    "usageName": "Helicopter Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 11,
+    "usageName": "Magic Carpet Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 12,
+    "usageName": "Bicycle Simulation Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        13,
+        31
+      ]
+    ]
+  },
+  {
+    "usageId": 32,
+    "usageName": "Flight Control Stick",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 33,
+    "usageName": "Flight Stick",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 34,
+    "usageName": "Cyclic Control",
+    "usageType": "CP",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 35,
+    "usageName": "Cyclic Trim",
+    "usageType": "CP",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 36,
+    "usageName": "Flight Yoke",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 37,
+    "usageName": "Track Control",
+    "usageType": "CP",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        38,
+        175
+      ]
+    ]
+  },
+  {
+    "usageId": 176,
+    "usageName": "Aileron",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 177,
+    "usageName": "Aileron Trim",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 178,
+    "usageName": "Anti-Torque Control",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 179,
+    "usageName": "Autopilot Enable",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 180,
+    "usageName": "Chaff Release",
+    "usageType": "OSC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 181,
+    "usageName": "Collective Control",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 182,
+    "usageName": "Dive Brake",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 183,
+    "usageName": "Electronic Countermeasures",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 184,
+    "usageName": "Elevator",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 185,
+    "usageName": "Elevator Trim",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 186,
+    "usageName": "Rudder",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 187,
+    "usageName": "Throttle",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 188,
+    "usageName": "Flight Communications",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 189,
+    "usageName": "Flare Release",
+    "usageType": "OSC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 190,
+    "usageName": "Landing Gear",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 191,
+    "usageName": "Toe Brake",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 192,
+    "usageName": "Trigger",
+    "usageType": "MC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 193,
+    "usageName": "Weapons Arm",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 194,
+    "usageName": "Weapons Select",
+    "usageType": "OSC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 195,
+    "usageName": "Wing Flaps",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 196,
+    "usageName": "Accelerator",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 197,
+    "usageName": "Brake",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 198,
+    "usageName": "Clutch",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 199,
+    "usageName": "Shifter",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 200,
+    "usageName": "Steering",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 201,
+    "usageName": "Turret Direction",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 202,
+    "usageName": "Barrel Elevation",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 203,
+    "usageName": "Dive Plane",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 204,
+    "usageName": "Ballast",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 205,
+    "usageName": "Bicycle Crank",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 206,
+    "usageName": "Handle Bars",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 207,
+    "usageName": "Front Brake",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 208,
+    "usageName": "Rear Brake",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        209,
+        65535
+      ]
+    ]
+  }
+]

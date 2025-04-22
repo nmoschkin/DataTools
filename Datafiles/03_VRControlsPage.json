@@ -1,0 +1,179 @@
+[
+  {
+    "usageId": 0,
+    "usageName": "Undefined",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1,
+    "usageName": "Belt",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 2,
+    "usageName": "Body Suit",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 3,
+    "usageName": "Flexor",
+    "usageType": "CP",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 4,
+    "usageName": "Glove",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 5,
+    "usageName": "Head Tracker",
+    "usageType": "CP",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 6,
+    "usageName": "Head Mounted Display",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 7,
+    "usageName": "Hand Tracker",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 8,
+    "usageName": "Oculometer",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 9,
+    "usageName": "Vest",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 10,
+    "usageName": "Animatronic Device",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        11,
+        31
+      ]
+    ]
+  },
+  {
+    "usageId": 32,
+    "usageName": "Stereo Enable",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 33,
+    "usageName": "Display Enable",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        34,
+        65535
+      ]
+    ]
+  }
+]

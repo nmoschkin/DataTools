@@ -1,0 +1,361 @@
+[
+  {
+    "usageId": 0,
+    "usageName": "Undefined",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1,
+    "usageName": "General Purpose IO Card",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 2,
+    "usageName": "Coin Door",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 3,
+    "usageName": "Watchdog Timer",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        4,
+        47
+      ]
+    ]
+  },
+  {
+    "usageId": 48,
+    "usageName": "General Purpose Analog Input State",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 49,
+    "usageName": "General Purpose Digital Input State",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 50,
+    "usageName": "General Purpose Optical Input State",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 51,
+    "usageName": "General Purpose Digital Output State",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 52,
+    "usageName": "Number of Coin Doors",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 53,
+    "usageName": "Coin Drawer Drop Count",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 54,
+    "usageName": "Coin Drawer Start",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 55,
+    "usageName": "Coin Drawer Service",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 56,
+    "usageName": "Coin Drawer Tilt",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 57,
+    "usageName": "Coin Door Test",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        58,
+        63
+      ]
+    ]
+  },
+  {
+    "usageId": 64,
+    "usageName": "Coin Door Lockout",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 65,
+    "usageName": "Watchdog Timeout",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 66,
+    "usageName": "Watchdog Action",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 67,
+    "usageName": "Watchdog Reboot",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 68,
+    "usageName": "Watchdog Restart",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 69,
+    "usageName": "Alarm Input",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 70,
+    "usageName": "Coin Door Counter",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 71,
+    "usageName": "I/O Direction Mapping",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 72,
+    "usageName": "Set I/O Direction Mapping",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 73,
+    "usageName": "Extended Optical Input State",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 74,
+    "usageName": "Pin Pad Input State",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 75,
+    "usageName": "Pin Pad Status",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 76,
+    "usageName": "Pin Pad Output",
+    "usageType": "OOC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 77,
+    "usageName": "Pin Pad Command",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        78,
+        65535
+      ]
+    ]
+  }
+]

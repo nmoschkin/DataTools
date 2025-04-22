@@ -1,0 +1,328 @@
+[
+  {
+    "usageId": 0,
+    "usageName": "Undefined",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1,
+    "usageName": "Background/Nonuser Controls [4] [65]",
+    "usageType": "CA",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        2,
+        31
+      ]
+    ]
+  },
+  {
+    "usageId": 32,
+    "usageName": "Battery Strength",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 33,
+    "usageName": "Wireless Channel",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 34,
+    "usageName": "Wireless ID",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 35,
+    "usageName": "Discover Wireless Control",
+    "usageType": "OSC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 36,
+    "usageName": "Security Code Character Entered",
+    "usageType": "OSC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 37,
+    "usageName": "Security Code Character Erased",
+    "usageType": "OSC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 38,
+    "usageName": "Security Code Cleared",
+    "usageType": "OSC",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 39,
+    "usageName": "Sequence ID [5]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 40,
+    "usageName": "Sequence ID Reset [5]",
+    "usageType": "DF",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 41,
+    "usageName": "RF Signal Strength [5]",
+    "usageType": "DV",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 42,
+    "usageName": "Software Version [32]",
+    "usageType": "CL",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 43,
+    "usageName": "Protocol Version [32]",
+    "usageType": "CL",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 44,
+    "usageName": "Hardware Version [32]",
+    "usageType": "CL",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 45,
+    "usageName": "Major [32]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 46,
+    "usageName": "Minor [32]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 47,
+    "usageName": "Revision [32]",
+    "usageType": "SV",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 48,
+    "usageName": "Handedness [40]",
+    "usageType": "NAry",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 49,
+    "usageName": "Either Hand [40]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 50,
+    "usageName": "Left Hand [40]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 51,
+    "usageName": "Right Hand [40]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 52,
+    "usageName": "Both Hands [40]",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        53,
+        63
+      ]
+    ]
+  },
+  {
+    "usageId": 64,
+    "usageName": "Grip Pose Offset [40]",
+    "usageType": "CP",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 65,
+    "usageName": "Pointer Pose Offset [40]",
+    "usageType": "CP",
+    "input": true,
+    "output": true,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": true,
+    "reportID": 0
+  },
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0,
+    "reservedRanges": [
+      [
+        66,
+        65535
+      ]
+    ]
+  }
+]

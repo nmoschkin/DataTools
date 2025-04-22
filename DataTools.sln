@@ -88,6 +88,32 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataTools.Windows.Essentials", "Windows\DataTools.Windows.Essentials\DataTools.Windows.Essentials.csproj", "{C552569F-D6F5-47FD-846A-46BA2BF3A341}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Datafiles", "Datafiles", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		Datafiles\01_GenericDesktopPage.json = Datafiles\01_GenericDesktopPage.json
+		Datafiles\02_SimulationControlsPage.json = Datafiles\02_SimulationControlsPage.json
+		Datafiles\03_VRControlsPage.json = Datafiles\03_VRControlsPage.json
+		Datafiles\04_SportControlsPage.json = Datafiles\04_SportControlsPage.json
+		Datafiles\05_GameControlsPage.json = Datafiles\05_GameControlsPage.json
+		Datafiles\06_GenericDeviceControlsPage.json = Datafiles\06_GenericDeviceControlsPage.json
+		Datafiles\07_KeyboardKeypadPage.json = Datafiles\07_KeyboardKeypadPage.json
+		Datafiles\08_LEDPage.json = Datafiles\08_LEDPage.json
+		Datafiles\09_ButtonPage.json = Datafiles\09_ButtonPage.json
+		Datafiles\12_EyeandHeadTrackersPage.json = Datafiles\12_EyeandHeadTrackersPage.json
+		Datafiles\14_AuxiliaryDisplayPage.json = Datafiles\14_AuxiliaryDisplayPage.json
+		Datafiles\20_SensorsPage.json = Datafiles\20_SensorsPage.json
+		Datafiles\40_MedicalInstrumentPage.json = Datafiles\40_MedicalInstrumentPage.json
+		Datafiles\41_BrailleDisplayPage.json = Datafiles\41_BrailleDisplayPage.json
+		Datafiles\59_LightingAndIlluminationPage.json = Datafiles\59_LightingAndIlluminationPage.json
+		Datafiles\80_MonitorPage.json = Datafiles\80_MonitorPage.json
+		Datafiles\81_MonitorEnumeratedPage.json = Datafiles\81_MonitorEnumeratedPage.json
+		Datafiles\82_VESAVirtualControlsPage.json = Datafiles\82_VESAVirtualControlsPage.json
+		Datafiles\84_PowerPage.json = Datafiles\84_PowerPage.json
+		Datafiles\85_BatterySystemPage.json = Datafiles\85_BatterySystemPage.json
+		Datafiles\90_CameraControlPage.json = Datafiles\90_CameraControlPage.json
+		Datafiles\91_ArcadePage.json = Datafiles\91_ArcadePage.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug NuGet|Any CPU = Debug NuGet|Any CPU
@@ -1665,6 +1691,7 @@ Global
 		{B95DAAF1-52CF-4B53-B80D-406ACE01400B} = {7E237DD5-AFD8-4B9A-A6EC-5698E712BD8D}
 		{765E0DA6-6403-4A96-AE3E-507C9DAE7852} = {7E237DD5-AFD8-4B9A-A6EC-5698E712BD8D}
 		{C552569F-D6F5-47FD-846A-46BA2BF3A341} = {F99203B8-03CA-4FB4-8879-AB0C0CA72D33}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {3295F312-C8B9-44A0-86DC-D49CDB9AF252}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {230C9A7B-0389-4BB4-990E-B2CC865D8DFD}

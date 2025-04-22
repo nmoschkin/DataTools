@@ -60,6 +60,7 @@ namespace TestHid
             {
                 Console.WriteLine("\x1b[H");
 
+                Console.WriteLine(batt2.FriendlyName);
                 if (Console.KeyAvailable) break;
 
                 var vals = batt2.RefreshDynamicValues();
