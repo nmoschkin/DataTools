@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace DataTools.Win32.Usb.Power
 {
+    /// <summary>
+    /// Encapsulates HID Battery Device USB Page Info
+    /// </summary>
     public class HidBatteryDevicePageInfo : HidUsagePageInfo<HidBatteryUsageInfo>
     {
+        /// <summary>
+        /// Get the singleton instance of this class
+        /// </summary>
         public static HidBatteryDevicePageInfo Instance { get; protected set; }
 
         static HidBatteryDevicePageInfo()
@@ -16,8 +22,7 @@ namespace DataTools.Win32.Usb.Power
             Instance = new HidBatteryDevicePageInfo();
         }
 
-
-        protected HidBatteryDevicePageInfo() : base((HidUsagePage)0x85)
+        private HidBatteryDevicePageInfo() : base(HidUsagePage.PowerDevice2)
         {
         }
 
