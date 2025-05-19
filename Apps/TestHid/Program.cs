@@ -14,6 +14,8 @@ namespace TestHid
         [STAThread]
         public static void Main(string[] args)
         {
+            var tebe = DataTools.Text.TextTools.TitleCase("camelCase");
+
             DeviceInfo[] hids = HidDeviceInfo.EnumerateHidDevices();
             DeviceInfo[] batts = DeviceEnum.EnumerateDevices<DeviceInfo>(DevProp.GUID_DEVICE_BATTERY);
             var test = HidFeatures.HidDevicesByUsage(HidUsagePage.PowerDevice1);
