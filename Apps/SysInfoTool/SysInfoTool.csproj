@@ -1,13 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1104</AssemblyVersion>
-    <FileVersion>8.0.0.1104</FileVersion>
+    <AssemblyVersion>8.0.0.1105</AssemblyVersion>
+    <FileVersion>8.0.0.1105</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1104</Version>
+    <Version>8.0.0.1105</Version>
     <Product>DataTools Sample Program</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -17,7 +17,7 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
-    <PreviousVersion>8.0.0.1100</PreviousVersion>
+    <PreviousVersion>8.0.0.1104</PreviousVersion>
     <AssemblyOriginatorKeyFile>C:\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
