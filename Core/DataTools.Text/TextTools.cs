@@ -2558,10 +2558,18 @@ namespace DataTools.Text
                     {
                         if (a == 0 || nextCap)
                         {
-                            if (a > 0 && input[a - 1] == '\'')
-                                varOut.Append(char.ToLower(input[a]));
-                            else
+                            if (a > 0 && char.IsLetter(input[a - 1]) && input[a - 1] == char.ToLower(input[a - 1]) && input[a] == char.ToUpper(input[a]))
+                            {
                                 varOut.Append(char.ToUpper(input[a]));
+                            }
+                            else if (a > 0 && input[a - 1] == '\'')
+                            {
+                                varOut.Append(char.ToLower(input[a]));
+                            }                                
+                            else
+                            {
+                                varOut.Append(char.ToUpper(input[a]));
+                            }
                         }
                         else
                         {
