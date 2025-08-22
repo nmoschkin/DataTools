@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net7.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1038</AssemblyVersion>
-    <FileVersion>8.0.0.1038</FileVersion>
+    <AssemblyVersion>8.0.0.1106</AssemblyVersion>
+    <FileVersion>8.0.0.1106</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1038</Version>
+    <Version>8.0.0.1106</Version>
     <Product>DataTools Sample Program</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -16,15 +16,16 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64;x86</Platforms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Configurations>Debug;Release;NuGet</Configurations>
-    <PreviousVersion>8.0.0.1037</PreviousVersion>
-    <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
+    <PreviousVersion>8.0.0.1105</PreviousVersion>
+    <AssemblyOriginatorKeyFile>C:\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AppCenter" Version="5.0.1" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.1" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.1" />
+    <PackageReference Include="Microsoft.AppCenter" Version="5.0.6" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.6" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\DataTools.Console\DataTools.Console.csproj" />

@@ -1,0 +1,68 @@
+[
+  {
+    "usageId": 0,
+    "usageName": "Reserved",
+    "usageType": "Reserved",
+    "input": false,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 1,
+    "usageName": "Enum 1",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 2,
+    "usageName": "Enum 2",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 3,
+    "usageName": "Enum 3",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 4,
+    "usageName": "Enum 4",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  },
+  {
+    "usageId": 65535,
+    "usageName": "Enum 65535",
+    "usageType": "Sel",
+    "input": true,
+    "output": false,
+    "feature": true,
+    "accessRead": true,
+    "accessWrite": false,
+    "reportID": 0
+  }
+]

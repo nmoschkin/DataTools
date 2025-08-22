@@ -1,15 +1,30 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
+
+using CoreTestOne.Resources;
 
 using DataTools.Desktop;
+using DataTools.Essentials.Broadcasting;
+using DataTools.Essentials.Converters.ClassDescriptions;
+using DataTools.Essentials.Converters.ClassDescriptions.Framework;
+using DataTools.Essentials.Converters.EnumDescriptions.Framework;
+using DataTools.Essentials.Observable;
+using DataTools.Essentials.Settings;
 using DataTools.Graphics;
 using DataTools.Streams;
+using DataTools.Text;
 using DataTools.Win32.Memory;
-
+using DataTools.Windows.Essentials.Settings;
 using Newtonsoft.Json;
 
 using SkiaSharp;
@@ -18,6 +33,56 @@ using static DataTools.Essentials.SortedLists.BinarySearch;
 
 namespace CoreTestOne
 {
+    [EnumDescriptionProvider(typeof(DataTools.Essentials.Converters.EnumDescriptions.GlobalizedDescriptionProvider<ExampleEnum>), typeof(AppResources))]
+    public enum ExampleEnum
+    {
+        Gold,
+        Silver,
+        Blue,
+        Green,
+        Red,
+        Purple
+    }
+
+    public class GetButtonEventArgs : EventArgs
+    {
+        public string ButtonText
+        {
+            get; set;
+        }
+    }
+
+    public class SamViewModel : SyncObservableBase
+    {
+        public event EventHandler<GetButtonEventArgs> GetButtonRequest;
+
+        private string title;
+
+        public SamViewModel() : base(Synchronizer.Default)
+        {
+        }
+
+        public string Title
+        {
+            get => title;
+            set => SetProperty(ref title, value);
+        }
+
+        public Task<string> GetButtonText()
+        {
+            return (sync as Synchronizer).InvokeAsync(() =>
+            {
+                var s = "";
+                var e = new GetButtonEventArgs()
+                {
+                    ButtonText = s
+                };
+                GetButtonRequest?.Invoke(this, e);
+                return e.ButtonText;
+            });
+        }
+    }
+
     public class ExternInfo : IEquatable<ExternInfo>
     {
         private static readonly PropertyInfo[] props = typeof(ExternInfo).GetProperties(BindingFlags.Public | BindingFlags.Instance);
@@ -171,8 +236,13 @@ namespace CoreTestOne
         }
     }
 
-    public class MySampleThing : IEquatable<MySampleThing>
+    [Globalized(typeof(SampleBaseClass), typeof(AppResources))]
+    public class SampleBaseClass : RegistrySerializable, IEquatable<SampleBaseClass>
     {
+        public SampleBaseClass() : base("Nathaniel Moschkin", typeof(SampleBaseClass).Assembly)
+        {
+        }
+
         public string ValueA
         {
             get; set;
@@ -183,13 +253,13 @@ namespace CoreTestOne
             get; set;
         }
 
-        public MySampleThing(string valueA, int valueI)
+        public SampleBaseClass(string valueA, int valueI) : this()
         {
             ValueA = valueA;
             ValueI = valueI;
         }
 
-        public bool Equals(MySampleThing other)
+        public bool Equals(SampleBaseClass other)
         {
             if (other is null) return false;
             return ValueA == other.ValueA && ValueI == other.ValueI;
@@ -197,7 +267,7 @@ namespace CoreTestOne
 
         public override bool Equals(object obj)
         {
-            if (obj is MySampleThing m) return Equals(m);
+            if (obj is SampleBaseClass m) return Equals(m);
             return false;
         }
 
@@ -206,7 +276,7 @@ namespace CoreTestOne
             return (ValueA, ValueI).GetHashCode();
         }
 
-        public static bool operator !=(MySampleThing a, MySampleThing b)
+        public static bool operator !=(SampleBaseClass a, SampleBaseClass b)
         {
             if (a is object)
             {
@@ -222,7 +292,7 @@ namespace CoreTestOne
             }
         }
 
-        public static bool operator ==(MySampleThing a, MySampleThing b)
+        public static bool operator ==(SampleBaseClass a, SampleBaseClass b)
         {
             if (a is object)
             {
@@ -248,27 +318,27 @@ namespace CoreTestOne
             return Crc32.Hash(b.ToArray());
         }
 
-        public RGBDATA TheBless
+        public RGBDATA ColorCode
         {
             get; set;
         }
 
-        public static implicit operator string(MySampleThing obj)
+        public static implicit operator string(SampleBaseClass obj)
         {
             return obj.ValueA;
         }
 
-        public static implicit operator MySampleThing(string obj)
+        public static implicit operator SampleBaseClass(string obj)
         {
-            return new MySampleThing(obj, 0);
+            return new SampleBaseClass(obj, 0);
         }
 
-        public static implicit operator MySampleThing(int obj)
+        public static implicit operator SampleBaseClass(int obj)
         {
-            return new MySampleThing(obj.ToString(), obj);
+            return new SampleBaseClass(obj.ToString(), obj);
         }
 
-        public static implicit operator int(MySampleThing obj)
+        public static implicit operator int(SampleBaseClass obj)
         {
             return obj.ValueI;
         }
@@ -276,6 +346,170 @@ namespace CoreTestOne
         public override string ToString()
         {
             return $"{ValueI}: {ValueA}";
+        }
+    }
+
+    public class DescendantA : SampleBaseClass
+    {
+        public DescendantA(string valueA, int valueI) : base(valueA, valueI)
+        {
+            Lanana = DateTime.Now;
+            Fanalala = Lanana.TimeOfDay;
+        }
+
+        public DateTime Lanana
+        {
+            get; set;
+        }
+
+        public TimeSpan Fanalala
+        {
+            get; set;
+        }
+    }
+
+    public class DescendantA1 : DescendantA
+    {
+        public string SkipNeeds
+        {
+            get; set;
+        }
+
+        public DescendantA1(string skipNeeds, string valueA, int valueI) : base(valueA, valueI)
+        {
+            SkipNeeds = skipNeeds;
+        }
+    }
+
+    public class DescendantA2 : DescendantA
+    {
+        public DescendantA2(short flowers, string valueA, int valueI) : base(valueA, valueI)
+        {
+            Flowers = flowers;
+        }
+
+        public short Flowers
+        {
+            get; set;
+        }
+
+        public DescendantA1 MaybeSkippers { get; set; } = new DescendantA1("Hoyaman", "Singing Loopily", 11);
+    }
+
+    public class DescendantB : SampleBaseClass
+    {
+        public decimal ValueDe
+        {
+            get; set;
+        }
+
+        public DescendantB(decimal valueDe, string valueA, int valueI) : base(valueA, valueI)
+        {
+            ValueDe = valueDe;
+        }
+
+        public override string ToString()
+        {
+            return ValueDe.ToString() + " @ " + base.ToString();
+        }
+    }
+
+    public class DescendantB1 : DescendantB
+    {
+        [TranslationKey("Proptens")]
+        public Guid HippieCode { get; set; } = Guid.NewGuid();
+
+        public DescendantB1(decimal valueDe, string valueA, int valueI, Guid? hippieCode = null) : base(valueDe, valueA, valueI)
+        {
+            HippieCode = hippieCode ?? HippieCode;
+        }
+
+        public override string ToString()
+        {
+            return HippieCode.ToString() + " %% " + base.ToString();
+        }
+    }
+
+    public class DescendantB1A : DescendantB1
+    {
+        [JsonProperty("staysNoodles")]
+        [DescriptionProvider(typeof(CallbackDescriptionProvider<List<string>>), nameof(GrizzlyJones), typeof(DescendantB1A))]
+        public List<string> MarketNoodles
+        {
+            get; set;
+        }
+
+        private static string GrizzlyJones(List<string> pappy, string sisterDaughter)
+        {
+            return string.Join(", ", pappy);
+        }
+
+        public DescendantA2 Ables { get; set; } = new DescendantA2(4, "nininin", 995);
+
+        public DescendantB1A(decimal valueDe, string valueA, int valueI, IEnumerable<string> preNoodles = null, Guid? hippieCode = null) : base(valueDe, valueA, valueI, hippieCode)
+        {
+            MarketNoodles = new List<string>
+            {
+                valueDe.ToString(),
+                valueA.ToString(),
+                valueI.ToString(),
+                HippieCode.ToString("d")
+            };
+
+            if (preNoodles != null) MarketNoodles.AddRange(preNoodles);
+        }
+
+        public override string ToString() => $"{string.Join("!", MarketNoodles)} {base.ToString()}";
+    }
+
+    public class DescendantB1B : DescendantB1
+    {
+        public string Balloons
+        {
+            get; set;
+        }
+
+        public DescendantB1B(string balloons, decimal valueDe, string valueA, int valueI, Guid? hippieCode = null) : base(valueDe, valueA, valueI, hippieCode)
+        {
+        }
+
+        public override string ToString() => $"{Balloons} float: {base.ToString()}";
+    }
+
+    public class DescendantB2B : DescendantB2<bool>
+    {
+        public double ForTe
+        {
+            get; set;
+        }
+
+        public DescendantB2B(bool aardvulnis, decimal valueDe, string valueA, int valueI) : base(aardvulnis, valueDe, valueA, valueI)
+        {
+            ForTe = (double)valueI / valueA.Length;
+        }
+
+        public override string ToString() => $"ForTe {ForTe} @ {base.ToString()}";
+    }
+
+    public abstract class DescendantB2<T> : DescendantB
+    {
+        public T Aardvulnis
+        {
+            get; set;
+        }
+
+        protected DescendantB2(T aardvulnis, decimal valueDe, string valueA, int valueI) : base(valueDe, valueA, valueI)
+        {
+            Aardvulnis = aardvulnis;
+        }
+
+        public override string ToString() => $"{Aardvulnis} :// {base.ToString()}";
+    }
+
+    public class DescendantB2A : DescendantB2<MemoryStream>
+    {
+        public DescendantB2A(decimal valueDe, string valueA, int valueI) : base(new MemoryStream(), valueDe, valueA, valueI)
+        {
         }
     }
 
@@ -371,8 +605,327 @@ namespace CoreTestOne
         }
     }
 
+    public class BCast : Broadcaster<byte[]>
+    {
+        public BCast(InvocationType invocationType = InvocationType.Synchronous) : base(invocationType, ChannelToken.CreateToken("My Dispatch"), "My Dispatch")
+        {
+        }
+
+        public void PostBytes(byte[] data, params ChannelToken[] channels)
+        {
+            TransmitData(data, InvocationType, channels);
+        }
+
+    }
+
+    public class Listener : ISubscriber<byte[]>
+    {
+        private byte[] buffer = new byte[65536];
+
+        public long Packets { get; set; } = 0;
+        public string ReceiveString { get; set; } = "Broadcast Received: {0}";
+        public long Counter { get; set; } = 0;
+        public long LongCounter { get; set; } = 0;
+
+        public void ReceiveData(byte[] value, ISideBandData sideBandData)
+        {
+            Counter += value.Length;
+            Packets++;
+            LongCounter++;
+
+            Array.Copy(value, buffer, 65536);
+        }
+        
+    }
+
+    public enum SomeEnum
+    {
+        Vabula,
+        Imbula,
+        Terba
+    }
+
     public static class Program
     {
+        [DllImport("kernel32.dll")]
+        private static extern bool AllocConsole();
+
+        [STAThread]
+        public static void Main(string[] args)
+        {
+
+
+            var clins = (System.Enum)SomeEnum.Vabula;
+
+
+            var den = new DescribedEnum(clins);
+
+
+            //AllocConsole();
+
+            //var bc = new BCast(InvocationType.Synchronous);
+
+            //var tok1 = ChannelToken.CreateToken("Boogie1");
+            //var tok2 = ChannelToken.CreateToken("Boogie2");
+            //var tok3 = ChannelToken.CreateToken("Boogie3");
+
+            //var tok4 = tok1 ^ tok3;
+            //var tok5 = tok4 ^ tok3;
+
+            //var tok8 = ~tok4 ^ tok1;
+
+            //var t8c = tok8.GetHashCode();
+
+            //var lb = tok5 == tok1;
+
+            //var th1 = tok1.GetHashCode();
+            //var th5 = tok5.GetHashCode();
+
+            //var lb2 = th1 == th5;
+
+            //var btest1 = new byte[16];
+
+            //btest1[0] = 5;
+            //btest1[1] = 5;
+            //btest1[2] = 0xa;
+            //btest1[7] = 0xc;
+            //btest1[13] = 71;
+            //btest1[14] = 15;
+            //btest1[15] = 55;
+
+            //var tok6 = new ChannelToken(btest1);
+
+            //Console.WriteLine($"{tok6}");
+
+            //var btest2 = new byte[16];
+            
+            //btest2[0] = 7;
+            //btest2[1] = 9;
+            //btest2[2] = 0xd;
+            //btest2[7] = 0xf;
+            //btest2[13] = 23;
+            //btest2[14] = 137;
+            //btest2[15] = 45;
+
+            //var sf = new DataTools.Memory.SafePtr();
+            //sf.FromByteArray(btest1);
+            //sf += btest2;
+
+            //var btest3 = sf.ToByteArray();
+            //sf.Free();
+
+            //var tok7 = new ChannelToken(btest1);
+
+
+            //var tv = tok6.CompareTo(tok7);
+
+            //var ls = new Listener();
+            //var ls3 = new Listener();
+            //var ls2 = new Listener()
+            //{
+            //    ReceiveString = "Other Listener {0}"
+            //};
+
+            //var sub = bc.Subscribe(ls, tok1);
+            //var sub2 = bc.Subscribe(ls2, tok2);
+            //var sub3 = bc.Subscribe(ls3, tok3);
+
+            //DateTime n = DateTime.Now;
+
+            //var bre = true;
+            //long ssz = 0;
+            
+            //int plep;
+
+            //Console.WriteLine("Initiating...");
+            //Console.WriteLine("");
+            //var forseed = (int)DateTime.Now.Ticks & 0x7fffffff;
+
+            //var orig = Console.GetCursorPosition().Top;
+
+            //var th = new Thread(async () =>
+            //{
+            //    var i = 0;
+            //    var rnd = new Random(forseed);
+
+            //    var bsize = 65536;// rnd.Next(4 * 1024 * 1024, 8 * 1024 * 1024);
+            //    var buff = new byte[bsize];
+
+            //    while (bre)
+            //    {
+            //        var nn = DateTime.Now;
+            //        var tf = nn - n;
+
+            //        plep = rnd.Next(1, 10);
+
+            //        if (tf.Seconds >= 1)
+            //        {
+            //            forseed ^= i;
+            //            rnd = new Random(forseed);
+
+            //            var bps1 = ls.Counter; // / ls.Counter;
+            //            var bps2 = ls2.Counter; // / ls2.Counter;
+            //            var bps3 = ls3.Counter; // / ls2.Counter;
+
+            //            var pk1 = ls.Packets;
+            //            var pk2 = ls2.Packets;
+            //            var pk3 = ls3.Packets;
+
+            //            var l1 = ls.LongCounter;
+            //            var l2 = ls2.LongCounter;
+            //            var l3 = ls3.LongCounter;
+
+
+            //            n = nn;
+            //            ls.Counter = ls2.Counter = ls3.Counter = 0;
+            //            ls.Packets = ls2.Packets = ls3.Packets = 0;
+
+            //            ssz = 0;
+
+            //            Console.SetCursorPosition(0, orig);
+
+            //            Console.WriteLine($"Object 1: {new FriendlySpeedLong(bps1),-9} ({pk1,-7:#,##0} Pkts/s) ({l1,-11:#,##0} Packets Total)        ");
+            //            Console.WriteLine($"Object 2: {new FriendlySpeedLong(bps2),-9} ({pk2,-7:#,##0} Pkts/s) ({l2,-11:#,##0} Packets Total)        ");
+            //            Console.WriteLine($"Object 3: {new FriendlySpeedLong(bps3),-9} ({pk3,-7:#,##0} Pkts/s) ({l3,-11:#,##0} Packets Total)        ");
+            //        }
+
+            //        i++;
+
+            //        _ = Task.Run(() =>
+            //        {
+            //            var by1 = (byte)rnd.Next(0, 255);
+            //            var by2 = (byte)rnd.Next(0, 255);
+
+            //            for (var j = 0; j < bsize; j++)
+            //            {
+            //                by1 ^= by2;
+            //                buff[j] = by1;
+            //                by2 ^= (byte)(by1 ^ by2 << 1);
+            //            }
+
+            //            ssz += bsize;
+
+            //            if ((plep & 8) != 0)
+            //            {
+            //                if (plep == 8)
+            //                {
+            //                    bc.PostBytes(buff, tok1);
+            //                }
+            //                else 
+            //                {
+            //                    bc.PostBytes(buff, tok2, tok3);
+            //                }
+            //            }
+            //            else
+            //            {
+            //                if ((plep & 1) != 0)
+            //                {
+            //                    bc.PostBytes(buff, tok1);
+            //                }
+
+            //                if ((plep & 2) != 0)
+            //                {
+            //                    bc.PostBytes(buff, tok2);
+            //                }
+
+            //                if ((plep & 4) != 0)
+            //                {
+            //                    bc.PostBytes(buff, tok3);
+            //                } 
+            //            }
+
+            //        });
+                    
+            //        await Task.Run(() =>
+            //        {
+            //            for (var n = 0; n < 64; n++)
+            //            {
+            //                Thread.Sleep(new TimeSpan(0, 0, 0, 0, 0, 500));
+            //            }
+            //        });
+            //    }
+
+            //    Console.WriteLine("");
+            //    Console.WriteLine("Terminated");
+            //});
+
+            //th.Priority = ThreadPriority.AboveNormal;
+            //th.IsBackground = false;
+            //th.Start();
+
+            //while(true)
+            //{
+            //    if (Console.KeyAvailable)
+            //    {
+            //        break;
+            //    }
+
+            //    Thread.Sleep(0);
+            //}
+
+            //bre = false;
+            //Environment.Exit(0);
+
+
+
+
+            //var b1 = new DescendantB1(5.4949944444M, "Volleyball", 10, Guid.NewGuid());
+
+            //var a1 = new DescendantA1("Hork filled", "smash", 400);
+
+            //var b2a = new DescendantB2A(69M, "Becknus", 5);
+
+            var b1a = new DescendantB1A(45.5912933M, "Glissful Blissoms", 55, new List<string> { "Glances", "Common Noodles", "Weeds" });
+
+            //var allprovs = ClassInfo.GetDescriptions(b1a);
+
+            //var a = new DescendantA("Becknus", 5)
+            //{
+            //    ColorCode = new RGBDATA()
+            //    {
+            //        Red = 255,
+            //        Green = 255,
+            //        Blue = 0
+            //    }
+            //};
+
+            //var b2b = new DescendantB2B(true, 551.33M, "thirty two men", 5)
+            //{
+            //    ColorCode = new RGBDATA()
+            //    {
+            //        Red = 253,
+            //        Green = 135,
+            //        Blue = 25
+            //    }
+            //};
+
+            //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2b, b2a);
+
+            //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b1, a1);
+
+            //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(b2a, b1);
+
+            //DataTools.Essentials.Helpers.ObjectMerge.MergeObjects(a, a1);
+
+            var smo = new SettingsMapOptions();
+            var bllb = new DescendantB1A(30.00M, "Hiiyp", 934);
+            bllb.Load();
+
+            var rmo = SettingsMapOptions.MapSettings(typeof(DescendantB1A), smo);
+            bllb.Ables.ValueA = "Bjorn";
+            var tbool = SettingsMapOptions.LookupProperty(bllb, "Ables\\MaybeSkippers\\SkipNeeds", out var found, out var fprop);
+
+            if (tbool)
+            {
+                var springTest = (string)fprop.GetValue(found);
+            }
+
+            bllb.Save();
+
+            var frm = new frmExterns();
+            System.Windows.Forms.Application.Run(frm);
+        }
+
         private static Dictionary<FoundStruct, List<string>> MatchedFiles = new Dictionary<FoundStruct, List<string>>();
         private static int max = 100;
 
@@ -593,6 +1146,7 @@ namespace CoreTestOne
 
             int i, c = lines.Length;
             string classname = null;
+            string classvis = "internal";
             string nns = null;
             var currvis = "private";
 
@@ -621,8 +1175,9 @@ namespace CoreTestOne
                     if (m.Success)
                     {
                         classname = m.Groups[1].Value;
-                        if (lines[i].Contains("public ")) currvis = "public";
-                        else if (lines[i].Contains("internal ")) currvis = "internal";
+                        if (lines[i].Contains("public ")) classvis = "public";
+                        else if (lines[i].Contains("private ")) classvis = "private";
+                        else classvis = "internal";
                     }
                 }
                 else
@@ -652,11 +1207,17 @@ namespace CoreTestOne
                         dtype = dm.Groups[1].Value;
                         dname = dm.Groups[2].Value;
 
-                        if (lines[i].Contains("public ") && currvis == "public") currvis = "public";
-                        else if (lines[i].Contains("internal ")) currvis = "internal";
-                        else if (lines[i].Contains("private ")) currvis = "private";
-                        else if (lines[i].Contains("protected ")) currvis = "protected";
-                        else if (lines[i].Contains("protected internal ")) currvis = "protected internal";
+                        if (lines[i].Contains("public ") && classvis == "public")
+                        {
+                            currvis = "public";
+                        }
+                        else if (classvis != "public")
+                        {
+                            if (lines[i].Contains("protected internal ")) currvis = "protected internal";
+                            else if (lines[i].Contains("internal ")) currvis = "internal";
+                            else if (lines[i].Contains("private ")) currvis = "private";
+                            else if (lines[i].Contains("protected ")) currvis = "protected";
+                        }
 
                         var mtypes = rtypes.Match(lines[i]);
 
@@ -741,10 +1302,6 @@ namespace CoreTestOne
             }
 
             return results ?? nsextern;
-        }
-
-        public static void Main(string[] args)
-        {
         }
 
         public static List<ExternInfo> ScanForExterns(string path)
@@ -1016,6 +1573,21 @@ namespace CoreTestOne
 
             modules = modout.ToArray();
             return projname;
+        }
+
+        public static void DescribedEnumDemo()
+        {
+            var eval = new DescribedEnum<ExampleEnum>(ExampleEnum.Silver);
+
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Blue;
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Red;
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Purple;
+            Console.WriteLine(eval.ToString());
+            eval = ExampleEnum.Green;
+            Console.WriteLine(eval.ToString());
         }
 
         public static void HuntForDuplicateFiles()

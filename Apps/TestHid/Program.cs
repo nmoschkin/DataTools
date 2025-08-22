@@ -1,4 +1,8 @@
-﻿using DataTools.Text;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+
+using DataTools.Text;
 using DataTools.Win32;
 using DataTools.Win32.Usb;
 using DataTools.Win32.Usb.Power;
@@ -10,9 +14,23 @@ namespace TestHid
         [STAThread]
         public static void Main(string[] args)
         {
-            var hids = HidDeviceInfo.EnumerateHidDevices();
+            var tebe = DataTools.Text.TextTools.TitleCase("camelCase");
 
+            DeviceInfo[] hids = HidDeviceInfo.EnumerateHidDevices();
+            DeviceInfo[] batts = DeviceEnum.EnumerateDevices<DeviceInfo>(DevProp.GUID_DEVICE_BATTERY);
+            var test = HidFeatures.HidDevicesByUsage(HidUsagePage.PowerDevice1);
             var battery = hids.Where((e) => e.DeviceClass == DeviceClassEnum.Battery).ToList().FirstOrDefault();
+
+            if (battery == null)
+            {
+                battery = batts.FirstOrDefault();
+            }
+
+            if (battery == null)
+            {
+                Environment.Exit(0);
+                return;
+            }
 
             var batt2 = HidPowerDeviceInfo.CreateFromHidDevice(battery);
             batt2.OpenHid();
@@ -24,7 +42,6 @@ namespace TestHid
 
             Console.Clear();
             Console.CursorVisible = false;
-            Console.WindowHeight = 100;
 
             Task.Delay(1000).Wait();
 
@@ -36,11 +53,16 @@ namespace TestHid
 
             //Environment.Exit(0);
 
+            Console.WriteLine("Press any key to begin...");
+            Console.Read();
+
+            Console.WriteLine("\x1b[2J\x1b[H");
+
             while (true)
             {
-                Console.CursorLeft = 0;
-                Console.CursorTop = 0;
+                Console.WriteLine("\x1b[H");
 
+                Console.WriteLine(batt2.FriendlyName);
                 if (Console.KeyAvailable) break;
 
                 var vals = batt2.RefreshDynamicValues();
@@ -161,7 +183,7 @@ namespace TestHid
                     printed = true;
                 }
 
-                Task.Delay(500);
+                Task.Delay(500).Wait();
             }
 
             batt2.CloseHid();

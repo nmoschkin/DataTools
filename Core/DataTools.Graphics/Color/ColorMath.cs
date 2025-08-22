@@ -269,6 +269,11 @@ namespace DataTools.Graphics
             saturation = sat;
         }
 
+        /// <summary>
+        /// Convert HSV to color
+        /// </summary>
+        /// <param name="hsv"></param>
+        /// <returns></returns>
         public static UniColor HSVToColor(HSVDATA hsv)
         {
             int c = 0;
@@ -276,6 +281,11 @@ namespace DataTools.Graphics
             return c;
         }
 
+        /// <summary>
+        /// Convert HSV to color
+        /// </summary>
+        /// <param name="hsv"></param>
+        /// <param name="dest"></param>
         public static void HSVToColor(HSVDATA hsv, ref UniColor dest)
         {
             // preserve alpha
@@ -413,6 +423,11 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <summary>
+        /// Convert Color to CMY(K)
+        /// </summary>
+        /// <param name="Color"></param>
+        /// <param name="cmy"></param>
         public static void ColorToCMY(UniColor Color, ref CMYDATA cmy)
         {
             //
@@ -435,6 +450,11 @@ namespace DataTools.Graphics
             cmy.Cyan = b;
         }
 
+        /// <summary>
+        /// Convert CMY(K) data to color
+        /// </summary>
+        /// <param name="cmy"></param>
+        /// <returns></returns>
         public static UniColor CMYToColor(CMYDATA cmy)
         {
             //
@@ -457,14 +477,21 @@ namespace DataTools.Graphics
             return new UniColor(255, r, g, b);
         }
 
-        public static void GetPercentages(UniColor Color, ref double dpRed, ref double dpGreen, ref double dpBlue)
+        /// <summary>
+        /// Get the individual percentages of the RGB color components
+        /// </summary>
+        /// <param name="color">The input color</param>
+        /// <param name="dpRed">The dpRed value</param>
+        /// <param name="dpGreen">The dpGreen value</param>
+        /// <param name="dpBlue">The dpBlue value</param>
+        public static void GetPercentages(UniColor color, ref double dpRed, ref double dpGreen, ref double dpBlue)
         {
             double vR;
             double vB;
             double vG;
             var vIn = new byte[3];
             double d;
-            GetRGB(Color, out vIn[0], out vIn[1], out vIn[2]);
+            GetRGB(color, out vIn[0], out vIn[1], out vIn[2]);
             vR = vIn[0];
             vG = vIn[1];
             vB = vIn[2];
@@ -481,7 +508,12 @@ namespace DataTools.Graphics
             dpBlue = vB / d;
         }
 
-        public static UniColor AbsTone(UniColor Color)
+        /// <summary>
+        /// Gets the absolute tone for the specified color
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns></returns>
+        public static UniColor AbsTone(UniColor color)
         {
             UniColor AbsToneRet = default;
             var pR = default(double);
@@ -490,14 +522,21 @@ namespace DataTools.Graphics
             double sR;
             double sB;
             double sG;
-            GetPercentages(Color, ref pR, ref pG, ref pB);
+            GetPercentages(color, ref pR, ref pG, ref pB);
             sR = pR * 255d;
             sG = pG * 255d;
             sB = pB * 255d;
-            AbsToneRet = new UniColor(Color.A, (byte)sR, (byte)sG, (byte)sB);
+            AbsToneRet = new UniColor(color.A, (byte)sR, (byte)sG, (byte)sB);
             return AbsToneRet;
         }
 
+        /// <summary>
+        /// Apply the specified absolute tone to the specified RGB color data and return a new <see cref="UniColor"/>.
+        /// </summary>
+        /// <param name="rgbData"></param>
+        /// <param name="pPercent"></param>
+        /// <param name="Color"></param>
+        /// <returns></returns>
         public static UniColor SetTone(ref RGBDATA rgbData, float pPercent, UniColor Color = default)
         {
             float x;
@@ -518,6 +557,13 @@ namespace DataTools.Graphics
             return RGBToColor(rgbData);
         }
 
+        /// <summary>
+        /// Apply the specified absolute tone to the specified RGB color data and return a new <see cref="UniColor"/>.
+        /// </summary>
+        /// <param name="argbData"></param>
+        /// <param name="pPercent"></param>
+        /// <param name="Color"></param>
+        /// <returns></returns>
         public static UniColor SetTone(ref ARGBDATA argbData, float pPercent, UniColor Color = default)
         {
             float x;
@@ -538,6 +584,11 @@ namespace DataTools.Graphics
             return ARGBToColor(argbData);
         }
 
+        /// <summary>
+        /// Gets the grayscale version of the specified color
+        /// </summary>
+        /// <param name="Color"></param>
+        /// <returns></returns>
         public static UniColor GrayTone(UniColor Color)
         {
             UniColor GrayToneRet = default;
@@ -555,16 +606,22 @@ namespace DataTools.Graphics
             return GrayToneRet;
         }
 
-        public static UniColor GetAverageColor(UniColor Color1, UniColor Color2)
+        /// <summary>
+        /// Gets the color that is the average between two colors
+        /// </summary>
+        /// <param name="color1"></param>
+        /// <param name="color2"></param>
+        /// <returns></returns>
+        public static UniColor GetAverageColor(UniColor color1, UniColor color2)
         {
             var Bits = new RGBDATA[3];
             float df;
             int e;
-            float clr2 = Color2.Value;
-            byte al = Color1.A;
-            byte af = Color2.A;
-            ColorToRGB(Color1, out Bits[0]);
-            ColorToRGB(Color2, out Bits[1]);
+            float clr2 = color2.Value;
+            byte al = color1.A;
+            byte af = color2.A;
+            ColorToRGB(color1, out Bits[0]);
+            ColorToRGB(color2, out Bits[1]);
             e = 0;
             if (Math.Round(clr2) != clr2)
             {

@@ -1,12 +1,12 @@
-﻿
-
-
-using DataTools.Win32.Disk.Partition.Mbr;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using DataTools.Text;
+using DataTools.Win32.Disk.Partition;
 using DataTools.Win32.Disk.Partition.Gpt;
-using DataTools.Win32;
-using DataTools.Win32.Disk;
-
-using static DataTools.Text.TextTools;
+using DataTools.Win32.Disk.Partition.Mbr;
 
 namespace TestNetwork
 {
@@ -16,36 +16,52 @@ namespace TestNetwork
         public static void Main(string[] args)
         {
             var disks = DataTools.Win32.Disk.DiskDeviceInfo.EnumDisks();
-            
+            var bd = Guid.Parse("EBD0A0A2-B9E5-4433-87C0-68B6B72699C7");
+
             foreach (var disk in disks)
             {
-                Console.WriteLine("Physical Disk: " + disk.BusReportedDeviceDesc);
-                Console.WriteLine("Partition Style: " + disk.DiskLayout?.ToString() ?? "None");
+                IList<RawDiskPartition> rawParts = null;
 
-                if (disk.DiskLayout != null)
+                if (disk.DeviceClass != DataTools.Win32.DeviceClassEnum.CdRom)
                 {
-                    if (disk.DiskLayout.PartitionStyle == DataTools.Win32.Disk.Partition.PartitionStyle.Gpt)
+
+                    try
                     {
-                        RawGptDisk.RAW_GPT_DISK? gptInfo = default;
-                        RawGptDisk.ReadRawGptDisk(disk.DevicePath, out gptInfo);
-
-                        if (gptInfo?.Header.IsValid ?? false)
-                        {
-                            Console.WriteLine("Successfully read raw GPT disk.  Total logical partitions: " + gptInfo?.Partitions.Length.ToString());
-                        }
+                        //var testdetect = RawDiskPartition.DetectPartitionStyle(disk);
+                        rawParts = RawDiskPartition.ReadPartitions(disk);
                     }
-                    else if (disk.DiskLayout.PartitionStyle == DataTools.Win32.Disk.Partition.PartitionStyle.Mbr)
+                    catch (Exception ex) 
                     {
-                        try
-                        {
-                            RawMbrDisk.RAW_MBR_INFO? mbrInfo = default;
-                            RawMbrDisk.ReadRawMbrDisk(disk.DevicePath, disk.SectorSize, out mbrInfo);
-
-                            Console.WriteLine("Successfully read raw MBR disk.  Total logical partitions: " + mbrInfo?.PartitionCount.ToString());
-
-                        }
-                        catch { }
+                        //Console.WriteLine($"Can't read disk '{disk.DevicePath}'");
+                        //Console.WriteLine(ex.Message);
                     }
+                }
+                
+
+                Console.WriteLine();
+                Console.WriteLine("Disk: " + disk.ToString());
+                Console.WriteLine("Is Virtual: " + (disk.VirtualDisk != null).ToString());
+
+                if (disk.VirtualDisk?.BackingStore != null)
+                {
+                    Console.WriteLine("Virtual Disk Files");
+                    Console.WriteLine("------------------");
+                    Console.WriteLine(string.Join("\r\n", disk.VirtualDisk.BackingStore));
+                    Console.WriteLine("------------------");
+                }
+                Console.WriteLine("Physical Disk: " + disk.BusReportedDeviceDesc);
+
+                if (rawParts != null)
+                {
+                    var iq = 1;
+                    foreach (var part in rawParts)
+                    {
+                        Console.WriteLine($"Partition {iq++}: {part}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No disk in drive, skipping...");
                 }
             }
         }

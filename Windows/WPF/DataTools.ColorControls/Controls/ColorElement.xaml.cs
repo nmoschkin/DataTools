@@ -626,7 +626,7 @@ namespace DataTools.ColorControls
 
                     //CursorCanvas.RenderSize = new Size(w, h);
                     cpRender = cw;
-                    PickerSite.Source = DataTools.Desktop.BitmapTools.MakeWPFImage(cpRender.Bitmap);
+                    PickerSite.Source = Desktop.WPFBitmapTools.MakeWPFImage(cpRender.Bitmap);
 
                     UniColor? selc = null;
 

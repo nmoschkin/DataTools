@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace DataTools.Win32.Memory
 {
     [Flags]
-    public enum HeapWalkFlags : short
+    internal enum HeapWalkFlags : short
     {
         /// <summary>
         /// The heap element is an allocated block.
@@ -44,7 +44,7 @@ namespace DataTools.Win32.Memory
     }
 
     [Flags]
-    public enum MemoryTypes
+    internal enum MemoryTypes
     {
         /// <summary>
         /// Indicates that the memory pages within the region are mapped into the view of an image section.
@@ -66,7 +66,7 @@ namespace DataTools.Win32.Memory
     }
 
     [Flags]
-    public enum MemoryStates
+    internal enum MemoryStates
     {
         /// <summary>
         /// Indicates committed pages for which physical storage has been allocated, either in memory or in the paging file on disk.
@@ -88,7 +88,7 @@ namespace DataTools.Win32.Memory
     }
 
     [Flags]
-    public enum MemoryProtectionFlags
+    internal enum MemoryProtectionFlags
     {
         /// <summary>
         ///Enables execute access to the committed region of pages. An attempt to read from or write to the committed region results in an access violation.
@@ -158,7 +158,7 @@ namespace DataTools.Win32.Memory
     }
 
     [Flags]
-    public enum VMemFreeFlags
+    internal enum VMemFreeFlags
     {
         /// <summary>
         ///Decommits the specified region of committed pages. After the operation, the pages are in the reserved state.
@@ -178,7 +178,7 @@ namespace DataTools.Win32.Memory
     }
 
     [Flags]
-    public enum VMemAllocFlags
+    internal enum VMemAllocFlags
     {
         /// <summary>
         ///Allocates memory charges (from the overall size of memory and the paging files on disk) for the specified reserved memory pages. The function also guarantees that when the caller later initially accesses the memory, the contents will be zero. Actual physical pages are not allocated unless/until the virtual addresses are actually accessed.
@@ -231,7 +231,7 @@ namespace DataTools.Win32.Memory
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct MEMORY_BASIC_INFORMATION
+    internal struct MEMORY_BASIC_INFORMATION
     {
         public IntPtr BaseAddress;
         public IntPtr AllocationBase;
@@ -243,7 +243,7 @@ namespace DataTools.Win32.Memory
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct PROCESS_HEAP_ENTRY_BLOCK
+    internal struct PROCESS_HEAP_ENTRY_BLOCK
     {
         public IntPtr lpData;
         public uint cbData;
@@ -257,7 +257,7 @@ namespace DataTools.Win32.Memory
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct PROCESS_HEAP_ENTRY_REGION
+    internal struct PROCESS_HEAP_ENTRY_REGION
     {
         public IntPtr lpData;
         public uint cbData;
@@ -270,86 +270,86 @@ namespace DataTools.Win32.Memory
         public IntPtr lpLastBlock;
     }
 
-    public static class Native
+    internal static class Native
     {
         [DllImport("netapi32.dll")]
-        internal static extern int NetApiBufferAllocate(int byteCount, out IntPtr buffer);
+        public static extern int NetApiBufferAllocate(int byteCount, out IntPtr buffer);
 
         [DllImport("netapi32.dll")]
-        internal static extern int NetApiBufferReallocate(IntPtr oldBuffer, int newSize, out IntPtr newBuffer);
+        public static extern int NetApiBufferReallocate(IntPtr oldBuffer, int newSize, out IntPtr newBuffer);
 
         [DllImport("netapi32.dll")]
-        internal static extern int NetApiBufferSize(IntPtr buffer, out int cbsize);
+        public static extern int NetApiBufferSize(IntPtr buffer, out int cbsize);
 
         [DllImport("netapi32.dll")]
-        internal static extern int NetApiBufferFree(IntPtr buffer);
+        public static extern int NetApiBufferFree(IntPtr buffer);
 
         [DllImport("kernel32")]
-        internal static extern IntPtr VirtualAlloc(IntPtr lpAddress, IntPtr dwSize, VMemAllocFlags flAllocationType, MemoryProtectionFlags flProtect);
+        public static extern IntPtr VirtualAlloc(IntPtr lpAddress, IntPtr dwSize, VMemAllocFlags flAllocationType, MemoryProtectionFlags flProtect);
 
         [DllImport("kernel32")]
-        internal static extern bool VirtualProtect(IntPtr lpAddress, IntPtr dwSize, MemoryProtectionFlags flNewProtect, ref MemoryProtectionFlags flOldProtect);
+        public static extern bool VirtualProtect(IntPtr lpAddress, IntPtr dwSize, MemoryProtectionFlags flNewProtect, ref MemoryProtectionFlags flOldProtect);
 
         [DllImport("kernel32")]
-        internal static extern bool VirtualFree(IntPtr lpAddress, IntPtr dwSize = default, VMemFreeFlags dwFreeType = VMemFreeFlags.MEM_RELEASE);
+        public static extern bool VirtualFree(IntPtr lpAddress, IntPtr dwSize = default, VMemFreeFlags dwFreeType = VMemFreeFlags.MEM_RELEASE);
 
         [DllImport("kernel32")]
-        internal static extern IntPtr VirtualQuery(IntPtr lpAddress, ref MEMORY_BASIC_INFORMATION lpBuffer, IntPtr dwLength);
+        public static extern IntPtr VirtualQuery(IntPtr lpAddress, ref MEMORY_BASIC_INFORMATION lpBuffer, IntPtr dwLength);
 
         [DllImport("kernel32")]
-        internal static extern bool VirtualLock(IntPtr lpAddress, IntPtr dwSize);
+        public static extern bool VirtualLock(IntPtr lpAddress, IntPtr dwSize);
 
         [DllImport("kernel32")]
-        internal static extern bool VirtualUnlock(IntPtr lpAddress, IntPtr dwSize);
+        public static extern bool VirtualUnlock(IntPtr lpAddress, IntPtr dwSize);
 
         [DllImport("kernel32")]
-        internal static extern bool SetProcessWorkingSetSize(IntPtr hProcess, IntPtr dwMinimumWorkingSetSize, IntPtr dwMaximumWorkingSetSize);
+        public static extern bool SetProcessWorkingSetSize(IntPtr hProcess, IntPtr dwMinimumWorkingSetSize, IntPtr dwMaximumWorkingSetSize);
 
         [DllImport("kernel32")]
-        internal static extern IntPtr GetLargePageMinimum();
+        public static extern IntPtr GetLargePageMinimum();
 
         [DllImport("kernel32", EntryPoint = "HeapWalk", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern bool HeapWalk(
+        public static extern bool HeapWalk(
           IntPtr hHeap,
           WinPtrBase lpEntry
         );
 
         [DllImport("kernel32", EntryPoint = "HeapCreate", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern IntPtr HeapCreate(int dwOptions, IntPtr initSize, IntPtr maxSize);
+        public static extern IntPtr HeapCreate(int dwOptions, IntPtr initSize, IntPtr maxSize);
 
         [DllImport("kernel32", EntryPoint = "HeapDestroy", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern bool HeapDestroy(IntPtr hHeap);
+        public static extern bool HeapDestroy(IntPtr hHeap);
 
         [DllImport("kernel32", EntryPoint = "GetProcessHeap", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern IntPtr GetProcessHeap();
+        public static extern IntPtr GetProcessHeap();
 
         [DllImport("kernel32", EntryPoint = "HeapQueryInformation", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern bool HeapQueryInformation(IntPtr HeapHandle, int HeapInformationClass, ref ulong HeapInformation, IntPtr HeapInformationLength, IntPtr ReturnLength);
+        public static extern bool HeapQueryInformation(IntPtr HeapHandle, int HeapInformationClass, ref ulong HeapInformation, IntPtr HeapInformationLength, IntPtr ReturnLength);
 
         // As per the MSDN manual, we're using ONLY Heap functions, here.
 
         [DllImport("kernel32", EntryPoint = "HeapAlloc", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern IntPtr HeapAlloc(IntPtr hHeap, uint dwOptions, IntPtr dwBytes);
+        public static extern IntPtr HeapAlloc(IntPtr hHeap, uint dwOptions, IntPtr dwBytes);
 
         [DllImport("kernel32", EntryPoint = "HeapReAlloc", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern IntPtr HeapReAlloc(IntPtr hHeap, int dwOptions, IntPtr lpMem, IntPtr dwBytes);
+        public static extern IntPtr HeapReAlloc(IntPtr hHeap, int dwOptions, IntPtr lpMem, IntPtr dwBytes);
 
         [DllImport("kernel32", EntryPoint = "HeapFree", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern bool HeapFree(IntPtr hHeap, uint dwOptions, IntPtr lpMem);
+        public static extern bool HeapFree(IntPtr hHeap, uint dwOptions, IntPtr lpMem);
 
         [DllImport("kernel32", EntryPoint = "HeapSize", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern IntPtr HeapSize(IntPtr hHeap, uint dwOptions, IntPtr lpMem);
+        public static extern IntPtr HeapSize(IntPtr hHeap, uint dwOptions, IntPtr lpMem);
 
         [DllImport("kernel32", EntryPoint = "HeapLock", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern bool HeapLock(IntPtr hHeap);
+        public static extern bool HeapLock(IntPtr hHeap);
 
         [DllImport("kernel32", EntryPoint = "HeapUnlock", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern bool HeaUnlock(IntPtr hHeap);
+        public static extern bool HeaUnlock(IntPtr hHeap);
 
         [DllImport("kernel32", EntryPoint = "HeapValidate", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        internal static extern bool HeapValidate(IntPtr hHeap, uint dwOptions, IntPtr lpMem);
+        public static extern bool HeapValidate(IntPtr hHeap, uint dwOptions, IntPtr lpMem);
 
-        internal static unsafe void PlatformZeroMemory(void* dest, long byteCount)
+        public static unsafe void PlatformZeroMemory(void* dest, long byteCount)
         {
             n_memset(dest, 0, (IntPtr)byteCount);
         }
@@ -360,21 +360,21 @@ namespace DataTools.Win32.Memory
 
         // used for specific operating system functions.
         [DllImport("kernel32.dll")]
-        internal static extern IntPtr GlobalFree(IntPtr hMem);
+        public static extern IntPtr GlobalFree(IntPtr hMem);
 
         /// <summary>
         ///Native Visual C Runtime memset.
         ///</summary>
         [DllImport("msvcrt.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "memset", PreserveSig = true)]
-        internal static extern unsafe void n_memset(void* dest, int c, IntPtr count);
+        public static extern unsafe void n_memset(void* dest, int c, IntPtr count);
 
         /// <summary>
         ///Native Visual C Runtime memcpy.
         ///</summary>
         [DllImport("msvcrt.dll", EntryPoint = "memcpy", CallingConvention = CallingConvention.Cdecl, SetLastError = false)]
-        internal static extern IntPtr n_memcpy(IntPtr dest, IntPtr src, UIntPtr count);
+        public static extern IntPtr n_memcpy(IntPtr dest, IntPtr src, UIntPtr count);
 
-        internal static unsafe void ZeroMemory(void* handle, long len)
+        public static unsafe void ZeroMemory(void* handle, long len)
         {
             if (len > 1024)
             {
@@ -440,7 +440,7 @@ namespace DataTools.Win32.Memory
             }
         }
 
-        //        internal static unsafe void MemCpy(void* src, void* dest, long len)
+        //        public static unsafe void MemCpy(void* src, void* dest, long len)
         //        {
         //            unsafe
         //            {

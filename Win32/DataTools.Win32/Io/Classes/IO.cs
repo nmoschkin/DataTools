@@ -44,7 +44,7 @@ namespace DataTools.Win32
         /// <param name="values">The comma-separated list of strings to parse.</param>
         /// <returns>An array of T</returns>
         /// <remarks></remarks>
-        public static int FlagsParse<T>(string values)
+        public static T FlagsParse<T>(string values) where T: Enum
         {
             int x;
 
@@ -78,7 +78,7 @@ namespace DataTools.Win32
                 }
             }
 
-            return vOut;
+            return (T)(object)vOut;
         }
 
         [DllImport("kernel32", EntryPoint = "RtlSecureZeroMemory", CharSet = CharSet.Unicode)]
@@ -550,13 +550,13 @@ namespace DataTools.Win32
         public static extern bool FlushFileBuffers(IntPtr hFile);
 
         [DllImport("kernel32.dll", EntryPoint = "GetDiskFreeSpaceW", CharSet = CharSet.Unicode)]
-        public static extern bool GetDiskFreeSpace(string lpRootPathName, ref uint lpSectorsPerCluster, ref uint lpBytesPerSector, ref uint lpNumberOfFreeClusters, ref uint lpTotalNumberOfClusters);
+        public static extern bool GetDiskFreeSpace(string lpRootPathName, out uint lpSectorsPerCluster, out uint lpBytesPerSector, out uint lpNumberOfFreeClusters, out uint lpTotalNumberOfClusters);
 
         [DllImport("kernel32.dll", EntryPoint = "GetDiskFreeSpaceExW", CharSet = CharSet.Unicode)]
-        public static extern bool GetDiskFreeSpaceEx(string lpRootPathName, ref ulong lpFreeBytesAvailableToCaller, ref ulong lpTotalNumberOfBytes, ref ulong lpTotalNumberOfFreeBytes);
+        public static extern bool GetDiskFreeSpaceEx(string lpRootPathName, out ulong lpFreeBytesAvailableToCaller, out ulong lpTotalNumberOfBytes, out ulong lpTotalNumberOfFreeBytes);
 
         [DllImport("kernel32.dll", EntryPoint = "GetDiskFreeSpaceW", CharSet = CharSet.Unicode)]
-        public static extern bool GetDiskFreeSpace(string lpRootPathName, ref int lpSectorsPerCluster, ref int lpBytesPerSector, ref int lpNumberOfFreeClusters, ref int lpTotalNumberofClusters);
+        public static extern bool GetDiskFreeSpace(string lpRootPathName, out int lpSectorsPerCluster, out int lpBytesPerSector, out int lpNumberOfFreeClusters, out int lpTotalNumberofClusters);
 
         [DllImport("kernel32.dll", EntryPoint = "GetDriveTypeW", CharSet = CharSet.Unicode)]
         public static extern uint GetDriveType([MarshalAs(UnmanagedType.LPWStr)] string lpRootPathName);
@@ -596,10 +596,10 @@ namespace DataTools.Win32
         public static extern int GetCurrentDirectory(int bLen, [MarshalAs(UnmanagedType.LPWStr)] ref string lpszBuffer);
 
         [DllImport("kernel32", EntryPoint = "GetFullPathNameW", CharSet = CharSet.Unicode)]
-        public static extern int GetFullPathName([MarshalAs(UnmanagedType.LPWStr)] string lpFilename, int nBufferLength, IntPtr lpBuffer, ref IntPtr lpFilepart);
+        public static extern int GetFullPathName([MarshalAs(UnmanagedType.LPWStr)] string lpFilename, int nBufferLength, IntPtr lpBuffer, out IntPtr lpFilepart);
 
         [DllImport("kernel32.dll", EntryPoint = "GetFullPathNameW", CharSet = CharSet.Unicode)]
-        public static extern uint GetFullPathName([MarshalAs(UnmanagedType.LPWStr)] string lpszFilePath, uint nBufferLength, [MarshalAs(UnmanagedType.LPWStr)] string lpBuffer, [MarshalAs(UnmanagedType.LPWStr)] ref string lpFilePart);
+        public static extern uint GetFullPathName([MarshalAs(UnmanagedType.LPWStr)] string lpszFilePath, uint nBufferLength, [MarshalAs(UnmanagedType.LPWStr)] string lpBuffer, [MarshalAs(UnmanagedType.LPWStr)] out string lpFilePart);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
         public static extern uint GetLogicalDrives();

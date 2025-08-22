@@ -22,6 +22,7 @@
 // When you fetch an item object from the virtual collection, that object is only alive in your program for as long as you reference it.
 // If the menu gets destroyed while you are still working with an item, it will fail.
 
+using DataTools.Desktop;
 using DataTools.Win32.Memory;
 
 using System;

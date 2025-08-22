@@ -19,48 +19,79 @@ namespace DataTools.Graphics
         private double width;
         private double height;
 
+        /// <summary>
+        /// Gets or sets the width
+        /// </summary>
         public double Width
         {
             get => width;
             set => width = value;
         }
 
+        /// <summary>
+        /// Gets or sets the height
+        /// </summary>
         public double Height
         {
             get => height;
             set => height = value;
         }
 
+        /// <summary>
+        /// Gets or sets the width
+        /// </summary>
         public double CX
         {
             get => width;
             set => width = value;
         }
 
+        /// <summary>
+        /// Gets or sets the height
+        /// </summary>
         public double CY
         {
             get => height;
             set => height = value;
         }
 
+        /// <summary>
+        /// Initialize a new <see cref="UniSize"/> structure
+        /// </summary>
+        /// <param name="p"></param>
         public UniSize(Size p)
         {
             width = p.Width;
             height = p.Height;
         }
 
+        /// <summary>
+        /// Initialize a new <see cref="UniSize"/> structure
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public UniSize(int x, int y)
         {
             width = x;
             height = y;
         }
 
+        /// <summary>
+        /// Initialize a new <see cref="UniSize"/> structure
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public UniSize(float x, float y)
         {
             width = x;
             height = y;
         }
 
+        /// <summary>
+        /// Initialize a new <see cref="UniSize"/> structure
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
         public UniSize(double x, double y)
         {
             width = x;
@@ -305,66 +336,79 @@ namespace DataTools.Graphics
             }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return string.Format("{0}, {1}", Width, Height);
         }
 
+        /// <inheritdoc/>
         public static explicit operator SizeF(UniSize operand)
         {
             return new SizeF((float)operand.Width, (float)operand.Height);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniSize(SizeF operand)
         {
             return new UniSize(operand.Width, operand.Height);
         }
 
+        /// <inheritdoc/>
         public static explicit operator Size(UniSize operand)
         {
             return new Size((int)operand.Width, (int)operand.Height);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniSize(Size operand)
         {
             return new UniSize(operand);
         }
 
+        /// <inheritdoc/>
         public static implicit operator (double, double)(UniSize operand)
         {
             return (operand.width, operand.height);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniSize((double, double) operand)
         {
             return new UniSize(operand.Item1, operand.Item2);
         }
 
+        /// <inheritdoc/>
         public static explicit operator (float, float)(UniSize operand)
         {
             return ((float)operand.width, (float)operand.height);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniSize((float, float) operand)
         {
             return new UniSize(operand.Item1, operand.Item2);
         }
 
+        /// <inheritdoc/>
         public static explicit operator (int, int)(UniSize operand)
         {
             return ((int)operand.width, (int)operand.height);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniSize((int, int) operand)
         {
             return new UniSize(operand.Item1, operand.Item2);
         }
 
+        /// <inheritdoc/>
         public static implicit operator LinearSize(UniSize size)
         {
             return new LinearSize(size.width, size.height);
         }
 
+        /// <inheritdoc/>
         public static implicit operator UniSize(LinearSize coordinates)
         {
             return new UniSize(coordinates.Width, coordinates.Height);

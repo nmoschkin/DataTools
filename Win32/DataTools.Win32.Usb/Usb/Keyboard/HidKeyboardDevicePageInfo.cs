@@ -6,11 +6,17 @@ using System.Threading.Tasks;
 
 namespace DataTools.Win32.Usb.Keyboard
 {
+    /// <summary>
+    /// Encapsulates HID Keyboard Device USB Page Info
+    /// </summary>
     public class HidKeyboardDevicePageInfo : HidUsagePageInfo<HidKeyboardUsageInfo>
     {
+        /// <summary>
+        /// Get the singleton instance of this class
+        /// </summary>
         public static HidKeyboardDevicePageInfo Instance { get; private set; } = new HidKeyboardDevicePageInfo();
 
-        protected HidKeyboardDevicePageInfo() : base(HidUsagePage.KeyboardKeypad)
+        private HidKeyboardDevicePageInfo() : base(HidUsagePage.KeyboardKeypad)
         {
         }
 

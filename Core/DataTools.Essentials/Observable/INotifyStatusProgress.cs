@@ -6,10 +6,26 @@
 
 namespace DataTools.Essentials.Observable
 {
+    /// <summary>
+    /// Progress event handler delegate
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public delegate void ProgressEventHandler(object sender, StatusProgressEventArgs e);
 
+    
+    /// <summary>
+    /// Progress finished delegate
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public delegate void FinishedEventHandler(object sender, StatusProgressEventArgs e);
 
+    /// <summary>
+    /// Progress starting delegate
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
     public delegate void StartingEventHandler(object sender, StatusProgressEventArgs e);
 
     /// <summary>
@@ -18,9 +34,24 @@ namespace DataTools.Essentials.Observable
     [Flags]
     public enum StatusModes
     {
+        /// <summary>
+        /// Static display
+        /// </summary>
         StaticDisplay = 1,
+
+        /// <summary>
+        /// Progress bar
+        /// </summary>
         ProgressBar = 2,
+
+        /// <summary>
+        /// Static progress bar
+        /// </summary>
         ProgressStatic = 4,
+
+        /// <summary>
+        /// Marquis progress bar
+        /// </summary>
         Marquis = 8
     }
 
@@ -29,10 +60,29 @@ namespace DataTools.Essentials.Observable
     /// </summary>
     public enum StatusCodes
     {
+        /// <summary>
+        /// The process was aborted or failed
+        /// </summary>
         Aborted = -1,
+
+        /// <summary>
+        /// The process has finished
+        /// </summary>
         Stopped = 0,
+
+        /// <summary>
+        /// The process is starting
+        /// </summary>
         Starting = 1,
+
+        /// <summary>
+        /// The process is running
+        /// </summary>
         Running = 2,
+
+        /// <summary>
+        /// The process is paused
+        /// </summary>
         Paused = 3
     }
 
@@ -44,22 +94,16 @@ namespace DataTools.Essentials.Observable
         /// <summary>
         /// Raised while the work is progressing.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         event ProgressEventHandler Progress;
 
         /// <summary>
         /// Raised when work is completed.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         event FinishedEventHandler Finished;
 
         /// <summary>
         /// Raised when work is starting.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         event StartingEventHandler Starting;
 
         /// <summary>
@@ -103,14 +147,14 @@ namespace DataTools.Essentials.Observable
     /// </summary>
     public class StatusProgressEventArgs : EventArgs
     {
-        protected int _pos;
-        protected int _count;
-        protected string _msg;
-        protected object _data;
-        protected int _msgcode;
-        protected string _detail;
-        protected StatusModes _mode;
-        protected StatusCodes _scode = StatusCodes.Stopped;
+        private int _pos;
+        private int _count;
+        private string _msg;
+        private object _data;
+        private int _msgcode;
+        private string _detail;
+        private StatusModes _mode;
+        private StatusCodes _scode = StatusCodes.Stopped;
 
         /// <summary>
         /// Gets or sets a value indicating a desire to abort the current process.
@@ -254,6 +298,9 @@ namespace DataTools.Essentials.Observable
             }
         }
 
+        /// <summary>
+        /// Create a new <see cref="StatusProgressEventArgs"/> instance
+        /// </summary>
         public StatusProgressEventArgs()
         {
         }

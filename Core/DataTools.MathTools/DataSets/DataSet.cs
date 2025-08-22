@@ -9,14 +9,23 @@ namespace DataTools.MathTools
     /// <typeparam name="T"></typeparam>
     public class DataSet<T> : List<T>, IEquatable<DataSet<T>>
     {
+        /// <summary>
+        /// Create a new data set
+        /// </summary>
         public DataSet() : base()
         {
         }
 
+        /// <summary>
+        /// Create a new data set
+        /// </summary>
         public DataSet(IEnumerable<T> items) : base(items)
         {
         }
 
+        /// <summary>
+        /// Create a new data set
+        /// </summary>
         public DataSet(int capacity) : base(capacity)
         {
         }
@@ -145,6 +154,7 @@ namespace DataTools.MathTools
             return result;
         }
 
+        /// <inheritdoc/>
         public static bool operator ==(DataSet<T> set1, DataSet<T> set2)
         {
             if (set1 is object)
@@ -161,6 +171,7 @@ namespace DataTools.MathTools
             }
         }
 
+        /// <inheritdoc/>
         public static bool operator !=(DataSet<T> set1, DataSet<T> set2)
         {
             if (set1 is object)
@@ -177,6 +188,7 @@ namespace DataTools.MathTools
             }
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             if (obj is DataSet<T> d)
@@ -189,6 +201,7 @@ namespace DataTools.MathTools
             }
         }
 
+        /// <inheritdoc/>
         public bool Equals(DataSet<T> set2)
         {
             var set1 = this;
@@ -224,6 +237,7 @@ namespace DataTools.MathTools
             }
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return base.GetHashCode();

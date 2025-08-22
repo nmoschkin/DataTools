@@ -140,7 +140,8 @@ namespace DataTools.Text
                     break;
             }
 
-            varWork = (long)value;
+            varWork = long.Parse(value.ToString());
+
             if (varWork < 0) varWork *= -1;
 
             b = Base;

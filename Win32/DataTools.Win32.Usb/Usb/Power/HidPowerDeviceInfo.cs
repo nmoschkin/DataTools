@@ -21,11 +21,11 @@ namespace DataTools.Win32.Usb.Power
         /// <remarks>
         /// The incoming object must be of device class 'Battery'.
         /// </remarks>
-        public static HidPowerDeviceInfo CreateFromHidDevice(HidDeviceInfo device)
+        public static HidPowerDeviceInfo CreateFromHidDevice(DeviceInfo device)
         {
             if (device.DeviceClass != DeviceClassEnum.Battery) throw new ArgumentException($"{nameof(device)} must have a device class of {DeviceClassEnum.Battery}");
 
-            var result = device.CopyTo<HidPowerDeviceInfo>();
+            var result = device.Clone<HidPowerDeviceInfo>();
 
             result.PopulateDeviceCaps();
             result.CreateUsageCollection();

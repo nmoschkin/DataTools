@@ -312,83 +312,80 @@ namespace DataTools.Desktop
 
                 // mm.AllocCoTaskMem((MAX_PATH * 2) + 8)
 
-                mm2 = new CoTaskMemPtr(NativeShell.MAX_PATH * 2 + 8);
-
-                cf = 0U;
-                mm2.ZeroMemory();
-                res = enumer.Next(1U, out ptr, out cf);
-                mm = ptr;
-
-                if (cf == 0L) return null;
-                if (res != HResult.Ok) return null;
-
-                mm2.IntAt(0L) = 2;
-
-                shfld.GetDisplayNameOf(mm, (uint)ShellItemDesignNameOptions.DesktopAbsoluteParsing, mm2);
-                CoTaskMemPtr inv;
-
-                if (IntPtr.Size == 4)
+                using (mm2 = new CoTaskMemPtr(NativeShell.MAX_PATH * 2 + 8))
                 {
-                    inv = (IntPtr)mm2.IntAt(1L);
-                }
-                else
-                {
-                    inv = (IntPtr)mm2.LongAt(1L);
-                }
-                var invh = inv.DangerousGetHandle();
-                if (invh != IntPtr.Zero)
-                {
-                    if (inv.CharAt(0L) != '\0')
+                    cf = 0U;
+                    mm2.ZeroMemory();
+                    res = enumer.Next(1U, out ptr, out cf);
+                    mm = ptr;
+
+                    if (cf == 0L) return null;
+                    if (res != HResult.Ok) return null;
+
+                    mm2.IntAt(0L) = 2;
+
+                    shfld.GetDisplayNameOf(mm, (uint)ShellItemDesignNameOptions.DesktopAbsoluteParsing, mm2);
+                    
+                    CoTaskMemPtr inv = mm2.NIntAt(1L);
+                    
+                    var invh = inv.DangerousGetHandle();
+
+                    if (invh != IntPtr.Zero)
                     {
-                        var fp = (string)inv;
-                        var lpInfo = new SHFILEINFO();
-
-                        // Dim sgfin As ShellFileGetAttributesOptions = 0,
-                        // sgfout As ShellFileGetAttributesOptions = 0
-
-                        int iFlags = User32.SHGFI_PIDL | User32.SHGFI_ATTRIBUTES;
-
-                        lpInfo.dwAttributes = 0;
-
-                        try
+                        if (inv.CharAt(0L) != '\0')
                         {
-                            User32.SHGetItemInfo(invh, 0, ref lpInfo, Marshal.SizeOf<SHFILEINFO>(), iFlags);
-                        }
-                        catch
-                        {
-                            return null;
-                        }
+                            var fp = (string)inv;
+                            var lpInfo = new SHFILEINFO();
 
-                        pout = Path.Combine(source.ParsingName, fp);
+                            // Dim sgfin As ShellFileGetAttributesOptions = 0,
+                            // sgfout As ShellFileGetAttributesOptions = 0
 
-                        if (lpInfo.dwAttributes == 0)
-                        {
-                            lpInfo.dwAttributes = (int)FileTools.GetFileAttributes(pout);
-                        }
+                            int iFlags = User32.SHGFI_PIDL | User32.SHGFI_ATTRIBUTES;
 
-                        FileAttributes drat = (FileAttributes)(int)(lpInfo.dwAttributes);
+                            lpInfo.dwAttributes = 0;
 
-                        if ((lpInfo.dwAttributes & (int)FileAttributes.Directory) == (int)FileAttributes.Directory && !File.Exists(pout))
-                        {
-                            dobj = new DirectoryObject(pout, source.IsSpecial || pout.Contains("$RECYCLE"), false, source.IconSize);
-                            dobj.Parent = source;
-                            dobj.IconSize = source.IconSize;
+                            try
+                            {
+                                User32.SHGetItemInfo(invh, 0, ref lpInfo, Marshal.SizeOf<SHFILEINFO>(), iFlags);
+                            }
+                            catch
+                            {
+                                return null;
+                            }
 
-                            return dobj;
-                        }
-                        else
-                        {
-                            fobj = new FileObject(pout, source.IsSpecial, true, source.IconSize);
-                            fobj.Parent = source;
-                            fobj.IconSize = source.IconSize;
+                            pout = Path.Combine(source.ParsingName, fp);
 
-                            return fobj;
+                            if (lpInfo.dwAttributes == 0)
+                            {
+                                lpInfo.dwAttributes = (int)FileTools.GetFileAttributes(pout);
+                            }
+
+                            FileAttributes drat = (FileAttributes)(int)(lpInfo.dwAttributes);
+
+                            if ((lpInfo.dwAttributes & (int)FileAttributes.Directory) == (int)FileAttributes.Directory && !File.Exists(pout))
+                            {
+                                dobj = new DirectoryObject(pout, source.IsSpecial || pout.Contains("$RECYCLE"), false, source.IconSize);
+                                dobj.Parent = source;
+                                dobj.IconSize = source.IconSize;
+
+                                return dobj;
+                            }
+                            else
+                            {
+                                fobj = new FileObject(pout, source.IsSpecial, true, source.IconSize);
+                                fobj.Parent = source;
+                                fobj.IconSize = source.IconSize;
+
+                                return fobj;
+                            }
                         }
                     }
                 }
+
             }
 
             return null;
+
         }
     }
 }

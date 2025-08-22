@@ -27,8 +27,17 @@ namespace DataTools.Win32.Usb
     {
         private WeakReference<HidUsageCollection> wfparent = null;
 
+        /// <summary>
+        /// Backing store for the <see cref="HidUsageInfo.UsageName"/> property.
+        /// </summary>
         protected string name = "";
 
+        /// <summary>
+        /// Gets the parent <see cref="HidUsageCollection"/> that owns this instance, if any.
+        /// </summary>
+        /// <remarks>
+        /// The value for the backing store of this property is a <see cref="WeakReference"/>.
+        /// </remarks>
         public virtual HidUsageCollection Parent
         {
             get
@@ -172,17 +181,20 @@ namespace DataTools.Win32.Usb
         [JsonProperty("reportID")]
         public virtual byte ReportID { get; set; }
 
+        /// <summary>
+        /// Gets a list of HID Device reserved ranges
+        /// </summary>
         [JsonProperty("reservedRanges")]
         public virtual List<int[]> ReservedRanges { get; set; }
 
         /// <summary>
-        /// The value
+        /// Gets or sets the value for this instance
         /// </summary>
         [JsonIgnore]
         public virtual object Value { get; set; }
 
         /// <summary>
-        /// Button Value
+        /// Gets or sets the button value for this instance
         /// </summary>
         [JsonIgnore]
         public virtual bool ButtonValue
@@ -191,9 +203,15 @@ namespace DataTools.Win32.Usb
             set => Value = value ? 1 : 0;
         }
 
+        /// <summary>
+        /// HID Device Value Capabilities
+        /// </summary>
         [JsonIgnore]
         public virtual HidPValueCaps? ValueCaps { get; set; }
 
+        /// <summary>
+        /// HID Device Button Capabilities
+        /// </summary>
         [JsonIgnore]
         public virtual HidPButtonCaps? ButtonCaps { get; set; }
 
@@ -235,6 +253,7 @@ namespace DataTools.Win32.Usb
             }
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             var text = UsageName ?? "";
@@ -289,15 +308,27 @@ namespace DataTools.Win32.Usb
             return MemberwiseClone();
         }
 
+        /// <summary>
+        /// Instantiate a new <see cref="HidUsageInfo"/> object.
+        /// </summary>
         public HidUsageInfo()
         {
         }
 
+        /// <summary>
+        /// Instantiate a new <see cref="HidUsageInfo"/> object with the specified parent.        
+        /// </summary>
+        /// <param name="parent">The parent collection this instance will belong to</param>
         public HidUsageInfo(HidUsageCollection parent)
         {
             Parent = parent;
         }
 
+        /// <summary>
+        /// Clone this object into another <see cref="HidUsageInfo"/>-derived object
+        /// </summary>
+        /// <typeparam name="T">The type of object to create</typeparam>
+        /// <returns></returns>
         public T CloneInto<T>() where T : HidUsageInfo, new()
         {
             T ret = new T();
@@ -306,6 +337,13 @@ namespace DataTools.Win32.Usb
             return ret;
         }
 
+        /// <summary>
+        /// Clone the object as the specified <paramref name="reportType"/>.
+        /// </summary>
+        /// <param name="reportType"></param>
+        /// <param name="isButton"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
         public virtual HidUsageInfo Clone(HidReportType reportType, bool isButton = false, HidUsageCollection parent = null)
         {
             var ret = MemberwiseClone();
@@ -321,6 +359,7 @@ namespace DataTools.Win32.Usb
             return rpt;
         }
 
+        /// <inheritdoc/>
         public int CompareTo(HidUsageInfo other)
         {
             if (other == null) return 1;

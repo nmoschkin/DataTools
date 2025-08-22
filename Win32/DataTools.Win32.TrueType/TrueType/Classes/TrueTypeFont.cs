@@ -96,7 +96,7 @@ namespace DataTools.Desktop
                 return null;
             }
 
-            MemoryTools.ReadStruct<TT_OFFSET_TABLE>(fs, ref oft);
+            MemoryTools.ReadStruct<TT_OFFSET_TABLE>(fs, out oft);
             oft.uNumOfTables = Swap(oft.uNumOfTables);
             oft.uMajorVersion = Swap(oft.uMajorVersion);
             oft.uMinorVersion = Swap(oft.uMinorVersion);
@@ -109,7 +109,7 @@ namespace DataTools.Desktop
 
             for (i = 0; i < nt; i++)
             {
-                MemoryTools.ReadStruct<TT_TABLE_DIRECTORY>(fs, ref tdir);
+                MemoryTools.ReadStruct<TT_TABLE_DIRECTORY>(fs, out tdir);
                 if (tdir.Tag.ToLower() == "name")
                 {
                     tdir.uLength = Swap(tdir.uLength);
@@ -124,7 +124,7 @@ namespace DataTools.Desktop
 
             fs.Seek(tdir.uOffset, SeekOrigin.Begin);
 
-            MemoryTools.ReadStruct<TT_NAME_TABLE_HEADER>(fs, ref nth);
+            MemoryTools.ReadStruct<TT_NAME_TABLE_HEADER>(fs, out nth);
 
             nth.uStorageOffset = Swap(nth.uStorageOffset);
             nth.uNRCount = Swap(nth.uNRCount);
@@ -133,7 +133,7 @@ namespace DataTools.Desktop
 
             for (i = 0; i < nthc; i++)
             {
-                MemoryTools.ReadStruct<TT_NAME_RECORD>(fs, ref nr);
+                MemoryTools.ReadStruct<TT_NAME_RECORD>(fs, out nr);
                 nr.uNameID = Swap(nr.uNameID);
 
                 if (nr.uNameID == 1)

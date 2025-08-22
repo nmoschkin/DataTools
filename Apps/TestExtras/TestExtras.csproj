@@ -1,14 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0-windows</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <nullable>disable</nullable>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.0.1038</AssemblyVersion>
-    <FileVersion>8.0.0.1038</FileVersion>
+    <AssemblyVersion>8.0.0.1106</AssemblyVersion>
+    <FileVersion>8.0.0.1106</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.0.1038</Version>
+    <Version>8.0.0.1106</Version>
     <Product>DataTools Extras Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
@@ -16,11 +15,12 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>AnyCPU;x64</Platforms>
-    <Configurations>Debug;Release;NuGet</Configurations>
+    <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.0.1037</PreviousVersion>
-    <AssemblyOriginatorKeyFile>E:\Projects\Keys\datatools.snk</AssemblyOriginatorKeyFile>
+    <PreviousVersion>8.0.0.1105</PreviousVersion>
+    <AssemblyOriginatorKeyFile>C:\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Extras\DataTools.Extras\DataTools.Extras.csproj" />

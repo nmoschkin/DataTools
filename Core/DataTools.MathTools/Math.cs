@@ -8,22 +8,40 @@ using System.Text;
 
 namespace DataTools.MathTools
 {
+    /// <summary>
+    /// Math functions static utility class
+    /// </summary>
     public static class MathLib
     {
         // Copyright (C) 2023 Nathaniel Moschkin.  All Rights Reserved.
         // Apache 2.0 License
         //
 
+        /// <summary>
+        /// Convert inches to millimeters
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static double InchesToMillimeters(double value)
         {
             return value * 25.4d;
         }
 
+        /// <summary>
+        /// Convert millimeters to inches
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static double MillimetersToInches(double value)
         {
             return value / 25.4d;
         }
 
+        /// <summary>
+        /// Convert inches to millimeters
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static double[] InchesToMillimeters(double[] value)
         {
             int i;
@@ -36,6 +54,11 @@ namespace DataTools.MathTools
             return output;
         }
 
+        /// <summary>
+        /// Convert millimeters to inches
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static double[] MillimetersToInches(double[] value)
         {
             int i;
@@ -97,8 +120,7 @@ namespace DataTools.MathTools
                 maxSignificantDigits = 18;
 
             // Go from 1 to the maximum number of significant digits.
-            retry:
-
+ 
             for (currSig = 1; currSig <= maxSignificantDigits; currSig++)
             {
                 // get the rounded, working value for the test.
@@ -365,6 +387,11 @@ namespace DataTools.MathTools
             return BitConverter.ToInt32(b, 0);
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static double Min(params double[] vars)
         {
             double d;
@@ -378,6 +405,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static double Max(params double[] vars)
         {
             double d;
@@ -392,6 +424,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static float Min(params float[] vars)
         {
             float d;
@@ -405,6 +442,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static float Max(params float[] vars)
         {
             float d;
@@ -418,6 +460,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static decimal Min(params decimal[] vars)
         {
             decimal d;
@@ -431,6 +478,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static decimal Max(params decimal[] vars)
         {
             decimal d;
@@ -444,6 +496,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static long Min(params long[] vars)
         {
             long d;
@@ -457,6 +514,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static long Max(params long[] vars)
         {
             long d;
@@ -470,6 +532,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static int Min(params int[] vars)
         {
             int d;
@@ -483,6 +550,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static int Max(params int[] vars)
         {
             int d;
@@ -496,6 +568,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static short Min(params short[] vars)
         {
             short d;
@@ -509,6 +586,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static short Max(params short[] vars)
         {
             short d;
@@ -522,6 +604,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static byte Min(params byte[] vars)
         {
             byte d;
@@ -535,6 +622,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static byte Max(params byte[] vars)
         {
             byte d;
@@ -548,6 +640,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static ulong Min(params ulong[] vars)
         {
             ulong d;
@@ -561,6 +658,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static ulong Max(params ulong[] vars)
         {
             ulong d;
@@ -574,6 +676,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static uint Min(params uint[] vars)
         {
             uint d;
@@ -587,6 +694,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static uint Max(params uint[] vars)
         {
             uint d;
@@ -600,6 +712,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static ushort Min(params ushort[] vars)
         {
             ushort d;
@@ -613,6 +730,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static ushort Max(params ushort[] vars)
         {
             ushort d;
@@ -626,6 +748,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the minimum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static sbyte Min(params sbyte[] vars)
         {
             sbyte d;
@@ -639,6 +766,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the maximum number from any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static sbyte Max(params sbyte[] vars)
         {
             sbyte d;
@@ -652,6 +784,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the sum of any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static double Sum(params double[] vars)
         {
             double d = 0d;
@@ -665,6 +802,11 @@ namespace DataTools.MathTools
             return d;
         }
 
+        /// <summary>
+        /// Find the sum of any arbitrary number of numbers
+        /// </summary>
+        /// <param name="vars"></param>
+        /// <returns></returns>
         public static decimal Sum(params decimal[] vars)
         {
             decimal d = 0m;

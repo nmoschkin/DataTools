@@ -9,7 +9,7 @@ using System.Text;
 namespace DataTools.Memory
 {
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct MemPtr
+    public struct MemPtr : IDisposable
     {
         internal IntPtr handle;
         public static readonly MemPtr Empty = new MemPtr(IntPtr.Zero);
@@ -30,6 +30,15 @@ namespace DataTools.Memory
                     handle = value;
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the pointer
+        /// </summary>
+        public unsafe void* Pointer
+        {
+            get => (void*)handle;
+            set => handle = (IntPtr)value;
         }
 
         public MemPtr(long size = 1024)
@@ -57,6 +66,23 @@ namespace DataTools.Memory
             unsafe
             {
                 return Crc32.Hash((byte*)handle, c);
+            }
+        }
+
+        /// <summary>
+        /// Gets a reference to the native int (IntPtr) value at the specified size-relative index in the memory block.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// In 64-bit environments, this value is 8 bytes long, and in 32-bit environments, it is 4 bytes long.
+        /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref IntPtr NIntAt(long index)
+        {
+            unsafe
+            {
+                return ref *(IntPtr*)((long)handle + index * IntPtr.Size);
             }
         }
 
@@ -1141,42 +1167,42 @@ namespace DataTools.Memory
             return val1.handle != val2.handle;
         }
 
+        public static unsafe implicit operator void*(MemPtr val)
+        {
+            return (void*)val.handle;
+        }
+
+        public static unsafe implicit operator MemPtr(void* val)
+        {
+            return new MemPtr(val);
+        }
+
         public static implicit operator IntPtr(MemPtr val)
         {
-            unsafe
-            {
-                return val.handle;
-            }
+            return val.handle;
         }
 
         public static implicit operator MemPtr(IntPtr val)
         {
-            unsafe
+            return new MemPtr
             {
-                return new MemPtr
-                {
-                    handle = (IntPtr)(void*)val
-                };
-            }
+                handle = val
+            };
         }
 
         public static implicit operator UIntPtr(MemPtr val)
         {
-            unsafe
-            {
-                return (UIntPtr)(void*)val.handle;
-            }
+            return (UIntPtr)(ulong)(long)val.handle;
         }
 
         public static implicit operator MemPtr(UIntPtr val)
         {
-            unsafe
-            {
-                return new MemPtr
-                {
-                    handle = (IntPtr)(void*)val
-                };
-            }
+            return new MemPtr((IntPtr)(long)(ulong)val);
+        }
+
+        public void Dispose()
+        {
+            Free();
         }
     }
 }

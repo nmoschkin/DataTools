@@ -1,5 +1,5 @@
-﻿
-
+﻿using System;
+using System.Linq;
 
 using DataTools.Desktop.Network;
 
@@ -12,8 +12,6 @@ namespace TestNetwork
         [STAThread]
         public static void Main(string[] args)
         {
-
-
             var adapters = new ObservableAdaptersCollection();
 
             foreach (var adapter in adapters)
@@ -25,8 +23,6 @@ namespace TestNetwork
                 Console.WriteLine(adapter.ToString() + $" ({Separate(adapter.HasInternet.ToString())})");
                 Console.ResetColor();
             }
-
-
         }
     }
 }
