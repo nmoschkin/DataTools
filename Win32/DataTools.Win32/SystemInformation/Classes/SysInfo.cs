@@ -12,7 +12,7 @@
 // *************************************************
 
 using DataTools.Win32;
-using DataTools.Win32.Memory;
+using DataTools.Memory;
 
 using System;
 using System.Linq;
@@ -182,55 +182,55 @@ namespace DataTools.SystemInformation
         static SysInfo()
         {
             // let's get some version information!
-            var mm = new MemPtr();
-
-            GetNativeSystemInfo(ref nativeEnv);
-
-            _memInfo.dwLength = Marshal.SizeOf(_memInfo);
-            GlobalMemoryStatusEx(ref _memInfo);
-
-            // now let's figure out how many processors we have on this system
-            MemPtr org;
-
-            var lp = new SystemLogicalProcessorInformation();
-
-            SystemLogicalProcessorInformation[] rets;
-
-            int i;
-            int c;
-
-            // The maximum number of processors for any version of Windows is 128, we'll allocate more for extra information.
-            mm.Alloc(Marshal.SizeOf(lp) * 1024);
-
-            // record the original memory pointer
-
-            org = mm;
-            var lRet = (int)mm.Length;
-
-            GetLogicalProcessorInformation(mm, ref lRet);
-
-            c = (int)(lRet / (double)Marshal.SizeOf(lp));
-
-            rets = new SystemLogicalProcessorInformation[c];
-            nativeEnv.nop = 0;
-
-            for (i = 0; i < c; i++)
+            using (var origPtr = new SafePtr())
             {
-                rets[i] = mm.ToStruct<SystemLogicalProcessorInformation>();
-                mm += Marshal.SizeOf(lp);
+                GetNativeSystemInfo(ref nativeEnv);
 
-                // what we're really after are the number of cores.
-                if (rets[i].Relationship == LogicalProcessorRelationship.RelationProcessorCore)
+                _memInfo.dwLength = Marshal.SizeOf(_memInfo);
+                GlobalMemoryStatusEx(ref _memInfo);
+
+                // now let's figure out how many processors we have on this system
+                MemPtr mm;
+
+                var lp = new SystemLogicalProcessorInformation();
+
+                SystemLogicalProcessorInformation[] rets;
+
+                int i;
+                int c;
+
+                // The maximum number of processors for any version of Windows is 128, we'll allocate more for extra information.
+                origPtr.Alloc(Marshal.SizeOf(lp) * 1024);
+
+                // record the original memory pointer
+
+                mm = origPtr.DangerousGetHandle();
+                var lRet = (int)Marshal.SizeOf(lp) * 1024;
+
+                GetLogicalProcessorInformation(mm, ref lRet);
+
+                c = (int)(lRet / (double)Marshal.SizeOf(lp));
+
+                rets = new SystemLogicalProcessorInformation[c];
+                nativeEnv.nop = 0;
+
+                for (i = 0; i < c; i++)
                 {
-                    nativeEnv.nop++;
+                    rets[i] = mm.ToStruct<SystemLogicalProcessorInformation>();
+                    mm += Marshal.SizeOf(lp);
+
+                    // what we're really after are the number of cores.
+                    if (rets[i].Relationship == LogicalProcessorRelationship.RelationProcessorCore)
+                    {
+                        nativeEnv.nop++;
+                    }
                 }
+
+                // store that data in case we need it for later.
+                _procRaw = rets;
+
+                // free our unmanaged resources.
             }
-
-            // store that data in case we need it for later.
-            _procRaw = rets;
-
-            // free our unmanaged resources.
-            org.Free();
         }
 
         /// <summary>
