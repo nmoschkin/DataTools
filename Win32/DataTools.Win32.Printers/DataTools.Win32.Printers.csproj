@@ -10,7 +10,7 @@
     <Version>8.0.0.1107</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - Printer and Print Queue Library</Description>
-    <Copyright>Copyright (C) 2023 Nathaniel Moschkin</Copyright>
+    <Copyright>Copyright (C) 2023-2026 Nathaniel Moschkin</Copyright>
     <RepositoryUrl>https://www.github.com/nmoschkin/DataTools</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en-US</NeutralLanguage>

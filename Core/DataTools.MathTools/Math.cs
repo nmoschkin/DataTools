@@ -2,7 +2,7 @@
 using System.Linq;
 
 // Basic Math Functions
-// Copyright (C) 2023 Nathaniel Moschkin
+// Copyright (C) 2023-2026 Nathaniel Moschkin
 
 using System.Text;
 
@@ -13,7 +13,7 @@ namespace DataTools.MathTools
     /// </summary>
     public static class MathLib
     {
-        // Copyright (C) 2023 Nathaniel Moschkin.  All Rights Reserved.
+        // Copyright (C) 2023-2026 Nathaniel Moschkin.  All Rights Reserved.
         // Apache 2.0 License
         //
 
