@@ -13,7 +13,7 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
-using DataTools.Win32.Memory;
+using DataTools.Memory;
 
 using System;
 using System.Collections.Generic;

@@ -23,9 +23,6 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AppCenter" Version="5.0.6" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.6" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.6" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\DataTools.Console\DataTools.Console.csproj" />

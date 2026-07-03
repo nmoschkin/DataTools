@@ -12,7 +12,7 @@
 // *************************************************
 
 using DataTools.Essentials.SortedLists;
-using DataTools.Win32.Memory;
+using DataTools.Memory;
 
 using System;
 using System.Collections;
@@ -448,7 +448,7 @@ namespace DataTools.Win32.Network
                 var nad = new Dictionary<int, T>();
                 var lOut = new List<T>();
 
-                var newmm = new MemPtr();
+                MemPtr newmm = (IntPtr)0;
 
                 // Get the array of unmanaged IP_ADAPTER_ADDRESSES structures
                 var newads = IfDefApi.GetAdapters(ref newmm, true);
@@ -531,7 +531,7 @@ namespace DataTools.Win32.Network
                     }
                 }
 
-                if (_origPtr != MemPtr.Empty)
+                if (_origPtr.Handle != IntPtr.Zero)
                 {
                     _origPtr.Free(true);
                 }

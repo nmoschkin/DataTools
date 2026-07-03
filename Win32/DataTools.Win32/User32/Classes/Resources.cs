@@ -13,7 +13,7 @@
 using DataTools.Shell.Native;
 using DataTools.Text;
 using DataTools.Win32;
-using DataTools.Win32.Memory;
+using DataTools.Memory;
 
 using System;
 using System.Collections.Generic;

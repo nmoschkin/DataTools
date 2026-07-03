@@ -14,7 +14,7 @@
 using DataTools.Desktop;
 using DataTools.Shell.Native;
 using DataTools.Text;
-using DataTools.Win32.Memory;
+using DataTools.Memory;
 
 using System;
 using System.Collections.Generic;
@@ -69,11 +69,11 @@ namespace DataTools.Win32.Network
                 // First thing's first... let's get the icon for the object from its parsing name.
                 // Which is magically the parsing name of the network device list and the adapter's GUID name.
                 string s = @"::{7007ACC7-3202-11D1-AAD2-00805FC1270E}\" + AdapterName;
-                var mm = new MemPtr();
+                SafePtr mm;
+                NativeShell.SHParseDisplayName(s, IntPtr.Zero, out var strmem, 0, out _);
+                mm = new SafePtr(strmem, true);
 
-                NativeShell.SHParseDisplayName(s, IntPtr.Zero, out mm.handle, 0, out _);
-
-                if (mm.Handle != IntPtr.Zero)
+                if (mm.DangerousGetHandle() != IntPtr.Zero)
                 {
                     // Get a WPFImage
 
@@ -110,7 +110,6 @@ namespace DataTools.Win32.Network
                         DeviceIcon = (System.Drawing.Bitmap)Resources.GrayIcon(icn);
                     }
                     mm.Free();
-
                     canShowNet = true;
                 }
                 else

@@ -188,11 +188,6 @@ namespace SysInfoTool
 
             
         {
-
-            var obj = new FileObject(@"E:\DailyMed\mplus_topics_compressed_2022-09-24.zip");
-
-
-
             this.InitializeComponent();
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             this.Title = "DataTools Interop Library Test Project";
@@ -302,25 +297,10 @@ namespace SysInfoTool
 
         private void IPWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //lrThread = new Thread(() =>
-            //{
-            //    while(true)
-            //    {
-            //        try
-            //        {
-            //            RefreshAdapters(false);
-            //        }
-            //        catch
-            //        {
-            //        }
-
-            //        Thread.Sleep(3275);
-            //    }
-            //});
-
-            //lrThread.IsBackground = true;
-            //lrThread.Start();
-            RefreshAdapters(true);
+            Task.Run(() =>
+            {
+                RefreshAdapters(true);
+            });            
         }
 
         private bool refreshing = false;
@@ -337,28 +317,28 @@ namespace SysInfoTool
                 {
                     if (_Adapters != null)
                     {
-                        _Adapters.Refresh();
+                        //_Adapters.Refresh();
 
-                        if (totalRefresh)
-                        {
-                            Dispatcher.Invoke(() =>
-                            {
-                                this.AdapterList.ItemsSource = _Adapters;
-                                ViewMenu = new VirtualMenu(this, this.AdapterList);
-                                this.netMenu.ItemsSource = ViewMenu;
-                            });
-                        }
+                        //if (totalRefresh)
+                        //{
+                        //    Dispatcher.Invoke(() =>
+                        //    {
+                        //        this.AdapterList.ItemsSource = _Adapters;
+                        //        ViewMenu = new VirtualMenu(this, this.AdapterList);
+                        //        this.netMenu.ItemsSource = ViewMenu;
+                        //    });
+                        //}
                     }
                     else
                     {
+
                         Dispatcher.Invoke(() =>
                         {
-                            _Adapters = new ObservableAdaptersCollection();
-
+                            _Adapters = new ObservableAdaptersCollection(false);
+                            _Adapters.Refresh();
                             this.AdapterList.ItemsSource = _Adapters;
-
-                            ViewMenu = new VirtualMenu(this, this.AdapterList);
-                            this.netMenu.ItemsSource = ViewMenu;
+                            //ViewMenu = new VirtualMenu(this, this.AdapterList);
+                            //this.netMenu.ItemsSource = ViewMenu;
                         });
                     }
                 }

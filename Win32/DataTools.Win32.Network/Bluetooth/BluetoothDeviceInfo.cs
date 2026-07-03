@@ -102,7 +102,7 @@ namespace DataTools.Hardware
 
             var p = InternalEnumerateDevices<BluetoothDeviceInfo>(DevProp.GUID_DEVCLASS_BLUETOOTH, ClassDevFlags.Present);
 
-            if (p != null && p.Length > 0)
+            if (p != null && p.Length > 0 && bth != null)
             {
                 foreach (var x in p)
                 {

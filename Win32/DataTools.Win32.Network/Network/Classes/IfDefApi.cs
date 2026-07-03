@@ -13,7 +13,7 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
-using DataTools.Win32.Memory;
+using DataTools.Memory;
 
 using System;
 using System.Collections.Generic;
@@ -52,6 +52,7 @@ namespace DataTools.Win32.Network
             // we have a buffer overflow?  We need to get more memory.
             if (res == ADAPTER_ENUM_RESULT.ERROR_BUFFER_OVERFLOW)
             {
+                cblen *= 2;
                 lpadapt.Handle.Alloc(cblen, noRelease);
                 res = GetAdaptersAddresses(AfENUM.AfUnspecified, GAA_FLAGS.GAA_FLAG_INCLUDE_GATEWAYS | GAA_FLAGS.GAA_FLAG_INCLUDE_WINS_INFO, IntPtr.Zero, lpadapt, ref cblen);
             }
@@ -61,18 +62,18 @@ namespace DataTools.Win32.Network
                 throw new NativeException();
             }
 
-            origPtr = lpadapt.Handle;
+            origPtr = (IntPtr)lpadapt.Handle;
             var adapters = new List<IP_ADAPTER_ADDRESSES>();
 
             adapt = lpadapt;
 
             do
             {
-                if (string.IsNullOrEmpty(adapt.Description) || adapt.FirstDnsServerAddress.Handle == MemPtr.Empty)
+                if (string.IsNullOrEmpty(adapt.Description) || adapt.FirstDnsServerAddress.Handle == (IntPtr)MemPtr.Empty)
                 {
                     adapt = adapt.Next;
 
-                    if (adapt.Next.Handle == MemPtr.Empty)
+                    if (adapt.Next.Handle == (IntPtr)MemPtr.Empty)
                     {
                         break;
                     }

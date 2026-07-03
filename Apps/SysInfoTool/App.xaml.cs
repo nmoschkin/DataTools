@@ -7,9 +7,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
 
 namespace SysInfoTool
 {
@@ -22,8 +19,6 @@ namespace SysInfoTool
 
         public App() : base()
         {
-            AppCenter.Start("f6f17897-33f6-4910-8fc5-9638de742b77",
-                   typeof(Analytics), typeof(Crashes));
         }
     }
 }
