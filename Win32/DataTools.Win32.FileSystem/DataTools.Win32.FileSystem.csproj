@@ -46,8 +46,8 @@
     <Optimize>True</Optimize>
   </PropertyGroup>
   <Target Name="PublishPackage" AfterTargets="GenerateNuspec" Condition="'$(Configuration)' == 'NuGet'">
-    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source C:\Users\theim\LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
-    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source C:\Users\theim\LocalNuggets" />
+    <!-- <Exec Command="nuget delete $(Title) $(PreviousVersion) -Source \LocalNuggets -NonInteractive" IgnoreExitCode="true" /> -->
+    <Exec Command="nuget add $(OutputPath)$(Title).$(Version).nupkg  -Source \LocalNuggets" />
     <!-- <Exec Command="post-build-tool /d ." /> -->
   </Target>
 </Project>
