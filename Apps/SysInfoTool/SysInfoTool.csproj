@@ -4,10 +4,10 @@
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.1.702</AssemblyVersion>
-    <FileVersion>8.0.1.702</FileVersion>
+    <AssemblyVersion>8.0.1.703</AssemblyVersion>
+    <FileVersion>8.0.1.703</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.1.702</Version>
+    <Version>8.0.1.703</Version>
     <Product>DataTools Sample Program</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023-2026 Nathaniel Moschkin</Copyright>
@@ -22,8 +22,7 @@
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
-  <ItemGroup>
-  </ItemGroup>
+  <ItemGroup></ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\DataTools.Console\DataTools.Console.csproj" />
     <ProjectReference Include="..\..\Core\DataTools.Graphics\DataTools.Graphics.csproj" />

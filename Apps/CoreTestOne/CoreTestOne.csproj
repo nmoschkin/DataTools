@@ -5,10 +5,10 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.1.702</AssemblyVersion>
-    <FileVersion>8.0.1.702</FileVersion>
+    <AssemblyVersion>8.0.1.703</AssemblyVersion>
+    <FileVersion>8.0.1.703</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.1.702</Version>
+    <Version>8.0.1.703</Version>
     <Product>DataTools Core 8 Test</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2023-2026 Nathaniel Moschkin</Copyright>

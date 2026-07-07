@@ -8,10 +8,10 @@
     <LangVersion>preview</LangVersion>
     <Platforms>AnyCPU;x64</Platforms>
     <UseWindowsForms>true</UseWindowsForms>
-    <AssemblyVersion>8.0.1.702</AssemblyVersion>
-    <FileVersion>8.0.1.702</FileVersion>
+    <AssemblyVersion>8.0.1.703</AssemblyVersion>
+    <FileVersion>8.0.1.703</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.1.702</Version>
+    <Version>8.0.1.703</Version>
     <Product>DataTools WinUI Base Library</Product>
     <Description>DataTools Utility Library</Description>
     <Copyright>Copyright (C) 2022 Nathaniel Moschkin</Copyright>
