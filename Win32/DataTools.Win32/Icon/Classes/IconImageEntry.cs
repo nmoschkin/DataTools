@@ -29,7 +29,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using DataTools.Win32;
 using DataTools.Shell.Native;
-using DataTools.Win32.Memory;
+using DataTools.Memory;
 
 namespace DataTools.Desktop
 {
@@ -37,33 +37,69 @@ namespace DataTools.Desktop
     /// Represents a single icon image.
     /// </summary>
     /// <remarks></remarks>
-    public class IconImageEntry : IDisposable
+    public sealed class IconImageEntry 
     {
-        internal ICONDIRENTRY _entry;
+        internal ICONDIRENTRY entry;
         internal byte[] imageBytes;
-        internal IntPtr _hIcon = IntPtr.Zero;
 
 
         [DllImport("gdi32.dll")]
         static extern bool DeleteObject(IntPtr hObject);
 
+        /// <summary>
+        /// Create a new blank IconImageEntry
+        /// </summary>
         internal IconImageEntry()
         {
         }
 
         /// <summary>
-        /// Gets the raw ICONDIRENTRY structure.
+        /// Initialize a new raw icon image from a standard image with the specified size as either a bitmap or PNG icon.
         /// </summary>
-        /// <value></value>
-        /// <returns></returns>
+        /// <param name="Image">Image from which to construct the icon.</param>
+        /// <param name="size">The standard size of the new icon.</param>
+        /// <param name="asBmp">Whether to create a bitmap icon (if false, a PNG icon is created).</param>
         /// <remarks></remarks>
-        internal ICONDIRENTRY EntryInfo
+        public IconImageEntry(Image Image, StandardIcons size, bool asBmp = false)
         {
-            get
+            int sz = (int)size != 0 ? (int)(size) & 0xFF : 256;
+            Bitmap im = (Bitmap)Image;
+
+            if (Image.Width != sz | Image.Height != sz)
             {
-                return _entry;
+                im = new Bitmap(sz, sz, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                var g = System.Drawing.Graphics.FromImage(im);
+
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+
+                g.DrawImage(Image, new Rectangle(0, 0, sz, sz));
+
+                g.Dispose();
             }
-        }
+
+            var s = new MemoryStream();
+
+            im.Save(s, System.Drawing.Imaging.ImageFormat.Png);
+
+            entry.wIconType = size;
+            entry.wBitsPixel = 32;
+            entry.wColorPlanes = 1;
+
+            imageBytes = new byte[(int)(s.Length - 1L) + 1];
+            imageBytes = s.ToArray();
+
+            if (asBmp)
+            {
+                imageBytes = MakeBitmap();
+            }
+
+            entry.dwImageSize = imageBytes.Length;
+
+            s.Close();
+        }        
 
         /// <summary>
         /// Create a new image from the pointer.
@@ -73,15 +109,15 @@ namespace DataTools.Desktop
         internal IconImageEntry(IntPtr ptr)
         {
             MemPtr mm = ptr;
-            _entry = mm.ToStruct<ICONDIRENTRY>();
-            ptr = ptr + _entry.dwOffset;
-            if (_entry.wBitsPixel < 24)
+            entry = mm.ToStruct<ICONDIRENTRY>();
+            ptr = ptr + entry.dwOffset;
+            if (entry.wBitsPixel < 24)
             {
                 // Throw New InvalidDataException("Reading low-bit icons is not supported")
             }
 
-            imageBytes = new byte[_entry.dwImageSize];
-            Marshal.Copy(ptr, imageBytes, 0, _entry.dwImageSize);
+            imageBytes = new byte[entry.dwImageSize];
+            Marshal.Copy(ptr, imageBytes, 0, entry.dwImageSize);
 
             // MemCpy(_image, ptr, _entry.dwImageSize)
 
@@ -93,20 +129,33 @@ namespace DataTools.Desktop
         /// <param name="entry">Icon entry structure.</param>
         /// <param name="ptr">Pointer to the bitmap.</param>
         /// <remarks></remarks>
-        internal IconImageEntry(ICONDIRENTRY entry, IntPtr ptr)
+        internal IconImageEntry(ICONDIRENTRY entry, IntPtr ptr) 
         {
-            _entry = entry;
-            if (_entry.wBitsPixel < 24)
+            this.entry = entry;
+            if (this.entry.wBitsPixel < 24)
             {
                 // Throw New InvalidDataException("Reading low-bit icons is not supported")
             }
 
-            ptr = ptr + _entry.dwOffset;
-            imageBytes = new byte[_entry.dwImageSize];
-            Marshal.Copy(ptr, imageBytes, 0, _entry.dwImageSize);
+            ptr = ptr + this.entry.dwOffset;
+            imageBytes = new byte[this.entry.dwImageSize];
+            Marshal.Copy(ptr, imageBytes, 0, this.entry.dwImageSize);
 
             // MemCpy(_image, ptr, _entry.dwImageSize)
 
+        }
+        /// <summary>
+        /// Gets the raw ICONDIRENTRY structure.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        internal ICONDIRENTRY EntryInfo
+        {
+            get
+            {
+                return entry;
+            }
         }
 
         /// <summary>
@@ -119,7 +168,7 @@ namespace DataTools.Desktop
         {
             get
             {
-                return _entry.wIconType;
+                return entry.wIconType;
             }
         }
 
@@ -173,7 +222,7 @@ namespace DataTools.Desktop
             }
             else
             {
-                iconOut = _constructIcon();
+                iconOut = ConstructIcon();
             }
 
             return iconOut;
@@ -189,10 +238,10 @@ namespace DataTools.Desktop
         {
             get
             {
-                if (_entry.cWidth == 0)
+                if (entry.cWidth == 0)
                     return 256;
                 else
-                    return _entry.cWidth;
+                    return entry.cWidth;
             }
         }
 
@@ -206,10 +255,10 @@ namespace DataTools.Desktop
         {
             get
             {
-                if (_entry.cHeight == 0)
+                if (entry.cHeight == 0)
                     return 256;
                 else
-                    return _entry.cHeight;
+                    return entry.cHeight;
             }
         }
 
@@ -252,7 +301,7 @@ namespace DataTools.Desktop
             }
             else
             {
-                result = Resources.IconToTransparentBitmap(_constructIcon());
+                result = Resources.IconToTransparentBitmap(ConstructIcon());
             }
 
             return result;
@@ -263,7 +312,7 @@ namespace DataTools.Desktop
         /// </summary>
         /// <returns>An array of bytes that represent data to create a bitmap.</returns>
         /// <remarks></remarks>
-        private byte[] _makeBitmap()
+        private byte[] MakeBitmap()
         {
             byte[] bytesOut;
             
@@ -282,8 +331,8 @@ namespace DataTools.Desktop
             
             int maskSize;
             
-            int w = _entry.cWidth;
-            int h = _entry.cHeight;
+            int w = entry.cWidth;
+            int h = entry.cHeight;
             
             if (w == 0)
                 w = 256;
@@ -311,7 +360,7 @@ namespace DataTools.Desktop
             bm = mm.ToStruct<BITMAPINFOHEADER>();
 
             _setMask(ptr1, ptr2, w, h);
-            _entry.dwImageSize = (int)mm.Length;
+            entry.dwImageSize = (int)mm.Length;
 
             bytesOut = (byte[])mm;
 
@@ -326,79 +375,76 @@ namespace DataTools.Desktop
         /// </summary>
         /// <returns></returns>
         /// <remarks></remarks>
-        private Icon _constructIcon()
+        private Icon ConstructIcon()
         {
-            Icon _constructIconRet = default;
-            if (_hIcon != IntPtr.Zero)
+            Icon constructedIcon = null;
+            using (SafePtr mm = (SafePtr)imageBytes)
             {
-                User32.DestroyIcon(_hIcon);
-                _hIcon = IntPtr.Zero;
-            }
+                var bmp = mm.ToStruct<BITMAPINFOHEADER>();
 
-            MemPtr mm = (MemPtr)imageBytes;
-            var bmp = mm.ToStruct<BITMAPINFOHEADER>();
+                IntPtr hBmp;
+                IntPtr ptr;
+                IntPtr ppBits = new IntPtr();
 
-            IntPtr hBmp;
-            IntPtr ptr;
-            IntPtr ppBits = new IntPtr();
+                var lpicon = default(ICONINFO);
 
-            var lpicon = default(ICONINFO);
+                IntPtr hicon;
+                IntPtr hBmpMask = new IntPtr();
 
-            IntPtr hicon;
-            IntPtr hBmpMask = new IntPtr();
+                bool hasMask;
+                if (bmp.biHeight == bmp.biWidth * 2)
+                {
+                    hasMask = true;
+                    bmp.biHeight = (int)(bmp.biHeight / 2d);
+                }
+                else
+                {
+                    hasMask = false;
+                }
 
-            bool hasMask;
-            if (bmp.biHeight == bmp.biWidth * 2)
-            {
-                hasMask = true;
-                bmp.biHeight = (int)(bmp.biHeight / 2d);
-            }
-            else
-            {
-                hasMask = false;
-            }
+                bmp.biSizeImage = (int)(bmp.biWidth * bmp.biHeight * (bmp.biBitCount / 8d));
 
-            bmp.biSizeImage = (int)(bmp.biWidth * bmp.biHeight * (bmp.biBitCount / 8d));
+                bmp.biXPelsPerMeter = (int)(24.5d * 1000d);
+                bmp.biYPelsPerMeter = (int)(24.5d * 1000d);
 
-            bmp.biXPelsPerMeter = (int)(24.5d * 1000d);
-            bmp.biYPelsPerMeter = (int)(24.5d * 1000d);
+                bmp.biClrUsed = 0;
+                bmp.biClrImportant = 0;
+                bmp.biPlanes = 1;
 
-            bmp.biClrUsed = 0;
-            bmp.biClrImportant = 0;
-            bmp.biPlanes = 1;
-            
-            Marshal.StructureToPtr(bmp, mm.Handle, false);
-            
-            ptr = mm.Handle + bmp.biSize;
-            
-            if (bmp.biSize != 40)
-                return null;
-            
-            hBmp = User32.CreateDIBSection(IntPtr.Zero, mm.Handle, 0U, ref ppBits, IntPtr.Zero, 0);
-
-            Native.MemCpy(ptr, ppBits, bmp.biSizeImage);
-            
-            if (hasMask)
-            {
-                ptr = ptr + bmp.biSizeImage;
-                bmp.biBitCount = 1;
-                bmp.biSizeImage = 0;
                 Marshal.StructureToPtr(bmp, mm.Handle, false);
-                hBmpMask = User32.CreateDIBSection(IntPtr.Zero, mm.Handle, 0U, ref ppBits, IntPtr.Zero, 0);
-                Native.MemCpy(ptr, ppBits, (long)(Math.Max(bmp.biWidth, 32) * bmp.biHeight / 8d));
-            }
 
-            lpicon.fIcon = 1;
-            lpicon.hbmColor = hBmp;
-            lpicon.hbmMask = hBmpMask;
-            hicon = User32.CreateIconIndirect(ref lpicon);
-            DeleteObject(hBmp);
-            if (hasMask)
-                DeleteObject(hBmpMask);
-            _constructIconRet = Icon.FromHandle(hicon);
-            _hIcon = hicon;
-            mm.Free();
-            return _constructIconRet;
+                ptr = mm.Handle + bmp.biSize;
+
+                if (bmp.biSize != 40)
+                    return null;
+
+                hBmp = User32.CreateDIBSection(IntPtr.Zero, mm.Handle, 0U, ref ppBits, IntPtr.Zero, 0);
+                Native.MemCpy(ptr, ppBits, bmp.biSizeImage);
+
+                if (hasMask)
+                {
+                    ptr = ptr + bmp.biSizeImage;
+                    bmp.biBitCount = 1;
+                    bmp.biSizeImage = 0;
+                    Marshal.StructureToPtr(bmp, mm.Handle, false);
+                    hBmpMask = User32.CreateDIBSection(IntPtr.Zero, mm.Handle, 0U, ref ppBits, IntPtr.Zero, 0);
+                    Native.MemCpy(ptr, ppBits, (long)(Math.Max(bmp.biWidth, 32) * bmp.biHeight / 8d));
+                }
+
+                lpicon.fIcon = 1;
+                lpicon.hbmColor = hBmp;
+                lpicon.hbmMask = hBmpMask;
+                hicon = User32.CreateIconIndirect(ref lpicon);
+                
+                DeleteObject(hBmp);
+                
+                if (hasMask)
+                    DeleteObject(hBmpMask);
+                
+                constructedIcon = (Icon)Icon.FromHandle(hicon).Clone();
+                User32.DestroyIcon(hicon);
+                return constructedIcon;
+            }
         }
 
         /// <summary>
@@ -409,7 +455,7 @@ namespace DataTools.Desktop
         /// <param name="Width">The width of the image.</param>
         /// <param name="Height">The height of the image.</param>
         /// <remarks></remarks>
-        private void _applyMask(MemPtr hBits, MemPtr hMask, int Width, int Height)
+        private void ApplyMask(MemPtr hBits, MemPtr hMask, int Width, int Height)
         {
             // Masks in icon images are bitstreams wherein a single bit represents a 1 or 0 transparency
             // for an entire pixel on the screen.  In order to convert an icon into a 32 bit images,
@@ -516,81 +562,6 @@ namespace DataTools.Desktop
             hMask.FromByteArray(bb, 0L);
         }
 
-        /// <summary>
-        /// Initialize a new raw icon image from a standard image with the specified size as either a bitmap or PNG icon.
-        /// </summary>
-        /// <param name="Image">Image from which to construct the icon.</param>
-        /// <param name="size">The standard size of the new icon.</param>
-        /// <param name="asBmp">Whether to create a bitmap icon (if false, a PNG icon is created).</param>
-        /// <remarks></remarks>
-        public IconImageEntry(Image Image, StandardIcons size, bool asBmp = false)
-        {
-            int sz = (int)size != 0 ? (int)(size) & 0xFF : 256;
-            Bitmap im = (Bitmap)Image;
 
-            if (Image.Width != sz | Image.Height != sz)
-            {
-                im = new Bitmap(sz, sz, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-                var g = System.Drawing.Graphics.FromImage(im);
-
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-
-                g.DrawImage(Image, new Rectangle(0, 0, sz, sz));
-
-                g.Dispose();
-            }
-
-            var s = new MemoryStream();
-
-            im.Save(s, System.Drawing.Imaging.ImageFormat.Png);
-
-            _entry.wIconType = size;
-            _entry.wBitsPixel = 32;
-            _entry.wColorPlanes = 1;
-
-            imageBytes = new byte[(int)(s.Length - 1L) + 1];
-            imageBytes = s.ToArray();
-
-            if (asBmp)
-            {
-                imageBytes = _makeBitmap();
-            }
-
-            _entry.dwImageSize = imageBytes.Length;
-
-            s.Close();
-        }
-
-
-        // IDisposable
-        private bool disposedValue; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (_hIcon != IntPtr.Zero)
-                {
-                    User32.DestroyIcon(_hIcon);
-                }
-            }
-
-            disposedValue = true;
-        }
-
-        ~IconImageEntry()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code.  Put cleanup code in Dispose(disposing As Boolean) above.
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
     }
 }

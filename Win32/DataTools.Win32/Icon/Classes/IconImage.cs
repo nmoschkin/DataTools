@@ -22,8 +22,8 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
-using DataTools.Win32.Memory;
-
+using DataTools.Memory;
+using DataTools.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -35,7 +35,7 @@ namespace DataTools.Desktop
     /// Represents an entire icon image file.
     /// </summary>
     /// <remarks></remarks>
-    public class IconImage
+    public sealed class IconImage
     {
         private readonly List<IconImageEntry> entries = new List<IconImageEntry>();
         private ICONDIR icondir;
@@ -110,7 +110,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public bool LoadIcon(Stream stream, bool closeStream = true)
         {
-            return internalLoadFromStream(stream, closeStream);
+            return InternalLoadFromStream(stream, closeStream);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public bool LoadIcon(IntPtr ptr)
         {
-            return internalLoadFromPtr(ptr);
+            return InternalLoadFromPtr(ptr);
         }
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public bool LoadIcon(byte[] bytes)
         {
-            return internalLoadFromBytes(bytes);
+            return InternalLoadFromBytes(bytes);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace DataTools.Desktop
         public bool LoadIcon(string fileName)
         {
             filename = fileName;
-            return internalLoadFromFile(fileName);
+            return InternalLoadFromFile(fileName);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public bool SaveIcon(string fileName)
         {
-            return internalSaveToFile(fileName);
+            return InternalSaveToFile(fileName);
         }
 
         /// <summary>
@@ -177,7 +177,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public bool SaveIcon(Stream stream)
         {
-            return internalSaveToStream(stream);
+            return InternalSaveToStream(stream);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace DataTools.Desktop
         /// <param name="ptr">The pointer to load.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        private bool internalLoadFromPtr(IntPtr ptr)
+        private bool InternalLoadFromPtr(IntPtr ptr)
         {
             // get the icon file header directory.
             MemPtr mm = ptr;
@@ -202,13 +202,13 @@ namespace DataTools.Desktop
             }
 
             entries.Clear();
-            mm = mm + e;
+            mm += e;
 
             for (i = 0; i < c; i++)
             {
                 // load all images in sequence.
                 entries.Add(new IconImageEntry(mm.ToStruct<ICONDIRENTRY>(), optr));
-                ptr = ptr + f;
+                ptr += f;
             }
 
             return true;
@@ -220,13 +220,12 @@ namespace DataTools.Desktop
         /// <param name="bytes"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        private bool internalLoadFromBytes(byte[] bytes)
+        private bool InternalLoadFromBytes(byte[] bytes)
         {
-            bool result = default;
-            SafePtr mm = (SafePtr)bytes;
-            result = internalLoadFromPtr(mm);
-            mm.Dispose();
-            return result;
+            using (SafePtr mm = (SafePtr)bytes)
+            {
+                return InternalLoadFromPtr(mm);
+            }
         }
 
         /// <summary>
@@ -236,15 +235,14 @@ namespace DataTools.Desktop
         /// <param name="closeStream"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        private bool internalLoadFromStream(Stream stream, bool closeStream)
+        private bool InternalLoadFromStream(Stream stream, bool closeStream)
         {
-            byte[] b;
-            b = new byte[(int)(stream.Length - 1L) + 1];
+            byte[] b = new byte[(int)(stream.Length - 1L) + 1];
             stream.Seek(0L, SeekOrigin.Begin);
-            stream.Read(b, 0, (int)stream.Length);
-            if (closeStream)
-                stream.Close();
-            return internalLoadFromBytes(b);
+            int v = stream.Read(b, 0, (int)stream.Length);
+            if (closeStream) stream.Close();
+            else stream.Seek(0L, SeekOrigin.Begin);
+            return InternalLoadFromBytes(b);
         }
 
         /// <summary>
@@ -253,10 +251,10 @@ namespace DataTools.Desktop
         /// <param name="fileName"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        private bool internalLoadFromFile(string fileName)
+        private bool InternalLoadFromFile(string fileName)
         {
             var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read, 10240);
-            return internalLoadFromStream(fs, true);
+            return InternalLoadFromStream(fs, true);
         }
 
         /// <summary>
@@ -265,7 +263,7 @@ namespace DataTools.Desktop
         /// <param name="stream">Stream to save.</param>
         /// <returns>True if successful.</returns>
         /// <remarks></remarks>
-        private bool internalSaveToStream(Stream stream)
+        private bool InternalSaveToStream(Stream stream)
         {
             var bl = new SafePtr();
             int f = Marshal.SizeOf(icondir);
@@ -279,9 +277,9 @@ namespace DataTools.Desktop
             bl = bl + MemoryTools.StructToBytes(icondir);
             foreach (var e in entries)
             {
-                e._entry.dwOffset = offset;
-                bl = bl + MemoryTools.StructToBytes(e._entry);
-                offset += e._entry.dwImageSize;
+                e.entry.dwOffset = offset;
+                bl = bl + MemoryTools.StructToBytes(e.entry);
+                offset += e.entry.dwImageSize;
             }
 
             foreach (var e in entries)
@@ -295,12 +293,10 @@ namespace DataTools.Desktop
             return true;
         }
 
-        private bool internalSaveToFile(string fileName)
+        private bool InternalSaveToFile(string fileName)
         {
-            bool internalSaveToFileRet = default;
             var fs = new FileStream(fileName, FileMode.CreateNew, FileAccess.Write, FileShare.None, 10240);
-            internalSaveToFileRet = internalSaveToStream(fs);
-            return internalSaveToFileRet;
+            return InternalSaveToStream(fs);
         }
 
         /// <summary>
@@ -335,10 +331,19 @@ namespace DataTools.Desktop
                     return StandardIcons.Icon256;
 
                 default:
-                    return defaultSize;
+                    if (size >= 200) return StandardIcons.Icon256;
+                    else if (size >= 100) return StandardIcons.Icon128;
+                    else if (size >= 50) return StandardIcons.Icon64;
+                    else if (size >= 40) return StandardIcons.Icon48;
+                    else if (size >= 30) return StandardIcons.Icon32;
+                    else if (size >= 10) return StandardIcons.Icon16;
+                    else return defaultSize;
             }
         }
 
+        /// <summary>
+        /// Create an empty icon image instance. 
+        /// </summary>
         public IconImage()
         {
         }
@@ -351,7 +356,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public IconImage(Stream stream, bool closeStream = true)
         {
-            internalLoadFromStream(stream, closeStream);
+            InternalLoadFromStream(stream, closeStream);
         }
 
         /// <summary>
@@ -361,7 +366,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public IconImage(IntPtr ptr)
         {
-            internalLoadFromPtr(ptr);
+            InternalLoadFromPtr(ptr);
         }
 
         /// <summary>
@@ -371,7 +376,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public IconImage(byte[] bytes)
         {
-            internalLoadFromBytes(bytes);
+            InternalLoadFromBytes(bytes);
         }
 
         /// <summary>
@@ -381,7 +386,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public IconImage(string fileName)
         {
-            if (internalLoadFromFile(fileName))
+            if (InternalLoadFromFile(fileName))
             {
                 filename = fileName;
             }

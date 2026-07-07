@@ -10,11 +10,10 @@
 // Licensed Under the Apache 2.0 License
 // *************************************************
 
+using DataTools.Memory;
 using DataTools.Shell.Native;
 using DataTools.Text;
 using DataTools.Win32;
-using DataTools.Memory;
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -203,7 +202,7 @@ namespace DataTools.Desktop
         /// Private icon library cache.
         /// </summary>
         /// <remarks></remarks>
-        private static Dictionary<string, Icon> LibCache = new Dictionary<string, Icon>();
+        private static Dictionary<string, Icon> libCache = new Dictionary<string, Icon>();
 
         /// <summary>
         /// Add an icon to the library cache.
@@ -215,7 +214,7 @@ namespace DataTools.Desktop
         {
             if (resId is null)
                 return;
-            LibCache.Add(resId, icn);
+            libCache.Add(resId, icn);
         }
 
         /// <summary>
@@ -230,7 +229,7 @@ namespace DataTools.Desktop
             if (resId is null)
                 return false;
 
-            return LibCache.TryGetValue(resId, out icn);
+            return libCache.TryGetValue(resId, out icn);
         }
 
         /// <summary>
@@ -239,7 +238,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static void ClearLibCache()
         {
-            LibCache.Clear();
+            libCache.Clear();
             GC.Collect(0);
         }
 
@@ -309,15 +308,15 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static ResCol EnumResources(IntPtr hmod, IntPtr restype)
         {
-            var _ptrs = new ResCol();
+            var ptrs = new ResCol();
             int c = 0;
             EnumResourceNamesEx(hmod, restype, new EnumResNameProcPtr((hModule, lpszType, lpszName, lParam) =>
             {
-                _ptrs.Add(lpszName);
+                ptrs.Add(lpszName);
                 c += 1;
                 return true;
             }), IntPtr.Zero, 0, 0);
-            return _ptrs;
+            return ptrs;
         }
 
         /// <summary>
@@ -328,7 +327,8 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static bool IsIntResource(IntPtr ptr)
         {
-            return (ptr.ToInt64() & 0xFFFFL) == ptr.ToInt64();
+            var lptr = (long)ptr;
+            return (lptr & 0xFFFFL) == lptr;
         }
 
         /// <summary>
@@ -342,9 +342,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static string LoadStringResource(string fileName, LoadLibraryExFlags uFlags = LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE | LoadLibraryExFlags.LOAD_LIBRARY_AS_IMAGE_RESOURCE, bool parseResName = false, int maxBuffer = 4096)
         {
-            string LoadStringResourceRet = default;
-            LoadStringResourceRet = LoadStringResource(fileName, 0, uFlags, true, maxBuffer);
-            return LoadStringResourceRet;
+            return LoadStringResource(fileName, 0, uFlags, true, maxBuffer);
         }
 
         /// <summary>
@@ -382,7 +380,7 @@ namespace DataTools.Desktop
 
             if (hmod == IntPtr.Zero)
             {
-                throw new NativeException(User32.GetLastError());
+                throw new NativeException(fileName);
             }
 
             var mm = new MemPtr();
@@ -463,7 +461,7 @@ namespace DataTools.Desktop
 
             if (hmod == IntPtr.Zero)
             {
-                throw new NativeException();
+                throw new NativeException(fileName);
             }
 
             var enumres = EnumResources(hmod, (IntPtr)RT_GROUP_ICON);
@@ -476,7 +474,7 @@ namespace DataTools.Desktop
             for (i = 0; i < c; i++)
             {
                 s = "#" + (i + 1);
-                l.Add(new LibraryIcon(s, _internalLoadLibraryIcon(fileName, i, null, desiredSize, uFlags, enumres, false, hmod)));
+                l.Add(new LibraryIcon(s, InternalLoadLibraryIcon(fileName, i, null, desiredSize, uFlags, enumres, false, hmod)));
             }
 
             User32.FreeLibrary(hmod);
@@ -494,9 +492,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static Icon LoadLibraryIcon(string fileName, StandardIcons desiredSize, LoadLibraryExFlags uFlags = LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE | LoadLibraryExFlags.LOAD_LIBRARY_AS_IMAGE_RESOURCE, ResCol enumRes = null)
         {
-            Icon LoadLibraryIconRet = default;
-            LoadLibraryIconRet = _internalLoadLibraryIcon(fileName, 0x80000, null, desiredSize, uFlags, enumRes, true, IntPtr.Zero);
-            return LoadLibraryIconRet;
+            return InternalLoadLibraryIcon(fileName, 0x80000, null, desiredSize, uFlags, enumRes, true, IntPtr.Zero);
         }
 
         /// <summary>
@@ -511,9 +507,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static Icon LoadLibraryIcon(string fileName, int iIcon, StandardIcons desiredSize, LoadLibraryExFlags uFlags = LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE | LoadLibraryExFlags.LOAD_LIBRARY_AS_IMAGE_RESOURCE, ResCol enumRes = null)
         {
-            Icon LoadLibraryIconRet = default;
-            LoadLibraryIconRet = _internalLoadLibraryIcon(fileName, iIcon, null, desiredSize, uFlags, enumRes, false, IntPtr.Zero);
-            return LoadLibraryIconRet;
+            return InternalLoadLibraryIcon(fileName, iIcon, null, desiredSize, uFlags, enumRes, false, IntPtr.Zero);
         }
 
         /// <summary>
@@ -528,9 +522,7 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static Icon LoadLibraryIcon(string fileName, string resIcon, StandardIcons desiredSize, LoadLibraryExFlags uFlags = LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE | LoadLibraryExFlags.LOAD_LIBRARY_AS_IMAGE_RESOURCE, ResCol enumRes = null)
         {
-            Icon LoadLibraryIconRet = default;
-            LoadLibraryIconRet = _internalLoadLibraryIcon(fileName, 0x80000, resIcon, desiredSize, uFlags, enumRes, false, IntPtr.Zero);
-            return LoadLibraryIconRet;
+            return InternalLoadLibraryIcon(fileName, 0x80000, resIcon, desiredSize, uFlags, enumRes, false, IntPtr.Zero);
         }
 
         /// <summary>
@@ -546,9 +538,9 @@ namespace DataTools.Desktop
         /// <param name="hMod">The handle to an open module or 0.</param>
         /// <returns>A managed-code .NET Framework Icon object.</returns>
         /// <remarks></remarks>
-        private static Icon _internalLoadLibraryIcon(string fileName, int iIcon, string resIcon, StandardIcons desiredSize, LoadLibraryExFlags uFlags, ResCol enumRes, bool parseIconIndex, IntPtr hMod)
+        private static Icon InternalLoadLibraryIcon(string fileName, int iIcon, string resIcon, StandardIcons desiredSize, LoadLibraryExFlags uFlags, ResCol enumRes, bool parseIconIndex, IntPtr hMod)
         {
-            Icon _internalLoadLibraryIconRet = default;
+            Icon resultIcon = default;
             string lk = null;
             Icon icn = null;
             bool noh = hMod == IntPtr.Zero;
@@ -638,13 +630,19 @@ namespace DataTools.Desktop
                 }
 
                 if (hMod == IntPtr.Zero)
-                {
-                    throw new NativeException();
+                {                    
+                    if (TryReadImage(fileName, out var image))
+                    {
+                        var icn2 = new IconImage();
+                        var entry = new IconImageEntry(image, IconImage.StandardIconFromSize(image.Size.Width));
+                        return entry.ToIcon();                        
+                    }
+                    throw new NativeException(fileName);
                 }
             }
 
             // pre-initialize the return value with null.
-            _internalLoadLibraryIconRet = null;
+            resultIcon = null;
 
             // if enumRes was already passed in we don't need to do this step...
             // also, if enumRes was passed in, it was by a particular function enumerating only RT_GROUP_ICON,
@@ -698,14 +696,14 @@ namespace DataTools.Desktop
                 {
                     if (noh)
                         User32.FreeLibrary(hMod);
-                    return _internalLoadLibraryIconRet;
+                    return resultIcon;
                 }
 
                 if (idx > enumRes.Count)
                 {
                     if (noh)
                         User32.FreeLibrary(hMod);
-                    return _internalLoadLibraryIconRet;
+                    return resultIcon;
                 }
 
                 // find the icon.
@@ -733,13 +731,13 @@ namespace DataTools.Desktop
                 AddToLibCache(lk, icn);
 
                 // set return value
-                _internalLoadLibraryIconRet = icn;
+                resultIcon = icn;
 
                 // free our unmanaged resources.
                 User32.DestroyIcon(hicon);
                 if (noh)
                     User32.FreeLibrary(hMod);
-                return _internalLoadLibraryIconRet;
+                return resultIcon;
             }
 
             // are we looking for the integer name of an icon resource?
@@ -782,7 +780,7 @@ namespace DataTools.Desktop
             {
                 if (noh)
                     User32.FreeLibrary(hMod);
-                return _internalLoadLibraryIconRet;
+                return resultIcon;
             }
 
             // find the group icon resource.
@@ -802,7 +800,7 @@ namespace DataTools.Desktop
                 {
                     if (noh)
                         User32.FreeLibrary(hMod);
-                    return _internalLoadLibraryIconRet;
+                    return resultIcon;
                 }
 
                 // find THAT icon resource.
@@ -832,7 +830,7 @@ namespace DataTools.Desktop
                     AddToLibCache(lk, icn);
 
                     // set return value
-                    _internalLoadLibraryIconRet = icn;
+                    resultIcon = icn;
 
                     // destroy the unmanaged icon.
                     User32.DestroyIcon(hicon);
@@ -842,7 +840,7 @@ namespace DataTools.Desktop
             // free the library.
             if (noh)
                 User32.FreeLibrary(hMod);
-            return _internalLoadLibraryIconRet;
+            return resultIcon;
         }
 
         /// <summary>
@@ -862,26 +860,28 @@ namespace DataTools.Desktop
         /// <summary>
         /// Retrieves a Bitmap resource from a library.
         /// </summary>
-        /// <param name="iBmp"></param>
-        /// <param name="iSize"></param>
-        /// <param name="uFlags"></param>
+        /// <param name="ibmp"></param>
+        /// <param name="isize"></param>
+        /// <param name="uflags"></param>
         /// <param name="library"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static Bitmap GetLibraryBitmap(int iBmp, Size iSize, int uFlags = User32.LR_DEFAULTCOLOR + User32.LR_CREATEDIBSECTION, string library = @"%systemroot%\system32\shell32.dll")
+        public static Bitmap GetLibraryBitmap(int ibmp, Size isize, int uflags = User32.LR_DEFAULTCOLOR | User32.LR_CREATEDIBSECTION, string library = @"%systemroot%\system32\shell32.dll")
         {
-            Bitmap GetLibraryBitmapRet = default;
+            Bitmap newbmp;
             var hInst = User32.LoadLibrary(Environment.ExpandEnvironmentVariables(library));
-            IntPtr hBmp;
-            if (hInst == IntPtr.Zero)
-                return null;
-            hBmp = User32.LoadImage(hInst, (IntPtr)iBmp, User32.IMAGE_BITMAP, iSize.Width, iSize.Height, uFlags);
-            if (hBmp == IntPtr.Zero)
-                return null;
+            if (hInst == IntPtr.Zero) return null;
+            
+            IntPtr hbmp;
+            
+            hbmp = User32.LoadImage(hInst, (IntPtr)ibmp, User32.IMAGE_BITMAP, isize.Width, isize.Height, uflags);
+            if (hbmp == IntPtr.Zero) return null;
+
             User32.FreeLibrary(hInst);
-            GetLibraryBitmapRet = Image.FromHbitmap(hBmp);
-            NativeShell.DeleteObject(hBmp);
-            return GetLibraryBitmapRet;
+            newbmp = Image.FromHbitmap(hbmp);
+            NativeShell.DeleteObject(hbmp);
+
+            return newbmp;
         }
 
         private static string MakeKey(int iIcon, SystemIconSizes shil)
@@ -1213,16 +1213,35 @@ namespace DataTools.Desktop
                 return null;
 
             var n = new Bitmap(icn.Width, icn.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            var g = System.Drawing.Graphics.FromImage(n);
+            using (var g = System.Drawing.Graphics.FromImage(n))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
 
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
-
-            g.Clear(Color.Transparent);
-            g.DrawIcon(icn, 0, 0);
-            g.Dispose();
-
+                g.Clear(Color.Transparent);
+                g.DrawIcon(icn, 0, 0);
+            }
             return n;
+        }
+
+        /// <summary>
+        /// Try to load a file as an image.
+        /// </summary>
+        /// <param name="filename">The name of the file to try to load.</param>
+        /// <param name="result">Contains the resultant image, if successful.</param>
+        /// <returns>True if successful.</returns>
+        public static bool TryReadImage(string filename, out Image result)
+        {
+            try
+            {
+                result = Image.FromFile(filename);                
+            }
+            catch
+            {
+                result = null;
+                return false;
+            }
+            return true;
         }
     }
 }
