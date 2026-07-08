@@ -310,12 +310,12 @@ namespace DataTools.Desktop
         {
             var ptrs = new ResCol();
             int c = 0;
-            EnumResourceNamesEx(hmod, restype, new EnumResNameProcPtr((hModule, lpszType, lpszName, lParam) =>
+            EnumResourceNamesEx(hmod, restype, (hModule, lpszType, lpszName, lParam) =>
             {
                 ptrs.Add(lpszName);
-                c += 1;
+                c++;
                 return true;
-            }), IntPtr.Zero, 0, 0);
+            }, IntPtr.Zero, 0, 0);
             return ptrs;
         }
 
@@ -357,7 +357,6 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         public static string LoadStringResource(string fileName, int resId, LoadLibraryExFlags uFlags = LoadLibraryExFlags.LOAD_LIBRARY_AS_DATAFILE | LoadLibraryExFlags.LOAD_LIBRARY_AS_IMAGE_RESOURCE, bool parseResName = false, int maxBuffer = 4096)
         {
-            string LoadStringResourceRet = default;
             IntPtr hmod;
             if (parseResName)
             {
@@ -383,15 +382,13 @@ namespace DataTools.Desktop
                 throw new NativeException(fileName);
             }
 
-            var mm = new MemPtr();
-
-            mm.AllocZero(maxBuffer);
-            LoadString(hmod, resId, mm, maxBuffer);
-            LoadStringResourceRet = (string)(mm);
-            mm.Free();
-
-            User32.FreeLibrary(hmod);
-            return LoadStringResourceRet;
+            using (var mm = new SafePtr(maxBuffer))
+            {
+                LoadString(hmod, resId, (IntPtr)mm, maxBuffer);
+                var resstr = (string)(mm);
+                User32.FreeLibrary(hmod);
+                return resstr;
+            }
         }
 
         /// <summary>
@@ -611,7 +608,7 @@ namespace DataTools.Desktop
                     }
                 }
                 // we're done, no need to open a resource.
-                if (fa is object)
+                if (fa != null)
                     return fa.ToIcon();
                 else
                     return null;

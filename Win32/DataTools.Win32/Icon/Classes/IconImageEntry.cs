@@ -44,7 +44,7 @@ namespace DataTools.Desktop
 
 
         [DllImport("gdi32.dll")]
-        static extern bool DeleteObject(IntPtr hObject);
+        private static extern bool DeleteObject(IntPtr hObject);
 
         /// <summary>
         /// Create a new blank IconImageEntry
@@ -64,41 +64,38 @@ namespace DataTools.Desktop
         {
             int sz = (int)size != 0 ? (int)(size) & 0xFF : 256;
             Bitmap im = (Bitmap)Image;
-
             if (Image.Width != sz | Image.Height != sz)
             {
                 im = new Bitmap(sz, sz, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                using (var g = System.Drawing.Graphics.FromImage(im))
+                {
 
-                var g = System.Drawing.Graphics.FromImage(im);
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
 
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
-
-                g.DrawImage(Image, new Rectangle(0, 0, sz, sz));
-
-                g.Dispose();
+                    g.DrawImage(Image, new Rectangle(0, 0, sz, sz));
+                }
             }
-
-            var s = new MemoryStream();
-
-            im.Save(s, System.Drawing.Imaging.ImageFormat.Png);
-
-            entry.wIconType = size;
-            entry.wBitsPixel = 32;
-            entry.wColorPlanes = 1;
-
-            imageBytes = new byte[(int)(s.Length - 1L) + 1];
-            imageBytes = s.ToArray();
-
-            if (asBmp)
+            using (var s = new MemoryStream())
             {
-                imageBytes = MakeBitmap();
+
+                im.Save(s, System.Drawing.Imaging.ImageFormat.Png);
+
+                entry.wIconType = size;
+                entry.wBitsPixel = 32;
+                entry.wColorPlanes = 1;
+
+                imageBytes = new byte[(int)(s.Length - 1L) + 1];
+                imageBytes = s.ToArray();
+
+                if (asBmp)
+                {
+                    imageBytes = MakeBitmap();
+                }
+
+                entry.dwImageSize = imageBytes.Length;
             }
-
-            entry.dwImageSize = imageBytes.Length;
-
-            s.Close();
         }        
 
         /// <summary>
@@ -272,14 +269,8 @@ namespace DataTools.Desktop
         {
             get
             {
-                if (imageBytes is null)
-                    return false;
-
-                SafePtr mm = (SafePtr)imageBytes;
-                int q = mm.IntAt(0L);
-
-                // The PNG moniker
-                return q == 0x474E5089;
+                if (imageBytes is null || imageBytes.Length < 4) return false;
+                return BitConverter.ToInt32(imageBytes, 0) == 0x474E5089;
             }
         }
 
@@ -294,10 +285,10 @@ namespace DataTools.Desktop
 
             if (IsPngFormat)
             {
-                var s = new MemoryStream(imageBytes);
-                result = Image.FromStream(s);
-                
-                s.Close();
+                using (var s = new MemoryStream(imageBytes))
+                {
+                    result = Image.FromStream(s);
+                }
             }
             else
             {
@@ -314,60 +305,58 @@ namespace DataTools.Desktop
         /// <remarks></remarks>
         private byte[] MakeBitmap()
         {
-            byte[] bytesOut;
-            
-            if (!IsPngFormat)
+            using (var mm = new SafePtr())
             {
-                bytesOut = imageBytes;
+                byte[] bytesOut;
+
+                if (!IsPngFormat)
+                {
+                    bytesOut = imageBytes;
+                    return bytesOut;
+                }
+
+                IntPtr bmp = default;
+
+                var hbmp = Resources.MakeDIBSection((Bitmap)ToImage(), ref bmp);
+                var bm = new BITMAPINFOHEADER();
+
+                int maskSize;
+
+                int w = entry.cWidth;
+                int h = entry.cHeight;
+
+                if (w == 0)
+                    w = 256;
+
+                if (h == 0)
+                    h = 256;
+
+                bm.biSize = 40;
+                bm.biWidth = w;
+                bm.biHeight = h * 2;
+                bm.biPlanes = 1;
+                bm.biBitCount = 32;
+                bm.biSizeImage = w * h * 4;
+
+                maskSize = (int)(Math.Max(w, 32) * h / 8d);
+
+                mm.Alloc(bm.biSizeImage + 40 + maskSize);
+
+                var ptr1 = mm.DangerousGetHandle() + 40;
+                var ptr2 = mm.DangerousGetHandle() + 40 + bm.biSizeImage;
+
+                Marshal.StructureToPtr(bm, mm.DangerousGetHandle(), false);
+                Native.MemCpy(bmp, ptr1, bm.biSizeImage);
+
+                bm = mm.ToStruct<BITMAPINFOHEADER>();
+
+                SetMask(ptr1, ptr2, w, h);
+                entry.dwImageSize = (int)mm.Length;
+
+                bytesOut = (byte[])mm;
+                DeleteObject(hbmp);
                 return bytesOut;
             }
-
-            IntPtr bmp = default;
-        
-            var hbmp = Resources.MakeDIBSection((Bitmap)ToImage(), ref bmp);
-            
-            var mm = new SafePtr();
-            var bm = new BITMAPINFOHEADER();
-            
-            int maskSize;
-            
-            int w = entry.cWidth;
-            int h = entry.cHeight;
-            
-            if (w == 0)
-                w = 256;
-            
-            if (h == 0)
-                h = 256;
-            
-            bm.biSize = 40;
-            bm.biWidth = w;
-            bm.biHeight = h * 2;
-            bm.biPlanes = 1;
-            bm.biBitCount = 32;
-            bm.biSizeImage = w * h * 4;
-
-            maskSize = (int)(Math.Max(w, 32) * h / 8d);
-
-            mm.Alloc(bm.biSizeImage + 40 + maskSize);
-
-            var ptr1 = mm.DangerousGetHandle() + 40;
-            var ptr2 = mm.DangerousGetHandle() + 40 + bm.biSizeImage;
-
-            Marshal.StructureToPtr(bm, mm.DangerousGetHandle(), false);
-            Native.MemCpy(bmp, ptr1, bm.biSizeImage);
-
-            bm = mm.ToStruct<BITMAPINFOHEADER>();
-
-            _setMask(ptr1, ptr2, w, h);
-            entry.dwImageSize = (int)mm.Length;
-
-            bytesOut = (byte[])mm;
-
-            mm.Free();
-            DeleteObject(hbmp);
-
-            return bytesOut;
         }
 
         /// <summary>
@@ -455,7 +444,7 @@ namespace DataTools.Desktop
         /// <param name="Width">The width of the image.</param>
         /// <param name="Height">The height of the image.</param>
         /// <remarks></remarks>
-        private void ApplyMask(MemPtr hBits, MemPtr hMask, int Width, int Height)
+        public static void ApplyMask(MemPtr hBits, MemPtr hMask, int Width, int Height)
         {
             // Masks in icon images are bitstreams wherein a single bit represents a 1 or 0 transparency
             // for an entire pixel on the screen.  In order to convert an icon into a 32 bit images,
@@ -510,7 +499,7 @@ namespace DataTools.Desktop
         /// <param name="Width">The width of the image.</param>
         /// <param name="Height">The height of the image.</param>
         /// <remarks></remarks>
-        private void _setMask(MemPtr hBits, MemPtr hMask, int Width, int Height)
+        public static void SetMask(MemPtr hBits, MemPtr hMask, int Width, int Height)
         {
             // this never changes
             int numBits = 32;
@@ -561,7 +550,5 @@ namespace DataTools.Desktop
 
             hMask.FromByteArray(bb, 0L);
         }
-
-
     }
 }
