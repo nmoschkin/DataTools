@@ -30,11 +30,6 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Partitioning\**" />
-    <EmbeddedResource Remove="Partitioning\**" />
-    <None Remove="Partitioning\**" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\DataTools.Win32.Memory\DataTools.Win32.Memory.csproj" />
     <ProjectReference Include="..\DataTools.Win32\DataTools.Win32.csproj" />
   </ItemGroup>
