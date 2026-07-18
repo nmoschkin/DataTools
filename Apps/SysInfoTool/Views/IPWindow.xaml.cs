@@ -213,6 +213,8 @@ namespace SysInfoTool
 
             listener = new HardwareListener(helper.Handle);
             listener.HardwareChange += Listener_HardwareChange;
+
+            ViewMenu = new VirtualMenu(this, AdapterList, helper);
         }
 
         private void ShowIcon_Click(object sender, RoutedEventArgs e)
@@ -353,30 +355,30 @@ namespace SysInfoTool
         }
     }
 
-    public class VirtualMenu : ObservableCollection<MenuItem>, INotifyPropertyChanged
+    public class VirtualMenu : ObservableCollection<MenuItem>
     {
-        private ListView __View;
+        private ListView view;
 
-        private ListView _View
+        public ListView ListViewControl
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
-                return __View;
+                return view;
             }
 
             [MethodImpl(MethodImplOptions.Synchronized)]
-            set
+            private set
             {
-                if (__View != null)
+                if (view != null)
                 {
-                    __View.SelectionChanged -= SelectionChanged;
+                    view.SelectionChanged -= SelectionChanged;
                 }
 
-                __View = value;
-                if (__View != null)
+                view = value;
+                if (view != null)
                 {
-                    __View.SelectionChanged += SelectionChanged;
+                    view.SelectionChanged += SelectionChanged;
                 }
             }
         }
@@ -395,10 +397,10 @@ namespace SysInfoTool
             _statusMenu.IsEnabled = SelectedItem.CanShowNetworkDialogs;
         }
 
-        internal VirtualMenu(Window window, ListView view)
+        internal VirtualMenu(Window window, ListView listview, WindowInteropHelper existingHelper = null)
         {
-            _View = view;
-            _wih = new WindowInteropHelper(window);
+            ListViewControl = listview;
+            _wih = existingHelper ?? new WindowInteropHelper(window);
 
             _netMenu = new MenuItem() { Header = "Show Network Properties Dialog" };
             _statusMenu = new MenuItem() { Header = "Show Network Status Dialog" };
@@ -413,30 +415,32 @@ namespace SysInfoTool
             Add(_devMenu);
         }
 
-        public struct ShDisplayNames
-        {
-            public string AbsoluteParsing;
-            public string Normal;
-            public string RelativeParsing;
-            public string Editing;
+        //public struct ShDisplayNames
+        //{
+        //    public string AbsoluteParsing;
+        //    public string Normal;
+        //    public string RelativeParsing;
+        //    public string Editing;
 
-            public override string ToString()
-            {
-                return Normal;
-            }
-        }
+        //    public override string ToString()
+        //    {
+        //        return Normal;
+        //    }
+        //}
 
         public NetworkAdapter SelectedItem
         {
             get
             {
-                return (NetworkAdapter)_View.SelectedItem;
+                return (NetworkAdapter)ListViewControl.SelectedItem;
             }
         }
 
         private void SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SelectedItem != null) CheckDevice();
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(SelectedItem)));
+
         }
 
         private void netStatus(object sender, EventArgs e)
