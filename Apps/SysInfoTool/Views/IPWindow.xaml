@@ -88,7 +88,7 @@
             <ListView.ContextMenu>
                 <ContextMenu
                     x:Name="netMenu"
-                    DataContext="{Binding IPWindow}"
+                    DataContext="{x:Reference Name=MainView}"
                     ItemsSource="{Binding ViewMenu}" />
 
             </ListView.ContextMenu>
