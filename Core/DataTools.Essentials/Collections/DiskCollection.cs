@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
@@ -37,17 +38,19 @@ namespace DataTools.Essentials.Collections
         /// </summary>
         private const int CHUNK_SIZE = 256;
 
+        private static readonly byte[] CrLf = new byte[] { (byte)'\r', (byte)'\n' };
+
         private readonly object lockObj = new object();
-        private string filename;
+        private readonly bool isReadOnly = false;
+        private readonly string filename;
+        private readonly JsonSerializerSettings jsonSettings;
+
         private bool disposedValue;
 
         private int recordSize = BUFFER_SIZE;
-
         private int count = 0;
-        private static readonly byte[] CrLf = new byte[] { (byte)'\r', (byte)'\n' };
-        private bool asScratch;
-        private JsonSerializerSettings jsonSettings;
-        private bool isReadOnly = false;
+
+        private bool asCompactTarget;
         private FileStream fileStream;
         private int isenumerating = 0;
 
@@ -77,7 +80,7 @@ namespace DataTools.Essentials.Collections
         /// <param name="recordSize">The default record size.</param>
         /// <param name="isReadOnly">True if the collection will be opened read-only.</param>
         /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
-        protected DiskCollection(string filename, int recordSize, bool isReadOnly, JsonSerializerSettings jsonSettings = null)
+        public DiskCollection(string filename, int recordSize, bool isReadOnly, JsonSerializerSettings jsonSettings = null)
         {
             this.isReadOnly = isReadOnly;
             this.recordSize = recordSize;
@@ -87,17 +90,23 @@ namespace DataTools.Essentials.Collections
             {
                 if (JsonConvert.DefaultSettings != null)
                 {
-                    jsonSettings = JsonConvert.DefaultSettings();
-                    jsonSettings.Formatting = Formatting.None;
+                    this.jsonSettings = JsonConvert.DefaultSettings();
+                    this.jsonSettings.Formatting = Formatting.None;
                 }
             }
             else
             {
                 this.jsonSettings = jsonSettings;
-                CheckSettings(jsonSettings);
             }
 
+            CheckSettings(this.jsonSettings);
             RefreshFromDiskState(false);
+        }
+
+        private DiskCollection(string filename, int recordSize, bool isReadOnly, bool asCompactTarget, JsonSerializerSettings jsonSettings = null)
+            : this(filename, recordSize, isReadOnly, jsonSettings)
+        {
+            this.asCompactTarget = asCompactTarget;
         }
 
         /// <summary>
@@ -108,17 +117,56 @@ namespace DataTools.Essentials.Collections
         /// <summary>
         /// Get the current record size of the on-disk collection
         /// </summary>
-        public int RecordSize => recordSize;
+        public int RecordSize
+        {
+            get
+            {
+                lock (lockObj)
+                {
+                    return recordSize;
+                }
+            }
+        }
 
         /// <summary>
         /// Get the number of items in the collection
         /// </summary>
-        public int Count => count;
+        public int Count
+        {
+            get
+            {
+                lock (lockObj)
+                {
+                    return count;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether or not the collection is read-only
         /// </summary>
         public bool IsReadOnly => isReadOnly;
+
+        /// <summary>
+        /// Gets the current size, in bytes, of the disk file that contains the collection.
+        /// </summary>
+        /// <remarks>
+        /// If the object is disposed then the size will be -1.
+        /// </remarks>
+        public long Size
+        {
+            get                
+            {
+                lock (lockObj)
+                {
+                    if (fileStream != null)
+                    {
+                        return fileStream.Length;
+                    }
+                    else return -1;
+                }
+            }
+        }
 
         /// <summary>
         /// Gets or sets the item at the specified index
@@ -167,7 +215,7 @@ namespace DataTools.Essentials.Collections
         public void Clear()
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
-            if (asScratch) throw new InvalidOperationException("Debug your code! Clearing change on collection change cannot happen/should not happen.");
+            if (asCompactTarget) throw new InvalidOperationException("Debug your code! Clearing change on compact target cannot happen/should not happen.");
             lock (lockObj)
             {
                 fileStream?.Close();
@@ -222,7 +270,7 @@ namespace DataTools.Essentials.Collections
         public bool RemoveAt(int index)
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
-            if (asScratch) throw new InvalidOperationException("Debug your code! Removing change on collection change cannot happen/should not happen.");
+            if (asCompactTarget) throw new InvalidOperationException("Debug your code! Removing change on compact target cannot happen/should not happen.");
             if (index >= count) throw new IndexOutOfRangeException();
             T old = this[index];
             Compact(index, 0);
@@ -238,7 +286,7 @@ namespace DataTools.Essentials.Collections
         public bool Remove(T item)
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
-            if (asScratch) throw new InvalidOperationException("Debug your code! Removing change on collection change cannot happen/should not happen.");
+            if (asCompactTarget) throw new InvalidOperationException("Debug your code! Removing change on compact target cannot happen/should not happen.");
             var idx = 0;
             foreach (var item2 in this)
             {
@@ -468,7 +516,7 @@ namespace DataTools.Essentials.Collections
             {
                 if (bytes.Length > recordSize)
                 {
-                    if (asScratch) throw new InvalidOperationException("Debug your code! Capacity change on collection change cannot happen/should not happen.");
+                    if (asCompactTarget) throw new InvalidOperationException("Debug your code! Capacity change on compact target cannot happen/should not happen.");
                     var newRecSize = GetRecordSize(bytes.Length);
                     if (count > 0)
                     {
@@ -519,7 +567,7 @@ namespace DataTools.Essentials.Collections
                 recCount = 0;
 
                 var newColSize = forceSize != 0 ? forceSize : recordSize;
-                using (var otherCol = new DiskCollection<T>(temp, newColSize, jsonSettings))
+                using (var otherCol = new DiskCollection<T>(temp, newColSize, false, true, jsonSettings))
                 {
                     using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None, BufferSize, FileOptions.SequentialScan))
                     {
@@ -637,6 +685,7 @@ namespace DataTools.Essentials.Collections
         {
             lock (lockObj)
             {
+                fileStream?.Flush();
                 fileStream?.Close();
                 fileStream = null;
             }

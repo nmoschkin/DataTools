@@ -8,6 +8,7 @@ using DataTools.Text;
 using DataTools.Win32;
 using DataTools.Win32.Usb;
 using DataTools.Win32.Usb.Power;
+using Newtonsoft.Json;
 
 namespace TestHid
 {
@@ -17,7 +18,7 @@ namespace TestHid
         public ExampleRecord()
         {
 
-            var size = Random.Shared.Next(10, 300);
+            var size = Random.Shared.Next(10, 2048);
             var sb = new StringBuilder();
 
             for (var i = 0; i < size; i++)
@@ -81,20 +82,27 @@ namespace TestHid
         {
 
             var folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var someSettings = new JsonSerializerSettings();
+            var getSettingsFunc = () =>
+            {
+                return someSettings;
+            };
+            
+            JsonConvert.DefaultSettings = getSettingsFunc;
+            
             using (var diskCol = new DiskCollection<ExampleRecord>($"{folder}\\simple_col.txt"))
             {
-                //diskCol.Clear();
-                //for (var i = 0; i < 1000; i++)
-                //{
-                //    diskCol.Add(new ExampleRecord());
-                //}
-
-                diskCol.Compact();
-                List<ExampleRecord> recovered = new List<ExampleRecord>();
-
                 var ridx = 192;
+                var ridx2 = 785;
                 var cc = 0;
                 ExampleRecord testobj = null;
+                var time1 = DateTime.Now;
+                var time2 = DateTime.Now;
+                var diff = time2 - time1;
+                List<ExampleRecord> recovered = new List<ExampleRecord>();
+
+                // Cold Enumeration
+                time1 = DateTime.Now;
                 foreach (var rec in diskCol)
                 {
                     recovered.Add(rec);
@@ -105,17 +113,104 @@ namespace TestHid
                     cc++;
                 }
 
-                var testobj2 = diskCol[ridx];
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+                Console.WriteLine($"Cold Enumeration {cc:#,##0} records: {diff}");
+                
+                // Reset for next test
+                cc = 0;
+                recovered.Clear();
 
+                // Clear and populate
+                diskCol.Clear();
+                time1 = DateTime.Now;
+                var recs = 20480;
+                for (var i = 0; i < recs; i++)
+                {
+                    diskCol.Add(new ExampleRecord());
+                }
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+
+                Console.WriteLine($"Write {recs:#,##0} records: {diff}");
+                Console.WriteLine($"Record size is now {diskCol.RecordSize}");
+
+                // Enumerate
+                time1 = DateTime.Now;
+                foreach (var rec in diskCol)
+                {
+                    recovered.Add(rec);
+                    if (cc == ridx)
+                    {
+                        testobj = rec;
+                    }
+                    cc++;
+                }
+
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+                Console.WriteLine($"Enumerate {cc:#,##0} records: {diff}");
+
+                // Spread
+                time1 = DateTime.Now;
+                List<ExampleRecord> testList = [.. diskCol];
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+
+                Console.WriteLine($"Spread to new list: {diff}");
+
+                // Retrieve Item #1
+                time1 = DateTime.Now;
+                var testobj2 = diskCol[ridx];
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+
+                Console.WriteLine($"Retrieve item randomly at {ridx}: {diff}");
+
+                // Retrieve Item #2
+                time1 = DateTime.Now;
+                var testobj3 = diskCol[ridx2];
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+
+                Console.WriteLine($"Retrieve item randomly at {ridx2}: {diff}");
+
+                // Test equality
+                time1 = DateTime.Now;
                 var pass = testobj2.Equals(testobj);
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+
+                Console.WriteLine($"Test equality result is {pass}: {diff}");
+
                 if (pass)
                 {
+                    // Remove two items
+                    time1 = DateTime.Now;
                     diskCol.RemoveAt(ridx);
+                    diskCol.RemoveAt(ridx2);
+                    time2 = DateTime.Now;
+                    diff = time2 - time1;
+                    Console.WriteLine($"Delete 2 records at index {ridx}, {ridx2}: {diff}");
                 }
+
+                Console.WriteLine($"Record size is now {diskCol.RecordSize}");
+
+                // Compact
+                time1 = DateTime.Now;
+                diskCol.Compact();
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+                Console.WriteLine($"Compact: {diff}");
+                Console.WriteLine($"Record size is now {diskCol.RecordSize}");
+
+                Console.WriteLine($"Size on Disk: {diskCol.Size:#,##0}");
 
                 //diskCol.Clear();
             }
 
+            Console.WriteLine("Press any key to continue...");
+            Console.Read();
 
 
             DeviceInfo[] hids = HidDeviceInfo.EnumerateHidDevices();
