@@ -121,8 +121,8 @@ namespace DataTools.Essentials.Collections
                 lock(lockObj) 
                 {
                     SetItem(value, index);
-                    OnItemChanged(value, index);
                 }
+                OnItemChanged(value, index);
             }
         }
 
@@ -136,8 +136,8 @@ namespace DataTools.Essentials.Collections
             {
                 SetItem(item, count);
                 count++;
-                OnItemAdded(item, count - 1);
             }
+            OnItemAdded(item, count - 1);
         }
 
         /// <summary>
@@ -154,8 +154,8 @@ namespace DataTools.Essentials.Collections
                 count = 0;
                 OpenFile(true);
                 RefreshFromDiskState(false);
-                OnCollectionCleared();
             }
+            OnCollectionCleared();
         }
 
         /// <summary>
@@ -203,17 +203,11 @@ namespace DataTools.Essentials.Collections
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (asScratch) throw new InvalidOperationException("Debug your code! Removing change on collection change cannot happen/should not happen.");
-            lock (lockObj)
-            {
-                if (index < count)
-                {
-                    var old = this[index];
-                    Compact(index, 0);
-                    OnItemRemoved(old, index);
-                    return true;
-                }
-                return false;
-            }
+            if (index >= count) throw new IndexOutOfRangeException();
+            T old = this[index];
+            Compact(index, 0);
+            OnItemRemoved(old, index);
+            return true;
         }
 
         /// <summary>
@@ -225,21 +219,17 @@ namespace DataTools.Essentials.Collections
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (asScratch) throw new InvalidOperationException("Debug your code! Removing change on collection change cannot happen/should not happen.");
-
-            lock (lockObj)
+            var idx = 0;
+            foreach (var item2 in this)
             {
-                var idx = 0;
-                foreach (var item2 in this)
+                if (Equals(item, item2))
                 {
-                    if (Equals(item, item2))
-                    {                        
-                        RemoveAt(idx);                        
-                        return true;
-                    }
-                    idx++;
+                    RemoveAt(idx);
+                    return true;
                 }
-                return false;
-            }
+                idx++;
+            }                
+            return false;
         }
 
         /// <summary>
@@ -491,10 +481,10 @@ namespace DataTools.Essentials.Collections
         private void Compact(int skip, int forceSize)
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
+            var del = skip != -1;
             lock (lockObj)
             {
                 const int BufferSize = BUFFER_SIZE;
-                var del = skip != -1;
                 var decoder = Encoding.UTF8.GetDecoder();
 
                 byte[] byteBuffer = new byte[BufferSize];
@@ -569,8 +559,8 @@ namespace DataTools.Essentials.Collections
 
                 OpenFile();
                 RefreshFromDiskState(false);
-                if (!del) OnCompacted();
             }
+            if (!del) OnCompacted();
         }
 
         private void OpenFile(bool overwrite = false)
