@@ -206,6 +206,18 @@ namespace TestHid
 
                 Console.WriteLine($"Size on Disk: {diskCol.Size:#,##0}");
 
+                time1 = DateTime.Now;
+                diskCol[ridx] = testobj3;
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+
+                Console.WriteLine($"Set item at {ridx}: {diff}");
+
+                testobj2 = diskCol[ridx];
+                if (testobj2.Equals(testobj3))
+                {
+                    Console.WriteLine("Round trip equality confirmed.");
+                }
                 //diskCol.Clear();
             }
 
