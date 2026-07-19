@@ -124,7 +124,7 @@ namespace TestHid
                 // Clear and populate
                 diskCol.Clear();
                 time1 = DateTime.Now;
-                var recs = 20480;
+                var recs = 2048;
                 for (var i = 0; i < recs; i++)
                 {
                     diskCol.Add(new ExampleRecord());
@@ -218,6 +218,34 @@ namespace TestHid
                 {
                     Console.WriteLine("Round trip equality confirmed.");
                 }
+
+
+                time1 = DateTime.Now;
+                var testsnap = diskCol.CreateSnapshot();
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+
+                Console.WriteLine($"Create snapshot: {diff}");
+
+                time1 = DateTime.Now;
+                var newcol = (DiskCollection<ExampleRecord>)testsnap.Promote($"{folder}\\simple_col_snapshot2.txt");
+                time2 = DateTime.Now;
+                diff = time2 - time1;
+
+                Console.WriteLine($"Promote snapshot: {diff}");
+
+                var testobj4 = diskCol[55];
+                var testobj5 = newcol[55];
+
+                if (testobj4.Equals(testobj5))
+                {
+                    Console.WriteLine("Snapshot sample equality confirmed. Deleting.");
+                    testsnap.RestoreOnDispose = false;
+                    testsnap.Dispose();
+                    newcol.Dispose();
+                    System.IO.File.Delete(newcol.Filename);
+                }
+
                 //diskCol.Clear();
             }
 

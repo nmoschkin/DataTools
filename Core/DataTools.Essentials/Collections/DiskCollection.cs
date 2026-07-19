@@ -9,15 +9,10 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace DataTools.Essentials.Collections
 {
-
-    //public enum BadObjectHandling
-    //{
-    //    Ignore,
-    //    Throw
-    //}
 
     /// <summary>
     /// A collection that is persisted and read from the disk, in real time.
@@ -28,6 +23,130 @@ namespace DataTools.Essentials.Collections
     /// </remarks>
     public class DiskCollection<T> : ICollection<T>, IDisposable
     {
+        /// <summary>
+        /// Represents a copy of a <see cref="DiskCollection{T}"/> instance
+        /// </summary>
+        protected class DiskCollectionSnapshot : ISnapshot<T>
+        {
+
+            /// <summary>
+            /// The disposed state
+            /// </summary>
+            protected bool disposedValue;
+
+            /// <summary>
+            /// The current owner of the token as a weak reference
+            /// </summary>
+            protected internal WeakReference<DiskCollection<T>> owner;
+
+            /// <inheritdoc />            
+            public bool IsExpired { get; internal set; }
+
+            /// <inheritdoc />            
+            public DateTime Timestamp { get; }
+
+            /// <summary>
+            /// Gets the filename of the temporary snapshot
+            /// </summary>
+            public string Filename { get; }
+
+            /// <inheritdoc />            
+            public bool RestoreOnDispose { get; set; }
+
+            /// <inheritdoc />            
+            public virtual IEnumerable<T> Promote(string filename)
+            {                
+                if (owner?.TryGetTarget(out var target) == true)
+                {
+                    if (string.Equals(filename, target.filename, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        throw new AccessViolationException("Cannot persist to known target.");
+                    }
+                    File.Copy(Filename, filename);
+                    var newobj = new DiskCollection<T>(filename, target.jsonSettings);
+                    return newobj;
+                }
+                return null;
+            }
+
+            /// <summary>
+            /// Create a new disk collection snapshot
+            /// </summary>
+            /// <param name="owner">The owning object</param>
+            /// <param name="filename">The filename of the temporary snapshot</param>
+            /// <param name="restoreOnDispose">Whether to automatically restore the snapshot to the original collection on token dispose</param>
+            /// <param name="timestamp">A timestamp the consumer provides or null to automatically add one</param>
+            protected internal DiskCollectionSnapshot(DiskCollection<T> owner, string filename, bool restoreOnDispose = false, DateTime? timestamp = null)
+            {
+                this.owner = new WeakReference<DiskCollection<T>>(owner);
+                Filename = filename;
+                RestoreOnDispose = restoreOnDispose;
+                if (timestamp is DateTime d) Timestamp = d;
+                else Timestamp = DateTime.Now;
+            }
+
+            /// <inheritdoc />            
+            public bool Restore()
+            {
+                if (disposedValue) throw new ObjectDisposedException("Token is expired");
+                if (!File.Exists(Filename))
+                {
+                    IsExpired = true;
+                    return false;
+                }
+                if (this?.owner.TryGetTarget(out var owner) == true)
+                {
+                    return owner.Restore(this);
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// Dispose of the snapshot
+            /// </summary>
+            /// <param name="disposing">True if disposing through <see cref="IDisposable.Dispose()"/></param>
+            /// <param name="restore">True to restore the backup</param>
+            protected virtual void Dispose(bool disposing, bool restore)
+            {
+                if (!disposedValue)
+                {
+                    try
+                    {
+                        if (!IsExpired && restore) Restore();
+                    }
+                    catch { }
+                    finally
+                    {
+                        if (File.Exists(Filename))
+                        {
+                            File.Delete(Filename);
+                        }
+                        owner?.SetTarget(null);
+                        owner = null;
+                        IsExpired = true;
+                        disposedValue = true;
+                    }
+                }
+            }
+
+            internal void Dispose(bool restore)
+            {
+                Dispose(disposing: true, restore: restore);
+            }
+
+            /// <summary>
+            /// Dispose of the snapshot and delete the file.
+            /// Once <see cref="Dispose()"/> has been called, the snapshot is not retrievable.
+            /// </summary>
+            public void Dispose()
+            {
+                Dispose(disposing: true, restore: RestoreOnDispose);
+                GC.SuppressFinalize(this);
+            }
+        }
+
+
+
         /// <summary>
         /// This is the buffer size for string actions.
         /// </summary>
@@ -40,7 +159,11 @@ namespace DataTools.Essentials.Collections
 
         private static readonly byte[] CrLf = new byte[] { (byte)'\r', (byte)'\n' };
 
-        private readonly object lockObj = new object();
+        /// <summary>
+        /// The synchronizer object
+        /// </summary>
+        protected readonly object lockObj = new object();
+        
         private readonly bool isReadOnly = false;
         private readonly string filename;
         private readonly JsonSerializerSettings jsonSettings;
@@ -141,6 +264,11 @@ namespace DataTools.Essentials.Collections
                 }
             }
         }
+
+        /// <summary>
+        /// Returns true if the file is open. Otherwise false.
+        /// </summary>
+        public bool IsFileOpen => fileStream != null && !disposedValue;
 
         /// <summary>
         /// Gets a value indicating whether or not the collection is read-only
@@ -316,6 +444,71 @@ namespace DataTools.Essentials.Collections
             Compact(-1, 0);
         }
 
+        /// <summary>
+        /// Reload the file from disk and rescan for structure
+        /// </summary>
+        public void Reset()
+        {
+            lock (lockObj)
+            {
+                CloseFile();
+                RefreshFromDiskState(false);
+            }
+        }
+
+        /// <summary>
+        /// Create a snapshot of the current collection state and return a <see cref="ISnapshot"/> token that can be used to restore from the backup
+        /// </summary>
+        /// <returns></returns>
+        public virtual ISnapshot<T> CreateSnapshot()
+        {
+            lock (lockObj)
+            {
+                var snapfile = GetTempName(true);
+                var token = new DiskCollectionSnapshot(this, snapfile);
+                File.Copy(filename, snapfile, true);
+                return token;
+            }
+        }
+
+        /// <summary>
+        /// Restore a snapshot
+        /// </summary>
+        /// <param name="snapshot">The snapshot to restore.</param>
+        /// <returns>True if successful</returns>
+        /// <remarks>
+        /// All changes made since this snapshot will be reverted.
+        /// </remarks>
+        public virtual bool Restore(ISnapshot<T> snapshot)
+        {
+            if (snapshot is DiskCollectionSnapshot dsn && !dsn.IsExpired)
+            {
+                if (dsn.owner.TryGetTarget(out var target) && target == this)
+                {
+                    if (!File.Exists(dsn.Filename)) return false;
+                    lock (lockObj)
+                    {
+                        try
+                        {
+                            CloseFile();
+                            File.Copy(dsn.Filename, filename, true);                            
+                            dsn.Dispose(false);
+                            return true;
+                        }
+                        catch
+                        {
+                            return false;
+                        }
+                        finally
+                        {
+                            Reset();
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
         // Overrideables
 
         /// <summary>
@@ -378,7 +571,7 @@ namespace DataTools.Essentials.Collections
         /// Gets a name for the temporary file to use during the compact process
         /// </summary>
         /// <returns>The full path of a file to open for compacting</returns>
-        protected virtual string GetTempName()
+        protected virtual string GetTempName(bool forSnapshot)
         {
             var ext = Path.GetExtension(filename);
             var dir = Path.GetDirectoryName(filename);
@@ -388,7 +581,14 @@ namespace DataTools.Essentials.Collections
             string path;
             do
             {
-                lookFile = $"{file}_{c++}.${ext}";
+                if (forSnapshot)
+                {
+                    lookFile = $"{file}_{c++}__snapshot.${ext}";
+                }
+                else
+                {
+                    lookFile = $"{file}_{c++}.${ext}";
+                }
                 path = Path.Combine(dir, lookFile);
             } while (File.Exists(path));
 
@@ -571,7 +771,7 @@ namespace DataTools.Essentials.Collections
                 fileStream?.Close();
                 fileStream = null;
 
-                var temp = GetTempName();
+                var temp = GetTempName(false);
                 recCount = 0;
 
                 var newColSize = forceSize != 0 ? forceSize : recordSize;
