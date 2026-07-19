@@ -80,9 +80,22 @@ namespace DataTools.Essentials.Collections
         protected DiskCollection(string filename, int recordSize, bool isReadOnly, JsonSerializerSettings jsonSettings = null)
         {
             this.isReadOnly = isReadOnly;
-            this.jsonSettings = jsonSettings;
             this.recordSize = recordSize;
             this.filename = filename;
+
+            if (jsonSettings == null)
+            {
+                if (JsonConvert.DefaultSettings != null)
+                {
+                    jsonSettings = JsonConvert.DefaultSettings();
+                    jsonSettings.Formatting = Formatting.None;
+                }
+            }
+            else
+            {
+                this.jsonSettings = jsonSettings;
+                CheckSettings(jsonSettings);
+            }
 
             RefreshFromDiskState(false);
         }
@@ -443,13 +456,14 @@ namespace DataTools.Essentials.Collections
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (index > count) throw new IndexOutOfRangeException();
-            // This record cannot have cr/lf
-            if (jsonSettings != null && jsonSettings.Formatting == Formatting.Indented)
-            {
-                jsonSettings.Formatting = Formatting.None;
-            }
+
+            // Always check settings.
+            // Provided (or even "created") settings can be mutated externally.
+            CheckSettings(jsonSettings);
+
             var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, jsonSettings));
             var reclen = bytes.Length;
+
             lock (lockObj)
             {
                 if (bytes.Length > recordSize)
@@ -568,6 +582,21 @@ namespace DataTools.Essentials.Collections
         private int GetRecordSize(int dataSize)
         {
             return dataSize + (CHUNK_SIZE - (dataSize % CHUNK_SIZE));
+        }
+
+        private void CheckSettings(JsonSerializerSettings settings)
+        {
+            // This record cannot have cr/lf
+            if (settings != null && settings.Formatting == Formatting.Indented)
+            {
+                // Gracefully overriding this setting is theoretically an option.
+                // But there's also the fact that this slows the system down,
+                // and the consumer should know how to use this API correctly.
+                // settings.Formatting = Formatting.None;
+
+                // Throw for now.
+                throw new InvalidDataException("Indented formatting is not permitted in serialization. Check your JsonSerializerSettings.");
+            }
         }
 
         private void OpenFile(bool overwrite = false)
