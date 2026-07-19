@@ -288,16 +288,19 @@ namespace DataTools.Essentials.Collections
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (asCompactTarget) throw new InvalidOperationException("Debug your code! Removing change on compact target cannot happen/should not happen.");
             var idx = 0;
-            foreach (var item2 in this)
+            var c = count;
+            foreach(var item2 in this)
             {
                 if (Equals(item, item2))
                 {
-                    RemoveAt(idx);
-                    return true;
+                    break;
                 }
                 idx++;
-            }                
-            return false;
+            }
+            if (idx >= count) 
+                return false;
+            else 
+                return true;
         }
 
         /// <summary>
