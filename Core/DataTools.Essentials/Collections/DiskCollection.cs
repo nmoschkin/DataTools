@@ -114,15 +114,22 @@ namespace DataTools.Essentials.Collections
         /// <returns></returns>
         public T this[int index]
         {
-            get => GetItem(index);
+            get
+            {
+                if (index >= count) throw new IndexOutOfRangeException();
+                return GetItem(index);
+            }
             set
             {
+                if (index >= count) throw new IndexOutOfRangeException();
                 if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
+                T olditem;
                 lock(lockObj) 
                 {
+                    olditem = GetItem(index);
                     SetItem(value, index);
                 }
-                OnItemChanged(value, index);
+                OnItemChanged(olditem, value, index);
             }
         }
 
@@ -270,9 +277,10 @@ namespace DataTools.Essentials.Collections
         /// <summary>
         /// Called when an item in the collection is changed
         /// </summary>
+        /// <param name="oldItem"></param>
         /// <param name="newItem"></param>
         /// <param name="index"></param>
-        protected virtual void OnItemChanged(T newItem, int index)
+        protected virtual void OnItemChanged(T oldItem, T newItem, int index)
         {
         }
 
@@ -289,6 +297,9 @@ namespace DataTools.Essentials.Collections
         /// <param name="inputItem">The item being compared</param>
         /// <param name="serializedItem">The item from the collection to compare</param>
         /// <returns>True if the items are equal</returns>
+        /// <remarks>
+        /// This method is used by <see cref="Remove(T)"/> and <see cref="Contains(T)"/>
+        /// </remarks>
         protected virtual bool Equals(T inputItem, T serializedItem)
         {
             return inputItem?.Equals(serializedItem) == true;
@@ -411,73 +422,59 @@ namespace DataTools.Essentials.Collections
             }
         }
 
-        /// <summary>
-        /// Deserializes the item at the specified index from disk
-        /// </summary>
-        /// <param name="index">The index at which to deserialize the item</param>
-        /// <returns></returns>
-        private T GetItem(int index)
+        private T GetItem(int index, byte[] bytes = null)
         {
+            if (bytes == null)
+            {
+                bytes = new byte[recordSize];
+            }
             lock (lockObj)
             {
                 fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
-                var bytes = new byte[recordSize];
-                var len = fileStream.Read(bytes, 0, recordSize);
-                if (len != recordSize)
+                if (fileStream.Read(bytes, 0, recordSize) != recordSize)
                 {
-                    return default(T);
+                    return default;
                 }
-                var str = Encoding.UTF8.GetString(bytes).Trim();
-                return JsonConvert.DeserializeObject<T>(str, jsonSettings);
             }
+            return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes).Trim(), jsonSettings);
         }
 
-        /// <summary>
-        /// Serialize an item to the file at the specified index, overwriting any existing value.
-        /// </summary>
-        /// <param name="item">The item to serialize.</param>
-        /// <param name="index">The index at which to write the item.</param>
-        /// <exception cref="IndexOutOfRangeException"></exception>
-        /// <exception cref="InvalidOperationException"></exception>
-        /// <remarks>
-        /// If the serialized item is longer than the current record size, then a compact action will be triggered to adjust the record size.<br />
-        /// Setting the index to <see cref="Count"/> will append the item to the end of the collection.
-        /// </remarks>
         private void SetItem(T item, int index)
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (index > count) throw new IndexOutOfRangeException();
+            var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, jsonSettings));
+            var reclen = bytes.Length;
             lock (lockObj)
             {
-                fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
-                var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, jsonSettings));
-                var reclen = bytes.Length;
                 if (bytes.Length > recordSize)
                 {
                     if (asScratch) throw new InvalidOperationException("Debug your code! Capacity change on collection change cannot happen/should not happen.");
-                    var newRecSize = bytes.Length + (CHUNK_SIZE - (bytes.Length % CHUNK_SIZE));
+                    var newRecSize = GetRecordSize(bytes.Length);
                     if (count > 0)
                     {
                         Compact(-1, newRecSize);
-                        fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
+                    }
+                    else
+                    {
+                        recordSize = newRecSize;
                     }
                 }
-
+                
                 Array.Resize(ref bytes, recordSize);
+                
                 for (int i = reclen; i < recordSize; i++)
                 {
                     bytes[i] = (byte)' ';
                 }
+
+                fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
                 fileStream.Write(bytes, 0, recordSize);
-                fileStream.Write(CrLf, 0, 2);                                
+                fileStream.Write(CrLf, 0, 2);
+                //fileStream.Flush();
             }
         }
 
-        /// <summary>
-        /// Compact the disk file
-        /// </summary>
-        /// <param name="skip">Record to skip or -1 to not skip records. (Used for removing records)</param>
-        /// <param name="forceSize">Force the records to have the specified size, or 0 for default.</param>
         private void Compact(int skip, int forceSize)
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
@@ -563,6 +560,11 @@ namespace DataTools.Essentials.Collections
             if (!del) OnCompacted();
         }
 
+        private int GetRecordSize(int dataSize)
+        {
+            return dataSize + (CHUNK_SIZE - (dataSize % CHUNK_SIZE));
+        }
+
         private void OpenFile(bool overwrite = false)
         {
             if (isReadOnly)
@@ -592,7 +594,7 @@ namespace DataTools.Essentials.Collections
                 if (existActual == 0) existActual = recordSize;
                 if (setRecordSize)
                 {
-                    recordSize = existActual + (CHUNK_SIZE - (existActual % CHUNK_SIZE));
+                    recordSize = GetRecordSize(existActual);
                 }
             }
         }
@@ -648,16 +650,18 @@ namespace DataTools.Essentials.Collections
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
         public IEnumerator<T> GetEnumerator()
-        {            
+        {
+            isenumerating++;
             int i = 0;
             int c = count;
-            isenumerating++;
+            var bytes = new byte[recordSize];
             for (i = 0; i < c; i++)
             {
                 if (c != count) throw new InvalidOperationException("Collection changed during enumeration");
-                yield return GetItem(i);
+                yield return GetItem(i, bytes);
             }
             isenumerating--;
+            bytes = null;
             yield break;
         }
 
