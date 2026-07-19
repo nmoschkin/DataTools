@@ -443,6 +443,11 @@ namespace DataTools.Essentials.Collections
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (index > count) throw new IndexOutOfRangeException();
+            // This record cannot have cr/lf
+            if (jsonSettings != null && jsonSettings.Formatting == Formatting.Indented)
+            {
+                jsonSettings.Formatting = Formatting.None;
+            }
             var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, jsonSettings));
             var reclen = bytes.Length;
             lock (lockObj)
