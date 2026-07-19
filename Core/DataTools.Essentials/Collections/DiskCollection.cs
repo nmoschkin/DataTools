@@ -39,7 +39,6 @@ namespace DataTools.Essentials.Collections
 
         private readonly object lockObj = new object();
         private string filename;
-        private FileStream file;
         private bool disposedValue;
 
         private int recordSize = BUFFER_SIZE;
@@ -49,6 +48,7 @@ namespace DataTools.Essentials.Collections
         private bool asScratch;
         private JsonSerializerSettings jsonSettings;
         private bool isReadOnly = false;
+        private FileStream fileStream;
         private int isenumerating = 0;
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace DataTools.Essentials.Collections
             this.recordSize = recordSize;
             this.filename = filename;
 
-            SetupFromDiskState(false);
+            RefreshFromDiskState(false);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace DataTools.Essentials.Collections
         /// <summary>
         /// Gets a value indicating whether or not the collection is read-only
         /// </summary>
-        public bool IsReadOnly => false;
+        public bool IsReadOnly => isReadOnly;
 
         /// <summary>
         /// Gets or sets the item at the specified index
@@ -117,7 +117,12 @@ namespace DataTools.Essentials.Collections
             get => GetItem(index);
             set
             {
-                SetItem(value, index);
+                if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
+                lock(lockObj) 
+                {
+                    SetItem(value, index);
+                    OnItemChanged(value, index);
+                }
             }
         }
 
@@ -131,6 +136,7 @@ namespace DataTools.Essentials.Collections
             {
                 SetItem(item, count);
                 count++;
+                OnItemAdded(item, count - 1);
             }
         }
 
@@ -140,13 +146,15 @@ namespace DataTools.Essentials.Collections
         /// <exception cref="InvalidOperationException"></exception>
         public void Clear()
         {
+            if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (asScratch) throw new InvalidOperationException("Debug your code! Clearing change on collection change cannot happen/should not happen.");
             lock (lockObj)
             {
-                file?.Close();
+                fileStream?.Close();
                 count = 0;
                 OpenFile(true);
-                SetupFromDiskState(false);
+                RefreshFromDiskState(false);
+                OnCollectionCleared();
             }
         }
 
@@ -159,11 +167,11 @@ namespace DataTools.Essentials.Collections
         /// For reference objects, items in the collection will never be equal to items outside of the collection as the items are created<br />
         /// from disk, on demand, unless their equality method is explicitly overridden to test of object content fidelity, and not memory reference.
         /// </remarks>
-        public virtual bool Contains(T item)
+        public bool Contains(T item)
         {
             foreach (var item2 in this)
             {
-                if (item?.Equals(item2) == true) return true;
+                if (Equals(item, item2)) return true;
             }
             return false;
         }
@@ -173,7 +181,7 @@ namespace DataTools.Essentials.Collections
         /// </summary>
         /// <param name="array">The array into which the elements will be copied.</param>
         /// <param name="arrayIndex">The index within the array to start copying elements.</param>
-        public virtual void CopyTo(T[] array, int arrayIndex)
+        public void CopyTo(T[] array, int arrayIndex)
         {
             lock (lockObj)
             {
@@ -193,12 +201,15 @@ namespace DataTools.Essentials.Collections
         /// <exception cref="InvalidOperationException"></exception>
         public bool RemoveAt(int index)
         {
+            if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (asScratch) throw new InvalidOperationException("Debug your code! Removing change on collection change cannot happen/should not happen.");
             lock (lockObj)
             {
                 if (index < count)
                 {
+                    var old = this[index];
                     Compact(index, 0);
+                    OnItemRemoved(old, index);
                     return true;
                 }
                 return false;
@@ -210,17 +221,19 @@ namespace DataTools.Essentials.Collections
         /// </summary>
         /// <param name="item">The item to match for removal.</param>
         /// <returns></returns>
-        public virtual bool Remove(T item)
+        public bool Remove(T item)
         {
+            if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (asScratch) throw new InvalidOperationException("Debug your code! Removing change on collection change cannot happen/should not happen.");
+
             lock (lockObj)
             {
                 var idx = 0;
                 foreach (var item2 in this)
                 {
-                    if (item2.Equals(item))
-                    {
-                        RemoveAt(idx);
+                    if (Equals(item, item2))
+                    {                        
+                        RemoveAt(idx);                        
                         return true;
                     }
                     idx++;
@@ -235,6 +248,60 @@ namespace DataTools.Essentials.Collections
         public void Compact()
         {
             Compact(-1, 0);
+        }
+
+        // Overrideables
+
+        /// <summary>
+        /// Called when the collection is cleared
+        /// </summary>
+        protected virtual void OnCollectionCleared()
+        {
+        }
+
+        /// <summary>
+        /// Called when an item is added to the collection
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="index"></param>
+        protected virtual void OnItemAdded(T item, int index)
+        {
+        }
+
+        /// <summary>
+        /// Called when an item is removed from the collection
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="index"></param>
+        protected virtual void OnItemRemoved(T item, int index)
+        {
+        }
+
+        /// <summary>
+        /// Called when an item in the collection is changed
+        /// </summary>
+        /// <param name="newItem"></param>
+        /// <param name="index"></param>
+        protected virtual void OnItemChanged(T newItem, int index)
+        {
+        }
+
+        /// <summary>
+        /// Called when the collection file has been compacted
+        /// </summary>
+        protected virtual void OnCompacted()
+        {
+        }
+
+        /// <summary>
+        /// Determines whether two items of type <typeparamref name="T"/> are equal
+        /// </summary>
+        /// <param name="inputItem">The item being compared</param>
+        /// <param name="serializedItem">The item from the collection to compare</param>
+        /// <returns>True if the items are equal</returns>
+        protected virtual bool Equals(T inputItem, T serializedItem)
+        {
+            return inputItem?.Equals(serializedItem) == true;
         }
 
         /// <summary>
@@ -266,7 +333,7 @@ namespace DataTools.Essentials.Collections
         /// <param name="maxActualSize">The maximum size of actual data</param>
         /// <param name="emptyIndices">An array of indices with no entries</param>
         /// <returns>The total number of lines counted in the file</returns>
-        protected virtual int GetCurrentState(out int records, out int recordSize, out int maxActualSize, out int[] emptyIndices)
+        protected int GetCurrentState(out int records, out int recordSize, out int maxActualSize, out int[] emptyIndices)
         {
             lock (lockObj)
             {
@@ -283,20 +350,20 @@ namespace DataTools.Essentials.Collections
                 var cs = 0;
                 var maxcs = 0;
 
-                if (file == null) return 0;
+                if (fileStream == null) return 0;
                 
-                var curpos = file.Position;
+                var curpos = fileStream.Position;
                 var lines = 0;
                 
                 var buffer = new byte[BUFFER_SIZE];
                 
                 var ns = false;
                 
-                file.Seek(0, SeekOrigin.Begin);
+                fileStream.Seek(0, SeekOrigin.Begin);
                 
                 while (true)
                 {
-                    var c = file.Read(buffer, 0, BUFFER_SIZE);
+                    var c = fileStream.Read(buffer, 0, BUFFER_SIZE);
                     if (c == 0) break;
                     
                     for(var i = 0; i < c; i++) 
@@ -342,7 +409,7 @@ namespace DataTools.Essentials.Collections
                     }
                     if (c < BUFFER_SIZE) break;
                 }
-                file.Seek(curpos, SeekOrigin.Begin);
+                fileStream.Seek(curpos, SeekOrigin.Begin);
                 records = reccount;
                 recordSize = maxrs;
                 maxActualSize = maxcs;
@@ -359,13 +426,13 @@ namespace DataTools.Essentials.Collections
         /// </summary>
         /// <param name="index">The index at which to deserialize the item</param>
         /// <returns></returns>
-        protected virtual T GetItem(int index)
+        private T GetItem(int index)
         {
             lock (lockObj)
             {
-                file.Seek(index * (recordSize + 2), SeekOrigin.Begin);
+                fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
                 var bytes = new byte[recordSize];
-                var len = file.Read(bytes, 0, recordSize);
+                var len = fileStream.Read(bytes, 0, recordSize);
                 if (len != recordSize)
                 {
                     return default(T);
@@ -386,12 +453,13 @@ namespace DataTools.Essentials.Collections
         /// If the serialized item is longer than the current record size, then a compact action will be triggered to adjust the record size.<br />
         /// Setting the index to <see cref="Count"/> will append the item to the end of the collection.
         /// </remarks>
-        protected virtual void SetItem(T item, int index)
+        private void SetItem(T item, int index)
         {
+            if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (index > count) throw new IndexOutOfRangeException();
             lock (lockObj)
             {
-                file.Seek(index * (recordSize + 2), SeekOrigin.Begin);
+                fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
                 var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, jsonSettings));
                 var reclen = bytes.Length;
                 if (bytes.Length > recordSize)
@@ -401,7 +469,7 @@ namespace DataTools.Essentials.Collections
                     if (count > 0)
                     {
                         Compact(-1, newRecSize);
-                        file.Seek(index * (recordSize + 2), SeekOrigin.Begin);
+                        fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
                     }
                 }
 
@@ -410,8 +478,8 @@ namespace DataTools.Essentials.Collections
                 {
                     bytes[i] = (byte)' ';
                 }
-                file.Write(bytes, 0, recordSize);
-                file.Write(CrLf, 0, 2);
+                fileStream.Write(bytes, 0, recordSize);
+                fileStream.Write(CrLf, 0, 2);                                
             }
         }
 
@@ -420,12 +488,13 @@ namespace DataTools.Essentials.Collections
         /// </summary>
         /// <param name="skip">Record to skip or -1 to not skip records. (Used for removing records)</param>
         /// <param name="forceSize">Force the records to have the specified size, or 0 for default.</param>
-        protected virtual void Compact(int skip, int forceSize)
+        private void Compact(int skip, int forceSize)
         {
+            if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             lock (lockObj)
             {
                 const int BufferSize = BUFFER_SIZE;
-
+                var del = skip != -1;
                 var decoder = Encoding.UTF8.GetDecoder();
 
                 byte[] byteBuffer = new byte[BufferSize];
@@ -435,10 +504,10 @@ namespace DataTools.Essentials.Collections
                 var currentLine = new StringBuilder();
                 var recCount = 0;
 
-                SetupFromDiskState(true);
+                RefreshFromDiskState(true);
 
-                file?.Close();
-                file = null;
+                fileStream?.Close();
+                fileStream = null;
 
                 var temp = GetTempName();
                 recCount = 0;
@@ -499,7 +568,8 @@ namespace DataTools.Essentials.Collections
                 File.Move(temp, filename);
 
                 OpenFile();
-                SetupFromDiskState(false);
+                RefreshFromDiskState(false);
+                if (!del) OnCompacted();
             }
         }
 
@@ -507,24 +577,24 @@ namespace DataTools.Essentials.Collections
         {
             if (isReadOnly)
             {
-                file = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
+                fileStream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             }
             else if (!overwrite)
             {
-                file = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
+                fileStream = new FileStream(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read);
             }
             else
             {
-                file = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
+                fileStream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
             }            
         }
 
-        private void SetupFromDiskState(bool setRecordSize)
+        private void RefreshFromDiskState(bool setRecordSize)
         {
             lock (lockObj)
             {
-                if (file == null) OpenFile();
-                file.Seek(0, SeekOrigin.End);
+                if (fileStream == null) OpenFile();
+                fileStream.Seek(0, SeekOrigin.End);
                 var currcapacity = GetCurrentState(out var exist, out var existSize, out var existActual, out _);
 
                 if (exist > 0) count = exist;
@@ -541,8 +611,8 @@ namespace DataTools.Essentials.Collections
         {
             lock (lockObj)
             {
-                file?.Close();
-                file = null;
+                fileStream?.Close();
+                fileStream = null;
             }
         }
 
