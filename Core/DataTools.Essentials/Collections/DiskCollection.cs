@@ -297,10 +297,15 @@ namespace DataTools.Essentials.Collections
                 }
                 idx++;
             }
-            if (idx >= count) 
+            if (idx == -1 || idx >= count)
+            {
                 return false;
-            else 
+            }
+            else
+            {
+                RemoveAt(idx);
                 return true;
+            }
         }
 
         /// <summary>
