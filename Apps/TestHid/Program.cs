@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-
+using DataTools.Essentials.Collections;
 using DataTools.Text;
 using DataTools.Win32;
 using DataTools.Win32.Usb;
@@ -9,11 +11,113 @@ using DataTools.Win32.Usb.Power;
 
 namespace TestHid
 {
+
+    public class ExampleRecord
+    {
+        public ExampleRecord()
+        {
+
+            var size = Random.Shared.Next(10, 300);
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < size; i++)
+            {
+                char bm = (char)((byte)' ' + (byte)Random.Shared.Next(0, 56));
+
+                sb.Append(bm);
+            }
+            R = sb.ToString();
+        }
+
+        public string A
+        {
+            get; set;
+        } = $"Example {DateTime.Now:dddd}";
+
+        public int B
+        {
+            get; set;
+        } = (int)Random.Shared.Next();
+
+        public DateTime D
+        {
+            get; set;
+        } = DateTime.Now;
+
+        public Guid GV
+        {
+            get; set;
+        } = Guid.NewGuid();
+
+        public string R
+        {
+            get; set;
+        }
+
+        public override string ToString()
+        {
+            return $"{A}, Reality {B} as {GV:O}";
+        }
+        public override bool Equals(object obj)
+        {
+            if (obj is ExampleRecord other)
+            {
+                if (other.A != A) return false;
+                if (other.B != B) return false;
+                if (other.D != D) return false;
+                if (other.GV != GV) return false;
+                if (other.R != R) return false;
+                return true;
+            }
+            return base.Equals(obj);
+        }
+    }
+
     public static class Program
     {
+
         [STAThread]
         public static void Main(string[] args)
         {
+
+            var folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            using (var diskCol = new DiskCollection<ExampleRecord>($"{folder}\\simple_col.txt"))
+            {
+                //diskCol.Clear();
+                //for (var i = 0; i < 1000; i++)
+                //{
+                //    diskCol.Add(new ExampleRecord());
+                //}
+
+                diskCol.Compact();
+                List<ExampleRecord> recovered = new List<ExampleRecord>();
+
+                var ridx = 192;
+                var cc = 0;
+                ExampleRecord testobj = null;
+                foreach (var rec in diskCol)
+                {
+                    recovered.Add(rec);
+                    if (cc == ridx)
+                    {
+                        testobj = rec;
+                    }
+                    cc++;
+                }
+
+                var testobj2 = diskCol[ridx];
+
+                var pass = testobj2.Equals(testobj);
+                if (pass)
+                {
+                    diskCol.RemoveAt(ridx);
+                }
+
+                //diskCol.Clear();
+            }
+
+
+
             DeviceInfo[] hids = HidDeviceInfo.EnumerateHidDevices();
             DeviceInfo[] batts = DeviceEnum.EnumerateDevices<DeviceInfo>(DevProp.GUID_DEVICE_BATTERY);
             var test = HidFeatures.HidDevicesByUsage(HidUsagePage.PowerDevice1);
