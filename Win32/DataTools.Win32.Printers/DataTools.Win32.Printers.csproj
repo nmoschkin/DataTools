@@ -4,10 +4,10 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <nullable>disable</nullable>
     <RootNamespace>DataTools</RootNamespace>
-    <AssemblyVersion>8.0.1.706</AssemblyVersion>
-    <FileVersion>8.0.1.706</FileVersion>
+    <AssemblyVersion>8.0.1.707</AssemblyVersion>
+    <FileVersion>8.0.1.707</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.1.706</Version>
+    <Version>8.0.1.707</Version>
     <Product>DataTools Hardware Library</Product>
     <Description>DataTools Hardware Library - Printer and Print Queue Library</Description>
     <Copyright>Copyright (C) 2023-2026 Nathaniel Moschkin</Copyright>
@@ -23,7 +23,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
     <Nullable>disable</Nullable>
-    <PreviousVersion>8.0.1.705</PreviousVersion>
+    <PreviousVersion>8.0.1.706</PreviousVersion>
     <AssemblyOriginatorKeyFile>C:\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
