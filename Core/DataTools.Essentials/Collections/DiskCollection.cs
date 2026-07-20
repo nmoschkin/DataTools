@@ -690,6 +690,7 @@ namespace DataTools.Essentials.Collections
                             Console.WriteLine(ex);
 #endif
                         }
+                        i++;
                     }
                     lines = null;
                 }
