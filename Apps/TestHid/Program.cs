@@ -134,7 +134,7 @@ namespace TestHid
                 // Clear and populate
                 diskCol.Clear();
                 time1 = DateTime.Now;
-                var recs = 20480;
+                var recs = 32000;
                 for (var i = 0; i < recs; i++)
                 {
                     diskCol.Add(new ExampleRecord());
