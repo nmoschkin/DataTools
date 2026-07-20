@@ -328,12 +328,33 @@ namespace DataTools.Essentials.Collections
         /// <param name="item"></param>
         public void Add(T item)
         {
+            int idx = 0;
             lock (lockObj)
             {
+                idx = count;
                 SetItem(item, count);
                 count++;
             }
-            OnItemAdded(item, count - 1);
+            OnItemAdded(item, idx);        
+        }
+
+        /// <summary>
+        /// Add multiple items to the collection
+        /// </summary>
+        /// <param name="items">The items to add</param>
+        public void AddRange(IEnumerable<T> items)
+        {
+            int idx = 0;
+            foreach (var item in items)
+            {
+                lock (lockObj)
+                {
+                    idx = count;
+                    SetItem(item, count);
+                    count++;
+                }
+                OnItemAdded(item, idx);
+            }
         }
 
         /// <summary>
