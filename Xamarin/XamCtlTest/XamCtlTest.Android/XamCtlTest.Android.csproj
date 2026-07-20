@@ -21,10 +21,10 @@
     <AndroidUseAapt2>true</AndroidUseAapt2>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
     <NuGetPackageImportStamp></NuGetPackageImportStamp>
-    <AssemblyVersion>8.0.1.714</AssemblyVersion>
-    <FileVersion>8.0.1.714</FileVersion>
-    <PreviousVersion>8.0.1.713</PreviousVersion>
-    <Version>8.0.1.714</Version>
+    <AssemblyVersion>8.0.1.715</AssemblyVersion>
+    <FileVersion>8.0.1.715</FileVersion>
+    <PreviousVersion>8.0.1.714</PreviousVersion>
+    <Version>8.0.1.715</Version>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
