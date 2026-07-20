@@ -1251,6 +1251,7 @@ namespace DataTools.Essentials.Collections
 
         private int GetRecordSize(int dataSize)
         {
+            if (dataSize % CHUNK_SIZE == 0) return dataSize;
             return dataSize + (CHUNK_SIZE - (dataSize % CHUNK_SIZE));
         }
 
