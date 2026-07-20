@@ -15,6 +15,28 @@ using System.Threading;
 
 namespace DataTools.Essentials.Collections
 {
+    
+    /// <summary>
+    /// The strategies for how caching is utilized in a <see cref="DiskCollection{T}"/> or its descendants
+    /// </summary>
+    public enum CacheStrategy
+    {
+        /// <summary>
+        /// No caching will be used. Items will be read from the disk every time.<br/>
+        /// New reference objects will be instantiated every time they are accessed.
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// Items are loaded from the disk on demand
+        /// </summary>
+        Lazy,
+
+        /// <summary>
+        /// All pre-existing items are loaded from disk on instantiation
+        /// </summary>
+        Complete
+    }
 
     /// <summary>
     /// A collection that is persisted and read from the disk, in real time.
@@ -158,7 +180,7 @@ namespace DataTools.Essentials.Collections
             {
                 if (owner?.TryGetTarget(out var target) == true)
                 {
-                    using (var snapfile = new DiskCollection<T>(Filename, target.recordSize, true, true, true, target.jsonSettings))
+                    using (var snapfile = new DiskCollection<T>(Filename, target.recordSize, true, CacheStrategy.None, true, target.jsonSettings))
                     {
                         var c = snapfile.Count;
                         for (var i = 0; i < c; i++)
@@ -214,7 +236,7 @@ namespace DataTools.Essentials.Collections
         /// </summary>
         /// <param name="filename">The full path to the file where the new collection will be stored.</param>
         /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
-        public DiskCollection(string filename, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, false, false, jsonSettings)
+        public DiskCollection(string filename, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, false, CacheStrategy.Lazy, jsonSettings)
         {
         }
 
@@ -224,12 +246,12 @@ namespace DataTools.Essentials.Collections
         /// <param name="filename">The full path to the file where the new collection will be stored.</param>
         /// <param name="items">The items to add to the collection</param>
         /// <param name="isReadOnly">True if the collection will be opened read-only.</param>
-        /// <param name="noCache">Disable caching of items in memory. Use this when short on memory.</param>
+        /// <param name="cacheStrategy">The caching strategy to use for this instance. Change this if short on memory.</param>
         /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
         /// <remarks>
         /// If a cache already exists, it will be appended.
         /// </remarks>
-        public DiskCollection(string filename, IEnumerable<T> items, bool isReadOnly, bool noCache, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, isReadOnly, noCache, jsonSettings)
+        public DiskCollection(string filename, IEnumerable<T> items, bool isReadOnly, CacheStrategy cacheStrategy, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, isReadOnly, cacheStrategy, jsonSettings)
         {
             AddRange(items);
         }
@@ -243,7 +265,7 @@ namespace DataTools.Essentials.Collections
         /// <remarks>
         /// If a cache already exists, it will be appended.
         /// </remarks>
-        public DiskCollection(string filename, IEnumerable<T> items, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, false, false, jsonSettings)
+        public DiskCollection(string filename, IEnumerable<T> items, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, false, CacheStrategy.Lazy, jsonSettings)
         {
             AddRange(items);
         }
@@ -254,7 +276,7 @@ namespace DataTools.Essentials.Collections
         /// <param name="filename">The full path to the file where the new collection will be stored.</param>
         /// <param name="recordSize">The default record size.</param>
         /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
-        public DiskCollection(string filename, int recordSize, JsonSerializerSettings jsonSettings = null) : this(filename, recordSize, false, false, jsonSettings)
+        public DiskCollection(string filename, int recordSize, JsonSerializerSettings jsonSettings = null) : this(filename, recordSize, false, CacheStrategy.Lazy, jsonSettings)
         {
         }
 
@@ -264,11 +286,11 @@ namespace DataTools.Essentials.Collections
         /// <param name="filename">The full path to the file where the new collection will be stored.</param>
         /// <param name="recordSize">The default record size.</param>
         /// <param name="isReadOnly">True if the collection will be opened read-only.</param>
-        /// <param name="noCache">Disable caching of items in memory. Use this when short on memory.</param>
+        /// <param name="cacheStrategy">The caching strategy to use for this instance. Change this if short on memory.</param>
         /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
-        public DiskCollection(string filename, int recordSize, bool isReadOnly, bool noCache, JsonSerializerSettings jsonSettings = null)
+        public DiskCollection(string filename, int recordSize, bool isReadOnly, CacheStrategy cacheStrategy, JsonSerializerSettings jsonSettings = null)
         {
-            this.noCache = noCache;
+            noCache = cacheStrategy == CacheStrategy.None;
             if (!noCache)
             {
                 cachedItems = new Dictionary<int, T>();
@@ -292,10 +314,15 @@ namespace DataTools.Essentials.Collections
 
             CheckSettings(this.jsonSettings);
             RefreshFromDiskState(false);
+            
+            if (cacheStrategy == CacheStrategy.Complete)
+            {
+                FreshenCachedItems(true);
+            }
         }
 
-        private DiskCollection(string filename, int recordSize, bool isReadOnly, bool noCache, bool asCompactTarget, JsonSerializerSettings jsonSettings = null)
-            : this(filename, recordSize, isReadOnly, noCache, jsonSettings)
+        private DiskCollection(string filename, int recordSize, bool isReadOnly, CacheStrategy cacheStrategy, bool asCompactTarget, JsonSerializerSettings jsonSettings)
+            : this(filename, recordSize, isReadOnly, cacheStrategy, jsonSettings)
         {
             this.asCompactTarget = asCompactTarget;
         }
@@ -623,7 +650,7 @@ namespace DataTools.Essentials.Collections
         }
 
         /// <summary>
-        /// Write cached items to disk. Object references will be preserved.
+        /// Write all currently cached items to disk. Object references will be preserved.
         /// </summary>
         public void CommitCachedItems()
         {
@@ -640,15 +667,39 @@ namespace DataTools.Essentials.Collections
         /// <summary>
         /// Refresh cached items from the disk. All object references will be lost.
         /// </summary>
-        public void FreshenCachedItems()
+        /// <param name="all">Load all existing records from disk</param>
+        public void FreshenCachedItems(bool all)
         {
             if (noCache) return;
             lock (lockObj)
             {
-                var keys = cachedItems.Keys.ToArray();
-                foreach (var key in keys)
+                if (all)
                 {
-                    GetItem(key, force: true);
+                    var lines = File.ReadAllLines(filename).Where(l => !string.IsNullOrWhiteSpace(l)).Select(l => l.Trim()).ToArray();
+                    var i = 0;
+                    foreach (var line in lines)
+                    {
+                        try
+                        {
+                            cachedItems[i] = JsonConvert.DeserializeObject<T>(line, jsonSettings);
+                        }
+                        catch (Exception ex)
+                        {
+                            // We don't really care if there's a problem, here. that's what Compact() is for.
+#if DEBUG
+                            Console.WriteLine(ex);
+#endif
+                        }
+                    }
+                    lines = null;
+                }
+                else
+                {
+                    var keys = cachedItems.Keys.ToArray();
+                    foreach (var key in keys)
+                    {
+                        GetItem(key, force: true);
+                    }
                 }
             }
         }
@@ -875,7 +926,7 @@ namespace DataTools.Essentials.Collections
             // Always check settings.
             // Provided (or even "created") settings can be mutated externally.
             CheckSettings(jsonSettings);
-
+            
             var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, jsonSettings));
             var reclen = bytes.Length;
 
@@ -935,7 +986,7 @@ namespace DataTools.Essentials.Collections
                 recCount = 0;
 
                 var newColSize = forceSize != 0 ? forceSize : recordSize;
-                using (var otherCol = new DiskCollection<T>(temp, newColSize, false, true, true, jsonSettings))
+                using (var otherCol = new DiskCollection<T>(temp, newColSize, false, CacheStrategy.None, true, jsonSettings))
                 {
                     using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None, BufferSize, FileOptions.SequentialScan))
                     {
