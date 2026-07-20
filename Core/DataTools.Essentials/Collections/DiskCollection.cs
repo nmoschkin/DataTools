@@ -50,10 +50,22 @@ namespace DataTools.Essentials.Collections
     /// </remarks>
     public class DiskCollection<T> : ICollection<T>, IDisposable
     {
+        private static readonly byte[] CrLf = new byte[] { (byte)'\r', (byte)'\n' };
+
+        /// <summary>
+        /// Gets the text of the last exception caught by this class
+        /// </summary>
+        /// <remarks>
+        /// In many cases, a function will simply fail rather than cause a system crash.<br />
+        /// In those instances, the exception will be caught and quietly bypassed when<br />
+        /// possible. This property will contain the last such error at any given time.<br />
+        /// </remarks>
+        public static string LastErrorMessage { get; private set; }
+
         /// <summary>
         /// Represents a copy of a <see cref="DiskCollection{T}"/> instance
         /// </summary>
-        protected class DiskCollectionSnapshot : ISnapshot<T>
+        protected internal class DiskCollectionSnapshot : ISnapshot<T>
         {
 
             /// <summary>
@@ -67,7 +79,7 @@ namespace DataTools.Essentials.Collections
             protected internal WeakReference<DiskCollection<T>> owner;
 
             /// <inheritdoc />            
-            public bool IsExpired { get; internal set; }
+            public bool IsExpired { get; private set; }
 
             /// <inheritdoc />            
             public DateTime Timestamp { get; }
@@ -80,10 +92,14 @@ namespace DataTools.Essentials.Collections
             /// <inheritdoc />            
             public bool RestoreOnDispose { get; set; }
 
+
+            /// <inheritdoc />            
+            public bool CanApply => true;
+
             /// <inheritdoc />            
             public virtual IEnumerable<T> Promote(string filename)
             {                
-                if (owner?.TryGetTarget(out var target) == true)
+                if (owner?.TryGetTarget(out var target) == true && !target.disposedValue)
                 {
                     if (string.Equals(filename, target.filename, StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -92,6 +108,11 @@ namespace DataTools.Essentials.Collections
                     File.Copy(Filename, filename);
                     var newobj = new DiskCollection<T>(filename, target.jsonSettings);
                     return newobj;
+                }
+                else
+                {
+                    // We have determined that the owner no longer exists. Take this opportunity to expire the token.
+                    IsExpired = true;
                 }
                 return null;
             }
@@ -116,17 +137,123 @@ namespace DataTools.Essentials.Collections
             public bool Restore()
             {
                 if (disposedValue) throw new ObjectDisposedException("Token is expired");
+                if (IsExpired) return false;
                 if (!File.Exists(Filename))
                 {
                     IsExpired = true;
                     return false;
                 }
-                if (this?.owner.TryGetTarget(out var owner) == true)
+                if (this?.owner.TryGetTarget(out var target) == true && !target.disposedValue)
                 {
-                    return owner.Restore(this);
+                    IsExpired = target.Restore(this);
                 }
+                else
+                {
+                    // We have determined that the owner no longer exists. Take this opportunity to expire the token.
+                    IsExpired = true;
+                    return false;
+                }
+                return IsExpired;
+            }
+
+            /// <inheritdoc />            
+            public bool Apply()
+            {
+                if (disposedValue) throw new ObjectDisposedException("Token is expired");
+                if (IsExpired) return false;
+                if (!File.Exists(Filename))
+                {
+                    IsExpired = true;
+                    return false;
+                }
+                try
+                {
+                    if (owner?.TryGetTarget(out var target) == true && !target.disposedValue)
+                    {
+                        target.AddRange(this);
+                        IsExpired = true;
+                    }
+                    else
+                    {
+                        // We have determined that the owner no longer exists. Take this opportunity to expire the token.
+                        IsExpired = true;
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LastErrorMessage = ex.ToString();
+#if DEBUG
+                    Console.WriteLine(ex);
+#endif
+                }
+                return IsExpired;
+            }
+
+            /// <summary>
+            /// Duplicate the file on disk to a new serialized copy
+            /// </summary>
+            /// <returns></returns>
+            public ISnapshot<T> Clone()
+            {
+                if (DuplicateFile(true, out var parent, out var filename))
+                {
+                    return new DiskCollectionSnapshot(parent, filename, RestoreOnDispose, DateTime.Now);
+                }
+                return null;
+            }
+
+            object ICloneable.Clone()
+            {
+                return Clone();
+            }
+
+            /// <summary>
+            /// Create a copy of the current backing store for the snapshot
+            /// </summary>
+            /// <param name="ownerRequired">True if the owner is required to exist and be in an active state</param>
+            /// <param name="parent">Receives the owner object for the current instance</param>
+            /// <param name="filename">Receives the new filename for the copy</param>
+            /// <returns>True if the file was copied successfully.</returns>
+            protected internal bool DuplicateFile(bool ownerRequired, out DiskCollection<T> parent, out string filename)
+            {
+                try
+                {
+                    if (owner?.TryGetTarget(out var target) == true && !target.disposedValue)
+                    {
+                        var copyname = target.GetTempName(true);
+                        File.Copy(Filename, copyname);
+                        parent = target;
+                        filename = copyname;
+                        return true;
+                    }
+                    else if (!ownerRequired)
+                    {
+                        if (TryParseTempName(Filename, out var original, out _, out _))
+                        {
+                            var copyname = CreateTempName(original, true);
+                            File.Copy(Filename, copyname);
+                            filename = copyname;
+                            parent = null;
+                            return true;
+                        }
+                    }
+
+                    // We have determined that the owner no longer exists. Take this opportunity to expire the token.
+                    IsExpired = true;
+                }
+                catch (Exception ex)
+                {
+                    LastErrorMessage = ex.ToString();
+#if DEBUG
+                    Console.WriteLine(ex);
+#endif
+                }
+                parent = null;
+                filename = null;
                 return false;
             }
+
 
             /// <summary>
             /// Dispose of the snapshot
@@ -135,17 +262,26 @@ namespace DataTools.Essentials.Collections
             /// <param name="restore">True to restore the backup</param>
             protected virtual void Dispose(bool disposing, bool restore)
             {
+                var mkbackup = false;
                 if (!disposedValue)
                 {
                     try
                     {
                         if (!IsExpired && restore) Restore();
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        LastErrorMessage = ex.ToString();
+                        mkbackup = true;
+                    }
                     finally
                     {
                         if (File.Exists(Filename))
                         {
+                            if (mkbackup)
+                            {
+                                DuplicateFile(false, out _, out _);
+                            }
                             File.Delete(Filename);
                         }
                         owner?.SetTarget(null);
@@ -178,7 +314,7 @@ namespace DataTools.Essentials.Collections
             /// <exception cref="NotImplementedException"></exception>
             public IEnumerator<T> GetEnumerator()
             {
-                if (owner?.TryGetTarget(out var target) == true)
+                if (owner?.TryGetTarget(out var target) == true && !target.disposedValue)
                 {
                     using (var snapfile = new DiskCollection<T>(Filename, target.recordSize, true, CacheStrategy.None, true, target.jsonSettings))
                     {
@@ -188,6 +324,10 @@ namespace DataTools.Essentials.Collections
                             yield return snapfile.GetItem(i);
                         }
                     }
+                }
+                else
+                {
+                    IsExpired = true;
                 }
                 yield break;
             }
@@ -199,6 +339,77 @@ namespace DataTools.Essentials.Collections
         }
 
         /// <summary>
+        /// Create a name for the temporary file or snapshot file from the provided base filename
+        /// </summary>
+        /// <returns>The full path of a file to open for compacting</returns>
+        public static string CreateTempName(string filename, bool forSnapshot)
+        {
+            var ext = Path.GetExtension(filename);
+            var dir = Path.GetDirectoryName(filename);
+            var file = Path.GetFileNameWithoutExtension(filename);
+            var c = 1;
+            string lookFile;
+            string path;
+            do
+            {
+                if (forSnapshot)
+                {
+                    lookFile = $"{file}_{c++}__snapshot.${ext}";
+                }
+                else
+                {
+                    lookFile = $"{file}_{c++}.${ext}";
+                }
+                path = Path.Combine(dir, lookFile);
+            } while (File.Exists(path));
+
+            return path;
+        }
+
+        /// <summary>
+        /// Try to parse a temporary filename and recover the encoded information
+        /// </summary>
+        /// <param name="filename">The input filename to parse</param>
+        /// <param name="basename">Receives the original base filename</param>
+        /// <param name="isSnapshot">Receives a boolean indicating it is a snapshot</param>
+        /// <param name="counter">Receives the incremental counter of the file</param>
+        /// <returns></returns>
+        public static bool TryParseTempName(string filename, out string basename, out bool isSnapshot, out int counter)
+        {
+            var temprgx = @"^(.+)_(\d+)\.\$\.(\w+)$";
+            var snaprgx = @"^(.+)_(\d+)__snapshot\.\$\.(\w+)$";
+
+            filename = Path.GetFileName(filename);
+
+            if (Regex.IsMatch(filename, temprgx))
+            {
+                var parsed = Regex.Match(filename, temprgx, RegexOptions.IgnoreCase);
+
+                basename = parsed.Groups[1].Value + "." + parsed.Groups[3].Value;
+                isSnapshot = false;
+                counter = int.Parse(parsed.Groups[2].Value);
+            }
+            else if (Regex.IsMatch(filename, snaprgx))
+            {
+                var parsed = Regex.Match(filename, snaprgx);
+
+                basename = parsed.Groups[1].Value + "." + parsed.Groups[3].Value;
+                isSnapshot = true;
+                counter = int.Parse(parsed.Groups[2].Value);
+            }
+            else
+            {
+                basename = null;
+                isSnapshot = false;
+                counter = -1;
+                return false;
+            }
+            return true;
+        }
+
+
+
+        /// <summary>
         /// This is the buffer size for string actions.
         /// </summary>
         private const int BUFFER_SIZE = 65535;
@@ -207,8 +418,6 @@ namespace DataTools.Essentials.Collections
         /// This is the size of the basic chunk. Compacting will adjust current record size to be a multiple of this number.
         /// </summary>
         private const int CHUNK_SIZE = 256;
-
-        private static readonly byte[] CrLf = new byte[] { (byte)'\r', (byte)'\n' };
 
         /// <summary>
         /// The synchronizer object
@@ -230,6 +439,7 @@ namespace DataTools.Essentials.Collections
         private int isenumerating = 0;
 
         private Dictionary<int, T> cachedItems;
+
 
         /// <summary>
         /// Open or Create a disk collection
@@ -623,7 +833,7 @@ namespace DataTools.Essentials.Collections
         {
             if (snapshot is DiskCollectionSnapshot dsn && !dsn.IsExpired)
             {
-                if (dsn.owner.TryGetTarget(out var target) && target == this)
+                if (dsn.owner.TryGetTarget(out var target) && target == this && !target.disposedValue)
                 {
                     if (!File.Exists(dsn.Filename)) return false;
                     lock (lockObj)
@@ -631,12 +841,14 @@ namespace DataTools.Essentials.Collections
                         try
                         {
                             CloseFile();
-                            File.Copy(dsn.Filename, filename, true);                            
+                            File.Copy(dsn.Filename, filename, true);           
                             dsn.Dispose(false);
                             return true;
                         }
-                        catch
+                        catch (Exception ex)
                         {
+
+                            LastErrorMessage = ex.ToString();
                             return false;
                         }
                         finally
@@ -644,6 +856,10 @@ namespace DataTools.Essentials.Collections
                             Reset();
                         }
                     }
+                }
+                else
+                {
+                    dsn.Dispose(false);
                 }
             }
             return false;
@@ -685,6 +901,7 @@ namespace DataTools.Essentials.Collections
                         }
                         catch (Exception ex)
                         {
+                            LastErrorMessage = ex.ToString();
                             // We don't really care if there's a problem, here. that's what Compact() is for.
 #if DEBUG
                             Console.WriteLine(ex);
@@ -781,26 +998,7 @@ namespace DataTools.Essentials.Collections
         /// <returns>The full path of a file to open for compacting</returns>
         protected virtual string GetTempName(bool forSnapshot)
         {
-            var ext = Path.GetExtension(filename);
-            var dir = Path.GetDirectoryName(filename);
-            var file = Path.GetFileNameWithoutExtension(filename);
-            var c = 1;
-            string lookFile;
-            string path;
-            do
-            {
-                if (forSnapshot)
-                {
-                    lookFile = $"{file}_{c++}__snapshot.${ext}";
-                }
-                else
-                {
-                    lookFile = $"{file}_{c++}.${ext}";
-                }
-                path = Path.Combine(dir, lookFile);
-            } while (File.Exists(path));
-
-            return path;
+            return CreateTempName(filename, forSnapshot);
         }
 
         /// <summary>
@@ -1020,7 +1218,10 @@ namespace DataTools.Essentials.Collections
                                                 skip = -1;
                                             }
                                         }
-                                        catch { }
+                                        catch (Exception ex) 
+                                        {
+                                            LastErrorMessage = ex.ToString();
+                                        }
 
                                         currentLine.Clear();
                                         break;

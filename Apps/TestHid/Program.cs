@@ -91,7 +91,7 @@ namespace TestHid
             };
             
             JsonConvert.DefaultSettings = getSettingsFunc;
-            
+
             using (var diskCol = new DiskCollection<ExampleRecord>($"{folder}\\simple_col.txt"))
             {
                 var ridx = 192;
