@@ -820,13 +820,13 @@ namespace DataTools.Essentials.Collections
                 maxActualSize = 0;
                 emptyIndices = null;
                 var empties = new List<int>();
-                var reccount = 0;
+                var recCount = 0;
                 var emptycount = 0;
-                var rs = 0;
-                var maxrs = 0;
+                var currentSpace = 0;
+                var fixedRecordSize = 0;
                 
-                var cs = 0;
-                var maxcs = 0;
+                var currentRecordSize = 0;
+                var largestRecordSize = 0;
 
                 if (fileStream == null) return 0;
                 
@@ -835,7 +835,7 @@ namespace DataTools.Essentials.Collections
                 
                 var buffer = new byte[BUFFER_SIZE];
                 
-                var ns = false;
+                var nonSpaceChars = false;
                 
                 fileStream.Seek(0, SeekOrigin.Begin);
                 
@@ -849,10 +849,10 @@ namespace DataTools.Essentials.Collections
                         var b = buffer[i];
                         if (b == (byte)'\n')
                         {
-                            if (ns)
+                            if (nonSpaceChars)
                             {
-                                reccount++;
-                                ns = false;
+                                recCount++;
+                                nonSpaceChars = false;
                             }
                             else
                             {
@@ -860,16 +860,16 @@ namespace DataTools.Essentials.Collections
                                 empties.Add(lines);
                             }
                             lines++;
-                            if (rs > maxrs)
+                            if (currentSpace > fixedRecordSize)
                             {
-                                maxrs = rs;
+                                fixedRecordSize = currentSpace;
                             }
-                            if (cs > maxcs)
+                            if (currentRecordSize > largestRecordSize)
                             {
-                                maxcs = cs;
+                                largestRecordSize = currentRecordSize;
                             }
-                            cs = 0;
-                            rs = 0;
+                            currentRecordSize = 0;
+                            currentSpace = 0;
                         }
                         else if (b == '\r')
                         {
@@ -877,20 +877,20 @@ namespace DataTools.Essentials.Collections
                         }
                         else
                         {
+                            currentSpace++;
                             if (b != ' ')
                             {
-                                ns = true;
-                                cs = rs;
+                                nonSpaceChars = true;
+                                currentRecordSize = currentSpace;
                             }
-                            rs++;
                         }
                     }
                     if (c < BUFFER_SIZE) break;
                 }
                 fileStream.Seek(curpos, SeekOrigin.Begin);
-                records = reccount;
-                recordSize = maxrs;
-                maxActualSize = maxcs;
+                records = recCount;
+                recordSize = fixedRecordSize;
+                maxActualSize = largestRecordSize;
                 if (empties.Count > 0)
                 {
                     emptyIndices = empties.ToArray();
@@ -1038,8 +1038,9 @@ namespace DataTools.Essentials.Collections
 
                 count = recCount;
 
+                fileStream.Flush();
+                File.Copy(temp, filename, true);
                 File.Delete(filename);
-                File.Move(temp, filename);
 
                 OpenFile();
                 RefreshFromDiskState(false);
