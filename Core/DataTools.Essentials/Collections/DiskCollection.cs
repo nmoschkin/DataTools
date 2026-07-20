@@ -316,7 +316,7 @@ namespace DataTools.Essentials.Collections
             {
                 if (owner?.TryGetTarget(out var target) == true && !target.disposedValue)
                 {
-                    using (var snapfile = new DiskCollection<T>(Filename, target.recordSize, true, CacheStrategy.Complete, true, target.jsonSettings))
+                    using (var snapfile = new DiskCollection<T>(Filename, target.recordSize, true, CacheStrategy.None, true, target.jsonSettings))
                     {
                         var c = snapfile.Count;
                         for (var i = 0; i < c; i++)
