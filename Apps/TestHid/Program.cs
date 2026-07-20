@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -124,7 +126,7 @@ namespace TestHid
                 // Clear and populate
                 diskCol.Clear();
                 time1 = DateTime.Now;
-                var recs = 2048;
+                var recs = 20480;
                 for (var i = 0; i < recs; i++)
                 {
                     diskCol.Add(new ExampleRecord());

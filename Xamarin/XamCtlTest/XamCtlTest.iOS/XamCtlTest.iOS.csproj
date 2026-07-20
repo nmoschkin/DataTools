@@ -14,10 +14,10 @@
     <MtouchEnableSGenConc>true</MtouchEnableSGenConc>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <ProvisioningType>automatic</ProvisioningType>
-    <AssemblyVersion>8.0.1.712</AssemblyVersion>
-    <FileVersion>8.0.1.712</FileVersion>
-    <PreviousVersion>8.0.1.711</PreviousVersion>
-    <Version>8.0.1.712</Version>
+    <AssemblyVersion>8.0.1.714</AssemblyVersion>
+    <FileVersion>8.0.1.714</FileVersion>
+    <PreviousVersion>8.0.1.713</PreviousVersion>
+    <Version>8.0.1.714</Version>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
     <DebugSymbols>true</DebugSymbols>
