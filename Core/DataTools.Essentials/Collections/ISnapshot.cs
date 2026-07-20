@@ -51,7 +51,7 @@ namespace DataTools.Essentials.Collections
         /// </summary>
         /// <param name="name">The name of the new collection</param>
         /// <returns>A new durable collection</returns>        
-        IEnumerable<T> Promote(string name);
+        IDiskCollection<T> Promote(string name);
 
         /// <summary>
         /// Duplicate the file on disk to a new serialized copy

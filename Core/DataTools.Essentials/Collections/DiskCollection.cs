@@ -48,7 +48,7 @@ namespace DataTools.Essentials.Collections
     /// When caching is used, you must call <see cref="CommitCachedItems"/> to update the disk collection with any mutated objects.<br/>
     /// The disposal method will not do this.
     /// </remarks>
-    public class DiskCollection<T> : ICollection<T>, IDisposable
+    public class DiskCollection<T> : IDiskCollection<T>
     {
         private static readonly byte[] CrLf = new byte[] { (byte)'\r', (byte)'\n' };
 
@@ -97,8 +97,8 @@ namespace DataTools.Essentials.Collections
             public bool CanApply => true;
 
             /// <inheritdoc />            
-            public virtual IEnumerable<T> Promote(string filename)
-            {                
+            public virtual IDiskCollection<T> Promote(string filename)
+            {
                 if (owner?.TryGetTarget(out var target) == true && !target.disposedValue)
                 {
                     if (string.Equals(filename, target.filename, StringComparison.InvariantCultureIgnoreCase))
@@ -106,7 +106,7 @@ namespace DataTools.Essentials.Collections
                         throw new AccessViolationException("Cannot persist to known target.");
                     }
                     File.Copy(Filename, filename);
-                    var newobj = new DiskCollection<T>(filename, target.jsonSettings);
+                    var newobj = new DiskCollection<T>(filename, target.CacheStrategy, target.jsonSettings);
                     return newobj;
                 }
                 else
@@ -413,7 +413,7 @@ namespace DataTools.Essentials.Collections
         /// This is the buffer size for string actions.
         /// </summary>
         private const int BUFFER_SIZE = 65535;
-        
+
         /// <summary>
         /// This is the size of the basic chunk. Compacting will adjust current record size to be a multiple of this number.
         /// </summary>
@@ -423,7 +423,7 @@ namespace DataTools.Essentials.Collections
         /// The synchronizer object
         /// </summary>
         protected readonly object lockObj = new object();
-        
+
         private readonly bool isReadOnly = false;
         private readonly string filename;
         private readonly JsonSerializerSettings jsonSettings;
@@ -604,7 +604,7 @@ namespace DataTools.Essentials.Collections
         /// </remarks>
         public long Size
         {
-            get                
+            get
             {
                 lock (lockObj)
                 {
@@ -634,7 +634,7 @@ namespace DataTools.Essentials.Collections
                 if (index >= count) throw new IndexOutOfRangeException();
                 if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
                 T olditem;
-                lock(lockObj) 
+                lock (lockObj)
                 {
                     olditem = GetItem(index);
                     SetItem(value, index);
@@ -656,26 +656,48 @@ namespace DataTools.Essentials.Collections
                 SetItem(item, count);
                 count++;
             }
-            OnItemAdded(item, idx);        
+            OnItemAdded(item, idx);
         }
 
         /// <summary>
         /// Add multiple items to the collection
         /// </summary>
         /// <param name="items">The items to add</param>
-        public void AddRange(IEnumerable<T> items)
+        public bool AddRange(IEnumerable<T> items)
         {
-            int idx = 0;
-            foreach (var item in items)
+            if (items == null) throw new ArgumentNullException(nameof(items)); 
+
+            var succeed = false;
+            var startIndex = -1;
+            var addedItems = new List<T>();
+
+            lock (lockObj)
             {
-                lock (lockObj)
+                startIndex = count;
+                using (var rollback = CreateSnapshot())
                 {
-                    idx = count;
-                    SetItem(item, count);
-                    count++;
+                    try
+                    {
+                        foreach (var item in items)
+                        {
+                            SetItem(item, count);
+                            count++;
+                            addedItems.Add(item);
+                        }
+                        succeed = true;
+                    }
+                    catch
+                    {
+                        rollback.Restore();
+                    }
                 }
-                OnItemAdded(item, idx);
             }
+
+            if (succeed)
+            {
+                OnItemsAdded(addedItems, startIndex);
+            }
+            return succeed;
         }
 
         /// <summary>
@@ -783,7 +805,7 @@ namespace DataTools.Essentials.Collections
             if (asCompactTarget) throw new InvalidOperationException("Debug your code! Removing change on compact target cannot happen/should not happen.");
             var idx = 0;
             var c = count;
-            foreach(var item2 in this)
+            foreach (var item2 in this)
             {
                 if (Equals(item, item2))
                 {
@@ -858,7 +880,7 @@ namespace DataTools.Essentials.Collections
                         try
                         {
                             CloseFile();
-                            File.Copy(dsn.Filename, filename, true);           
+                            File.Copy(dsn.Filename, filename, true);
                             dsn.Dispose(false);
                             return true;
                         }
@@ -955,6 +977,15 @@ namespace DataTools.Essentials.Collections
         }
 
         /// <summary>
+        /// Called when multiple items are added with <see cref="AddRange(IEnumerable{T})"/>
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="startIndex"></param>
+        protected virtual void OnItemsAdded(IEnumerable<T> items, int startIndex)
+        {
+        }
+
+        /// <summary>
         /// Called when an item is removed from the collection
         /// </summary>
         /// <param name="item"></param>
@@ -1024,27 +1055,27 @@ namespace DataTools.Essentials.Collections
                 var emptycount = 0;
                 var currentSpace = 0;
                 var fixedRecordSize = 0;
-                
+
                 var currentRecordSize = 0;
                 var largestRecordSize = 0;
 
                 if (fileStream == null) return 0;
-                
+
                 var curpos = fileStream.Position;
                 var lines = 0;
-                
+
                 var buffer = new byte[BUFFER_SIZE];
-                
+
                 var nonSpaceChars = false;
-                
+
                 fileStream.Seek(0, SeekOrigin.Begin);
-                
+
                 while (true)
                 {
                     var c = fileStream.Read(buffer, 0, BUFFER_SIZE);
                     if (c == 0) break;
-                    
-                    for(var i = 0; i < c; i++) 
+
+                    for (var i = 0; i < c; i++)
                     {
                         var b = buffer[i];
                         if (b == (byte)'\n')
@@ -1127,7 +1158,7 @@ namespace DataTools.Essentials.Collections
             // Always check settings.
             // Provided (or even "created") settings can be mutated externally.
             CheckSettings(jsonSettings);
-            
+
             var bytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(item, jsonSettings));
             var reclen = bytes.Length;
 
@@ -1146,9 +1177,9 @@ namespace DataTools.Essentials.Collections
                         recordSize = newRecSize;
                     }
                 }
-                
+
                 Array.Resize(ref bytes, recordSize);
-                
+
                 for (int i = reclen; i < recordSize; i++)
                 {
                     bytes[i] = (byte)' ';
@@ -1220,7 +1251,7 @@ namespace DataTools.Essentials.Collections
                                                 skip = -1;
                                             }
                                         }
-                                        catch (Exception ex) 
+                                        catch (Exception ex)
                                         {
                                             LastErrorMessage = ex.ToString();
                                         }
@@ -1284,7 +1315,7 @@ namespace DataTools.Essentials.Collections
             else
             {
                 fileStream = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
-            }            
+            }
         }
 
         private void RefreshFromDiskState(bool setRecordSize)
@@ -1305,7 +1336,7 @@ namespace DataTools.Essentials.Collections
                 }
             }
         }
-        
+
         private void CloseFile()
         {
             lock (lockObj)
