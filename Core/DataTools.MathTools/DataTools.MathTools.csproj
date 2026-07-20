@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0;net472;net48;net481</TargetFrameworks>
     <Nullable>disable</Nullable>
-    <AssemblyVersion>8.0.1.715</AssemblyVersion>
-    <FileVersion>8.0.1.715</FileVersion>
+    <AssemblyVersion>8.0.1.716</AssemblyVersion>
+    <FileVersion>8.0.1.716</FileVersion>
     <Authors>Nathaniel Moschkin</Authors>
-    <Version>8.0.1.715</Version>
+    <Version>8.0.1.716</Version>
     <Product>DataTools Miscellaneous Math Tools</Product>
     <Description>DataTools Miscellaneous Math Tools</Description>
     <Copyright>Copyright (C) 2023-2026 Nathaniel Moschkin</Copyright>
@@ -20,7 +20,7 @@
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Platforms>AnyCPU;x64</Platforms>
     <Configurations>Debug;Release;NuGet;Debug NuGet</Configurations>
-    <PreviousVersion>8.0.1.714</PreviousVersion>
+    <PreviousVersion>8.0.1.715</PreviousVersion>
     <AssemblyOriginatorKeyFile>C:\Keys\datatools.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
