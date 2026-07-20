@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -20,6 +22,9 @@ namespace DataTools.Essentials.Collections
     /// <typeparam name="T"></typeparam>
     /// <remarks>
     /// Useful for telemetry caches, or data that must be preserved between sessions.
+    /// <br/><br/>
+    /// When caching is used, you must call <see cref="CommitCachedItems"/> to update the disk collection with any mutated objects.<br/>
+    /// The disposal method will not do this.
     /// </remarks>
     public class DiskCollection<T> : ICollection<T>, IDisposable
     {
@@ -143,9 +148,33 @@ namespace DataTools.Essentials.Collections
                 Dispose(disposing: true, restore: RestoreOnDispose);
                 GC.SuppressFinalize(this);
             }
+
+            /// <summary>
+            /// Enumerate through the items in the snapshot
+            /// </summary>
+            /// <returns></returns>
+            /// <exception cref="NotImplementedException"></exception>
+            public IEnumerator<T> GetEnumerator()
+            {
+                if (owner?.TryGetTarget(out var target) == true)
+                {
+                    using (var snapfile = new DiskCollection<T>(Filename, target.recordSize, true, true, true, target.jsonSettings))
+                    {
+                        var c = snapfile.Count;
+                        for (var i = 0; i < c; i++)
+                        {
+                            yield return snapfile.GetItem(i);
+                        }
+                    }
+                }
+                yield break;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
-
-
 
         /// <summary>
         /// This is the buffer size for string actions.
@@ -174,37 +203,76 @@ namespace DataTools.Essentials.Collections
         private int count = 0;
 
         private bool asCompactTarget;
+        private bool noCache;
         private FileStream fileStream;
         private int isenumerating = 0;
 
+        private Dictionary<int, T> cachedItems;
+
         /// <summary>
-        /// Create a new disk collection
+        /// Open or Create a disk collection
         /// </summary>
         /// <param name="filename">The full path to the file where the new collection will be stored.</param>
         /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
-        public DiskCollection(string filename, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, false, jsonSettings)
+        public DiskCollection(string filename, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, false, false, jsonSettings)
         {
         }
 
         /// <summary>
-        /// Create a new disk collection
+        /// Open or Create a disk collection with items
+        /// </summary>
+        /// <param name="filename">The full path to the file where the new collection will be stored.</param>
+        /// <param name="items">The items to add to the collection</param>
+        /// <param name="isReadOnly">True if the collection will be opened read-only.</param>
+        /// <param name="noCache">Disable caching of items in memory. Use this when short on memory.</param>
+        /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
+        /// <remarks>
+        /// If a cache already exists, it will be appended.
+        /// </remarks>
+        public DiskCollection(string filename, IEnumerable<T> items, bool isReadOnly, bool noCache, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, isReadOnly, noCache, jsonSettings)
+        {
+            AddRange(items);
+        }
+
+        /// <summary>
+        /// Open or Create a disk collection with items
+        /// </summary>
+        /// <param name="filename">The full path to the file where the new collection will be stored.</param>
+        /// <param name="items">The items to add to the collection</param>
+        /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
+        /// <remarks>
+        /// If a cache already exists, it will be appended.
+        /// </remarks>
+        public DiskCollection(string filename, IEnumerable<T> items, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, false, false, jsonSettings)
+        {
+            AddRange(items);
+        }
+
+        /// <summary>
+        /// Open or Create a disk collection
         /// </summary>
         /// <param name="filename">The full path to the file where the new collection will be stored.</param>
         /// <param name="recordSize">The default record size.</param>
         /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
-        public DiskCollection(string filename, int recordSize, JsonSerializerSettings jsonSettings = null) : this(filename, recordSize, false, jsonSettings)
+        public DiskCollection(string filename, int recordSize, JsonSerializerSettings jsonSettings = null) : this(filename, recordSize, false, false, jsonSettings)
         {
         }
 
         /// <summary>
-        /// Create a new disk collection
+        /// Open or Create a disk collection
         /// </summary>
         /// <param name="filename">The full path to the file where the new collection will be stored.</param>
         /// <param name="recordSize">The default record size.</param>
         /// <param name="isReadOnly">True if the collection will be opened read-only.</param>
+        /// <param name="noCache">Disable caching of items in memory. Use this when short on memory.</param>
         /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
-        public DiskCollection(string filename, int recordSize, bool isReadOnly, JsonSerializerSettings jsonSettings = null)
+        public DiskCollection(string filename, int recordSize, bool isReadOnly, bool noCache, JsonSerializerSettings jsonSettings = null)
         {
+            this.noCache = noCache;
+            if (!noCache)
+            {
+                cachedItems = new Dictionary<int, T>();
+            }
             this.isReadOnly = isReadOnly;
             this.recordSize = recordSize;
             this.filename = filename;
@@ -226,8 +294,8 @@ namespace DataTools.Essentials.Collections
             RefreshFromDiskState(false);
         }
 
-        private DiskCollection(string filename, int recordSize, bool isReadOnly, bool asCompactTarget, JsonSerializerSettings jsonSettings = null)
-            : this(filename, recordSize, isReadOnly, jsonSettings)
+        private DiskCollection(string filename, int recordSize, bool isReadOnly, bool noCache, bool asCompactTarget, JsonSerializerSettings jsonSettings = null)
+            : this(filename, recordSize, isReadOnly, noCache, jsonSettings)
         {
             this.asCompactTarget = asCompactTarget;
         }
@@ -420,9 +488,33 @@ namespace DataTools.Essentials.Collections
         {
             if (isReadOnly) throw new ReadOnlyException("Collection is read-only");
             if (asCompactTarget) throw new InvalidOperationException("Debug your code! Removing change on compact target cannot happen/should not happen.");
-            if (index >= count) throw new IndexOutOfRangeException();
+            if (index >= count || index < 0) throw new IndexOutOfRangeException();
             T old = this[index];
-            Compact(index, 0);
+            lock (lockObj)
+            {
+                Dictionary<int, T> oldDict = null;
+                if (!noCache && cachedItems.Count > 0)
+                {
+                    oldDict = new Dictionary<int, T>(cachedItems);
+                }
+
+                Compact(index, 0);
+
+                if (!noCache && oldDict != null && oldDict.Count > 0)
+                {
+                    var keys = oldDict.Keys.ToArray();
+                    foreach (var key in keys)
+                    {
+                        if (key > index)
+                        {
+                            var newkey = key - 1;
+                            oldDict[newkey] = oldDict[key];
+                            oldDict.Remove(key);
+                        }
+                    }
+                    cachedItems = oldDict;
+                }
+            }
             OnItemRemoved(old, index);
             return true;
         }
@@ -528,6 +620,49 @@ namespace DataTools.Essentials.Collections
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Write cached items to disk. Object references will be preserved.
+        /// </summary>
+        public void CommitCachedItems()
+        {
+            if (noCache) return;
+            lock (lockObj)
+            {
+                foreach (var kv in cachedItems)
+                {
+                    SetItem(kv.Value, kv.Key);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Refresh cached items from the disk. All object references will be lost.
+        /// </summary>
+        public void FreshenCachedItems()
+        {
+            if (noCache) return;
+            lock (lockObj)
+            {
+                var keys = cachedItems.Keys.ToArray();
+                foreach (var key in keys)
+                {
+                    GetItem(key, force: true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clear the cache. All object references will be lost.
+        /// </summary>
+        public void ResetCache()
+        {
+            if (noCache) return;
+            lock (lockObj)
+            {
+                cachedItems?.Clear();
+            }
         }
 
         // Overrideables
@@ -712,8 +847,9 @@ namespace DataTools.Essentials.Collections
             }
         }
 
-        private T GetItem(int index, byte[] bytes = null)
+        private T GetItem(int index, byte[] bytes = null, bool force = false)
         {
+            if (!force && !noCache && cachedItems.TryGetValue(index, out var item)) return item;
             if (bytes == null)
             {
                 bytes = new byte[recordSize];
@@ -726,7 +862,9 @@ namespace DataTools.Essentials.Collections
                     return default;
                 }
             }
-            return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes).Trim(), jsonSettings);
+            item = JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(bytes).Trim(), jsonSettings);
+            if (!noCache) cachedItems[index] = item;
+            return item;
         }
 
         private void SetItem(T item, int index)
@@ -767,7 +905,7 @@ namespace DataTools.Essentials.Collections
                 fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
                 fileStream.Write(bytes, 0, recordSize);
                 fileStream.Write(CrLf, 0, 2);
-                //fileStream.Flush();
+                if (!noCache) cachedItems[index] = item;
             }
         }
 
@@ -789,6 +927,7 @@ namespace DataTools.Essentials.Collections
 
                 RefreshFromDiskState(true);
 
+                ResetCache();
                 fileStream?.Close();
                 fileStream = null;
 
@@ -796,7 +935,7 @@ namespace DataTools.Essentials.Collections
                 recCount = 0;
 
                 var newColSize = forceSize != 0 ? forceSize : recordSize;
-                using (var otherCol = new DiskCollection<T>(temp, newColSize, false, true, jsonSettings))
+                using (var otherCol = new DiskCollection<T>(temp, newColSize, false, true, true, jsonSettings))
                 {
                     using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None, BufferSize, FileOptions.SequentialScan))
                     {
@@ -896,6 +1035,7 @@ namespace DataTools.Essentials.Collections
         {
             lock (lockObj)
             {
+                ResetCache();
                 if (fileStream == null) OpenFile();
                 fileStream.Seek(0, SeekOrigin.End);
                 var currcapacity = GetCurrentState(out var exist, out var existSize, out var existActual, out _);

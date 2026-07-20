@@ -6,7 +6,7 @@ namespace DataTools.Essentials.Collections
     /// <summary>
     /// An object that represents a reference to a backup snapshot within a given context
     /// </summary>
-    public interface ISnapshot<T> : IDisposable
+    public interface ISnapshot<T> : IDisposable, IEnumerable<T>
     {
         /// <summary>
         /// True if the token is no longer redeemable for a restoration
