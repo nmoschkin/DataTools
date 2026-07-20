@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -83,7 +84,7 @@ namespace TestHid
         public static void Main(string[] args)
         {
 
-            var folder = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var folder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
             var someSettings = new JsonSerializerSettings();
             var getSettingsFunc = () =>
             {
@@ -91,9 +92,15 @@ namespace TestHid
             };
             
             JsonConvert.DefaultSettings = getSettingsFunc;
+            
+            CacheStrategy strategy = CacheStrategy.Complete;
 
-            using (var diskCol = new DiskCollection<ExampleRecord>($"{folder}\\simple_col.txt"))
+            Console.WriteLine($"Active Cache Strategy for tests: {strategy}");
+            Console.WriteLine($"(Snapshots are always {CacheStrategy.Complete})");
+
+            using (var diskCol = new DiskCollection<ExampleRecord>($"{folder}\\simple_col.txt", strategy))
             {
+                Console.WriteLine($"File open: {Path.GetFileName(diskCol.Filename)}");
                 var ridx = 192;
                 var ridx2 = 785;
                 var cc = 0;
@@ -117,10 +124,11 @@ namespace TestHid
 
                 time2 = DateTime.Now;
                 diff = time2 - time1;
-                Console.WriteLine($"Cold Enumeration {cc:#,##0} records: {diff}");
+                Console.WriteLine($"Cold Enumeration from previous session, {cc:#,##0} records: {diff}");
                 
                 // Reset for next test
                 cc = 0;
+                Console.WriteLine("Clear and populate.");                
                 recovered.Clear();
 
                 // Clear and populate
@@ -230,24 +238,67 @@ namespace TestHid
                 Console.WriteLine($"Create snapshot: {diff}");
 
                 time1 = DateTime.Now;
-                var newcol = (DiskCollection<ExampleRecord>)testsnap.Promote($"{folder}\\simple_col_snapshot2.txt");
+                var newcol = (DiskCollection<ExampleRecord>)testsnap.Promote($"{folder}\\simple_col_snapshot.txt");
                 time2 = DateTime.Now;
                 diff = time2 - time1;
 
                 Console.WriteLine($"Promote snapshot: {diff}");
+                Console.WriteLine($"File open: {Path.GetFileName(newcol.Filename)}");
 
                 var testobj4 = diskCol[55];
                 var testobj5 = newcol[55];
 
                 if (testobj4.Equals(testobj5))
                 {
-                    Console.WriteLine("Snapshot sample equality confirmed. Deleting.");
+                    var tidx = 403;
+                    Console.WriteLine("Snapshot sample equality confirmed.");
+                
+                    Console.WriteLine($"Clone the snapshot and iterate the clone. Test Index {tidx}. Test against original copy.");
+
+                    var orig4 = diskCol[tidx];
+                    ExampleRecord compare4 = null;
+
+                    time1 = DateTime.Now;
+                    var clonesnap = testsnap.Clone();
+                    time2 = DateTime.Now;
+                    diff = time2 - time1;
+
+                    Console.WriteLine($"Clone: {diff}");
+
+                    cc = 0;
+
+                    time1 = DateTime.Now;
+
+                    foreach (var item in clonesnap)
+                    {
+                        if (cc == tidx)
+                        {
+                            compare4 = item;
+                        }
+                        cc++;
+                    }
+
+                    time2 = DateTime.Now;
+                    diff = time2 - time1;
+
+                    Console.WriteLine($"Iterate: {diff}");
+
+
+                    if (compare4 != null && orig4.Equals(compare4))
+                    {
+                        Console.WriteLine("Snapshot sample equality confirmed.");
+                    } 
+                    Console.WriteLine($"Deleting Everything except main {Path.GetFileName(diskCol.Filename)}.");
+                    clonesnap.Dispose();
                     testsnap.RestoreOnDispose = false;
                     testsnap.Dispose();
                     newcol.Dispose();
                     System.IO.File.Delete(newcol.Filename);
                 }
-
+                else
+                {
+                    Console.WriteLine("Round Trip Snapshot Clone failed!");
+                }
                 //diskCol.Clear();
             }
 

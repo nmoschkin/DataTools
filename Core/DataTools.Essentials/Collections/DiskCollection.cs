@@ -198,7 +198,7 @@ namespace DataTools.Essentials.Collections
             {
                 if (DuplicateFile(true, out var parent, out var filename))
                 {
-                    return new DiskCollectionSnapshot(parent, filename, RestoreOnDispose, DateTime.Now);
+                    return new DiskCollectionSnapshot(parent, filename, RestoreOnDispose, Timestamp);
                 }
                 return null;
             }
@@ -316,7 +316,7 @@ namespace DataTools.Essentials.Collections
             {
                 if (owner?.TryGetTarget(out var target) == true && !target.disposedValue)
                 {
-                    using (var snapfile = new DiskCollection<T>(Filename, target.recordSize, true, CacheStrategy.None, true, target.jsonSettings))
+                    using (var snapfile = new DiskCollection<T>(Filename, target.recordSize, true, CacheStrategy.Complete, true, target.jsonSettings))
                     {
                         var c = snapfile.Count;
                         for (var i = 0; i < c; i++)
@@ -451,6 +451,16 @@ namespace DataTools.Essentials.Collections
         }
 
         /// <summary>
+        /// Open or Create a disk collection
+        /// </summary>
+        /// <param name="filename">The full path to the file where the new collection will be stored.</param>
+        /// <param name="cacheStrategy">The caching strategy to use for this instance. Change this if short on memory.</param>
+        /// <param name="jsonSettings">Optional <see cref="JsonSerializerSettings"/>.</param>
+        public DiskCollection(string filename, CacheStrategy cacheStrategy, JsonSerializerSettings jsonSettings = null) : this(filename, CHUNK_SIZE, false, cacheStrategy, jsonSettings)
+        {
+        }
+
+        /// <summary>
         /// Open or Create a disk collection with items
         /// </summary>
         /// <param name="filename">The full path to the file where the new collection will be stored.</param>
@@ -524,7 +534,8 @@ namespace DataTools.Essentials.Collections
 
             CheckSettings(this.jsonSettings);
             RefreshFromDiskState(false);
-            
+            CacheStrategy = cacheStrategy;
+
             if (cacheStrategy == CacheStrategy.Complete)
             {
                 FreshenCachedItems(true);
@@ -569,6 +580,11 @@ namespace DataTools.Essentials.Collections
                 }
             }
         }
+
+        /// <summary>
+        /// Get the active cache strategy
+        /// </summary>
+        public CacheStrategy CacheStrategy { get; }
 
         /// <summary>
         /// Returns true if the file is open. Otherwise false.
@@ -816,6 +832,7 @@ namespace DataTools.Essentials.Collections
             {
                 var snapfile = GetTempName(true);
                 var token = new DiskCollectionSnapshot(this, snapfile);
+                fileStream?.Flush();
                 File.Copy(filename, snapfile, true);
                 return token;
             }
@@ -891,25 +908,10 @@ namespace DataTools.Essentials.Collections
             {
                 if (all)
                 {
-                    var lines = File.ReadAllLines(filename).Where(l => !string.IsNullOrWhiteSpace(l)).Select(l => l.Trim()).ToArray();
-                    var i = 0;
-                    foreach (var line in lines)
+                    for (var key = 0; key < count; key++)
                     {
-                        try
-                        {
-                            cachedItems[i] = JsonConvert.DeserializeObject<T>(line, jsonSettings);
-                        }
-                        catch (Exception ex)
-                        {
-                            LastErrorMessage = ex.ToString();
-                            // We don't really care if there's a problem, here. that's what Compact() is for.
-#if DEBUG
-                            Console.WriteLine(ex);
-#endif
-                        }
-                        i++;
+                        GetItem(key, force: true);
                     }
-                    lines = null;
                 }
                 else
                 {
@@ -1239,9 +1241,8 @@ namespace DataTools.Essentials.Collections
 
                 count = recCount;
 
-                fileStream.Flush();
                 File.Copy(temp, filename, true);
-                File.Delete(filename);
+                File.Delete(temp);
 
                 OpenFile();
                 RefreshFromDiskState(false);
