@@ -1328,7 +1328,7 @@ namespace DataTools.Essentials.Collections
 
         private List<string> MakeDaughters(int maxCount)
         {
-            return MakeDaughters((item, index) => maxCount % index == 0);
+            return MakeDaughters((item, index) => index % maxCount == 0);
         }
 
         private List<string> MakeDaughters(SeparationPredicate<T> predicate)
