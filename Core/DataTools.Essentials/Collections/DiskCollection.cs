@@ -866,7 +866,7 @@ namespace DataTools.Essentials.Collections
         }
 
         /// <summary>
-        /// Create a snapshot of the current collection state and return a <see cref="ISnapshot"/> token that can be used to restore from the backup
+        /// Create a snapshot of the current collection state and return a <see cref="ISnapshot{T}"/> token that can be used to restore from the backup
         /// </summary>
         /// <returns></returns>
         public virtual ISnapshot<T> CreateSnapshot()
