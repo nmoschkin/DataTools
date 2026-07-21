@@ -1106,7 +1106,7 @@ namespace DataTools.Essentials.Collections
 
                 if (fileStream == null) return 0;
 
-                var curpos = fileStream.Position;
+                long curpos = fileStream.Position;
                 var lines = 0;
 
                 var buffer = new byte[BUFFER_SIZE];
@@ -1184,7 +1184,7 @@ namespace DataTools.Essentials.Collections
             }
             lock (lockObj)
             {
-                fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
+                fileStream.Seek((long)index * (recordSize + 2), SeekOrigin.Begin);
                 if (fileStream.Read(bytes, 0, recordSize) != recordSize)
                 {
                     return default;
@@ -1230,7 +1230,7 @@ namespace DataTools.Essentials.Collections
                     bytes[i] = (byte)' ';
                 }
 
-                fileStream.Seek(index * (recordSize + 2), SeekOrigin.Begin);
+                fileStream.Seek((long)index * (recordSize + 2), SeekOrigin.Begin);
                 fileStream.Write(bytes, 0, recordSize);
                 fileStream.Write(CrLf, 0, 2);
                 if (!noCache) cachedItems[index] = item;
@@ -1363,12 +1363,13 @@ namespace DataTools.Essentials.Collections
 
                 try
                 {
+                    var buffer = new byte[recordSize];
                     foreach (var range in ranges)
                     {
                         var startIdx = range.Item1;
                         var stopIdx = range.Item2;
                         var dbname = GetTempName(false, startIdx, stopIdx);
-                        var buffer = new byte[recordSize];
+                        dnames.Add(dbname);
                         using (var col = new DiskCollection<T>(dbname, recordSize, false, CacheStrategy.None, true, jsonSettings))
                         {
                             for (var i = startIdx; i < stopIdx; i++)
@@ -1376,7 +1377,6 @@ namespace DataTools.Essentials.Collections
                                 col.Add(GetItem(i, buffer));
                             }
                         }
-                        dnames.Add(dbname);
                     }
                 }
                 catch (Exception ex)
