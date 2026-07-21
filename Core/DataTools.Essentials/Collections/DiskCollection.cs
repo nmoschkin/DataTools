@@ -39,6 +39,15 @@ namespace DataTools.Essentials.Collections
     }
 
     /// <summary>
+    /// Return true to create a boundary starting with the current item in the collection
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="item">The item to test</param>
+    /// <param name="index">The current index of the item in the owning collection</param>
+    /// <returns></returns>
+    public delegate bool SeparationPredicate<T>(T item, int index);
+
+    /// <summary>
     /// A collection that is persisted and read from the disk, in real time.
     /// </summary>
     /// <typeparam name="T"></typeparam>
@@ -341,8 +350,13 @@ namespace DataTools.Essentials.Collections
         /// <summary>
         /// Create a name for the temporary file or snapshot file from the provided base filename
         /// </summary>
+        /// <param name="filename">The input filename</param>
+        /// <param name="forSnapshot">True if the filename is being created for a snapshot</param>
+        /// <param name="startIndex">Start index of a volume set</param>
+        /// <param name="stopIndex">Stop index (exclusive) of a volume set</param>
+        /// <param name="indexFormat">Number format for indexes printed into the filename</param>
         /// <returns>The full path of a file to open for compacting</returns>
-        public static string CreateTempName(string filename, bool forSnapshot)
+        public static string CreateTempName(string filename, bool forSnapshot, int startIndex = -1, int stopIndex = -1, string indexFormat = "00000")
         {
             var ext = Path.GetExtension(filename);
             var dir = Path.GetDirectoryName(filename);
@@ -352,13 +366,20 @@ namespace DataTools.Essentials.Collections
             string path;
             do
             {
-                if (forSnapshot)
+                if (startIndex != -1 && stopIndex != -1)
                 {
-                    lookFile = $"{file}_{c++}__snapshot.${ext}";
+                    lookFile = $"{file}_{startIndex.ToString(indexFormat)}_{stopIndex.ToString(indexFormat)}_{c++}.@{ext}";
                 }
                 else
                 {
-                    lookFile = $"{file}_{c++}.${ext}";
+                    if (forSnapshot)
+                    {
+                        lookFile = $"{file}_{c++}__snapshot.${ext}";
+                    }
+                    else
+                    {
+                        lookFile = $"{file}_{c++}.${ext}";
+                    }
                 }
                 path = Path.Combine(dir, lookFile);
             } while (File.Exists(path));
@@ -958,6 +979,26 @@ namespace DataTools.Essentials.Collections
             }
         }
 
+        /// <summary>
+        /// Divide the collection into a series of files, each containing a segment of items
+        /// </summary>
+        /// <param name="maxItems">The maximum number of items in each segment</param>
+        /// <returns>A list of the created files</returns>
+        public IReadOnlyList<string> DivideCollection(int maxItems)
+        {
+            return MakeDaughters(maxItems);
+        }
+
+        /// <summary>
+        /// Divide the collection into a series of files, each containing a segment of items
+        /// </summary>
+        /// <param name="predicate">A function that returns true where the next file should be created</param>
+        /// <returns>A list of the created files</returns>
+        public IReadOnlyList<string> DivideCollection(SeparationPredicate<T> predicate)
+        {
+            return MakeDaughters(predicate);
+        }
+
         // Overrideables
 
         /// <summary>
@@ -1028,10 +1069,14 @@ namespace DataTools.Essentials.Collections
         /// <summary>
         /// Gets a name for the temporary file to use during the compact process
         /// </summary>
+        /// <param name="forSnapshot">True if the name is being created for a snapshot</param>
+        /// <param name="startIndex">Start index of a volume set</param>
+        /// <param name="stopIndex">Stop index (exclusive) of a volume set</param>
+        /// <param name="indexFormat">Number format for indexes printed into the filename</param>
         /// <returns>The full path of a file to open for compacting</returns>
-        protected virtual string GetTempName(bool forSnapshot)
+        protected virtual string GetTempName(bool forSnapshot, int startIndex = -1, int stopIndex = -1, string indexFormat = "00000")
         {
-            return CreateTempName(filename, forSnapshot);
+            return CreateTempName(filename, forSnapshot, startIndex, stopIndex, indexFormat);
         }
 
         /// <summary>
@@ -1279,6 +1324,71 @@ namespace DataTools.Essentials.Collections
                 RefreshFromDiskState(false);
             }
             if (!del) OnCompacted();
+        }
+
+        private List<string> MakeDaughters(int maxCount)
+        {
+            return MakeDaughters((item, index) => maxCount % index == 0);
+        }
+
+        private List<string> MakeDaughters(SeparationPredicate<T> predicate)
+        {
+            lock (lockObj)
+            {
+                var cidx = 0;
+                var bidx = -1;
+                List<(int, int)> ranges = new List<(int, int)>();
+                List<string> dnames = new List<string>();
+
+                foreach (var item in this)
+                {
+                    if (cidx == 0 || predicate(item, cidx))
+                    {
+                        if (bidx != -1)
+                        {
+                            ranges.Add((bidx, cidx));
+                            bidx = -1;
+                        }
+                        bidx = cidx;
+                    }
+                    cidx++;
+                }
+
+                if (bidx != -1)
+                {
+                    ranges.Add((bidx, cidx));
+                }
+
+                try
+                {
+                    foreach (var range in ranges)
+                    {
+                        var startIdx = range.Item1;
+                        var stopIdx = range.Item2;
+                        var dbname = GetTempName(false, startIdx, stopIdx);
+                        var buffer = new byte[recordSize];
+                        using (var col = new DiskCollection<T>(dbname, recordSize, false, CacheStrategy.None, true, jsonSettings))
+                        {
+                            for (var i = startIdx; i < stopIdx; i++)
+                            {
+                                col.Add(GetItem(i, buffer));
+                            }
+                        }
+                        dnames.Add(dbname);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LastErrorMessage = ex.ToString();
+
+                    foreach (var rollback in dnames)
+                    {
+                        File.Delete(rollback);
+                    }
+                    return null;
+                }
+                return dnames;
+            }
         }
 
         private int GetRecordSize(int dataSize)
