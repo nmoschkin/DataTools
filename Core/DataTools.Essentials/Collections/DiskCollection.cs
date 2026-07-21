@@ -1333,6 +1333,8 @@ namespace DataTools.Essentials.Collections
 
         private List<string> MakeDaughters(SeparationPredicate<T> predicate)
         {
+            if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
             lock (lockObj)
             {
                 var cidx = 0;
